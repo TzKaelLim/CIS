@@ -4,9 +4,14 @@
   "type": "module",
   "exports": {
     "./tokens.css": "./dist/tokens.css",
-    ".": { "types": "./dist/tokens.d.ts", "default": "./dist/tokens.js" }
+    ".": {
+      "types": "./dist/tokens.d.ts",
+      "default": "./dist/tokens.js"
+    }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "node build.mjs",
     "test": "node build.mjs && node check.mjs",

@@ -16,7 +16,7 @@ process.once('uncaughtException', (error) => {
       [
         '🔴 Error: It looks like you are having a known issue with package hoisting.',
         'Please check the following issue for details and solutions: https://github.com/storybookjs/storybook/issues/22431#issuecomment-1630086092\n\n',
-      ].join('\n')
+      ].join('\n'),
     );
   }
 

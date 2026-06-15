@@ -37,7 +37,13 @@ export class TcButton extends TcElement {
 
   render() {
     return html`
-      <button part="base" class="btn" type="button" ?disabled=${this.disabled} @click=${this.#onClick}>
+      <button
+        part="base"
+        class="btn"
+        type="button"
+        ?disabled=${this.disabled}
+        @click=${this.#onClick}
+      >
         <slot name="start"></slot>
         <slot></slot>
         <slot name="end"></slot>

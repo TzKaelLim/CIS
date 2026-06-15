@@ -18,10 +18,7 @@ const meta: Meta<ButtonArgs> = {
   },
   args: { variant: 'filled', disabled: false, fullWidth: false },
   render: (a) =>
-    html`<tc-button
-      variant=${a.variant}
-      ?disabled=${a.disabled}
-      ?full-width=${a.fullWidth}
+    html`<tc-button variant=${a.variant} ?disabled=${a.disabled} ?full-width=${a.fullWidth}
       >送出</tc-button
     >`,
 };

@@ -1,1 +1,37 @@
-{"name":"@bundled-es-modules/deepmerge","version":"4.3.2","requiresBuild":false,"files":{"index.cjs":{"checkedAt":1781487564834,"integrity":"sha512-xZlISwqrMGZsMDiuekWPL2Rp1IqLNZ8/JS32hjQDOeZ/AjxMYc8BOJotNW/JNuC1ASqd8W45Q5jgorZxSmgnSw==","mode":420,"size":68},"index.js":{"checkedAt":1781487564835,"integrity":"sha512-Z+tl3dzpe5LTpf3PToB8vMvrcEYf5Q4/bfal7NsG926MArnWNHhGqZoy0vSjNytc5XL+xOiSs4h0BK3LQqOFhg==","mode":420,"size":5579},"package.json":{"checkedAt":1781487564835,"integrity":"sha512-3CHZE1n091E4AKc3ya9Fs3QWCzr/64zHBBLmh3ZmcrO23S/7iqnkRi1fhyPKRlqewzj5ctqR0bkCq4bpzb5FOg==","mode":420,"size":669},"README.md":{"checkedAt":1781487564837,"integrity":"sha512-AquTlDP4iWUrzCV2znYC4G94iN1sJRBSnY9uGI56RiUZ1XdQQtOMuai/vq7TxaA2vcEoJGs3bNh6qP+Uff77sQ==","mode":420,"size":429},"index.d.ts":{"checkedAt":1781487564838,"integrity":"sha512-J7MD5cBsBIo06jZd5zvBkFHOKw8yrIPkVD0+lRt2TxzPMa7kXi73hBL1PkI9fPl+BRtQw3oSwKGCFWovNdM4ew==","mode":420,"size":829}}}
+{
+  "name": "@bundled-es-modules/deepmerge",
+  "version": "4.3.2",
+  "requiresBuild": false,
+  "files": {
+    "index.cjs": {
+      "checkedAt": 1781487564834,
+      "integrity": "sha512-xZlISwqrMGZsMDiuekWPL2Rp1IqLNZ8/JS32hjQDOeZ/AjxMYc8BOJotNW/JNuC1ASqd8W45Q5jgorZxSmgnSw==",
+      "mode": 420,
+      "size": 68
+    },
+    "index.js": {
+      "checkedAt": 1781487564835,
+      "integrity": "sha512-Z+tl3dzpe5LTpf3PToB8vMvrcEYf5Q4/bfal7NsG926MArnWNHhGqZoy0vSjNytc5XL+xOiSs4h0BK3LQqOFhg==",
+      "mode": 420,
+      "size": 5579
+    },
+    "package.json": {
+      "checkedAt": 1781487564835,
+      "integrity": "sha512-3CHZE1n091E4AKc3ya9Fs3QWCzr/64zHBBLmh3ZmcrO23S/7iqnkRi1fhyPKRlqewzj5ctqR0bkCq4bpzb5FOg==",
+      "mode": 420,
+      "size": 669
+    },
+    "README.md": {
+      "checkedAt": 1781487564837,
+      "integrity": "sha512-AquTlDP4iWUrzCV2znYC4G94iN1sJRBSnY9uGI56RiUZ1XdQQtOMuai/vq7TxaA2vcEoJGs3bNh6qP+Uff77sQ==",
+      "mode": 420,
+      "size": 429
+    },
+    "index.d.ts": {
+      "checkedAt": 1781487564838,
+      "integrity": "sha512-J7MD5cBsBIo06jZd5zvBkFHOKw8yrIPkVD0+lRt2TxzPMa7kXi73hBL1PkI9fPl+BRtQw3oSwKGCFWovNdM4ew==",
+      "mode": 420,
+      "size": 829
+    }
+  }
+}

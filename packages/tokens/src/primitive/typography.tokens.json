@@ -3,7 +3,14 @@
     "family": {
       "base": {
         "$type": "fontFamily",
-        "$value": ["Noto Sans TC", "system-ui", "-apple-system", "PingFang TC", "Microsoft JhengHei", "sans-serif"]
+        "$value": [
+          "Noto Sans TC",
+          "system-ui",
+          "-apple-system",
+          "PingFang TC",
+          "Microsoft JhengHei",
+          "sans-serif"
+        ]
       }
     },
     "weight": {

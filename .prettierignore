@@ -1,5 +1,10 @@
+**/node_modules/**
+.pnpm-store/**
+.turbo/**
 **/dist/**
 **/storybook-static/**
 **/custom-elements.json
 pnpm-lock.yaml
 docs/**
+packages/react/src/generated/**
+packages/react/src/index.ts

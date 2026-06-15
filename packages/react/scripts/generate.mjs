@@ -22,9 +22,7 @@ for (const d of decls) {
   const tag = d.tagName; // tc-button
   const cls = d.name; // TcButton
   const subpath = tag.replace(/^tc-/, ''); // button
-  const events = (d.events ?? [])
-    .map((e) => `    on${pascal(e.name)}: '${e.name}'`)
-    .join(',\n');
+  const events = (d.events ?? []).map((e) => `    on${pascal(e.name)}: '${e.name}'`).join(',\n');
   const eventsBlock = events ? `\n${events}\n  ` : '';
   const out = `'use client';
 import * as React from 'react';

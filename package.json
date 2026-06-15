@@ -2,7 +2,11 @@
   "name": "tzuchi-uikit",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=20", "pnpm": ">=9" },
+  "packageManager": "pnpm@10.26.1",
+  "engines": {
+    "node": ">=20",
+    "pnpm": ">=9"
+  },
   "scripts": {
     "build": "turbo run build",
     "typecheck": "tsc -b",

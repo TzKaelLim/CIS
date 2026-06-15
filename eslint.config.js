@@ -20,4 +20,9 @@ export default [
       'no-undef': 'off',
     },
   },
+  {
+    // chai-style assertions (expect(x).to.exist) read as unused expressions
+    files: ['**/test/**/*.ts', '**/*.test.ts'],
+    rules: { '@typescript-eslint/no-unused-expressions': 'off' },
+  },
 ];

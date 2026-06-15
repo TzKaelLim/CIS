@@ -19,7 +19,9 @@ if (missing.length) {
 // outputReferences: semantic brand-primary must reference the blue-900 primitive.
 const brand = css.match(/--tc-color-brand-primary:\s*([^;]+);/);
 if (!brand || !brand[1].includes('var(--tc-color-blue-900)')) {
-  console.error('outputReferences not applied: --tc-color-brand-primary did not reference --tc-color-blue-900');
+  console.error(
+    'outputReferences not applied: --tc-color-brand-primary did not reference --tc-color-blue-900',
+  );
   console.error('actual:', brand ? brand[1].trim() : '(absent)');
   process.exit(1);
 }

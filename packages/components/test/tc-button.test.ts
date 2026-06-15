@@ -23,7 +23,9 @@ it('does not fire click when disabled', async () => {
 });
 
 it('submits the associated form when type=submit', async () => {
-  const form = await fixture<HTMLFormElement>(html`<form><tc-button type="submit">go</tc-button></form>`);
+  const form = await fixture<HTMLFormElement>(
+    html`<form><tc-button type="submit">go</tc-button></form>`,
+  );
   const el = form.querySelector('tc-button') as TcButton;
   let submitted = false;
   form.addEventListener('submit', (e) => {

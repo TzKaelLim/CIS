@@ -1,1 +1,31 @@
-{"name":"@types/sinon","version":"21.0.1","requiresBuild":false,"files":{"LICENSE":{"checkedAt":1781487877533,"integrity":"sha512-HQaIQk9pwOcyKutyDk4o2a87WnotwYuLGYFW43emGm4FvIJFKPyg+OYaw5sTegKAKf+C5SKa1ACjzCLivbaHrQ==","mode":420,"size":1141},"README.md":{"checkedAt":1781487877533,"integrity":"sha512-/UKJ25suzOe9RXGci9vvEakq/CqYCRXut5rTV7/Q1/hbsWcyYwNX7HwE+TB53BIc62ME7Gsv40nl/UFmLTWblg==","mode":420,"size":850},"index.d.ts":{"checkedAt":1781487877534,"integrity":"sha512-rcEpxPrPn08uCHcl0RazsFY+hIRkSZayjJ+HnXu7PhlwgamIMlrumGsLNi2JhbStA7BtmzRQILJwAY8s7dKF1A==","mode":420,"size":61419},"package.json":{"checkedAt":1781487877534,"integrity":"sha512-R3GAvyJyzPUoYA7oiRercRSbBdXLvPqgtdtv97kNJ2KLwMXpt21mmzSlbiZojQ2Lw3q2wtKd4WMVI1dAbqQWCg==","mode":420,"size":1901}}}
+{
+  "name": "@types/sinon",
+  "version": "21.0.1",
+  "requiresBuild": false,
+  "files": {
+    "LICENSE": {
+      "checkedAt": 1781487877533,
+      "integrity": "sha512-HQaIQk9pwOcyKutyDk4o2a87WnotwYuLGYFW43emGm4FvIJFKPyg+OYaw5sTegKAKf+C5SKa1ACjzCLivbaHrQ==",
+      "mode": 420,
+      "size": 1141
+    },
+    "README.md": {
+      "checkedAt": 1781487877533,
+      "integrity": "sha512-/UKJ25suzOe9RXGci9vvEakq/CqYCRXut5rTV7/Q1/hbsWcyYwNX7HwE+TB53BIc62ME7Gsv40nl/UFmLTWblg==",
+      "mode": 420,
+      "size": 850
+    },
+    "index.d.ts": {
+      "checkedAt": 1781487877534,
+      "integrity": "sha512-rcEpxPrPn08uCHcl0RazsFY+hIRkSZayjJ+HnXu7PhlwgamIMlrumGsLNi2JhbStA7BtmzRQILJwAY8s7dKF1A==",
+      "mode": 420,
+      "size": 61419
+    },
+    "package.json": {
+      "checkedAt": 1781487877534,
+      "integrity": "sha512-R3GAvyJyzPUoYA7oiRercRSbBdXLvPqgtdtv97kNJ2KLwMXpt21mmzSlbiZojQ2Lw3q2wtKd4WMVI1dAbqQWCg==",
+      "mode": 420,
+      "size": 1901
+    }
+  }
+}
