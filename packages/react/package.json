@@ -1,0 +1,32 @@
+{
+  "name": "@tzuchi/react",
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "generate": "node scripts/generate.mjs",
+    "build": "node scripts/generate.mjs && tsc -b",
+    "verify:pkg": "publint && attw --pack . --profile esm-only"
+  },
+  "dependencies": {
+    "@tzuchi/components": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": "^18 || ^19",
+    "react-dom": "^18 || ^19",
+    "lit": "^3.2.0",
+    "@lit/react": "^1.0.0"
+  },
+  "devDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "@lit/react": "^1.0.8",
+    "@types/react": "^19.0.0",
+    "typescript": "^5.7.0",
+    "publint": "^0.2.12",
+    "@arethetypeswrong/cli": "^0.18.0"
+  }
+}
