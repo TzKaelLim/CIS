@@ -1,0 +1,81 @@
+---
+title: ThemeToggle
+description: tc-theme-toggle — 深色／淺色主題切換鈕，切換 <html data-theme> 並記憶選擇，所有元件透過 token cascade 自動跟隨。
+---
+
+import Demo from '../../../components/Demo.astro';
+import PropsTable from '../../../components/PropsTable.astro';
+
+`<tc-theme-toggle>` 切換 `<html>` 的 `data-theme` 屬性。深色色票由 `@tzuchi/tokens` 的
+`[data-theme="dark"]` 區塊提供，元件僅引用語意色 token，因此整個元件庫會透過 CSS 變數
+串接**自動換色**——切換鈕本身不需要知道任何元件的存在。
+
+<Demo>
+  <tc-theme-toggle></tc-theme-toggle>
+  <tc-theme-toggle show-label></tc-theme-toggle>
+</Demo>
+
+:::tip[試試看]
+本手冊右上角的 Starlight 主題切換鈕也會設定同一個 `data-theme`，因此上方所有
+**可互動範例**會即時跟著深淺切換。
+:::
+
+## 行為
+
+- **記憶**：使用者點擊後寫入 `localStorage["tc-theme"]`；下次載入沿用。
+- **系統跟隨**：在使用者尚未選擇前，跟隨系統 `prefers-color-scheme`，並即時回應系統切換。
+- **同步外部變更**：以 `MutationObserver` 監看 `<html data-theme>`，與頁面上其他切換鈕
+  （或 docs 內建切換）保持一致。
+- **無障礙**：以 `role="switch"` + `aria-checked` 呈現，並提供動態 `aria-label`
+  （「切換至深色／淺色模式」）。
+
+## 防止閃爍（anti-FOUC）
+
+元件在 `connectedCallback` 才套用主題，無法避免整頁載入時的閃爍。請在 `<head>`
+**最前面**加入一段同步 inline script，在首次繪製前就設定好 `data-theme`：
+
+```html
+<script>
+  (function () {
+    try {
+      var s = localStorage.getItem('tc-theme');
+      var t =
+        s === 'light' || s === 'dark'
+          ? s
+          : matchMedia('(prefers-color-scheme: dark)').matches
+            ? 'dark'
+            : 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    } catch (e) {}
+  })();
+</script>
+```
+
+## 用法
+
+### 純 HTML
+
+```html
+<link rel="stylesheet" href="@tzuchi/tokens/tokens.css" />
+<script type="module" src="@tzuchi/components/cdn"></script>
+
+<tc-theme-toggle></tc-theme-toggle>
+```
+
+### React
+
+```tsx
+import { TcThemeToggle } from '@tzuchi/react';
+
+<TcThemeToggle onTcThemeChange={(e) => console.log(e.detail.theme)} />;
+```
+
+## API
+
+下表自 Custom Elements Manifest 自動產生：
+
+<PropsTable tag="tc-theme-toggle" />
+
+## 相關
+
+- [主題與深色模式（Theming）](/foundations/theming/) — 深色色票如何運作、如何擴充。

@@ -52,30 +52,35 @@ export const badgeStyles = css`
     --tc-badge-_solid-bg: var(--tc-color-blue-700, #30559f);
     --tc-badge-_solid-fg: var(--tc-color-white, #ffffff);
     --tc-badge-_soft-bg: var(--tc-color-brand-surface, var(--tc-color-blue-100, #e8eefe));
-    --tc-badge-_soft-fg: var(--tc-color-blue-700, #30559f);
+    /* Theme-adaptive fg (blue-900 → blue-300 in dark) so it reads on the
+       brand-surface that turns navy in dark mode. */
+    --tc-badge-_soft-fg: var(--tc-color-brand-primary, var(--tc-color-blue-900, #1b2d58));
     --tc-badge-_line: var(--tc-color-blue-700, #30559f);
   }
 
   :host([tone='success']) {
-    --tc-badge-_solid-bg: var(--tc-color-feedback-success, var(--tc-color-green-600, #168967));
+    /* Solid fill stays the SATURATED primitive (not the themed feedback colour,
+       which lightens in dark) so the white fg keeps AA contrast in both themes. */
+    --tc-badge-_solid-bg: var(--tc-color-green-600, #168967);
     --tc-badge-_solid-fg: var(--tc-color-white, #ffffff);
-    /* No dedicated success-surface token: tint with a low-opacity feedback colour. */
+    /* No dedicated success-surface token: tint the feedback colour over the
+       current surface so the soft badge adapts to light AND dark backgrounds. */
     --tc-badge-_soft-bg: color-mix(
       in srgb,
       var(--tc-color-feedback-success, var(--tc-color-green-600, #168967)) 12%,
-      var(--tc-color-white, #ffffff)
+      var(--tc-color-surface-default, #ffffff)
     );
     --tc-badge-_soft-fg: var(--tc-color-feedback-success, var(--tc-color-green-600, #168967));
     --tc-badge-_line: var(--tc-color-feedback-success, var(--tc-color-green-600, #168967));
   }
 
   :host([tone='error']) {
-    --tc-badge-_solid-bg: var(--tc-color-feedback-error, var(--tc-color-red-500, #d4494f));
+    --tc-badge-_solid-bg: var(--tc-color-red-500, #d4494f);
     --tc-badge-_solid-fg: var(--tc-color-white, #ffffff);
     --tc-badge-_soft-bg: color-mix(
       in srgb,
       var(--tc-color-feedback-error, var(--tc-color-red-500, #d4494f)) 12%,
-      var(--tc-color-white, #ffffff)
+      var(--tc-color-surface-default, #ffffff)
     );
     --tc-badge-_soft-fg: var(--tc-color-feedback-error, var(--tc-color-red-500, #d4494f));
     --tc-badge-_line: var(--tc-color-feedback-error, var(--tc-color-red-500, #d4494f));
@@ -89,9 +94,10 @@ export const badgeStyles = css`
     --tc-badge-_soft-bg: color-mix(
       in srgb,
       var(--tc-color-blue-400, #587291) 14%,
-      var(--tc-color-white, #ffffff)
+      var(--tc-color-surface-default, #ffffff)
     );
-    --tc-badge-_soft-fg: var(--tc-color-blue-400, #587291);
+    /* Theme-adaptive fg so warning text stays legible on the dark-tinted bg. */
+    --tc-badge-_soft-fg: var(--tc-color-brand-primary, var(--tc-color-blue-900, #1b2d58));
     --tc-badge-_line: var(--tc-color-blue-400, #587291);
   }
 

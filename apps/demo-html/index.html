@@ -4,15 +4,37 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Tzu Chi UIKit — HTML demo</title>
+    <!-- Anti-FOUC: set the theme before first paint from the stored choice or
+         the system preference (the same key tc-theme-toggle persists to). -->
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem('tc-theme');
+          var theme =
+            stored === 'light' || stored === 'dark'
+              ? stored
+              : window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+                ? 'dark'
+                : 'light';
+          document.documentElement.setAttribute('data-theme', theme);
+        } catch (e) {}
+      })();
+    </script>
     <link rel="stylesheet" href="../../packages/tokens/dist/tokens.css" />
     <script type="module" src="../../packages/components/dist/cdn/tc-components.js"></script>
     <style>
       :not(:defined) {
         visibility: hidden;
       }
+      html {
+        background: var(--tc-color-surface-subtle, #f8f8f8);
+      }
       body {
         font: var(--tc-typography-body, 16px sans-serif);
         color: var(--tc-color-text-default, #333);
+        background: var(--tc-color-surface-subtle, #f8f8f8);
+        min-block-size: 100vh;
+        margin: 0;
         padding: var(--tc-space-32, 32px);
         display: flex;
         flex-direction: column;
@@ -24,10 +46,17 @@
         gap: var(--tc-space-12, 12px);
         align-items: center;
       }
+      .topbar {
+        align-self: stretch;
+        justify-content: space-between;
+      }
     </style>
   </head>
   <body>
-    <h1 style="font: var(--tc-typography-heading-2)">慈濟入口網 UIKit — 純 HTML demo</h1>
+    <header class="row topbar">
+      <h1 style="font: var(--tc-typography-heading-2)">慈濟入口網 UIKit — 純 HTML demo</h1>
+      <tc-theme-toggle></tc-theme-toggle>
+    </header>
 
     <div class="row">
       <tc-button variant="filled">主要按鈕</tc-button>

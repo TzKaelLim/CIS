@@ -23,4 +23,22 @@ if (!cdn.includes('tc-button')) {
   console.error('FAIL: tc-button not present in the CDN bundle');
   process.exit(1);
 }
+if (!cdn.includes('tc-theme-toggle')) {
+  console.error('FAIL: tc-theme-toggle not present in the CDN bundle');
+  process.exit(1);
+}
+
+// The tokens stylesheet must ship both themes so the HTML demo can switch.
+const tokensCss = await readFile(
+  new URL('../../packages/tokens/dist/tokens.css', import.meta.url),
+  'utf8',
+);
+if (!tokensCss.includes('[data-theme="dark"]')) {
+  console.error('FAIL: tokens.css has no [data-theme="dark"] block');
+  process.exit(1);
+}
+if (!tokensCss.includes('@media (prefers-color-scheme: dark)')) {
+  console.error('FAIL: tokens.css has no prefers-color-scheme dark fallback');
+  process.exit(1);
+}
 console.log('CDN smoke OK');

@@ -1,0 +1,77 @@
+---
+title: Theming（主題與深色模式）
+description: 深色模式如何運作——只覆寫語意色 token，元件透過 var() cascade 自動換色；含啟用方式、深色色票對照與擴充指引。
+---
+
+import Demo from '../../../components/Demo.astro';
+import ThemeSwatches from '../../../components/ThemeSwatches.astro';
+
+設計系統內建**淺色（預設）**與**深色**兩套主題。核心原則：**只有語意層（semantic）會換色**。
+primitive 純色票不可變，元件只引用語意 / 元件層 token，因此深色模式只需在一個 selector 內
+重新對應約 15 個語意色變數，整個元件庫就會透過 `var()` cascade 自動跟隨——**包含 Shadow DOM 內部**。
+
+## 啟用方式
+
+深色色票包在兩個 selector 內，由 `@tzuchi/tokens/tokens.css` 一併提供：
+
+```css
+:root { /* 淺色：primitives + 語意 + 元件 */ }
+
+[data-theme='dark'] { /* 15 個語意色覆寫 */ }
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) { /* 系統自動，除非明確選擇淺色 */ }
+}
+```
+
+- **手動**：在 `<html>` 設定 `data-theme="dark"` 或 `"light"`。
+- **系統自動**：未設定 `data-theme` 時，跟隨作業系統 `prefers-color-scheme`。
+- **元件**：用 [`<tc-theme-toggle>`](/components/theme-toggle/) 切換並記憶選擇。
+
+<Demo>
+  <tc-theme-toggle show-label></tc-theme-toggle>
+  <tc-button variant="filled">主要按鈕</tc-button>
+  <tc-button variant="tonal">柔色按鈕</tc-button>
+  <tc-badge tone="success" variant="soft">成功</tc-badge>
+  <tc-badge tone="error" variant="filled">錯誤</tc-badge>
+  <tc-chip>標籤</tc-chip>
+</Demo>
+
+:::tip
+按右上角手冊主題鈕（或上方切換鈕），本頁所有範例會即時切換深淺。
+:::
+
+## 運作原理：三層 cascade
+
+以 filled 按鈕為例，深色模式下三層自動級聯：
+
+```text
+--tc-button-filled-bg  →  var(--tc-color-brand-primary)
+--tc-color-brand-primary  →  var(--tc-color-blue-300)   (僅深色區塊覆寫此行)
+--tc-color-blue-300  →  #A9C2EA
+```
+
+元件 CSS 完全不需修改——它引用的語意變數在深色 selector 內被重新指向不同的 primitive。
+
+## 深色色票對照
+
+下表直接從 token 原始檔渲染（primitive + 淺色語意 + 深色 overlay），所有對比度皆符合 WCAG 2.1 AA：
+
+<ThemeSwatches />
+
+### 關鍵設計決策
+
+- **品牌色反轉（Material-3 tonal）**：`brand.primary` 由深靛藍 `#1B2D58` **提亮**為 `#A9C2EA`
+  以在深色面上可讀（9.39:1）。連帶地 `text.on-brand` 由白色**翻轉**為深靛藍 `#1B2D58`
+  （白字在淺藍底僅 1.81:1 會失敗）——因此 filled 按鈕在深色模式呈現「淺藍底＋深藍字」。
+- **表面分層**：`surface.subtle`（`#161618`）比 `surface.default`（`#1C1C1E`）更深，
+  讓卡片以**色階**浮起，不全靠陰影。
+- **陰影加強**：深色模式 `--tc-elevation-*` 提高黑色不透明度（純黑陰影在深色面上幾乎不可見）。
+- **回饋色提亮**：`feedback.error/success` 在深色改用提亮的 `red-300 / green-400`，
+  作為深色面上的前景文字仍達 AA。
+
+## 擴充：新增元件時
+
+引用語意色（`--tc-color-surface-default`、`--tc-color-text-default`、`--tc-color-brand-primary`…）
+而非 primitive 或寫死色碼，元件即自動支援深色。**勿**將 `color-mix(... , white)` 寫死白色作為底色，
+請改用 `var(--tc-color-surface-default)`，使色調隨主題調整。

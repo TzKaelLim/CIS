@@ -23,6 +23,7 @@ import './footer/tc-footer-define.js';
 import './ebook-toolbar/tc-ebook-toolbar-define.js';
 import './container/tc-container-define.js';
 import './grid/tc-grid-define.js';
+import './theme-toggle/tc-theme-toggle-define.js';
 
 export { TcButton } from './button/tc-button.js';
 export { TcIcon } from './icon/tc-icon.js';
@@ -46,3 +47,4 @@ export { TcFooter, TcFooterColumn } from './footer/tc-footer.js';
 export { TcEbookToolbar } from './ebook-toolbar/tc-ebook-toolbar.js';
 export { TcContainer } from './container/tc-container.js';
 export { TcGrid } from './grid/tc-grid.js';
+export { TcThemeToggle } from './theme-toggle/tc-theme-toggle.js';

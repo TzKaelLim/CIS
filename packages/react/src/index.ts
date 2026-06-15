@@ -22,3 +22,4 @@ export { TcRadio } from './generated/TcRadio.js';
 export { TcSearchBar } from './generated/TcSearchBar.js';
 export { TcTab } from './generated/TcTab.js';
 export { TcTabs } from './generated/TcTabs.js';
+export { TcThemeToggle } from './generated/TcThemeToggle.js';

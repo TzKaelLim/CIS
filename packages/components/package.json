@@ -183,6 +183,14 @@
       "types": "./dist/grid/tc-grid.d.ts",
       "default": "./dist/grid/tc-grid.js"
     },
+    "./theme-toggle": {
+      "types": "./dist/theme-toggle/tc-theme-toggle-define.d.ts",
+      "default": "./dist/theme-toggle/tc-theme-toggle-define.js"
+    },
+    "./theme-toggle/class": {
+      "types": "./dist/theme-toggle/tc-theme-toggle.d.ts",
+      "default": "./dist/theme-toggle/tc-theme-toggle.js"
+    },
     "./cdn": {
       "types": "./dist/cdn/tc-components.d.ts",
       "default": "./dist/cdn/tc-components.js"

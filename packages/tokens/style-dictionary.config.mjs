@@ -8,7 +8,14 @@
  * @type {import('style-dictionary/types').Config}
  */
 export default {
-  source: ['src/**/*.tokens.json'],
+  // Base (light) build. Theme overlays under src/themes/** are intentionally
+  // excluded here — they are built by style-dictionary.dark.config.mjs into a
+  // selector-scoped block and concatenated onto tokens.css by build.mjs.
+  source: [
+    'src/primitive/**/*.tokens.json',
+    'src/semantic/**/*.tokens.json',
+    'src/component/**/*.tokens.json',
+  ],
   platforms: {
     css: {
       transformGroup: 'css',

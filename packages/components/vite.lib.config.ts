@@ -77,6 +77,11 @@ export default defineConfig({
         'container/tc-container-define': resolve(__dirname, 'src/container/tc-container-define.ts'),
         'grid/tc-grid': resolve(__dirname, 'src/grid/tc-grid.ts'),
         'grid/tc-grid-define': resolve(__dirname, 'src/grid/tc-grid-define.ts'),
+        'theme-toggle/tc-theme-toggle': resolve(__dirname, 'src/theme-toggle/tc-theme-toggle.ts'),
+        'theme-toggle/tc-theme-toggle-define': resolve(
+          __dirname,
+          'src/theme-toggle/tc-theme-toggle-define.ts',
+        ),
       },
       formats: ['es'],
     },

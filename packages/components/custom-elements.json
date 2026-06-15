@@ -190,6 +190,14 @@
             "name": "TcGrid",
             "module": "./grid/tc-grid.js"
           }
+        },
+        {
+          "kind": "js",
+          "name": "TcThemeToggle",
+          "declaration": {
+            "name": "TcThemeToggle",
+            "module": "./theme-toggle/tc-theme-toggle.js"
+          }
         }
       ]
     },
@@ -5190,6 +5198,286 @@
           "declaration": {
             "name": "TcSearchBar",
             "module": "src/search-bar/tc-search-bar.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/theme-toggle/tc-theme-toggle-define.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/theme-toggle/tc-theme-toggle.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "深色／淺色主題切換鈕。\n\n切換 `<html data-theme=\"dark|light\">`，由 `@tzuchi/tokens` 的 `[data-theme=\"dark\"]`\n區塊重新對應語意色票，所有元件透過 CSS 變數串接自動跟隨。使用者選擇會寫入\n`localStorage[\"tc-theme\"]`；未選擇前跟隨系統 `prefers-color-scheme`。透過\nMutationObserver 同步外部對 `data-theme` 的變更（例如 docs 既有的主題切換）。",
+          "name": "TcThemeToggle",
+          "cssProperties": [
+            {
+              "description": "按鈕方形邊長",
+              "name": "--tc-theme-toggle-size"
+            },
+            {
+              "description": "圖示尺寸",
+              "name": "--tc-theme-toggle-icon-size"
+            },
+            {
+              "description": "背景色",
+              "name": "--tc-theme-toggle-bg"
+            },
+            {
+              "description": "hover 背景色",
+              "name": "--tc-theme-toggle-bg-hover"
+            },
+            {
+              "description": "圖示／文字色",
+              "name": "--tc-theme-toggle-fg"
+            },
+            {
+              "description": "邊框色",
+              "name": "--tc-theme-toggle-border"
+            },
+            {
+              "description": "hover 邊框色",
+              "name": "--tc-theme-toggle-border-hover"
+            },
+            {
+              "description": "焦點環顏色",
+              "name": "--tc-theme-toggle-focus-ring-color"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "內部 `<button>`",
+              "name": "button"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "theme",
+              "type": {
+                "text": "TcTheme"
+              },
+              "default": "'light'",
+              "description": "目前套用的主題。會反映到屬性以供樣式與檢視使用（唯讀，請用點擊切換）。",
+              "attribute": "theme",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "showLabel",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "是否在圖示旁顯示動作文字（例如「切換至深色模式」）。",
+              "attribute": "show-label",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "following",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "true",
+              "description": "是否跟隨系統色彩（尚未有使用者選擇時為 true）。"
+            },
+            {
+              "kind": "field",
+              "name": "#mql",
+              "privacy": "private",
+              "type": {
+                "text": "MediaQueryList | null"
+              },
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "#observer",
+              "privacy": "private",
+              "type": {
+                "text": "MutationObserver | null"
+              },
+              "default": "null"
+            },
+            {
+              "kind": "method",
+              "name": "#init",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Resolve the initial theme: an already-applied attribute wins, then the\nstored choice, then the system preference. Never persists on init."
+            },
+            {
+              "kind": "method",
+              "name": "#systemPrefersDark",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "#read",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string | null"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "#write",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "theme",
+                  "type": {
+                    "text": "TcTheme"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "#apply",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "theme",
+                  "type": {
+                    "text": "TcTheme"
+                  }
+                },
+                {
+                  "name": "opts",
+                  "type": {
+                    "text": "{ persist: boolean; emit: boolean }"
+                  }
+                }
+              ],
+              "description": "Apply a theme to <html> and (optionally) persist + announce it."
+            },
+            {
+              "kind": "field",
+              "name": "#toggle",
+              "privacy": "private",
+              "description": "User toggled — this becomes an explicit, persisted choice."
+            },
+            {
+              "kind": "field",
+              "name": "#onSystemChange",
+              "privacy": "private",
+              "description": "System preference changed while still following it."
+            },
+            {
+              "kind": "field",
+              "name": "#onAttrChange",
+              "privacy": "private",
+              "description": "Some other code changed <html data-theme>; mirror it without re-applying."
+            },
+            {
+              "kind": "method",
+              "name": "#moon",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "#sun",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              }
+            },
+            {
+              "kind": "field",
+              "name": "shadowRootOptions",
+              "type": {
+                "text": "ShadowRootInit"
+              },
+              "static": true,
+              "default": "{ ...LitElement.shadowRootOptions, delegatesFocus: true, }",
+              "inheritedFrom": {
+                "name": "TcElement",
+                "module": "src/base/tc-element.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "name": "tc-theme-change",
+              "type": {
+                "text": "CustomEvent<{ theme: 'light' | 'dark' }>"
+              },
+              "description": "套用主題改變時觸發（含使用者點擊與系統跟隨）。"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "theme",
+              "type": {
+                "text": "TcTheme"
+              },
+              "default": "'light'",
+              "description": "目前套用的主題。會反映到屬性以供樣式與檢視使用（唯讀，請用點擊切換）。",
+              "fieldName": "theme"
+            },
+            {
+              "name": "show-label",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "是否在圖示旁顯示動作文字（例如「切換至深色模式」）。",
+              "fieldName": "showLabel"
+            }
+          ],
+          "superclass": {
+            "name": "TcElement",
+            "module": "/src/base/tc-element.js"
+          },
+          "summary": "切換 `data-theme` 的無障礙主題切換鈕（含記憶與系統跟隨）。",
+          "customElement": true,
+          "tagName": "tc-theme-toggle"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "TcThemeToggle",
+          "declaration": {
+            "name": "TcThemeToggle",
+            "module": "src/theme-toggle/tc-theme-toggle.ts"
           }
         }
       ]

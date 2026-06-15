@@ -1,0 +1,111 @@
+---
+// Foundations: render the light vs dark SEMANTIC colour mapping straight from
+// the DTCG sources (primitives + light semantics + dark overlay), resolving each
+// semantic reference to its primitive hex. Kept source-driven so it can never
+// drift from the published tokens.
+import primitive from '../../../../packages/tokens/src/primitive/color.tokens.json';
+import lightSem from '../../../../packages/tokens/src/semantic/color.tokens.json';
+import darkSem from '../../../../packages/tokens/src/themes/dark/color.tokens.json';
+
+type Node = { $value?: string } & Record<string, unknown>;
+
+/** Flatten a nested token tree into a dot-path → hex/ref map. */
+function flatten(obj: Record<string, unknown>, prefix: string, out: Record<string, string>) {
+  for (const [k, v] of Object.entries(obj)) {
+    if (k.startsWith('$')) continue;
+    const node = v as Node;
+    if (node && typeof node === 'object' && typeof node.$value === 'string') {
+      out[`${prefix}${k}`] = node.$value;
+    } else if (node && typeof node === 'object') {
+      flatten(node as Record<string, unknown>, `${prefix}${k}.`, out);
+    }
+  }
+}
+
+const prim: Record<string, string> = {};
+flatten(primitive as Record<string, unknown>, '', prim);
+
+const light: Record<string, string> = {};
+flatten(lightSem as Record<string, unknown>, '', light);
+
+const dark: Record<string, string> = {};
+flatten(darkSem as Record<string, unknown>, '', dark);
+
+/** Resolve a `{color.x.y}` reference (or raw hex) to a hex string. */
+const hex = (ref: string | undefined): string =>
+  ref ? (ref.startsWith('{') ? (prim[ref.slice(1, -1)] ?? ref) : ref) : '—';
+
+const rows = Object.keys(light).map((token) => ({
+  token: token.replace(/^color\./, ''),
+  varName: `--tc-${token.replace(/\./g, '-')}`,
+  light: hex(light[token]),
+  dark: hex(dark[token] ?? light[token]),
+}));
+---
+
+<div class="theme-swatches">
+  <div class="head">
+    <span>Semantic token</span>
+    <span>Light</span>
+    <span>Dark</span>
+  </div>
+  {
+    rows.map((r) => (
+      <div class="row">
+        <code>{r.varName}</code>
+        <span class="cell">
+          <span class="chip" style={`background:${r.light}`} />
+          <span>{r.light}</span>
+        </span>
+        <span class="cell dark">
+          <span class="chip" style={`background:${r.dark}`} />
+          <span>{r.dark}</span>
+        </span>
+      </div>
+    ))
+  }
+</div>
+
+<style>
+  .theme-swatches {
+    margin-block: 1rem;
+    font-size: 0.8rem;
+  }
+  .head,
+  .row {
+    display: grid;
+    grid-template-columns: minmax(180px, 1.4fr) 1fr 1fr;
+    gap: 0.75rem;
+    align-items: center;
+  }
+  .head {
+    font-weight: 600;
+    padding-block: 0.4rem;
+    border-block-end: 1px solid var(--sl-color-gray-5);
+  }
+  .row {
+    padding-block: 0.35rem;
+    border-block-end: 1px solid var(--sl-color-gray-6);
+  }
+  .row code {
+    font-size: 0.72rem;
+  }
+  .cell {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .cell.dark {
+    padding: 0.3rem 0.5rem;
+    border-radius: 6px;
+    background: #1c1c1e;
+    color: #f2f2f2;
+  }
+  .chip {
+    inline-size: 28px;
+    block-size: 28px;
+    flex: 0 0 auto;
+    border-radius: 6px;
+    border: 1px solid rgba(128, 128, 128, 0.4);
+  }
+</style>
