@@ -13,6 +13,9 @@ import './chip/tc-chip-define.js';
 import './link/tc-link-define.js';
 import './pagination/tc-pagination-define.js';
 import './dropdown/tc-dropdown-define.js';
+import './article-card/tc-article-card-define.js';
+import './book-card/tc-book-card-define.js';
+import './list-panel/tc-list-panel-define.js';
 
 export { TcButton } from './button/tc-button.js';
 export { TcIcon } from './icon/tc-icon.js';
@@ -26,3 +29,6 @@ export { TcChip } from './chip/tc-chip.js';
 export { TcLink } from './link/tc-link.js';
 export { TcPagination } from './pagination/tc-pagination.js';
 export { TcDropdown } from './dropdown/tc-dropdown.js';
+export { TcArticleCard } from './article-card/tc-article-card.js';
+export { TcBookCard } from './book-card/tc-book-card.js';
+export { TcListPanel } from './list-panel/tc-list-panel.js';

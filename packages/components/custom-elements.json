@@ -102,6 +102,544 @@
             "name": "TcDropdown",
             "module": "./dropdown/tc-dropdown.js"
           }
+        },
+        {
+          "kind": "js",
+          "name": "TcArticleCard",
+          "declaration": {
+            "name": "TcArticleCard",
+            "module": "./article-card/tc-article-card.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "TcBookCard",
+          "declaration": {
+            "name": "TcBookCard",
+            "module": "./book-card/tc-book-card.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "TcListPanel",
+          "declaration": {
+            "name": "TcListPanel",
+            "module": "./list-panel/tc-list-panel.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/article-card/tc-article-card-define.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/article-card/tc-article-card.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "文稿卡片，涵蓋焦點文稿／一般文稿／互動式文稿／公告／影片／志工早會／週報等版式，\n以方向（vertical／horizontal）、尺寸（featured）與插槽組合區分。支援影片播放遮罩、\n可互動與整張卡片連結（stretched link）模式。",
+          "name": "TcArticleCard",
+          "cssProperties": [
+            {
+              "description": "卡片底色",
+              "name": "--tc-article-card-bg"
+            },
+            {
+              "description": "圓角",
+              "name": "--tc-article-card-radius"
+            },
+            {
+              "description": "靜止陰影",
+              "name": "--tc-article-card-elevation"
+            },
+            {
+              "description": "互動／連結時的提升陰影",
+              "name": "--tc-article-card-elevation-hover"
+            },
+            {
+              "description": "標題文字色",
+              "name": "--tc-article-card-headline-fg"
+            },
+            {
+              "description": "互動 hover 時的標題色",
+              "name": "--tc-article-card-headline-fg-hover"
+            },
+            {
+              "description": "內文摘要文字色",
+              "name": "--tc-article-card-excerpt-fg"
+            },
+            {
+              "description": "meta（日期／作者）文字色",
+              "name": "--tc-article-card-meta-fg"
+            },
+            {
+              "description": "影片播放鈕遮罩底色",
+              "name": "--tc-article-card-overlay-bg"
+            },
+            {
+              "description": "卡片寬度（亦可用 width 屬性設定）",
+              "name": "--tc-article-card-width"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "卡片外層容器",
+              "name": "base"
+            },
+            {
+              "description": "媒體區包裝",
+              "name": "media"
+            },
+            {
+              "description": "影片模式的圓形播放鈕遮罩",
+              "name": "play"
+            },
+            {
+              "description": "文字內容區",
+              "name": "body"
+            },
+            {
+              "description": "href 模式下覆蓋整張卡片的 <a>（stretched link）",
+              "name": "link"
+            }
+          ],
+          "slots": [
+            {
+              "description": "媒體區（圖片或影片縮圖）；vertical 置頂、horizontal 置於 inline-start",
+              "name": "media"
+            },
+            {
+              "description": "標題上方的分類／標籤 pill（可放 <tc-chip> 或文字）",
+              "name": "badge"
+            },
+            {
+              "description": "主標題（粗體、品牌色、約 2 行截斷）",
+              "name": "headline"
+            },
+            {
+              "description": "內文摘要（次要色、約 2–3 行截斷）",
+              "name": "excerpt"
+            },
+            {
+              "description": "日期／作者列（小字、次要色）",
+              "name": "meta"
+            },
+            {
+              "description": "動作區（如讚／分享按鈕，於連結模式下仍可獨立點擊）",
+              "name": "actions"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "orientation",
+              "type": {
+                "text": "'vertical' | 'horizontal'"
+              },
+              "default": "'vertical'",
+              "description": "版面方向：vertical（媒體置頂）或 horizontal（媒體置於 inline-start）。",
+              "attribute": "orientation",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "featured",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "焦點文稿：放大標題並使用較大的主視覺媒體。",
+              "attribute": "featured",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "video",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "影片卡片：在媒體上方疊加置中的圓形播放鈕。",
+              "attribute": "video",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "href",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "連結目標。設定後整張卡片以 stretched-link 方式變成連結。",
+              "attribute": "href",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "interactive",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "是否可互動（無 href 時：host 可聚焦並回應 Enter／Space）。",
+              "attribute": "interactive",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "width",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "卡片寬度（CSS 長度，如 `320px` 或 `100%`）。未設定時由內容／容器決定。",
+              "attribute": "width",
+              "reflects": true
+            },
+            {
+              "kind": "method",
+              "name": "#syncInteractivity",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Make the host focusable + announce a role when interactive without an href.\n(With an href the inner <a> is the real focus/interaction target.)"
+            },
+            {
+              "kind": "field",
+              "name": "#onKeydown",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "#onSlotChange",
+              "privacy": "private",
+              "description": "Toggle a `data-empty` flag on the slot's wrapper so empty regions\n(no assigned nodes) can be hidden via CSS without unreliable\n`:has(::slotted())` selectors."
+            },
+            {
+              "kind": "field",
+              "name": "shadowRootOptions",
+              "type": {
+                "text": "ShadowRootInit"
+              },
+              "static": true,
+              "default": "{ ...LitElement.shadowRootOptions, delegatesFocus: true, }",
+              "inheritedFrom": {
+                "name": "TcElement",
+                "module": "src/base/tc-element.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "description": "可互動卡片（無 href）以鍵盤 Enter／Space 或點擊觸發",
+              "name": "tc-card-click"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "orientation",
+              "type": {
+                "text": "'vertical' | 'horizontal'"
+              },
+              "default": "'vertical'",
+              "description": "版面方向：vertical（媒體置頂）或 horizontal（媒體置於 inline-start）。",
+              "fieldName": "orientation"
+            },
+            {
+              "name": "featured",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "焦點文稿：放大標題並使用較大的主視覺媒體。",
+              "fieldName": "featured"
+            },
+            {
+              "name": "video",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "影片卡片：在媒體上方疊加置中的圓形播放鈕。",
+              "fieldName": "video"
+            },
+            {
+              "name": "href",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "連結目標。設定後整張卡片以 stretched-link 方式變成連結。",
+              "fieldName": "href"
+            },
+            {
+              "name": "interactive",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "是否可互動（無 href 時：host 可聚焦並回應 Enter／Space）。",
+              "fieldName": "interactive"
+            },
+            {
+              "name": "width",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "卡片寬度（CSS 長度，如 `320px` 或 `100%`）。未設定時由內容／容器決定。",
+              "fieldName": "width"
+            }
+          ],
+          "superclass": {
+            "name": "TcElement",
+            "module": "/src/base/tc-element.js"
+          },
+          "summary": "Tzu Chi article/content card with media, badge, headline, excerpt, meta and actions.",
+          "customElement": true,
+          "tagName": "tc-article-card"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "TcArticleCard",
+          "declaration": {
+            "name": "TcArticleCard",
+            "module": "src/article-card/tc-article-card.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/book-card/tc-book-card-define.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/book-card/tc-book-card.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "書籍封面卡片：以封面圖為主的直式卡片，適用書籍封面／證嚴上人每日一叮嚀。\n封面圖在上、下方為標題／副標與動作區（footer），支援可互動與整張連結模式。",
+          "name": "TcBookCard",
+          "cssProperties": [
+            {
+              "description": "卡片底色",
+              "name": "--tc-book-card-bg"
+            },
+            {
+              "description": "卡片寬度（亦可用 width 屬性設定）",
+              "name": "--tc-book-card-width"
+            },
+            {
+              "description": "圓角",
+              "name": "--tc-book-card-radius"
+            },
+            {
+              "description": "內文區內距",
+              "name": "--tc-book-card-padding"
+            },
+            {
+              "description": "靜止陰影",
+              "name": "--tc-book-card-elevation"
+            },
+            {
+              "description": "互動時的提升陰影",
+              "name": "--tc-book-card-elevation-hover"
+            },
+            {
+              "description": "標題文字色",
+              "name": "--tc-book-card-title-fg"
+            },
+            {
+              "description": "互動 hover 時的標題色",
+              "name": "--tc-book-card-title-fg-hover"
+            },
+            {
+              "description": "副標文字色",
+              "name": "--tc-book-card-subtitle-fg"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "卡片外層容器",
+              "name": "base"
+            },
+            {
+              "description": "href 模式下覆蓋整張卡片的 <a>（stretched link）",
+              "name": "link"
+            }
+          ],
+          "slots": [
+            {
+              "description": "封面圖（建議放置 <img>，依 ratio 裁切為直式或方形）",
+              "name": "cover"
+            },
+            {
+              "description": "標題（粗體品牌色，約 1–2 行）",
+              "name": "title"
+            },
+            {
+              "description": "副標（淡色，約 1 行）",
+              "name": "subtitle"
+            },
+            {
+              "description": "動作區（如「更多」連結，於連結模式下仍可獨立點擊）",
+              "name": "footer"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "interactive",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "是否可互動（無 href 時：host 可聚焦並回應 Enter／Space）。",
+              "attribute": "interactive",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "href",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "連結目標。設定後整張卡片以 stretched-link 方式變成連結。",
+              "attribute": "href",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "ratio",
+              "type": {
+                "text": "'portrait' | 'square'"
+              },
+              "default": "'portrait'",
+              "description": "封面長寬比：portrait（直式 3/4）或 square（方形 1/1）。",
+              "attribute": "ratio",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "width",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "卡片寬度（CSS 長度，如 `240px` 或 `100%`）。未設定時由內容／容器決定。",
+              "attribute": "width",
+              "reflects": true
+            },
+            {
+              "kind": "method",
+              "name": "#syncInteractivity",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Make the host focusable + announce a role when interactive without an href.\n(With an href the inner <a> is the real focus/interaction target.)"
+            },
+            {
+              "kind": "field",
+              "name": "#onKeydown",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "#onSlotChange",
+              "privacy": "private",
+              "description": "Toggle a `data-empty` flag on the slot's wrapper so empty regions\n(no assigned nodes) can be hidden via CSS without unreliable\n`:has(::slotted())` selectors."
+            },
+            {
+              "kind": "field",
+              "name": "shadowRootOptions",
+              "type": {
+                "text": "ShadowRootInit"
+              },
+              "static": true,
+              "default": "{ ...LitElement.shadowRootOptions, delegatesFocus: true, }",
+              "inheritedFrom": {
+                "name": "TcElement",
+                "module": "src/base/tc-element.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "description": "可互動卡片（無 href）以鍵盤 Enter／Space 或點擊觸發",
+              "name": "tc-book-card-click"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "interactive",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "是否可互動（無 href 時：host 可聚焦並回應 Enter／Space）。",
+              "fieldName": "interactive"
+            },
+            {
+              "name": "href",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "連結目標。設定後整張卡片以 stretched-link 方式變成連結。",
+              "fieldName": "href"
+            },
+            {
+              "name": "ratio",
+              "type": {
+                "text": "'portrait' | 'square'"
+              },
+              "default": "'portrait'",
+              "description": "封面長寬比：portrait（直式 3/4）或 square（方形 1/1）。",
+              "fieldName": "ratio"
+            },
+            {
+              "name": "width",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "卡片寬度（CSS 長度，如 `240px` 或 `100%`）。未設定時由內容／容器決定。",
+              "fieldName": "width"
+            }
+          ],
+          "superclass": {
+            "name": "TcElement",
+            "module": "/src/base/tc-element.js"
+          },
+          "summary": "Tzu Chi cover-dominant vertical book card.",
+          "customElement": true,
+          "tagName": "tc-book-card"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "TcBookCard",
+          "declaration": {
+            "name": "TcBookCard",
+            "module": "src/book-card/tc-book-card.ts"
+          }
         }
       ]
     },
@@ -368,6 +906,231 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/card/tc-card-define.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/card/tc-card.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "卡片容器，含媒體、標題、內文與動作區，支援 elevated / outlined 變體與可互動／連結模式。",
+          "name": "TcCard",
+          "cssProperties": [
+            {
+              "description": "卡片底色",
+              "name": "--tc-card-bg"
+            },
+            {
+              "description": "卡片寬度（亦可用 width 屬性設定）",
+              "name": "--tc-card-width"
+            },
+            {
+              "description": "圓角",
+              "name": "--tc-card-radius"
+            },
+            {
+              "description": "內文區內距",
+              "name": "--tc-card-padding"
+            },
+            {
+              "description": "outlined 變體邊框色",
+              "name": "--tc-card-border"
+            },
+            {
+              "description": "elevated 變體靜止陰影",
+              "name": "--tc-card-elevation"
+            },
+            {
+              "description": "互動時的提升陰影",
+              "name": "--tc-card-elevation-hover"
+            },
+            {
+              "description": "標題文字色",
+              "name": "--tc-card-headline-fg"
+            },
+            {
+              "description": "互動 hover 時的標題色",
+              "name": "--tc-card-headline-fg-hover"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "卡片外層容器",
+              "name": "base"
+            },
+            {
+              "description": "href 模式下覆蓋整張卡片的 <a>（stretched link）",
+              "name": "link"
+            }
+          ],
+          "slots": [
+            {
+              "description": "頂部圖片／媒體區（建議放置 <img>）",
+              "name": "media"
+            },
+            {
+              "description": "卡片主標題",
+              "name": "headline"
+            },
+            {
+              "description": "卡片內文（預設插槽）",
+              "name": ""
+            },
+            {
+              "description": "動作區（按鈕等，於連結模式下仍可獨立點擊）",
+              "name": "footer"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "variant",
+              "type": {
+                "text": "'elevated' | 'outlined'"
+              },
+              "default": "'elevated'",
+              "description": "視覺變體：elevated（陰影）或 outlined（邊框）。",
+              "attribute": "variant",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "interactive",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "是否可互動（無 href 時：host 可聚焦並回應 Enter／Space）。",
+              "attribute": "interactive",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "href",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "連結目標。設定後整張卡片以 stretched-link 方式變成連結。",
+              "attribute": "href",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "width",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "卡片寬度（CSS 長度，如 `320px` 或 `100%`）。未設定時由內容／容器決定。",
+              "attribute": "width",
+              "reflects": true
+            },
+            {
+              "kind": "method",
+              "name": "#syncInteractivity",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Make the host focusable + announce a role when interactive without an href.\n(With an href the inner <a> is the real focus/interaction target.)"
+            },
+            {
+              "kind": "field",
+              "name": "#onKeydown",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "#onSlotChange",
+              "privacy": "private",
+              "description": "Toggle a `data-empty` flag on the slot's wrapper so empty regions\n(no assigned nodes) can be hidden via CSS without unreliable\n`:has(::slotted())` selectors."
+            },
+            {
+              "kind": "field",
+              "name": "shadowRootOptions",
+              "type": {
+                "text": "ShadowRootInit"
+              },
+              "static": true,
+              "default": "{ ...LitElement.shadowRootOptions, delegatesFocus: true, }",
+              "inheritedFrom": {
+                "name": "TcElement",
+                "module": "src/base/tc-element.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "description": "可互動卡片（無 href）以鍵盤 Enter／Space 或點擊觸發",
+              "name": "tc-card-click"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "variant",
+              "type": {
+                "text": "'elevated' | 'outlined'"
+              },
+              "default": "'elevated'",
+              "description": "視覺變體：elevated（陰影）或 outlined（邊框）。",
+              "fieldName": "variant"
+            },
+            {
+              "name": "interactive",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "是否可互動（無 href 時：host 可聚焦並回應 Enter／Space）。",
+              "fieldName": "interactive"
+            },
+            {
+              "name": "href",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "連結目標。設定後整張卡片以 stretched-link 方式變成連結。",
+              "fieldName": "href"
+            },
+            {
+              "name": "width",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "卡片寬度（CSS 長度，如 `320px` 或 `100%`）。未設定時由內容／容器決定。",
+              "fieldName": "width"
+            }
+          ],
+          "superclass": {
+            "name": "TcElement",
+            "module": "/src/base/tc-element.js"
+          },
+          "summary": "Tzu Chi card surface with media, headline, body and footer.",
+          "customElement": true,
+          "tagName": "tc-card"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "TcCard",
+          "declaration": {
+            "name": "TcCard",
+            "module": "src/card/tc-card.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/chip/tc-chip-define.ts",
       "declarations": [],
       "exports": []
@@ -602,231 +1365,6 @@
           "declaration": {
             "name": "TcChip",
             "module": "src/chip/tc-chip.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/card/tc-card-define.ts",
-      "declarations": [],
-      "exports": []
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/card/tc-card.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "卡片容器，含媒體、標題、內文與動作區，支援 elevated / outlined 變體與可互動／連結模式。",
-          "name": "TcCard",
-          "cssProperties": [
-            {
-              "description": "卡片底色",
-              "name": "--tc-card-bg"
-            },
-            {
-              "description": "卡片寬度（亦可用 width 屬性設定）",
-              "name": "--tc-card-width"
-            },
-            {
-              "description": "圓角",
-              "name": "--tc-card-radius"
-            },
-            {
-              "description": "內文區內距",
-              "name": "--tc-card-padding"
-            },
-            {
-              "description": "outlined 變體邊框色",
-              "name": "--tc-card-border"
-            },
-            {
-              "description": "elevated 變體靜止陰影",
-              "name": "--tc-card-elevation"
-            },
-            {
-              "description": "互動時的提升陰影",
-              "name": "--tc-card-elevation-hover"
-            },
-            {
-              "description": "標題文字色",
-              "name": "--tc-card-headline-fg"
-            },
-            {
-              "description": "互動 hover 時的標題色",
-              "name": "--tc-card-headline-fg-hover"
-            }
-          ],
-          "cssParts": [
-            {
-              "description": "卡片外層容器",
-              "name": "base"
-            },
-            {
-              "description": "href 模式下覆蓋整張卡片的 <a>（stretched link）",
-              "name": "link"
-            }
-          ],
-          "slots": [
-            {
-              "description": "頂部圖片／媒體區（建議放置 <img>）",
-              "name": "media"
-            },
-            {
-              "description": "卡片主標題",
-              "name": "headline"
-            },
-            {
-              "description": "卡片內文（預設插槽）",
-              "name": ""
-            },
-            {
-              "description": "動作區（按鈕等，於連結模式下仍可獨立點擊）",
-              "name": "footer"
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "variant",
-              "type": {
-                "text": "'elevated' | 'outlined'"
-              },
-              "default": "'elevated'",
-              "description": "視覺變體：elevated（陰影）或 outlined（邊框）。",
-              "attribute": "variant",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "interactive",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "是否可互動（無 href 時：host 可聚焦並回應 Enter／Space）。",
-              "attribute": "interactive",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "href",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "連結目標。設定後整張卡片以 stretched-link 方式變成連結。",
-              "attribute": "href",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "width",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "卡片寬度（CSS 長度，如 `320px` 或 `100%`）。未設定時由內容／容器決定。",
-              "attribute": "width",
-              "reflects": true
-            },
-            {
-              "kind": "method",
-              "name": "#syncInteractivity",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "description": "Make the host focusable + announce a role when interactive without an href.\n(With an href the inner <a> is the real focus/interaction target.)"
-            },
-            {
-              "kind": "field",
-              "name": "#onKeydown",
-              "privacy": "private"
-            },
-            {
-              "kind": "field",
-              "name": "#onSlotChange",
-              "privacy": "private",
-              "description": "Toggle a `data-empty` flag on the slot's wrapper so empty regions\n(no assigned nodes) can be hidden via CSS without unreliable\n`:has(::slotted())` selectors."
-            },
-            {
-              "kind": "field",
-              "name": "shadowRootOptions",
-              "type": {
-                "text": "ShadowRootInit"
-              },
-              "static": true,
-              "default": "{ ...LitElement.shadowRootOptions, delegatesFocus: true, }",
-              "inheritedFrom": {
-                "name": "TcElement",
-                "module": "src/base/tc-element.ts"
-              }
-            }
-          ],
-          "events": [
-            {
-              "description": "可互動卡片（無 href）以鍵盤 Enter／Space 或點擊觸發",
-              "name": "tc-card-click"
-            }
-          ],
-          "attributes": [
-            {
-              "name": "variant",
-              "type": {
-                "text": "'elevated' | 'outlined'"
-              },
-              "default": "'elevated'",
-              "description": "視覺變體：elevated（陰影）或 outlined（邊框）。",
-              "fieldName": "variant"
-            },
-            {
-              "name": "interactive",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "是否可互動（無 href 時：host 可聚焦並回應 Enter／Space）。",
-              "fieldName": "interactive"
-            },
-            {
-              "name": "href",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "連結目標。設定後整張卡片以 stretched-link 方式變成連結。",
-              "fieldName": "href"
-            },
-            {
-              "name": "width",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "卡片寬度（CSS 長度，如 `320px` 或 `100%`）。未設定時由內容／容器決定。",
-              "fieldName": "width"
-            }
-          ],
-          "superclass": {
-            "name": "TcElement",
-            "module": "/src/base/tc-element.js"
-          },
-          "summary": "Tzu Chi card surface with media, headline, body and footer.",
-          "customElement": true,
-          "tagName": "tc-card"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "TcCard",
-          "declaration": {
-            "name": "TcCard",
-            "module": "src/card/tc-card.ts"
           }
         }
       ]
@@ -2094,6 +2632,177 @@
           "declaration": {
             "name": "TcLink",
             "module": "src/link/tc-link.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/list-panel/tc-list-panel-define.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/list-panel/tc-list-panel.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "標題面板：彩色標題列加上一條垂直清單，項目間以細分隔線區隔\n（首頁側欄「內部觀點：領航慈濟」樣式）。標題以 label 屬性設定，\n或以 `header` 插槽覆寫；清單內容由使用者透過預設插槽提供。",
+          "name": "TcListPanel",
+          "cssProperties": [
+            {
+              "description": "標題列底色（brand 變體為品牌主色）",
+              "name": "--tc-list-panel-header-bg"
+            },
+            {
+              "description": "標題列文字色",
+              "name": "--tc-list-panel-header-fg"
+            },
+            {
+              "description": "面板底色",
+              "name": "--tc-list-panel-bg"
+            },
+            {
+              "description": "圓角",
+              "name": "--tc-list-panel-radius"
+            },
+            {
+              "description": "外框色",
+              "name": "--tc-list-panel-border"
+            },
+            {
+              "description": "項目間分隔線色",
+              "name": "--tc-list-panel-divider"
+            },
+            {
+              "description": "面板寬度（亦可用 width 屬性設定）",
+              "name": "--tc-list-panel-width"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "面板外層容器",
+              "name": "base"
+            },
+            {
+              "description": "彩色標題列",
+              "name": "header"
+            },
+            {
+              "description": "清單內容區",
+              "name": "body"
+            }
+          ],
+          "slots": [
+            {
+              "description": "清單項目（預設插槽，每個子元素為一列，列與列間自動加分隔線）",
+              "name": ""
+            },
+            {
+              "description": "覆寫標題列內容（未提供時顯示 label 屬性文字）",
+              "name": "header"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "標題列文字（亦可用 `header` 插槽覆寫）。",
+              "attribute": "label",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "variant",
+              "type": {
+                "text": "'brand' | 'plain'"
+              },
+              "default": "'brand'",
+              "description": "視覺變體：`brand`（品牌主色標題列、白字）或 `plain`（淡色標題列、內文色）。",
+              "attribute": "variant",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "width",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "面板寬度（CSS 長度，如 `320px` 或 `100%`）。未設定時由內容／容器決定。",
+              "attribute": "width",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "#onSlotChange",
+              "privacy": "private",
+              "description": "Toggle a `data-empty` flag on the slot's wrapper so empty regions\n(no assigned nodes) can be hidden via CSS without unreliable\n`:has(::slotted())` selectors."
+            },
+            {
+              "kind": "field",
+              "name": "shadowRootOptions",
+              "type": {
+                "text": "ShadowRootInit"
+              },
+              "static": true,
+              "default": "{ ...LitElement.shadowRootOptions, delegatesFocus: true, }",
+              "inheritedFrom": {
+                "name": "TcElement",
+                "module": "src/base/tc-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "標題列文字（亦可用 `header` 插槽覆寫）。",
+              "fieldName": "label"
+            },
+            {
+              "name": "variant",
+              "type": {
+                "text": "'brand' | 'plain'"
+              },
+              "default": "'brand'",
+              "description": "視覺變體：`brand`（品牌主色標題列、白字）或 `plain`（淡色標題列、內文色）。",
+              "fieldName": "variant"
+            },
+            {
+              "name": "width",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "面板寬度（CSS 長度，如 `320px` 或 `100%`）。未設定時由內容／容器決定。",
+              "fieldName": "width"
+            }
+          ],
+          "superclass": {
+            "name": "TcElement",
+            "module": "/src/base/tc-element.js"
+          },
+          "summary": "Tzu Chi titled panel with a coloured header and a vertical divided list.",
+          "customElement": true,
+          "tagName": "tc-list-panel"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "TcListPanel",
+          "declaration": {
+            "name": "TcListPanel",
+            "module": "src/list-panel/tc-list-panel.ts"
           }
         }
       ]

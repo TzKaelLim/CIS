@@ -103,6 +103,30 @@
       "types": "./dist/dropdown/tc-dropdown.d.ts",
       "default": "./dist/dropdown/tc-dropdown.js"
     },
+    "./article-card": {
+      "types": "./dist/article-card/tc-article-card-define.d.ts",
+      "default": "./dist/article-card/tc-article-card-define.js"
+    },
+    "./article-card/class": {
+      "types": "./dist/article-card/tc-article-card.d.ts",
+      "default": "./dist/article-card/tc-article-card.js"
+    },
+    "./book-card": {
+      "types": "./dist/book-card/tc-book-card-define.d.ts",
+      "default": "./dist/book-card/tc-book-card-define.js"
+    },
+    "./book-card/class": {
+      "types": "./dist/book-card/tc-book-card.d.ts",
+      "default": "./dist/book-card/tc-book-card.js"
+    },
+    "./list-panel": {
+      "types": "./dist/list-panel/tc-list-panel-define.d.ts",
+      "default": "./dist/list-panel/tc-list-panel-define.js"
+    },
+    "./list-panel/class": {
+      "types": "./dist/list-panel/tc-list-panel.d.ts",
+      "default": "./dist/list-panel/tc-list-panel.js"
+    },
     "./cdn": {
       "types": "./dist/cdn/tc-components.d.ts",
       "default": "./dist/cdn/tc-components.js"

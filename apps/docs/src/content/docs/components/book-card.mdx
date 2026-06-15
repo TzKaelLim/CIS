@@ -1,0 +1,94 @@
+---
+title: BookCard
+description: tc-book-card — 以封面圖為主的直式書籍卡片，支援直式／方形封面、可互動與連結模式。
+---
+
+import Demo from '../../../components/Demo.astro';
+import PropsTable from '../../../components/PropsTable.astro';
+
+`<tc-book-card>` 是以封面圖為主的直式卡片，適用於書籍封面與「證嚴上人 每日一叮嚀」。封面圖在上、下方為標題（粗體品牌色）／副標（淡色）與 footer 動作區。封面依 `ratio`（`portrait` 直式 3/4 或 `square` 方形）裁切並貼齊頂部圓角。下方為**可互動的真實元件**（圖片為 Lorem Picsum 假圖）：
+
+<Demo>
+  <tc-book-card ratio="portrait" width="240px">
+    <img slot="cover" src="https://picsum.photos/seed/tzuchibook1/300/400" alt="書籍封面" />
+    <span slot="title">證嚴上人 每日一叮嚀</span>
+    <span slot="subtitle">世間祥和在於心……</span>
+    <tc-link slot="footer" href="#more">更多</tc-link>
+  </tc-book-card>
+  <tc-book-card ratio="square" width="240px">
+    <img slot="cover" src="https://picsum.photos/seed/tzuchibook2/400/400" alt="書籍封面" />
+    <span slot="title">靜思語選輯（建議標題在 15 字以內）</span>
+    <span slot="subtitle">心寬念純，福慧雙修……</span>
+    <tc-link slot="footer" href="#more">更多</tc-link>
+  </tc-book-card>
+</Demo>
+
+## 封面比例（ratio）
+
+`ratio="portrait"`（預設）為 3/4 直式封面；`ratio="square"` 為 1/1 方形封面：
+
+<Demo>
+  <tc-book-card ratio="square" width="240px">
+    <img slot="cover" src="https://picsum.photos/seed/tzuchibook3/400/400" alt="書籍封面" />
+    <span slot="title">方形封面</span>
+    <span slot="subtitle">適用相片或方形書影</span>
+  </tc-book-card>
+</Demo>
+
+## 寬度（width）
+
+`width` 接受任何 CSS 長度（如 `240px`、`100%`），等同設定 `--tc-book-card-width`。
+
+## 用法
+
+### 純 HTML
+
+```html
+<link rel="stylesheet" href="@tzuchi/tokens/tokens.css" />
+<script type="module" src="@tzuchi/components/cdn"></script>
+
+<tc-book-card>
+  <img slot="cover" src="cover.jpg" alt="書籍封面" />
+  <span slot="title">證嚴上人 每日一叮嚀</span>
+  <span slot="subtitle">世間祥和在於心</span>
+  <tc-link slot="footer" href="/more">更多</tc-link>
+</tc-book-card>
+```
+
+### React
+
+```tsx
+import { TcBookCard } from '@tzuchi/react';
+
+<TcBookCard href="/books/1">
+  <img slot="cover" src="cover.jpg" alt="" />
+  <span slot="title">證嚴上人 每日一叮嚀</span>
+  <span slot="subtitle">世間祥和在於心</span>
+</TcBookCard>;
+```
+
+## 連結模式（Stretched Link）
+
+設定 `href` 後，整張卡片透過覆蓋層 `<a>` 變成連結；`footer` 內的控件（如「更多」連結）仍可獨立點擊，不會被連結攔截：
+
+<Demo>
+  <tc-book-card href="#book" style="max-width:240px">
+    <img slot="cover" src="https://picsum.photos/seed/tzuchibook4/300/400" alt="書籍封面" />
+    <span slot="title">點整張卡片即可前往</span>
+    <span slot="subtitle">footer 連結仍可獨立點擊</span>
+    <tc-link slot="footer" href="#more">更多</tc-link>
+  </tc-book-card>
+</Demo>
+
+## API
+
+下表自 Custom Elements Manifest 自動產生：
+
+<PropsTable tag="tc-book-card" />
+
+## 無障礙（Accessibility）
+
+- `href` 模式以原生 `<a>` 為焦點與互動目標，支援鍵盤 Enter。
+- `interactive`（無 `href`）模式下，host 取得 `tabindex="0"` 與 `role="button"`，並以 Enter／Space 觸發 `tc-book-card-click`。
+- `footer` 內的可聚焦控件不會被巢狀於連結中，可獨立鍵盤操作。
+- `:focus-visible` 焦點環使用 `--tc-focus-ring-*` token。

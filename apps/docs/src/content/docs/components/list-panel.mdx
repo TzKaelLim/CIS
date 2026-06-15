@@ -1,0 +1,111 @@
+---
+title: ListPanel
+description: tc-list-panel — 彩色標題列加上垂直分隔清單的標題面板，首頁側欄「內部觀點：領航慈濟」樣式。
+---
+
+import Demo from '../../../components/Demo.astro';
+import PropsTable from '../../../components/PropsTable.astro';
+
+`<tc-list-panel>` 是標題面板：上方為彩色標題列（`brand` 變體為品牌主色底、白字），下方為由預設插槽提供的垂直清單，項目間自動加上細分隔線。標題以 `label` 屬性設定，或用 `header` 插槽覆寫。用 `width` 屬性控制寬度（CSS 長度）。下方為**可互動的真實元件**（圖片為 Lorem Picsum 假圖）：
+
+<Demo>
+  <tc-list-panel label="內部觀點：領航慈濟" width="360px">
+    <article>
+      <h3 style="margin:0 0 4px;font-weight:700;color:#1b2d58">目前做的事情原因與做法做法</h3>
+      <p style="margin:0 0 4px;color:#616161">2023-06-15</p>
+      <p style="margin:0;display:flex;justify-content:space-between;color:#616161">
+        <span>顏博文 執行長</span>
+        <span>讚 ｜ 分享</span>
+      </p>
+    </article>
+    <article>
+      <h3 style="margin:0 0 4px;font-weight:700;color:#1b2d58">目前做的事情原因與做法</h3>
+      <p style="margin:0 0 4px;color:#616161">2023-06-15</p>
+      <p style="margin:0;display:flex;justify-content:space-between;color:#616161">
+        <span>顏博文 執行長</span>
+        <span>讚 ｜ 分享</span>
+      </p>
+    </article>
+  </tc-list-panel>
+</Demo>
+
+## 變體（variant）
+
+`brand`（預設）為品牌主色標題列、白字；`plain` 為淡色標題列、內文色標題，適合次要區塊：
+
+<Demo>
+  <tc-list-panel variant="plain" label="相關連結" width="360px">
+    <article>
+      <h3 style="margin:0;font-weight:700;color:#1b2d58">慈濟全球資訊網</h3>
+    </article>
+    <article>
+      <h3 style="margin:0;font-weight:700;color:#1b2d58">慈濟月刊</h3>
+    </article>
+  </tc-list-panel>
+</Demo>
+
+## 自訂標題（header 插槽）
+
+需要圖示或更複雜的標題時，用 `header` 插槽覆寫 `label`：
+
+<Demo>
+  <tc-list-panel width="360px">
+    <h2 slot="header" style="margin:0;display:flex;align-items:center;gap:8px">
+      <img
+        src="https://picsum.photos/seed/tzuchi-lp/32/32"
+        alt=""
+        style="width:24px;height:24px;border-radius:50%"
+      />
+      內部觀點：領航慈濟
+    </h2>
+    <article>
+      <h3 style="margin:0;font-weight:700;color:#1b2d58">用願力與行動翻轉人生</h3>
+      <p style="margin:4px 0 0;color:#616161">2023-06-15 ｜ 顏博文 執行長</p>
+    </article>
+  </tc-list-panel>
+</Demo>
+
+## 用法
+
+### 純 HTML
+
+```html
+<link rel="stylesheet" href="@tzuchi/tokens/tokens.css" />
+<script type="module" src="@tzuchi/components/cdn"></script>
+
+<tc-list-panel label="內部觀點：領航慈濟">
+  <article>
+    <h3>目前做的事情原因與做法</h3>
+    <p>2023-06-15 ｜ 顏博文 執行長</p>
+  </article>
+  <article>
+    <h3>用願力與行動翻轉人生</h3>
+    <p>2023-06-15 ｜ 顏博文 執行長</p>
+  </article>
+</tc-list-panel>
+```
+
+### React
+
+```tsx
+import { TcListPanel } from '@tzuchi/react';
+
+<TcListPanel label="內部觀點：領航慈濟" variant="brand">
+  <article>
+    <h3>目前做的事情原因與做法</h3>
+    <p>2023-06-15 ｜ 顏博文 執行長</p>
+  </article>
+</TcListPanel>;
+```
+
+## API
+
+下表自 Custom Elements Manifest 自動產生：
+
+<PropsTable tag="tc-list-panel" />
+
+## 無障礙（Accessibility）
+
+- 標題列以 `<h2>` 呈現，建立頁面標題層級；使用 `header` 插槽時請放入適當的標題標籤。
+- 清單項目為使用者提供的內容，建議用語意化標籤（如 `<article>`）並維持標題層級。
+- 分隔線僅為視覺輔助，不影響朗讀順序。
