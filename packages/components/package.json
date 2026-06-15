@@ -127,6 +127,22 @@
       "types": "./dist/list-panel/tc-list-panel.d.ts",
       "default": "./dist/list-panel/tc-list-panel.js"
     },
+    "./badge": {
+      "types": "./dist/badge/tc-badge-define.d.ts",
+      "default": "./dist/badge/tc-badge-define.js"
+    },
+    "./badge/class": {
+      "types": "./dist/badge/tc-badge.d.ts",
+      "default": "./dist/badge/tc-badge.js"
+    },
+    "./search-bar": {
+      "types": "./dist/search-bar/tc-search-bar-define.d.ts",
+      "default": "./dist/search-bar/tc-search-bar-define.js"
+    },
+    "./search-bar/class": {
+      "types": "./dist/search-bar/tc-search-bar.d.ts",
+      "default": "./dist/search-bar/tc-search-bar.js"
+    },
     "./cdn": {
       "types": "./dist/cdn/tc-components.d.ts",
       "default": "./dist/cdn/tc-components.js"

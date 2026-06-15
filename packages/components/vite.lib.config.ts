@@ -53,6 +53,13 @@ export default defineConfig({
           __dirname,
           'src/list-panel/tc-list-panel-define.ts',
         ),
+        'badge/tc-badge': resolve(__dirname, 'src/badge/tc-badge.ts'),
+        'badge/tc-badge-define': resolve(__dirname, 'src/badge/tc-badge-define.ts'),
+        'search-bar/tc-search-bar': resolve(__dirname, 'src/search-bar/tc-search-bar.ts'),
+        'search-bar/tc-search-bar-define': resolve(
+          __dirname,
+          'src/search-bar/tc-search-bar-define.ts',
+        ),
       },
       formats: ['es'],
     },

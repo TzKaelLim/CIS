@@ -1,0 +1,59 @@
+{
+  "badge": {
+    "radius": {
+      "$type": "dimension",
+      "$value": "{radius.sm}",
+      "$description": "Default (non-pill) corner radius. Pill shape uses {radius.full}."
+    },
+    "font-size": {
+      "$type": "dimension",
+      "$value": "12px",
+      "$description": "Label type size for md; sm reduces to 11px."
+    },
+    "gap": {
+      "$type": "dimension",
+      "$value": "{space.4}",
+      "$description": "Gap between leading dot and label."
+    },
+    "min-size": {
+      "$type": "dimension",
+      "$value": "20px",
+      "$description": "Minimum block size (height) of the badge box; sm uses 18px."
+    },
+    "padding-inline": {
+      "$type": "dimension",
+      "$value": "{space.8}",
+      "$description": "Horizontal padding."
+    },
+    "padding-block": {
+      "$type": "dimension",
+      "$value": "2px",
+      "$description": "Vertical padding."
+    },
+    "dot-size": {
+      "$type": "dimension",
+      "$value": "6px",
+      "$description": "Leading status dot diameter; sm uses 5px."
+    },
+    "bg": {
+      "$type": "color",
+      "$value": "{color.surface.subtle}",
+      "$description": "Badge background; overridden per tone+variant. Default reflects neutral/soft."
+    },
+    "fg": {
+      "$type": "color",
+      "$value": "{color.text.default}",
+      "$description": "Text/icon colour; overridden per tone+variant. Default reflects neutral/soft."
+    },
+    "border-color": {
+      "$type": "color",
+      "$value": "{color.border.default}",
+      "$description": "Outline-variant border colour; resolved per tone."
+    },
+    "dot-color": {
+      "$type": "color",
+      "$value": "currentColor",
+      "$description": "Status-dot fill on filled variant (defaults to currentColor)."
+    }
+  }
+}

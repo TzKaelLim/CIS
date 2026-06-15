@@ -1,0 +1,94 @@
+---
+title: Badge
+description: tc-badge — 小型標籤 / 狀態 / 數量徽章，支援多種色調、變體與尺寸。
+---
+
+import Demo from '../../../components/Demo.astro';
+import PropsTable from '../../../components/PropsTable.astro';
+
+`<tc-badge>` 是小型、非互動的徽章，用於標示標籤、狀態或數量。比 `tc-chip` 更小且不可點擊。支援六種色調（`neutral`、`brand`、`success`、`error`、`warning`、`info`）、三種變體（`soft`、`filled`、`outline`）、兩種尺寸（`md` / `sm`），並可加上前置狀態圓點與膠囊形外觀。下方為**真實元件**：
+
+<Demo>
+  <tc-badge>標籤</tc-badge>
+  <tc-badge tone="brand">兒少</tc-badge>
+  <tc-badge tone="success" dot>上線</tc-badge>
+  <tc-badge tone="error">錯誤</tc-badge>
+</Demo>
+
+## 用法
+
+### 純 HTML
+
+```html
+<link rel="stylesheet" href="@tzuchi/tokens/tokens.css" />
+<script type="module" src="@tzuchi/components/cdn"></script>
+
+<tc-badge tone="brand">兒少</tc-badge>
+<tc-badge tone="success" dot>上線</tc-badge>
+```
+
+### React
+
+```tsx
+import { TcBadge } from '@tzuchi/react';
+
+<TcBadge tone="error" variant="filled" pill>
+  12
+</TcBadge>;
+```
+
+## 色調（Tone）
+
+色調對應語意色彩。`neutral` 與 `brand` 視為一般標籤；`success`、`error`、`warning`、`info` 視為狀態，會附帶一段視覺隱藏文字供螢幕報讀器辨識。
+
+<Demo>
+  <tc-badge tone="neutral">neutral</tc-badge>
+  <tc-badge tone="brand">brand</tc-badge>
+  <tc-badge tone="success">success</tc-badge>
+  <tc-badge tone="error">error</tc-badge>
+  <tc-badge tone="warning">warning</tc-badge>
+  <tc-badge tone="info">info</tc-badge>
+</Demo>
+
+## 變體（Variant）
+
+`soft`（預設）為淡底配色調文字；`filled` 為實底配反白文字；`outline` 為透明底配色調邊框與文字。
+
+<Demo>
+  <tc-badge tone="brand" variant="soft">soft</tc-badge>
+  <tc-badge tone="brand" variant="filled">filled</tc-badge>
+  <tc-badge tone="brand" variant="outline">outline</tc-badge>
+</Demo>
+
+## 尺寸（Size）
+
+`md`（預設）適用桌機與平板橫式；`sm` 適用平板直式與手機。
+
+<Demo>
+  <tc-badge tone="brand" size="md">Medium</tc-badge>
+  <tc-badge tone="brand" size="sm">Small</tc-badge>
+</Demo>
+
+## 狀態圓點與膠囊形
+
+`dot` 會在前端顯示狀態圓點；`pill` 會將徽章改為完整膠囊形（適合數量計數）。
+
+<Demo>
+  <tc-badge tone="success" dot>上線</tc-badge>
+  <tc-badge tone="error" dot>離線</tc-badge>
+  <tc-badge tone="brand" pill>99+</tc-badge>
+  <tc-badge tone="error" variant="filled" pill>12</tc-badge>
+</Demo>
+
+## API
+
+下表自 Custom Elements Manifest 自動產生：
+
+<PropsTable tag="tc-badge" />
+
+## 無障礙（Accessibility）
+
+- 徽章預設為 `role="presentation"`（純裝飾）。若徽章承載狀態語意，作者可自行加上 `role="status"`。
+- 狀態色調（`success` / `error` / `warning` / `info`）會附帶視覺隱藏文字，向螢幕報讀器說明狀態。
+- 狀態圓點為純裝飾（`aria-hidden`），不依賴顏色傳達意義——色調搭配文字與隱藏標籤共同表意。
+- 徽章為非互動元件，不接收焦點、不派發事件。

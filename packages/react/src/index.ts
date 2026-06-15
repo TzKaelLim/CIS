@@ -1,5 +1,6 @@
 'use client';
 export { TcArticleCard } from './generated/TcArticleCard.js';
+export { TcBadge } from './generated/TcBadge.js';
 export { TcBookCard } from './generated/TcBookCard.js';
 export { TcButton } from './generated/TcButton.js';
 export { TcCard } from './generated/TcCard.js';
@@ -12,5 +13,6 @@ export { TcLink } from './generated/TcLink.js';
 export { TcListPanel } from './generated/TcListPanel.js';
 export { TcPagination } from './generated/TcPagination.js';
 export { TcRadio } from './generated/TcRadio.js';
+export { TcSearchBar } from './generated/TcSearchBar.js';
 export { TcTab } from './generated/TcTab.js';
 export { TcTabs } from './generated/TcTabs.js';

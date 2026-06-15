@@ -16,6 +16,8 @@ import './dropdown/tc-dropdown-define.js';
 import './article-card/tc-article-card-define.js';
 import './book-card/tc-book-card-define.js';
 import './list-panel/tc-list-panel-define.js';
+import './badge/tc-badge-define.js';
+import './search-bar/tc-search-bar-define.js';
 
 export { TcButton } from './button/tc-button.js';
 export { TcIcon } from './icon/tc-icon.js';
@@ -32,3 +34,5 @@ export { TcDropdown } from './dropdown/tc-dropdown.js';
 export { TcArticleCard } from './article-card/tc-article-card.js';
 export { TcBookCard } from './book-card/tc-book-card.js';
 export { TcListPanel } from './list-panel/tc-list-panel.js';
+export { TcBadge } from './badge/tc-badge.js';
+export { TcSearchBar } from './search-bar/tc-search-bar.js';
