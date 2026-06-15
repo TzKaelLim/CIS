@@ -1,0 +1,297 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/button/index.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/base/define-element.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "defineElement",
+          "return": {
+            "type": {
+              "text": "void"
+            }
+          },
+          "parameters": [
+            {
+              "name": "tag",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "ctor",
+              "type": {
+                "text": "CustomElementConstructor"
+              }
+            }
+          ],
+          "description": "Register a custom element once; a no-op if the tag is already defined\n(prevents \"already defined\" crashes on double-load / HMR)."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "defineElement",
+          "declaration": {
+            "name": "defineElement",
+            "module": "src/base/define-element.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "tag",
+          "declaration": {
+            "name": "ctor",
+            "module": "src/base/define-element.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/base/tc-element.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Shared base for all `<tc-*>` components.\n`delegatesFocus` forwards external `.focus()` and label clicks to the inner\nnative control inside the shadow root.",
+          "name": "TcElement",
+          "members": [
+            {
+              "kind": "field",
+              "name": "shadowRootOptions",
+              "type": {
+                "text": "ShadowRootInit"
+              },
+              "static": true,
+              "default": "{ ...LitElement.shadowRootOptions, delegatesFocus: true, }"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "TcElement",
+          "declaration": {
+            "name": "TcElement",
+            "module": "src/base/tc-element.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/button/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "TcButton",
+          "declaration": {
+            "name": "TcButton",
+            "module": "./tc-button.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/button/tc-button-define.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/button/tc-button.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "主要按鈕。",
+          "name": "TcButton",
+          "cssProperties": [
+            {
+              "description": "圓角",
+              "name": "--tc-button-radius"
+            },
+            {
+              "description": "filled 變體底色",
+              "name": "--tc-button-filled-bg"
+            },
+            {
+              "description": "filled 變體文字色",
+              "name": "--tc-button-filled-fg"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "內部原生 <button>",
+              "name": "base"
+            }
+          ],
+          "slots": [
+            {
+              "description": "按鈕標籤文字",
+              "name": ""
+            },
+            {
+              "description": "前置圖示",
+              "name": "start"
+            },
+            {
+              "description": "後置圖示",
+              "name": "end"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "formAssociated",
+              "type": {
+                "text": "boolean"
+              },
+              "static": true,
+              "default": "true"
+            },
+            {
+              "kind": "field",
+              "name": "variant",
+              "type": {
+                "text": "'filled' | 'outlined' | 'tonal'"
+              },
+              "default": "'filled'",
+              "attribute": "variant",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "type",
+              "type": {
+                "text": "'button' | 'submit' | 'reset'"
+              },
+              "default": "'button'",
+              "attribute": "type",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "disabled",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "fullWidth",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "full-width",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "#internals",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "#onClick",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "shadowRootOptions",
+              "type": {
+                "text": "ShadowRootInit"
+              },
+              "static": true,
+              "default": "{ ...LitElement.shadowRootOptions, delegatesFocus: true, }",
+              "inheritedFrom": {
+                "name": "TcElement",
+                "module": "src/base/tc-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "variant",
+              "type": {
+                "text": "'filled' | 'outlined' | 'tonal'"
+              },
+              "default": "'filled'",
+              "fieldName": "variant"
+            },
+            {
+              "name": "type",
+              "type": {
+                "text": "'button' | 'submit' | 'reset'"
+              },
+              "default": "'button'",
+              "fieldName": "type"
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "disabled"
+            },
+            {
+              "name": "full-width",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "fullWidth"
+            }
+          ],
+          "superclass": {
+            "name": "TcElement",
+            "module": "/src/base/tc-element.js"
+          },
+          "summary": "Tzu Chi primary button.",
+          "customElement": true,
+          "tagName": "tc-button"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "TcButton",
+          "declaration": {
+            "name": "TcButton",
+            "module": "src/button/tc-button.ts"
+          }
+        }
+      ]
+    }
+  ]
+}

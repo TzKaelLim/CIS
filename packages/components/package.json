@@ -1,0 +1,55 @@
+{
+  "name": "@tzuchi/components",
+  "version": "0.0.0",
+  "type": "module",
+  "sideEffects": [
+    "**/*.css",
+    "**/*-define.js",
+    "./dist/index.js",
+    "./dist/cdn/*"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./button": {
+      "types": "./dist/button/tc-button-define.d.ts",
+      "default": "./dist/button/tc-button-define.js"
+    },
+    "./button/class": {
+      "types": "./dist/button/tc-button.d.ts",
+      "default": "./dist/button/tc-button.js"
+    },
+    "./cdn": {
+      "types": "./dist/cdn/tc-components.d.ts",
+      "default": "./dist/cdn/tc-components.js"
+    },
+    "./custom-elements.json": "./custom-elements.json"
+  },
+  "files": [
+    "dist",
+    "custom-elements.json"
+  ],
+  "dependencies": {
+    "@tzuchi/tokens": "workspace:*",
+    "lit": "^3.2.0"
+  },
+  "scripts": {
+    "build": "tsc -b && vite build --config vite.lib.config.ts && vite build --config vite.cdn.config.ts && node write-cdn-dts.mjs && pnpm run cem",
+    "cem": "cem analyze --config custom-elements-manifest.config.mjs",
+    "test": "vite build --config vite.lib.config.ts && wtr --config web-test-runner.config.mjs",
+    "verify:pkg": "publint && attw --pack . --profile esm-only"
+  },
+  "devDependencies": {
+    "vite": "^5.4.0",
+    "typescript": "^5.7.0",
+    "@custom-elements-manifest/analyzer": "^0.10.0",
+    "@web/test-runner": "^0.19.0",
+    "@web/dev-server-esbuild": "^1.0.0",
+    "@open-wc/testing": "^4.0.0",
+    "publint": "^0.2.12",
+    "@arethetypeswrong/cli": "^0.18.0"
+  },
+  "customElements": "custom-elements.json"
+}
