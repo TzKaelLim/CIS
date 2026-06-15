@@ -1,0 +1,72 @@
+---
+title: Chip
+description: tc-chip — 膠囊形標籤籌碼，支援前置圖示、可切換選取與可移除。
+---
+
+import Demo from '../../../components/Demo.astro';
+import PropsTable from '../../../components/PropsTable.astro';
+
+`<tc-chip>` 是膠囊形的 tonal 標籤籌碼，採用品牌淺底（brand surface）配品牌主色文字（brand primary）。可作為動作型（assist）或篩選型（filter）標籤，支援前置圖示、可切換選取與可移除。下方為**可互動的真實元件**：
+
+<Demo>
+  <tc-chip>連結</tc-chip>
+  <tc-chip selected>已選取</tc-chip>
+  <tc-chip removable>增加</tc-chip>
+  <tc-chip disabled>停用</tc-chip>
+</Demo>
+
+## 用法
+
+### 純 HTML
+
+```html
+<link rel="stylesheet" href="@tzuchi/tokens/tokens.css" />
+<script type="module" src="@tzuchi/components/cdn"></script>
+
+<tc-chip>連結</tc-chip>
+<tc-chip removable>增加</tc-chip>
+```
+
+### React
+
+```tsx
+import { TcChip } from '@tzuchi/react';
+
+<TcChip removable onTcRemove={() => removeTag(id)}>
+  增加
+</TcChip>;
+```
+
+## 前置圖示
+
+透過 `slot="leading"` 放入前置圖示：
+
+<Demo>
+  <tc-chip>
+    <span slot="leading" aria-hidden="true">★</span>連結
+  </tc-chip>
+</Demo>
+
+## 可移除
+
+`removable` 會在尾端顯示關閉鈕。點擊關閉鈕或於籌碼上按 `Delete` / `Backspace` 會派發 `tc-remove`，且**不會**切換選取狀態：
+
+<Demo>
+  <tc-chip
+    removable
+    ontc-remove="this.remove();"
+  >按我移除</tc-chip>
+</Demo>
+
+## API
+
+下表自 Custom Elements Manifest 自動產生：
+
+<PropsTable tag="tc-chip" />
+
+## 無障礙（Accessibility）
+
+- 籌碼本體為 `role="button"`，可切換 `selected` 時以 `aria-pressed` 反映狀態。
+- 鍵盤：`Enter` / `Space` 切換選取；`removable` 時 `Delete` / `Backspace` 派發 `tc-remove`。
+- `:focus-visible` 焦點環使用 `--tc-focus-ring-*` token。
+- `disabled` 以 `aria-disabled` 標示並移出 Tab 順序（非 `pointer-events:none`）。

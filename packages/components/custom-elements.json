@@ -62,6 +62,46 @@
             "name": "TcTab",
             "module": "./tabs/tc-tab.js"
           }
+        },
+        {
+          "kind": "js",
+          "name": "TcRadio",
+          "declaration": {
+            "name": "TcRadio",
+            "module": "./radio/tc-radio.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "TcChip",
+          "declaration": {
+            "name": "TcChip",
+            "module": "./chip/tc-chip.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "TcLink",
+          "declaration": {
+            "name": "TcLink",
+            "module": "./link/tc-link.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "TcPagination",
+          "declaration": {
+            "name": "TcPagination",
+            "module": "./pagination/tc-pagination.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "TcDropdown",
+          "declaration": {
+            "name": "TcDropdown",
+            "module": "./dropdown/tc-dropdown.js"
+          }
         }
       ]
     },
@@ -328,6 +368,246 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/chip/tc-chip-define.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/chip/tc-chip.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "標籤籌碼（Chip）。",
+          "name": "TcChip",
+          "cssProperties": [
+            {
+              "description": "籌碼底色",
+              "name": "--tc-chip-bg"
+            },
+            {
+              "description": "hover / selected 底色",
+              "name": "--tc-chip-bg-hover"
+            },
+            {
+              "description": "文字與圖示顏色",
+              "name": "--tc-chip-fg"
+            },
+            {
+              "description": "圓角（預設膠囊形）",
+              "name": "--tc-chip-radius"
+            },
+            {
+              "description": "停用透明度",
+              "name": "--tc-chip-disabled-opacity"
+            },
+            {
+              "description": "焦點環顏色",
+              "name": "--tc-chip-focus-ring-color"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "內部籌碼容器",
+              "name": "base"
+            },
+            {
+              "description": "標籤文字容器",
+              "name": "label"
+            },
+            {
+              "description": "移除按鈕（removable 時）",
+              "name": "remove"
+            }
+          ],
+          "slots": [
+            {
+              "description": "籌碼標籤文字",
+              "name": ""
+            },
+            {
+              "description": "前置圖示",
+              "name": "leading"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "variant",
+              "type": {
+                "text": "'assist' | 'filter'"
+              },
+              "default": "'assist'",
+              "description": "變體：`assist`（預設動作型）或 `filter`（篩選型）。視覺皆為單一 tonal 樣式。",
+              "attribute": "variant",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "停用：以 `aria-disabled` 表示，不可點擊、切換或移除。",
+              "attribute": "disabled",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "selected",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "選取狀態（可切換）。Enter / Space 或點擊會切換。",
+              "attribute": "selected",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "removable",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "可移除：顯示後置關閉鈕，點擊或按 Delete / Backspace 會派發 `tc-remove`。",
+              "attribute": "removable",
+              "reflects": true
+            },
+            {
+              "kind": "method",
+              "name": "#syncA11y",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Keep host ARIA + roving tabindex in sync with state."
+            },
+            {
+              "kind": "method",
+              "name": "#toggle",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Toggle selection and emit `tc-select`."
+            },
+            {
+              "kind": "method",
+              "name": "#remove",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Emit `tc-remove`. Does NOT toggle selection."
+            },
+            {
+              "kind": "field",
+              "name": "#onClick",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "#onKeydown",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "shadowRootOptions",
+              "type": {
+                "text": "ShadowRootInit"
+              },
+              "static": true,
+              "default": "{ ...LitElement.shadowRootOptions, delegatesFocus: true, }",
+              "inheritedFrom": {
+                "name": "TcElement",
+                "module": "src/base/tc-element.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "name": "tc-select",
+              "type": {
+                "text": "CustomEvent<{ selected: boolean }>"
+              },
+              "description": "切換選取狀態時派發（composed, bubbles）。"
+            },
+            {
+              "name": "tc-remove",
+              "type": {
+                "text": "CustomEvent<Record<string, never>>"
+              },
+              "description": "點擊移除鈕或按 Delete/Backspace 時派發（composed, bubbles）。"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "variant",
+              "type": {
+                "text": "'assist' | 'filter'"
+              },
+              "default": "'assist'",
+              "description": "變體：`assist`（預設動作型）或 `filter`（篩選型）。視覺皆為單一 tonal 樣式。",
+              "fieldName": "variant"
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "停用：以 `aria-disabled` 表示，不可點擊、切換或移除。",
+              "fieldName": "disabled"
+            },
+            {
+              "name": "selected",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "選取狀態（可切換）。Enter / Space 或點擊會切換。",
+              "fieldName": "selected"
+            },
+            {
+              "name": "removable",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "可移除：顯示後置關閉鈕，點擊或按 Delete / Backspace 會派發 `tc-remove`。",
+              "fieldName": "removable"
+            }
+          ],
+          "superclass": {
+            "name": "TcElement",
+            "module": "/src/base/tc-element.js"
+          },
+          "summary": "Tzu Chi tonal chip — a compact pill for labels, filters and removable tags.",
+          "customElement": true,
+          "tagName": "tc-chip"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "TcChip",
+          "declaration": {
+            "name": "TcChip",
+            "module": "src/chip/tc-chip.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/card/tc-card-define.ts",
       "declarations": [],
       "exports": []
@@ -344,6 +624,10 @@
             {
               "description": "卡片底色",
               "name": "--tc-card-bg"
+            },
+            {
+              "description": "卡片寬度（亦可用 width 屬性設定）",
+              "name": "--tc-card-width"
             },
             {
               "description": "圓角",
@@ -437,6 +721,17 @@
               "reflects": true
             },
             {
+              "kind": "field",
+              "name": "width",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "卡片寬度（CSS 長度，如 `320px` 或 `100%`）。未設定時由內容／容器決定。",
+              "attribute": "width",
+              "reflects": true
+            },
+            {
               "kind": "method",
               "name": "#syncInteractivity",
               "privacy": "private",
@@ -505,6 +800,15 @@
               "default": "''",
               "description": "連結目標。設定後整張卡片以 stretched-link 方式變成連結。",
               "fieldName": "href"
+            },
+            {
+              "name": "width",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "卡片寬度（CSS 長度，如 `320px` 或 `100%`）。未設定時由內容／容器決定。",
+              "fieldName": "width"
             }
           ],
           "superclass": {
@@ -523,6 +827,393 @@
           "declaration": {
             "name": "TcCard",
             "module": "src/card/tc-card.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/dropdown/tc-dropdown-define.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/dropdown/tc-dropdown.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "單選下拉選單（combobox / listbox）。",
+          "name": "TcDropdown",
+          "cssProperties": [
+            {
+              "description": "觸發按鈕底色（收合）",
+              "name": "--tc-dropdown-bg"
+            },
+            {
+              "description": "觸發按鈕底色（展開）",
+              "name": "--tc-dropdown-bg-open"
+            },
+            {
+              "description": "預設邊框色",
+              "name": "--tc-dropdown-border"
+            },
+            {
+              "description": "展開時邊框色",
+              "name": "--tc-dropdown-border-open"
+            },
+            {
+              "description": "圓角",
+              "name": "--tc-dropdown-radius"
+            },
+            {
+              "description": "placeholder / 觸發文字色",
+              "name": "--tc-dropdown-trigger-fg"
+            },
+            {
+              "description": "已選取值文字色",
+              "name": "--tc-dropdown-value-fg"
+            },
+            {
+              "description": "選單底色",
+              "name": "--tc-dropdown-listbox-bg"
+            },
+            {
+              "description": "選項文字色",
+              "name": "--tc-dropdown-option-fg"
+            },
+            {
+              "description": "選項 hover / active 底色",
+              "name": "--tc-dropdown-option-bg-hover"
+            },
+            {
+              "description": "已選取選項底色",
+              "name": "--tc-dropdown-option-bg-selected"
+            },
+            {
+              "description": "焦點環顏色",
+              "name": "--tc-dropdown-focus-ring-color"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "外框觸發按鈕",
+              "name": "trigger"
+            },
+            {
+              "description": "觸發按鈕內顯示的文字",
+              "name": "label"
+            },
+            {
+              "description": "下拉箭頭圖示",
+              "name": "chevron"
+            },
+            {
+              "description": "展開的選項清單容器（role=listbox）",
+              "name": "listbox"
+            },
+            {
+              "description": "單一選項（role=option）",
+              "name": "option"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "formAssociated",
+              "type": {
+                "text": "boolean"
+              },
+              "static": true,
+              "default": "true"
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "目前選取選項的 value（反映為屬性）。",
+              "attribute": "value",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "placeholder",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "未選取時顯示的提示文字。",
+              "attribute": "placeholder"
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "停用：停用內部原生按鈕（非 pointer-events:none）。",
+              "attribute": "disabled",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "open",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "選單是否展開（反映為屬性）。",
+              "attribute": "open",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "表單欄位名稱。",
+              "attribute": "name",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "options",
+              "type": {
+                "text": "TcDropdownOption[]"
+              },
+              "default": "[]",
+              "description": "選項清單。可由 property 設定物件陣列，或由 HTML/React 以 JSON 字串屬性提供。",
+              "attribute": "options"
+            },
+            {
+              "kind": "field",
+              "name": "_activeIndex",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "-1",
+              "description": "Index of the keyboard-active option while the listbox is open (-1 = none)."
+            },
+            {
+              "kind": "field",
+              "name": "#internals",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "#uid",
+              "privacy": "private",
+              "default": "`tc-dropdown-${++dropdownUid}`"
+            },
+            {
+              "kind": "field",
+              "name": "#listboxId",
+              "privacy": "private",
+              "default": "`${this.#uid}-listbox`"
+            },
+            {
+              "kind": "field",
+              "name": "form",
+              "type": {
+                "text": "HTMLFormElement | null"
+              },
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "#syncFormState",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "field",
+              "name": "#selectedOption",
+              "privacy": "private",
+              "type": {
+                "text": "TcDropdownOption | undefined"
+              },
+              "description": "Currently selected option, if any.",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "#toggle",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "#close",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "#selectIndex",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "index",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "#focusTrigger",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "field",
+              "name": "#onDocumentPointerDown",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "#onTriggerClick",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "#onOptionClick",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "#onKeydown",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "#chevron",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "shadowRootOptions",
+              "type": {
+                "text": "ShadowRootInit"
+              },
+              "static": true,
+              "default": "{ ...LitElement.shadowRootOptions, delegatesFocus: true, }",
+              "inheritedFrom": {
+                "name": "TcElement",
+                "module": "src/base/tc-element.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "name": "tc-change",
+              "type": {
+                "text": "CustomEvent<{ value: string }>"
+              },
+              "description": "選取值改變時派發（composed, bubbles）。"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "目前選取選項的 value（反映為屬性）。",
+              "fieldName": "value"
+            },
+            {
+              "name": "placeholder",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "未選取時顯示的提示文字。",
+              "fieldName": "placeholder"
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "停用：停用內部原生按鈕（非 pointer-events:none）。",
+              "fieldName": "disabled"
+            },
+            {
+              "name": "open",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "選單是否展開（反映為屬性）。",
+              "fieldName": "open"
+            },
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "表單欄位名稱。",
+              "fieldName": "name"
+            },
+            {
+              "name": "options",
+              "type": {
+                "text": "TcDropdownOption[]"
+              },
+              "default": "[]",
+              "description": "選項清單。可由 property 設定物件陣列，或由 HTML/React 以 JSON 字串屬性提供。",
+              "fieldName": "options"
+            }
+          ],
+          "superclass": {
+            "name": "TcElement",
+            "module": "/src/base/tc-element.js"
+          },
+          "summary": "Tzu Chi single-select outlined dropdown (combobox/listbox).",
+          "customElement": true,
+          "tagName": "tc-dropdown"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "TcDropdown",
+          "declaration": {
+            "name": "TcDropdown",
+            "module": "src/dropdown/tc-dropdown.ts"
           }
         }
       ]
@@ -1206,6 +1897,802 @@
           "declaration": {
             "name": "TcInput",
             "module": "src/input/tc-input.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/link/tc-link-define.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/link/tc-link.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "文字連結。",
+          "name": "TcLink",
+          "cssProperties": [
+            {
+              "description": "連結文字色",
+              "name": "--tc-link-fg"
+            },
+            {
+              "description": "hover 文字色",
+              "name": "--tc-link-fg-hover"
+            },
+            {
+              "description": "subtle 變體靜止文字色",
+              "name": "--tc-link-subtle-fg"
+            },
+            {
+              "description": "停用文字色",
+              "name": "--tc-link-disabled-fg"
+            },
+            {
+              "description": "焦點環顏色",
+              "name": "--tc-link-focus-ring-color"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "內部原生 <a>（停用時為 <span>）",
+              "name": "link"
+            }
+          ],
+          "slots": [
+            {
+              "description": "連結文字標籤",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "href",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "連結目標網址。",
+              "attribute": "href"
+            },
+            {
+              "kind": "field",
+              "name": "target",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "`<a target>`，例如 `_blank`。",
+              "attribute": "target"
+            },
+            {
+              "kind": "field",
+              "name": "rel",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "`<a rel>`。`target=\"_blank\"` 時自動補上 `noopener noreferrer`。",
+              "attribute": "rel"
+            },
+            {
+              "kind": "field",
+              "name": "variant",
+              "type": {
+                "text": "'default' | 'subtle'"
+              },
+              "default": "'default'",
+              "description": "視覺變體：`default`（品牌色）或 `subtle`（內文色，hover 變品牌色）。",
+              "attribute": "variant",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "停用：改以 `<span aria-disabled>` 呈現，無法點擊或導覽。",
+              "attribute": "disabled",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "#onClick",
+              "privacy": "private",
+              "description": "Block navigation + propagation while disabled."
+            },
+            {
+              "kind": "field",
+              "name": "shadowRootOptions",
+              "type": {
+                "text": "ShadowRootInit"
+              },
+              "static": true,
+              "default": "{ ...LitElement.shadowRootOptions, delegatesFocus: true, }",
+              "inheritedFrom": {
+                "name": "TcElement",
+                "module": "src/base/tc-element.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "MouseEvent"
+              },
+              "description": "原生點擊事件（停用時被攔截，不會冒泡）。",
+              "name": "click"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "href",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "連結目標網址。",
+              "fieldName": "href"
+            },
+            {
+              "name": "target",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "`<a target>`，例如 `_blank`。",
+              "fieldName": "target"
+            },
+            {
+              "name": "rel",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "`<a rel>`。`target=\"_blank\"` 時自動補上 `noopener noreferrer`。",
+              "fieldName": "rel"
+            },
+            {
+              "name": "variant",
+              "type": {
+                "text": "'default' | 'subtle'"
+              },
+              "default": "'default'",
+              "description": "視覺變體：`default`（品牌色）或 `subtle`（內文色，hover 變品牌色）。",
+              "fieldName": "variant"
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "停用：改以 `<span aria-disabled>` 呈現，無法點擊或導覽。",
+              "fieldName": "disabled"
+            }
+          ],
+          "superclass": {
+            "name": "TcElement",
+            "module": "/src/base/tc-element.js"
+          },
+          "summary": "Tzu Chi inline text link wrapping a native `<a>`.",
+          "customElement": true,
+          "tagName": "tc-link"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "TcLink",
+          "declaration": {
+            "name": "TcLink",
+            "module": "src/link/tc-link.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/pagination/tc-pagination-define.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/pagination/tc-pagination.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "分頁導覽：頁碼按鈕與上一頁／下一頁控制，頁數過多時以省略號收合。",
+          "name": "TcPagination",
+          "cssProperties": [
+            {
+              "description": "頁碼文字色",
+              "name": "--tc-pagination-item-fg"
+            },
+            {
+              "description": "目前頁碼底色",
+              "name": "--tc-pagination-item-bg-selected"
+            },
+            {
+              "description": "目前頁碼文字色",
+              "name": "--tc-pagination-item-fg-selected"
+            },
+            {
+              "description": "頁碼 hover 底色",
+              "name": "--tc-pagination-item-bg-hover"
+            },
+            {
+              "description": "頁碼圓角",
+              "name": "--tc-pagination-radius"
+            },
+            {
+              "description": "焦點環顏色",
+              "name": "--tc-pagination-focus-ring-color"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "外層 <nav> 容器",
+              "name": "nav"
+            },
+            {
+              "description": "上一頁按鈕",
+              "name": "prev"
+            },
+            {
+              "description": "下一頁按鈕",
+              "name": "next"
+            },
+            {
+              "description": "單一頁碼按鈕",
+              "name": "page"
+            },
+            {
+              "description": "省略號標記",
+              "name": "ellipsis"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "total",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "總頁數。",
+              "attribute": "total",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "page",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "目前頁碼（1 起算，會反映至屬性）。",
+              "attribute": "page",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "siblingCount",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "目前頁碼兩側固定顯示的頁數，預設 1。",
+              "attribute": "sibling-count",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "ariaLabelText",
+              "type": {
+                "text": "string"
+              },
+              "default": "'分頁導覽'",
+              "description": "導覽區域的無障礙標籤，套用至 <nav> 的 aria-label。",
+              "attribute": "aria-label-text"
+            },
+            {
+              "kind": "field",
+              "name": "#total",
+              "privacy": "private",
+              "type": {
+                "text": "number"
+              },
+              "description": "Clamp `total` to at least 1 and `page` into `[1, total]`.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "#page",
+              "privacy": "private",
+              "type": {
+                "text": "number"
+              },
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "#range",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "Array<number | typeof ELLIPSIS>"
+                }
+              },
+              "description": "Compute the windowed list of page numbers, inserting ELLIPSIS sentinels.\nAlways shows the first and last page; shows `siblingCount` pages on each\nside of the current page. Collapses gaps wider than one page into an\nellipsis, but keeps a real page number when the gap is exactly one."
+            },
+            {
+              "kind": "method",
+              "name": "#goTo",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "next",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "field",
+              "name": "#onPrev",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "#onNext",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "#onPage",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "#renderPage",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "n",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "field",
+              "name": "shadowRootOptions",
+              "type": {
+                "text": "ShadowRootInit"
+              },
+              "static": true,
+              "default": "{ ...LitElement.shadowRootOptions, delegatesFocus: true, }",
+              "inheritedFrom": {
+                "name": "TcElement",
+                "module": "src/base/tc-element.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "name": "tc-page-change",
+              "type": {
+                "text": "CustomEvent<{ page: number }>"
+              },
+              "description": "頁碼改變時派發（composed, bubbles）。"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "total",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "總頁數。",
+              "fieldName": "total"
+            },
+            {
+              "name": "page",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "目前頁碼（1 起算，會反映至屬性）。",
+              "fieldName": "page"
+            },
+            {
+              "name": "sibling-count",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "目前頁碼兩側固定顯示的頁數，預設 1。",
+              "fieldName": "siblingCount"
+            },
+            {
+              "name": "aria-label-text",
+              "type": {
+                "text": "string"
+              },
+              "default": "'分頁導覽'",
+              "description": "導覽區域的無障礙標籤，套用至 <nav> 的 aria-label。",
+              "fieldName": "ariaLabelText"
+            }
+          ],
+          "superclass": {
+            "name": "TcElement",
+            "module": "/src/base/tc-element.js"
+          },
+          "summary": "Tzu Chi pagination — windowed page-number buttons with prev / next controls.",
+          "customElement": true,
+          "tagName": "tc-pagination"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "TcPagination",
+          "declaration": {
+            "name": "TcPagination",
+            "module": "src/pagination/tc-pagination.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/radio/tc-radio-define.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/radio/tc-radio.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "單選圓鈕。",
+          "name": "TcRadio",
+          "cssProperties": [
+            {
+              "description": "控件尺寸（預設 24px）",
+              "name": "--tc-radio-size"
+            },
+            {
+              "description": "未選取時的外圈顏色",
+              "name": "--tc-radio-ring"
+            },
+            {
+              "description": "選取 / hover 時的外圈顏色",
+              "name": "--tc-radio-ring-checked"
+            },
+            {
+              "description": "內點顏色",
+              "name": "--tc-radio-dot"
+            },
+            {
+              "description": "控件底色",
+              "name": "--tc-radio-bg"
+            },
+            {
+              "description": "標籤文字色",
+              "name": "--tc-radio-label"
+            },
+            {
+              "description": "停用時透明度",
+              "name": "--tc-radio-disabled-opacity"
+            },
+            {
+              "description": "焦點環顏色",
+              "name": "--tc-radio-focus-ring-color"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "外圈 ring 與內點的容器",
+              "name": "control"
+            },
+            {
+              "description": "選取時填滿的內點",
+              "name": "dot"
+            },
+            {
+              "description": "標籤文字容器",
+              "name": "label"
+            }
+          ],
+          "slots": [
+            {
+              "description": "標籤文字",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "formAssociated",
+              "type": {
+                "text": "boolean"
+              },
+              "static": true,
+              "default": "true"
+            },
+            {
+              "kind": "field",
+              "name": "checked",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "是否選取（反映為屬性）。",
+              "attribute": "checked",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "表單值，選取時提交。",
+              "attribute": "value"
+            },
+            {
+              "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "群組名稱（反映為屬性）。同名的 `<tc-radio>` 互斥。",
+              "attribute": "name",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "停用（反映為屬性）：無法選取且不可聚焦。",
+              "attribute": "disabled",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "required",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "必填：群組內無任何選取時無效。",
+              "attribute": "required",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "#internals",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "#inputId",
+              "privacy": "private",
+              "default": "`tc-radio-${++radioUid}`"
+            },
+            {
+              "kind": "field",
+              "name": "form",
+              "type": {
+                "text": "HTMLFormElement | null"
+              },
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "validity",
+              "type": {
+                "text": "ValidityState"
+              },
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "validationMessage",
+              "type": {
+                "text": "string"
+              },
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "#syncTabIndex",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Roving tabindex within a group: the checked radio (or, if none checked,\nthe first enabled radio) is the only one in the tab order."
+            },
+            {
+              "kind": "method",
+              "name": "#syncFormState",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "#group",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TcRadio[]"
+                }
+              },
+              "description": "All same-name radios within this element's root (form or shadow/document)."
+            },
+            {
+              "kind": "method",
+              "name": "#groupHasChecked",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "#uncheckSiblings",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Uncheck every other same-name radio in the group."
+            },
+            {
+              "kind": "method",
+              "name": "#select",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Select this radio (no-op if disabled or already checked). Emits tc-change."
+            },
+            {
+              "kind": "field",
+              "name": "#onClick",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "#onKeydown",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "shadowRootOptions",
+              "type": {
+                "text": "ShadowRootInit"
+              },
+              "static": true,
+              "default": "{ ...LitElement.shadowRootOptions, delegatesFocus: true, }",
+              "inheritedFrom": {
+                "name": "TcElement",
+                "module": "src/base/tc-element.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "name": "tc-change",
+              "type": {
+                "text": "CustomEvent<{ checked: boolean; value: string }>"
+              },
+              "description": "選取狀態改變時派發（composed, bubbles）。"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "checked",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "是否選取（反映為屬性）。",
+              "fieldName": "checked"
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "表單值，選取時提交。",
+              "fieldName": "value"
+            },
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "群組名稱（反映為屬性）。同名的 `<tc-radio>` 互斥。",
+              "fieldName": "name"
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "停用（反映為屬性）：無法選取且不可聚焦。",
+              "fieldName": "disabled"
+            },
+            {
+              "name": "required",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "必填：群組內無任何選取時無效。",
+              "fieldName": "required"
+            }
+          ],
+          "superclass": {
+            "name": "TcElement",
+            "module": "/src/base/tc-element.js"
+          },
+          "summary": "Tzu Chi form-associated radio button (24×24 ring + dot).",
+          "customElement": true,
+          "tagName": "tc-radio"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "TcRadio",
+          "declaration": {
+            "name": "TcRadio",
+            "module": "src/radio/tc-radio.ts"
           }
         }
       ]

@@ -63,6 +63,46 @@
       "types": "./dist/tabs/tc-tabs.d.ts",
       "default": "./dist/tabs/tc-tabs.js"
     },
+    "./radio": {
+      "types": "./dist/radio/tc-radio-define.d.ts",
+      "default": "./dist/radio/tc-radio-define.js"
+    },
+    "./radio/class": {
+      "types": "./dist/radio/tc-radio.d.ts",
+      "default": "./dist/radio/tc-radio.js"
+    },
+    "./chip": {
+      "types": "./dist/chip/tc-chip-define.d.ts",
+      "default": "./dist/chip/tc-chip-define.js"
+    },
+    "./chip/class": {
+      "types": "./dist/chip/tc-chip.d.ts",
+      "default": "./dist/chip/tc-chip.js"
+    },
+    "./link": {
+      "types": "./dist/link/tc-link-define.d.ts",
+      "default": "./dist/link/tc-link-define.js"
+    },
+    "./link/class": {
+      "types": "./dist/link/tc-link.d.ts",
+      "default": "./dist/link/tc-link.js"
+    },
+    "./pagination": {
+      "types": "./dist/pagination/tc-pagination-define.d.ts",
+      "default": "./dist/pagination/tc-pagination-define.js"
+    },
+    "./pagination/class": {
+      "types": "./dist/pagination/tc-pagination.d.ts",
+      "default": "./dist/pagination/tc-pagination.js"
+    },
+    "./dropdown": {
+      "types": "./dist/dropdown/tc-dropdown-define.d.ts",
+      "default": "./dist/dropdown/tc-dropdown-define.js"
+    },
+    "./dropdown/class": {
+      "types": "./dist/dropdown/tc-dropdown.d.ts",
+      "default": "./dist/dropdown/tc-dropdown.js"
+    },
     "./cdn": {
       "types": "./dist/cdn/tc-components.d.ts",
       "default": "./dist/cdn/tc-components.js"

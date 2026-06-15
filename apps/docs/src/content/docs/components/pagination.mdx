@@ -1,0 +1,63 @@
+---
+title: Pagination
+description: tc-pagination — 分頁導覽，頁碼按鈕與上一頁／下一頁控制，頁數過多時以省略號收合。
+---
+
+import Demo from '../../../components/Demo.astro';
+import PropsTable from '../../../components/PropsTable.astro';
+
+`<tc-pagination>` 提供分頁導覽：上一頁、頁碼、下一頁。目前頁碼以品牌主色凸顯並標記 `aria-current="page"`，頁數過多時以省略號收合。下方為**可互動的真實元件**：
+
+<Demo>
+  <tc-pagination total="8" page="1"></tc-pagination>
+</Demo>
+
+頁數過多時，會依 `sibling-count`（目前頁碼兩側的頁數）與首／末頁收合中間範圍：
+
+<Demo>
+  <tc-pagination total="20" page="10"></tc-pagination>
+  <tc-pagination total="20" page="10" sibling-count="2"></tc-pagination>
+</Demo>
+
+## 用法
+
+### 純 HTML
+
+```html
+<link rel="stylesheet" href="@tzuchi/tokens/tokens.css" />
+<script type="module" src="@tzuchi/components/cdn"></script>
+
+<tc-pagination total="8" page="1"></tc-pagination>
+<script>
+  document.querySelector('tc-pagination').addEventListener('tc-page-change', (e) => {
+    console.log('目前頁碼：', e.detail.page);
+  });
+</script>
+```
+
+### React
+
+```tsx
+import { TcPagination } from '@tzuchi/react';
+
+<TcPagination total={8} page={page} onTcPageChange={(e) => setPage(e.detail.page)} />;
+```
+
+## 事件
+
+| 事件名稱         | detail            | 說明                       |
+| ---------------- | ----------------- | -------------------------- |
+| `tc-page-change` | `{ page: number }` | 頁碼改變時派發（會冒泡）。 |
+
+## API
+
+下表自 Custom Elements Manifest 自動產生：
+
+<PropsTable tag="tc-pagination" />
+
+## 無障礙（Accessibility）
+
+- 外層為 `<nav aria-label>`，頁碼與上一頁／下一頁皆為原生 `<button>`，支援鍵盤 Enter / Space。
+- 目前頁碼標記 `aria-current="page"`，每個頁碼具有 `aria-label`（如「第 3 頁」）。
+- 第一頁時停用「上一頁」、最後一頁時停用「下一頁」（透過原生 `disabled`，非 `pointer-events:none`）。
+- `:focus-visible` 焦點環使用 `--tc-focus-ring-*` token。

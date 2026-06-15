@@ -7,6 +7,7 @@ interface CardArgs {
   variant: 'elevated' | 'outlined';
   interactive: boolean;
   href: string;
+  width: string;
 }
 
 const meta: Meta<CardArgs> = {
@@ -16,19 +17,22 @@ const meta: Meta<CardArgs> = {
     variant: { control: 'inline-radio', options: ['elevated', 'outlined'] },
     interactive: { control: 'boolean' },
     href: { control: 'text' },
+    width: { control: 'text' },
   },
-  args: { variant: 'elevated', interactive: false, href: '' },
+  args: { variant: 'elevated', interactive: false, href: '', width: '360px' },
   render: (a) => html`
     <tc-card
       variant=${a.variant}
       ?interactive=${a.interactive}
       href=${a.href || ''}
-      style="max-width:380px"
+      width=${a.width || ''}
     >
-      <div
+      <img
         slot="media"
-        style="aspect-ratio:16/10;background:var(--tc-color-gray-200,#e0e0e0)"
-      ></div>
+        src="https://picsum.photos/seed/tzuchi/720/420"
+        alt="示意圖片"
+        style="display:block;width:100%;aspect-ratio:16/10;object-fit:cover"
+      />
       <span slot="headline">專案名稱</span>
       <p style="margin:0;color:var(--tc-color-text-muted,#616161)">
         2022-03-21 ｜ TCnews 慈善新聞網

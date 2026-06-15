@@ -6,18 +6,45 @@ description: tc-card — 卡片容器，elevated / outlined 兩種變體，支�
 import Demo from '../../../components/Demo.astro';
 import PropsTable from '../../../components/PropsTable.astro';
 
-`<tc-card>` 是卡片容器，提供 media／headline／內文／footer 插槽，以及 elevated 與 outlined 兩種變體。互動時提升陰影（elevation）。下方為**可互動的真實元件**：
+`<tc-card>` 是卡片容器，提供 media／headline／內文／footer 插槽，以及 elevated 與 outlined 兩種變體。互動時提升陰影（elevation）。用 `width` 屬性控制寬度（CSS 長度）。下方為**可互動的真實元件**（圖片為 Lorem Picsum 假圖）：
 
 <Demo>
-  <tc-card variant="elevated" style="max-width:360px">
-    <div slot="media" style="aspect-ratio:16/10;background:#e0e0e0"></div>
+  <tc-card variant="elevated" width="360px">
+    <img
+      slot="media"
+      src="https://picsum.photos/seed/tzuchi1/720/420"
+      alt="示意圖片"
+      style="display:block;width:100%;aspect-ratio:16/10;object-fit:cover"
+    />
     <span slot="headline">專案名稱</span>
     <p style="margin:0;color:#616161">2022-03-21 ｜ TCnews 慈善新聞網</p>
     <tc-button slot="footer" variant="filled">捐款</tc-button>
   </tc-card>
-  <tc-card variant="outlined" style="max-width:360px">
+  <tc-card variant="outlined" width="360px">
+    <img
+      slot="media"
+      src="https://picsum.photos/seed/tzuchi2/720/420"
+      alt="示意圖片"
+      style="display:block;width:100%;aspect-ratio:16/10;object-fit:cover"
+    />
     <span slot="headline">文章標題（建議字數在 15 字以內）</span>
     <p style="margin:0;color:#616161">2022-03-21 ｜ TCnews 慈善新聞網</p>
+  </tc-card>
+</Demo>
+
+## 寬度（width）
+
+`width` 接受任何 CSS 長度（如 `320px`、`100%`），等同設定 `--tc-card-width`：
+
+<Demo>
+  <tc-card variant="elevated" width="240px">
+    <img
+      slot="media"
+      src="https://picsum.photos/seed/tzuchi3/480/300"
+      alt="示意圖片"
+      style="display:block;width:100%;aspect-ratio:16/10;object-fit:cover"
+    />
+    <span slot="headline">240px 卡片</span>
   </tc-card>
 </Demo>
 

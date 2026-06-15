@@ -1,0 +1,60 @@
+---
+title: Link
+description: tc-link — 行內文字連結，包覆原生 <a>，支援 default / subtle 變體與停用狀態。
+---
+
+import Demo from '../../../components/Demo.astro';
+import PropsTable from '../../../components/PropsTable.astro';
+
+`<tc-link>` 是行內文字連結，內部使用原生 `<a>`，保留原生點擊與導覽行為。下方為**可互動的真實元件**：
+
+<Demo>
+  <tc-link href="#">詳細了解我們所做的</tc-link>
+  <tc-link variant="subtle" href="#">隱性連結</tc-link>
+  <tc-link disabled href="#">停用連結</tc-link>
+</Demo>
+
+## 行內使用
+
+`tc-link` 為 `display: inline`，可直接置於段落文字之中：
+
+<Demo>
+  <p style="max-width:32rem;">
+    慈濟基金會在全球推動慈善志業，歡迎您
+    <tc-link href="#">詳細了解我們所做的</tc-link>
+    ，一起成就善的循環。
+  </p>
+</Demo>
+
+## 用法
+
+### 純 HTML
+
+```html
+<link rel="stylesheet" href="@tzuchi/tokens/tokens.css" />
+<script type="module" src="@tzuchi/components/cdn"></script>
+
+<tc-link href="/about">了解更多</tc-link>
+<tc-link href="https://example.org" target="_blank">外部連結</tc-link>
+```
+
+### React
+
+```tsx
+import { TcLink } from '@tzuchi/react';
+
+<TcLink href="/about">了解更多</TcLink>;
+```
+
+## API
+
+下表自 Custom Elements Manifest 自動產生：
+
+<PropsTable tag="tc-link" />
+
+## 無障礙（Accessibility）
+
+- 內含原生 `<a>`，支援鍵盤 Enter 與螢幕閱讀器的連結語意。
+- `:focus-visible` 焦點環使用 `--tc-focus-ring-*` token。
+- `disabled` 時改以 `<span aria-disabled="true">` 呈現，無法點擊或導覽（非 `pointer-events:none`，AT 仍可讀取）。
+- `target="_blank"` 會自動補上 `rel="noopener noreferrer"`，可由 `rel` 屬性覆寫。

@@ -53,11 +53,10 @@ export const tabStyles = css`
     border-radius: var(--tc-radius-sm, 4px);
   }
 
+  /* Transparent wrapper: an empty icon slot must occupy no space (otherwise it
+     pushes the label off-center). The slotted icon, if any, sizes itself. */
   .icon {
-    display: inline-flex;
-    align-items: center;
-    inline-size: var(--tc-size-icon-md, 24px);
-    block-size: var(--tc-size-icon-md, 24px);
+    display: contents;
   }
 
   ::slotted([slot='icon']) {

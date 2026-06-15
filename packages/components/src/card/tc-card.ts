@@ -13,6 +13,7 @@ import { cardStyles } from './tc-card.styles.js';
  * @csspart base - 卡片外層容器
  * @csspart link - href 模式下覆蓋整張卡片的 <a>（stretched link）
  * @cssprop [--tc-card-bg] - 卡片底色
+ * @cssprop [--tc-card-width] - 卡片寬度（亦可用 width 屬性設定）
  * @cssprop [--tc-card-radius] - 圓角
  * @cssprop [--tc-card-padding] - 內文區內距
  * @cssprop [--tc-card-border] - outlined 變體邊框色
@@ -34,6 +35,9 @@ export class TcCard extends TcElement {
   /** 連結目標。設定後整張卡片以 stretched-link 方式變成連結。 */
   @property({ reflect: true }) href = '';
 
+  /** 卡片寬度（CSS 長度，如 `320px` 或 `100%`）。未設定時由內容／容器決定。 */
+  @property({ reflect: true }) width = '';
+
   override connectedCallback(): void {
     super.connectedCallback();
     this.#syncInteractivity();
@@ -47,6 +51,10 @@ export class TcCard extends TcElement {
 
   override updated(changed: Map<string, unknown>): void {
     if (changed.has('interactive') || changed.has('href')) this.#syncInteractivity();
+    if (changed.has('width')) {
+      if (this.width) this.style.setProperty('--tc-card-width', this.width);
+      else this.style.removeProperty('--tc-card-width');
+    }
   }
 
   /** Make the host focusable + announce a role when interactive without an href.

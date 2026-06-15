@@ -4,6 +4,7 @@ export const cardStyles = css`
   :host {
     display: block;
     position: relative;
+    inline-size: var(--tc-card-width, auto);
     border-radius: var(--tc-card-radius, var(--tc-radius-lg, 16px));
     background: var(--tc-card-bg, var(--tc-color-surface-default, #fff));
     color: var(--tc-color-text-default, #212121);

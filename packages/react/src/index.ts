@@ -1,8 +1,13 @@
 'use client';
 export { TcButton } from './generated/TcButton.js';
 export { TcCard } from './generated/TcCard.js';
+export { TcChip } from './generated/TcChip.js';
+export { TcDropdown } from './generated/TcDropdown.js';
 export { TcIcon } from './generated/TcIcon.js';
 export { TcIconButton } from './generated/TcIconButton.js';
 export { TcInput } from './generated/TcInput.js';
+export { TcLink } from './generated/TcLink.js';
+export { TcPagination } from './generated/TcPagination.js';
+export { TcRadio } from './generated/TcRadio.js';
 export { TcTab } from './generated/TcTab.js';
 export { TcTabs } from './generated/TcTabs.js';

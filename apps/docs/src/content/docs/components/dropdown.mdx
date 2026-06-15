@@ -1,0 +1,94 @@
+---
+title: Dropdown
+description: tc-dropdown — 單選 outlined 下拉選單（combobox / listbox），支援鍵盤瀏覽與表單整合。
+---
+
+import Demo from '../../../components/Demo.astro';
+import PropsTable from '../../../components/PropsTable.astro';
+
+`<tc-dropdown>` 是單選的 outlined 下拉選單（combobox / listbox）。選項可由 `options` property（物件陣列）或 `options` 屬性（JSON 字串）提供，因此純 HTML 與 React 皆可使用。下方為**可互動的真實元件**：
+
+<Demo>
+  <tc-dropdown
+    placeholder="請選擇地區"
+    options='[{"value":"tw","label":"台灣"},{"value":"jp","label":"日本"},{"value":"us","label":"美國"}]'
+    style="width:180px;"
+  ></tc-dropdown>
+  <tc-dropdown
+    placeholder="請選擇地區"
+    value="jp"
+    options='[{"value":"tw","label":"台灣"},{"value":"jp","label":"日本"},{"value":"us","label":"美國"}]'
+    style="width:180px;"
+  ></tc-dropdown>
+  <tc-dropdown
+    placeholder="已停用"
+    disabled
+    options='[{"value":"tw","label":"台灣"}]'
+    style="width:180px;"
+  ></tc-dropdown>
+</Demo>
+
+## 用法
+
+### 純 HTML
+
+選項以 JSON 字串放入 `options` 屬性：
+
+```html
+<link rel="stylesheet" href="@tzuchi/tokens/tokens.css" />
+<script type="module" src="@tzuchi/components/cdn"></script>
+
+<tc-dropdown
+  name="region"
+  placeholder="請選擇地區"
+  options='[{"value":"tw","label":"台灣"},{"value":"jp","label":"日本"}]'
+></tc-dropdown>
+```
+
+### React
+
+選項以物件陣列 property 傳入：
+
+```tsx
+import { TcDropdown } from '@tzuchi/react';
+
+<TcDropdown
+  name="region"
+  placeholder="請選擇地區"
+  options={[
+    { value: 'tw', label: '台灣' },
+    { value: 'jp', label: '日本' },
+  ]}
+  onTcChange={(e) => console.log(e.detail.value)}
+/>;
+```
+
+## 事件
+
+- `tc-change`：選取值改變時觸發，`detail: { value }`（composed、bubbles）。
+
+## 鍵盤操作
+
+- `Enter` / `空白鍵` / `↓`：展開選單。
+- `↓` / `↑`：在選單中移動作用中選項。
+- `Home` / `End`：跳到第一個 / 最後一個選項。
+- `Enter`：選取作用中選項。
+- `Esc`：關閉選單並將焦點移回觸發按鈕。
+- 點選選單外或按 `Esc` 皆會關閉選單。
+
+## 表單
+
+`<tc-dropdown>` 透過 Form-Associated Custom Elements（ElementInternals）參與表單：`name` / `value` 會被序列化到 `FormData`。
+
+## API
+
+下表自 Custom Elements Manifest 自動產生：
+
+<PropsTable tag="tc-dropdown" />
+
+## 無障礙（Accessibility）
+
+- 觸發按鈕為原生 `<button>`，標註 `role=combobox`、`aria-haspopup=listbox`、`aria-expanded`、`aria-controls`。
+- 選單為 `role=listbox`，選項為 `role=option` 並以 `aria-selected` 標示目前選取項。
+- `:focus-visible` 焦點環使用 `--tc-focus-ring-*` token。
+- `disabled` 透過停用內部原生按鈕實作（非 `pointer-events:none`）。
