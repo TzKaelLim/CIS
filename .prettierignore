@@ -1,0 +1,5 @@
+**/dist/**
+**/storybook-static/**
+**/custom-elements.json
+pnpm-lock.yaml
+docs/**

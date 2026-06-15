@@ -1,0 +1,26 @@
+{
+  "name": "tzuchi-uikit",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=20", "pnpm": ">=9" },
+  "scripts": {
+    "build": "turbo run build",
+    "typecheck": "tsc -b",
+    "test": "turbo run test",
+    "lint": "eslint . && prettier --check .",
+    "format": "prettier --write .",
+    "verify:pkg": "turbo run verify:pkg",
+    "changeset": "changeset"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "turbo": "^2.3.0",
+    "@changesets/cli": "^2.27.0",
+    "eslint": "^9.13.0",
+    "@eslint/js": "^9.13.0",
+    "typescript-eslint": "^8.13.0",
+    "prettier": "^3.3.0",
+    "publint": "^0.2.12",
+    "@arethetypeswrong/cli": "^0.17.0"
+  }
+}

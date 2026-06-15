@@ -1,0 +1,11 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", "custom-elements.json", "src/generated/**"]
+    },
+    "test": { "dependsOn": ["^build"] },
+    "verify:pkg": { "dependsOn": ["build"] }
+  }
+}
