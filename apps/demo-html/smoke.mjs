@@ -11,8 +11,14 @@ if (/from\s*['"]lit['"]/.test(cdn)) {
   console.error('FAIL: bare "lit" import escaped the CDN bundle');
   process.exit(1);
 }
+// Assert the registration side effect actually survived bundling (a string
+// match on the tag name alone passes even when the define() is tree-shaken).
+if (!cdn.includes('customElements.define')) {
+  console.error('FAIL: CDN bundle contains no customElements.define — registration was tree-shaken');
+  process.exit(1);
+}
 if (!cdn.includes('tc-button')) {
-  console.error('FAIL: tc-button not registered in the CDN bundle');
+  console.error('FAIL: tc-button not present in the CDN bundle');
   process.exit(1);
 }
 console.log('CDN smoke OK');
