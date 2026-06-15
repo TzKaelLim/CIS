@@ -1,0 +1,10 @@
+{
+  "name": "@tzuchi/demo-html",
+  "private": true,
+  "type": "module",
+  "scripts": { "test": "node smoke.mjs" },
+  "dependencies": {
+    "@tzuchi/components": "workspace:*",
+    "@tzuchi/tokens": "workspace:*"
+  }
+}

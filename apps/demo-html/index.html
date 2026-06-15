@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tzu Chi UIKit — HTML demo</title>
+    <link rel="stylesheet" href="../../packages/tokens/dist/tokens.css" />
+    <script type="module" src="../../packages/components/dist/cdn/tc-components.js"></script>
+    <style>
+      :not(:defined) {
+        visibility: hidden;
+      }
+      body {
+        font: var(--tc-typography-body, 16px sans-serif);
+        color: var(--tc-color-text-default, #333);
+        padding: var(--tc-space-32, 32px);
+        display: flex;
+        flex-direction: column;
+        gap: var(--tc-space-16, 16px);
+        align-items: flex-start;
+      }
+      .row {
+        display: flex;
+        gap: var(--tc-space-12, 12px);
+        align-items: center;
+      }
+    </style>
+  </head>
+  <body>
+    <h1 style="font: var(--tc-typography-heading-2)">慈濟入口網 UIKit — 純 HTML demo</h1>
+
+    <div class="row">
+      <tc-button variant="filled">主要按鈕</tc-button>
+      <tc-button variant="outlined">外框按鈕</tc-button>
+      <tc-button variant="tonal">柔色按鈕</tc-button>
+      <tc-button disabled>停用</tc-button>
+    </div>
+
+    <form id="demo-form" class="row">
+      <span>表單測試：</span>
+      <tc-button type="submit" variant="filled">提交表單</tc-button>
+      <tc-button type="reset" variant="outlined">重設</tc-button>
+      <output id="result" aria-live="polite"></output>
+    </form>
+
+    <script type="module">
+      document.getElementById('demo-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        document.getElementById('result').textContent = '✅ 表單已提交（form-associated）';
+      });
+    </script>
+  </body>
+</html>
