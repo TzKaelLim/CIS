@@ -143,6 +143,22 @@
       "types": "./dist/search-bar/tc-search-bar.d.ts",
       "default": "./dist/search-bar/tc-search-bar.js"
     },
+    "./navbar": {
+      "types": "./dist/navbar/tc-navbar-define.d.ts",
+      "default": "./dist/navbar/tc-navbar-define.js"
+    },
+    "./navbar/class": {
+      "types": "./dist/navbar/tc-navbar.d.ts",
+      "default": "./dist/navbar/tc-navbar.js"
+    },
+    "./footer": {
+      "types": "./dist/footer/tc-footer-define.d.ts",
+      "default": "./dist/footer/tc-footer-define.js"
+    },
+    "./footer/class": {
+      "types": "./dist/footer/tc-footer.d.ts",
+      "default": "./dist/footer/tc-footer.js"
+    },
     "./cdn": {
       "types": "./dist/cdn/tc-components.d.ts",
       "default": "./dist/cdn/tc-components.js"

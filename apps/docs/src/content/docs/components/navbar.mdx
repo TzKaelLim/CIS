@@ -1,0 +1,109 @@
+---
+title: Navbar
+description: tc-navbar — 響應式網站頂部導覽列；桌機水平導覽，行動裝置收合為漢堡選單抽屜。
+---
+
+import Demo from '../../../components/Demo.astro';
+import PropsTable from '../../../components/PropsTable.astro';
+
+`<tc-navbar>` 是響應式的網站頂部列／站台 header：`brand` 插槽放標誌或站名（inline-start），預設插槽放主要導覽項目（桌機水平排列），`actions` 插槽放搜尋／語言／登入等操作（inline-end）。於平板斷點（`--tc-breakpoint-tablet` = 768px）以下，導覽會收合為漢堡選單，點擊後以垂直抽屜呈現。下方為**可互動的真實元件**：
+
+<Demo>
+  <tc-navbar variant="light">
+    <strong slot="brand">慈濟</strong>
+    <tc-link href="#news">全球消息</tc-link>
+    <tc-link href="#events">活動訊息</tc-link>
+    <tc-link href="#donate">前往捐款</tc-link>
+    <tc-link href="#about">關於我們</tc-link>
+    <tc-icon-button slot="actions" label="搜尋">
+      <tc-icon name="search"></tc-icon>
+    </tc-icon-button>
+  </tc-navbar>
+</Demo>
+
+## 變體（variant）
+
+`brand` 變體以品牌深藍底搭配 on-brand 文字；`light`（預設）為白底搭配預設文字色。
+
+<Demo>
+  <tc-navbar variant="brand">
+    <strong slot="brand">慈濟基金會</strong>
+    <tc-link href="#news">全球消息</tc-link>
+    <tc-link href="#events">活動訊息</tc-link>
+    <tc-icon-button slot="actions" label="搜尋">
+      <tc-icon name="search"></tc-icon>
+    </tc-icon-button>
+  </tc-navbar>
+</Demo>
+
+## 黏附（sticky）
+
+設定 `sticky` 後，導覽列以 `position: sticky; top: 0` 黏附於捲動容器頂部，`z-index` 採用 `--tc-z-sticky`。
+
+```html
+<tc-navbar sticky>
+  <strong slot="brand">慈濟</strong>
+  <tc-link href="#news">全球消息</tc-link>
+</tc-navbar>
+```
+
+## 行動抽屜（open）
+
+768px 以下會出現漢堡按鈕；點擊切換 `open` 屬性並派發 `tc-menu-toggle`。導覽改以垂直抽屜呈現於列下方。按 `Escape` 或點擊列外區域皆會關閉抽屜。
+
+```html
+<tc-navbar open>
+  <strong slot="brand">慈濟</strong>
+  <tc-link href="#news">全球消息</tc-link>
+  <tc-link href="#events">活動訊息</tc-link>
+</tc-navbar>
+```
+
+```js
+navbar.addEventListener('tc-menu-toggle', (e) => {
+  console.log('drawer open?', e.detail.open);
+});
+```
+
+## 用法
+
+### 純 HTML
+
+```html
+<link rel="stylesheet" href="@tzuchi/tokens/tokens.css" />
+<script type="module" src="@tzuchi/components/cdn"></script>
+
+<tc-navbar variant="light" sticky>
+  <strong slot="brand">慈濟</strong>
+  <tc-link href="/news">全球消息</tc-link>
+  <tc-link href="/events">活動訊息</tc-link>
+  <tc-icon-button slot="actions" label="搜尋">
+    <tc-icon name="search"></tc-icon>
+  </tc-icon-button>
+</tc-navbar>
+```
+
+### React
+
+```tsx
+import { TcNavbar } from '@tzuchi/react';
+
+<TcNavbar variant="brand" sticky onTcMenuToggle={(e) => console.log(e.detail.open)}>
+  <strong slot="brand">慈濟</strong>
+  <TcLink href="/news">全球消息</TcLink>
+</TcNavbar>;
+```
+
+## API
+
+下表自 Custom Elements Manifest 自動產生：
+
+<PropsTable tag="tc-navbar" />
+
+## 無障礙（Accessibility）
+
+- 外層為原生 `<header>` 並帶 `role="banner"`。
+- 導覽區為原生 `<nav>` 並帶 `aria-label="主要導覽"`。
+- 漢堡按鈕帶 `aria-label="選單"`、`aria-controls`（指向 nav）與 `aria-expanded`（隨 `open` 同步）。
+- `Escape` 與點擊列外區域皆會關閉抽屜。
+- 焦點環使用 `--tc-focus-ring-*` token。

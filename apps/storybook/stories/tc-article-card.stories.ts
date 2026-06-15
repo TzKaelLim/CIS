@@ -94,10 +94,8 @@ export const WithActions: Story = {
       <tc-chip slot="badge">志工早會</tc-chip>
       <span slot="headline">點整張卡片即可前往，動作區仍可獨立點擊</span>
       <span slot="meta">2022-03-21</span>
-      <span slot="actions">
-        <tc-icon-button variant="tonal" label="讚">♥</tc-icon-button>
-        <tc-icon-button variant="tonal" label="分享">↗</tc-icon-button>
-      </span>
+      <tc-icon-button slot="actions" variant="tonal" label="讚">♥</tc-icon-button>
+      <tc-icon-button slot="actions" variant="tonal" label="分享">↗</tc-icon-button>
     </tc-article-card>
   `,
 };

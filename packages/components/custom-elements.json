@@ -142,6 +142,30 @@
             "name": "TcSearchBar",
             "module": "./search-bar/tc-search-bar.js"
           }
+        },
+        {
+          "kind": "js",
+          "name": "TcNavbar",
+          "declaration": {
+            "name": "TcNavbar",
+            "module": "./navbar/tc-navbar.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "TcFooter",
+          "declaration": {
+            "name": "TcFooter",
+            "module": "./footer/tc-footer.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "TcFooterColumn",
+          "declaration": {
+            "name": "TcFooterColumn",
+            "module": "./footer/tc-footer.js"
+          }
         }
       ]
     },
@@ -645,91 +669,6 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/base/define-element.ts",
-      "declarations": [
-        {
-          "kind": "function",
-          "name": "defineElement",
-          "return": {
-            "type": {
-              "text": "void"
-            }
-          },
-          "parameters": [
-            {
-              "name": "tag",
-              "type": {
-                "text": "string"
-              }
-            },
-            {
-              "name": "ctor",
-              "type": {
-                "text": "CustomElementConstructor"
-              }
-            }
-          ],
-          "description": "Register a custom element once; a no-op if the tag is already defined\n(prevents \"already defined\" crashes on double-load / HMR)."
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "defineElement",
-          "declaration": {
-            "name": "defineElement",
-            "module": "src/base/define-element.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "tag",
-          "declaration": {
-            "name": "ctor",
-            "module": "src/base/define-element.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/base/tc-element.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "Shared base for all `<tc-*>` components.\n`delegatesFocus` forwards external `.focus()` and label clicks to the inner\nnative control inside the shadow root.",
-          "name": "TcElement",
-          "members": [
-            {
-              "kind": "field",
-              "name": "shadowRootOptions",
-              "type": {
-                "text": "ShadowRootInit"
-              },
-              "static": true,
-              "default": "{ ...LitElement.shadowRootOptions, delegatesFocus: true, }"
-            }
-          ],
-          "superclass": {
-            "name": "LitElement",
-            "package": "lit"
-          },
-          "customElement": true
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "TcElement",
-          "declaration": {
-            "name": "TcElement",
-            "module": "src/base/tc-element.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
       "path": "src/book-card/tc-book-card-define.ts",
       "declarations": [],
       "exports": []
@@ -955,6 +894,91 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/base/define-element.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "defineElement",
+          "return": {
+            "type": {
+              "text": "void"
+            }
+          },
+          "parameters": [
+            {
+              "name": "tag",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "ctor",
+              "type": {
+                "text": "CustomElementConstructor"
+              }
+            }
+          ],
+          "description": "Register a custom element once; a no-op if the tag is already defined\n(prevents \"already defined\" crashes on double-load / HMR)."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "defineElement",
+          "declaration": {
+            "name": "defineElement",
+            "module": "src/base/define-element.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "tag",
+          "declaration": {
+            "name": "ctor",
+            "module": "src/base/define-element.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/base/tc-element.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Shared base for all `<tc-*>` components.\n`delegatesFocus` forwards external `.focus()` and label clicks to the inner\nnative control inside the shadow root.",
+          "name": "TcElement",
+          "members": [
+            {
+              "kind": "field",
+              "name": "shadowRootOptions",
+              "type": {
+                "text": "ShadowRootInit"
+              },
+              "static": true,
+              "default": "{ ...LitElement.shadowRootOptions, delegatesFocus: true, }"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "TcElement",
+          "declaration": {
+            "name": "TcElement",
+            "module": "src/base/tc-element.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/button/tc-button-define.ts",
       "declarations": [],
       "exports": []
@@ -1125,6 +1149,231 @@
           "declaration": {
             "name": "TcButton",
             "module": "src/button/tc-button.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/card/tc-card-define.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/card/tc-card.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "卡片容器，含媒體、標題、內文與動作區，支援 elevated / outlined 變體與可互動／連結模式。",
+          "name": "TcCard",
+          "cssProperties": [
+            {
+              "description": "卡片底色",
+              "name": "--tc-card-bg"
+            },
+            {
+              "description": "卡片寬度（亦可用 width 屬性設定）",
+              "name": "--tc-card-width"
+            },
+            {
+              "description": "圓角",
+              "name": "--tc-card-radius"
+            },
+            {
+              "description": "內文區內距",
+              "name": "--tc-card-padding"
+            },
+            {
+              "description": "outlined 變體邊框色",
+              "name": "--tc-card-border"
+            },
+            {
+              "description": "elevated 變體靜止陰影",
+              "name": "--tc-card-elevation"
+            },
+            {
+              "description": "互動時的提升陰影",
+              "name": "--tc-card-elevation-hover"
+            },
+            {
+              "description": "標題文字色",
+              "name": "--tc-card-headline-fg"
+            },
+            {
+              "description": "互動 hover 時的標題色",
+              "name": "--tc-card-headline-fg-hover"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "卡片外層容器",
+              "name": "base"
+            },
+            {
+              "description": "href 模式下覆蓋整張卡片的 <a>（stretched link）",
+              "name": "link"
+            }
+          ],
+          "slots": [
+            {
+              "description": "頂部圖片／媒體區（建議放置 <img>）",
+              "name": "media"
+            },
+            {
+              "description": "卡片主標題",
+              "name": "headline"
+            },
+            {
+              "description": "卡片內文（預設插槽）",
+              "name": ""
+            },
+            {
+              "description": "動作區（按鈕等，於連結模式下仍可獨立點擊）",
+              "name": "footer"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "variant",
+              "type": {
+                "text": "'elevated' | 'outlined'"
+              },
+              "default": "'elevated'",
+              "description": "視覺變體：elevated（陰影）或 outlined（邊框）。",
+              "attribute": "variant",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "interactive",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "是否可互動（無 href 時：host 可聚焦並回應 Enter／Space）。",
+              "attribute": "interactive",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "href",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "連結目標。設定後整張卡片以 stretched-link 方式變成連結。",
+              "attribute": "href",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "width",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "卡片寬度（CSS 長度，如 `320px` 或 `100%`）。未設定時由內容／容器決定。",
+              "attribute": "width",
+              "reflects": true
+            },
+            {
+              "kind": "method",
+              "name": "#syncInteractivity",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Make the host focusable + announce a role when interactive without an href.\n(With an href the inner <a> is the real focus/interaction target.)"
+            },
+            {
+              "kind": "field",
+              "name": "#onKeydown",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "#onSlotChange",
+              "privacy": "private",
+              "description": "Toggle a `data-empty` flag on the slot's wrapper so empty regions\n(no assigned nodes) can be hidden via CSS without unreliable\n`:has(::slotted())` selectors."
+            },
+            {
+              "kind": "field",
+              "name": "shadowRootOptions",
+              "type": {
+                "text": "ShadowRootInit"
+              },
+              "static": true,
+              "default": "{ ...LitElement.shadowRootOptions, delegatesFocus: true, }",
+              "inheritedFrom": {
+                "name": "TcElement",
+                "module": "src/base/tc-element.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "description": "可互動卡片（無 href）以鍵盤 Enter／Space 或點擊觸發",
+              "name": "tc-card-click"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "variant",
+              "type": {
+                "text": "'elevated' | 'outlined'"
+              },
+              "default": "'elevated'",
+              "description": "視覺變體：elevated（陰影）或 outlined（邊框）。",
+              "fieldName": "variant"
+            },
+            {
+              "name": "interactive",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "是否可互動（無 href 時：host 可聚焦並回應 Enter／Space）。",
+              "fieldName": "interactive"
+            },
+            {
+              "name": "href",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "連結目標。設定後整張卡片以 stretched-link 方式變成連結。",
+              "fieldName": "href"
+            },
+            {
+              "name": "width",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "卡片寬度（CSS 長度，如 `320px` 或 `100%`）。未設定時由內容／容器決定。",
+              "fieldName": "width"
+            }
+          ],
+          "superclass": {
+            "name": "TcElement",
+            "module": "/src/base/tc-element.js"
+          },
+          "summary": "Tzu Chi card surface with media, headline, body and footer.",
+          "customElement": true,
+          "tagName": "tc-card"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "TcCard",
+          "declaration": {
+            "name": "TcCard",
+            "module": "src/card/tc-card.ts"
           }
         }
       ]
@@ -1365,231 +1614,6 @@
           "declaration": {
             "name": "TcChip",
             "module": "src/chip/tc-chip.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/card/tc-card-define.ts",
-      "declarations": [],
-      "exports": []
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/card/tc-card.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "卡片容器，含媒體、標題、內文與動作區，支援 elevated / outlined 變體與可互動／連結模式。",
-          "name": "TcCard",
-          "cssProperties": [
-            {
-              "description": "卡片底色",
-              "name": "--tc-card-bg"
-            },
-            {
-              "description": "卡片寬度（亦可用 width 屬性設定）",
-              "name": "--tc-card-width"
-            },
-            {
-              "description": "圓角",
-              "name": "--tc-card-radius"
-            },
-            {
-              "description": "內文區內距",
-              "name": "--tc-card-padding"
-            },
-            {
-              "description": "outlined 變體邊框色",
-              "name": "--tc-card-border"
-            },
-            {
-              "description": "elevated 變體靜止陰影",
-              "name": "--tc-card-elevation"
-            },
-            {
-              "description": "互動時的提升陰影",
-              "name": "--tc-card-elevation-hover"
-            },
-            {
-              "description": "標題文字色",
-              "name": "--tc-card-headline-fg"
-            },
-            {
-              "description": "互動 hover 時的標題色",
-              "name": "--tc-card-headline-fg-hover"
-            }
-          ],
-          "cssParts": [
-            {
-              "description": "卡片外層容器",
-              "name": "base"
-            },
-            {
-              "description": "href 模式下覆蓋整張卡片的 <a>（stretched link）",
-              "name": "link"
-            }
-          ],
-          "slots": [
-            {
-              "description": "頂部圖片／媒體區（建議放置 <img>）",
-              "name": "media"
-            },
-            {
-              "description": "卡片主標題",
-              "name": "headline"
-            },
-            {
-              "description": "卡片內文（預設插槽）",
-              "name": ""
-            },
-            {
-              "description": "動作區（按鈕等，於連結模式下仍可獨立點擊）",
-              "name": "footer"
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "variant",
-              "type": {
-                "text": "'elevated' | 'outlined'"
-              },
-              "default": "'elevated'",
-              "description": "視覺變體：elevated（陰影）或 outlined（邊框）。",
-              "attribute": "variant",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "interactive",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "是否可互動（無 href 時：host 可聚焦並回應 Enter／Space）。",
-              "attribute": "interactive",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "href",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "連結目標。設定後整張卡片以 stretched-link 方式變成連結。",
-              "attribute": "href",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "width",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "卡片寬度（CSS 長度，如 `320px` 或 `100%`）。未設定時由內容／容器決定。",
-              "attribute": "width",
-              "reflects": true
-            },
-            {
-              "kind": "method",
-              "name": "#syncInteractivity",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "description": "Make the host focusable + announce a role when interactive without an href.\n(With an href the inner <a> is the real focus/interaction target.)"
-            },
-            {
-              "kind": "field",
-              "name": "#onKeydown",
-              "privacy": "private"
-            },
-            {
-              "kind": "field",
-              "name": "#onSlotChange",
-              "privacy": "private",
-              "description": "Toggle a `data-empty` flag on the slot's wrapper so empty regions\n(no assigned nodes) can be hidden via CSS without unreliable\n`:has(::slotted())` selectors."
-            },
-            {
-              "kind": "field",
-              "name": "shadowRootOptions",
-              "type": {
-                "text": "ShadowRootInit"
-              },
-              "static": true,
-              "default": "{ ...LitElement.shadowRootOptions, delegatesFocus: true, }",
-              "inheritedFrom": {
-                "name": "TcElement",
-                "module": "src/base/tc-element.ts"
-              }
-            }
-          ],
-          "events": [
-            {
-              "description": "可互動卡片（無 href）以鍵盤 Enter／Space 或點擊觸發",
-              "name": "tc-card-click"
-            }
-          ],
-          "attributes": [
-            {
-              "name": "variant",
-              "type": {
-                "text": "'elevated' | 'outlined'"
-              },
-              "default": "'elevated'",
-              "description": "視覺變體：elevated（陰影）或 outlined（邊框）。",
-              "fieldName": "variant"
-            },
-            {
-              "name": "interactive",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "是否可互動（無 href 時：host 可聚焦並回應 Enter／Space）。",
-              "fieldName": "interactive"
-            },
-            {
-              "name": "href",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "連結目標。設定後整張卡片以 stretched-link 方式變成連結。",
-              "fieldName": "href"
-            },
-            {
-              "name": "width",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "卡片寬度（CSS 長度，如 `320px` 或 `100%`）。未設定時由內容／容器決定。",
-              "fieldName": "width"
-            }
-          ],
-          "superclass": {
-            "name": "TcElement",
-            "module": "/src/base/tc-element.js"
-          },
-          "summary": "Tzu Chi card surface with media, headline, body and footer.",
-          "customElement": true,
-          "tagName": "tc-card"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "TcCard",
-          "declaration": {
-            "name": "TcCard",
-            "module": "src/card/tc-card.ts"
           }
         }
       ]
@@ -1977,6 +2001,413 @@
           "declaration": {
             "name": "TcDropdown",
             "module": "src/dropdown/tc-dropdown.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/footer/tc-footer-column.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "頁尾連結群組：帶標題的一組連結，置於 `<tc-footer>` 內。桌機固定展開（標題為靜態\nheading）；行動裝置（<=768px）標題變為可切換展開／收合的按鈕（手風琴）。",
+          "name": "TcFooterColumn",
+          "cssProperties": [
+            {
+              "description": "標題文字色",
+              "name": "--tc-footer-heading-fg"
+            },
+            {
+              "description": "連結靜止文字色",
+              "name": "--tc-footer-link-fg"
+            },
+            {
+              "description": "連結 hover 文字色",
+              "name": "--tc-footer-link-fg-hover"
+            },
+            {
+              "description": "行動裝置上群組間分隔線色",
+              "name": "--tc-footer-divider"
+            },
+            {
+              "description": "切換按鈕焦點環顏色",
+              "name": "--tc-footer-focus-ring-color"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "標題容器（行動裝置上為切換按鈕）",
+              "name": "header"
+            },
+            {
+              "description": "連結容器（region）",
+              "name": "body"
+            }
+          ],
+          "slots": [
+            {
+              "description": "連結內容（通常為 `<tc-link>` 或 `<a>`）",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "群組標題。",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "open",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "展開狀態。桌機固定展開；行動裝置預設展開，可切換。",
+              "attribute": "open",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "_mobile",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "是否處於行動裝置（手風琴）模式。由 matchMedia 維護。"
+            },
+            {
+              "kind": "field",
+              "name": "#headingId",
+              "privacy": "private",
+              "default": "`tc-footer-col-h-${++columnId}`"
+            },
+            {
+              "kind": "field",
+              "name": "#bodyId",
+              "privacy": "private",
+              "default": "`tc-footer-col-b-${columnId}`"
+            },
+            {
+              "kind": "field",
+              "name": "#mql",
+              "privacy": "private",
+              "type": {
+                "text": "MediaQueryList | null"
+              },
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "#onMediaChange",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "#toggle",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "shadowRootOptions",
+              "type": {
+                "text": "ShadowRootInit"
+              },
+              "static": true,
+              "default": "{ ...LitElement.shadowRootOptions, delegatesFocus: true, }",
+              "inheritedFrom": {
+                "name": "TcElement",
+                "module": "src/base/tc-element.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "CustomEvent<{ open: boolean }>"
+              },
+              "description": "行動裝置切換展開狀態時派發（composed, bubbles）。",
+              "name": "tc-toggle"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "群組標題。",
+              "fieldName": "label"
+            },
+            {
+              "name": "open",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "展開狀態。桌機固定展開；行動裝置預設展開，可切換。",
+              "fieldName": "open"
+            }
+          ],
+          "superclass": {
+            "name": "TcElement",
+            "module": "/src/base/tc-element.js"
+          },
+          "summary": "Tzu Chi footer link group; static heading on desktop, collapsible accordion on mobile.",
+          "customElement": true,
+          "tagName": "tc-footer-column"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "TcFooterColumn",
+          "declaration": {
+            "name": "TcFooterColumn",
+            "module": "src/footer/tc-footer-column.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/footer/tc-footer-define.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/footer/tc-footer.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "網站頁尾容器：上方彩色內容區（品牌資訊、社群連結、連結群組、回到頂部）加上底部版權列。",
+          "name": "TcFooter",
+          "cssProperties": [
+            {
+              "description": "上方內容區底色",
+              "name": "--tc-footer-bg"
+            },
+            {
+              "description": "主要文字色",
+              "name": "--tc-footer-fg"
+            },
+            {
+              "description": "次要（品牌資訊／連結）文字色",
+              "name": "--tc-footer-muted-fg"
+            },
+            {
+              "description": "群組標題與圖示色",
+              "name": "--tc-footer-heading-fg"
+            },
+            {
+              "description": "連結靜止色",
+              "name": "--tc-footer-link-fg"
+            },
+            {
+              "description": "連結 hover 色",
+              "name": "--tc-footer-link-fg-hover"
+            },
+            {
+              "description": "邊框色",
+              "name": "--tc-footer-border"
+            },
+            {
+              "description": "分隔線色",
+              "name": "--tc-footer-divider"
+            },
+            {
+              "description": "版權列底色",
+              "name": "--tc-footer-copyright-bg"
+            },
+            {
+              "description": "版權列文字色",
+              "name": "--tc-footer-copyright-fg"
+            },
+            {
+              "description": "內容最大寬度（預設 1200px）",
+              "name": "--tc-footer-max-width"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "內部 <footer> 容器",
+              "name": "base"
+            },
+            {
+              "description": "上方內容區",
+              "name": "top"
+            },
+            {
+              "description": "連結群組格線容器",
+              "name": "columns"
+            },
+            {
+              "description": "底部版權列",
+              "name": "copyright"
+            }
+          ],
+          "slots": [
+            {
+              "description": "品牌區（logo、地址／聯絡資訊），置於 inline-start",
+              "name": "brand"
+            },
+            {
+              "description": "一排社群圖示連結（FB／IG／YT 等，由使用端提供）",
+              "name": "social"
+            },
+            {
+              "description": "`<tc-footer-column>` 連結群組，於響應式格線中排列",
+              "name": ""
+            },
+            {
+              "description": "自訂「回到頂部」控件（未提供時使用內建按鈕），置於 inline-end",
+              "name": "back-to-top"
+            },
+            {
+              "description": "底部版權列文字（亦可改用 `copyright` 屬性）",
+              "name": "copyright"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "variant",
+              "type": {
+                "text": "'light' | 'brand'"
+              },
+              "default": "'light'",
+              "description": "視覺變體：`light`（淺色底）或 `brand`（深色品牌底）。",
+              "attribute": "variant",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "copyright",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "版權列文字。設定後等同於提供 `copyright` 插槽內容。",
+              "attribute": "copyright"
+            },
+            {
+              "kind": "field",
+              "name": "backToTopLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'回到頂部'",
+              "description": "內建「回到頂部」按鈕的無障礙標籤。",
+              "attribute": "back-to-top-label"
+            },
+            {
+              "kind": "field",
+              "name": "#onBackToTop",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "#onSlotChange",
+              "privacy": "private",
+              "description": "Toggle a `data-empty` flag on a slot's wrapper so empty regions\n(no assigned nodes) can be hidden via CSS."
+            },
+            {
+              "kind": "field",
+              "name": "#onBackToTopSlotChange",
+              "privacy": "private",
+              "description": "Flag the back-to-top wrapper when a custom control is slotted (so the\nbuilt-in button is hidden via CSS)."
+            },
+            {
+              "kind": "field",
+              "name": "#onCopyrightSlotChange",
+              "privacy": "private",
+              "description": "Copyright bar is hidden only when BOTH the slot and the `copyright`\nattribute are empty."
+            },
+            {
+              "kind": "field",
+              "name": "shadowRootOptions",
+              "type": {
+                "text": "ShadowRootInit"
+              },
+              "static": true,
+              "default": "{ ...LitElement.shadowRootOptions, delegatesFocus: true, }",
+              "inheritedFrom": {
+                "name": "TcElement",
+                "module": "src/base/tc-element.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "點擊內建「回到頂部」時派發（composed, bubbles），預設捲動至頁首。",
+              "name": "tc-back-to-top"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "variant",
+              "type": {
+                "text": "'light' | 'brand'"
+              },
+              "default": "'light'",
+              "description": "視覺變體：`light`（淺色底）或 `brand`（深色品牌底）。",
+              "fieldName": "variant"
+            },
+            {
+              "name": "copyright",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "版權列文字。設定後等同於提供 `copyright` 插槽內容。",
+              "fieldName": "copyright"
+            },
+            {
+              "name": "back-to-top-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'回到頂部'",
+              "description": "內建「回到頂部」按鈕的無障礙標籤。",
+              "fieldName": "backToTopLabel"
+            }
+          ],
+          "superclass": {
+            "name": "TcElement",
+            "module": "/src/base/tc-element.js"
+          },
+          "summary": "Tzu Chi site footer with a coloured top area and a copyright bar.",
+          "customElement": true,
+          "tagName": "tc-footer"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "TcFooter",
+          "declaration": {
+            "name": "TcFooter",
+            "module": "src/footer/tc-footer.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "TcFooterColumn",
+          "declaration": {
+            "name": "TcFooterColumn",
+            "module": "./tc-footer-column.js"
           }
         }
       ]
@@ -3028,6 +3459,243 @@
           "declaration": {
             "name": "TcListPanel",
             "module": "src/list-panel/tc-list-panel.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/navbar/tc-navbar-define.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/navbar/tc-navbar.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "響應式網站頂部導覽列／應用列。桌機顯示水平導覽，於平板斷點（768px）以下收合為漢堡選單抽屜。",
+          "name": "TcNavbar",
+          "cssProperties": [
+            {
+              "description": "列底色",
+              "name": "--tc-navbar-bg"
+            },
+            {
+              "description": "文字／圖示色",
+              "name": "--tc-navbar-fg"
+            },
+            {
+              "description": "底部分隔線色",
+              "name": "--tc-navbar-border"
+            },
+            {
+              "description": "列高度",
+              "name": "--tc-navbar-height"
+            },
+            {
+              "description": "左右內距",
+              "name": "--tc-navbar-padding-inline"
+            },
+            {
+              "description": "導覽項目間距",
+              "name": "--tc-navbar-item-gap"
+            },
+            {
+              "description": "行動抽屜底色",
+              "name": "--tc-navbar-drawer-bg"
+            },
+            {
+              "description": "行動抽屜陰影",
+              "name": "--tc-navbar-drawer-elevation"
+            },
+            {
+              "description": "漢堡按鈕 hover 底色",
+              "name": "--tc-navbar-toggle-bg-hover"
+            },
+            {
+              "description": "焦點環顏色",
+              "name": "--tc-navbar-focus-ring-color"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "頂部列容器",
+              "name": "base"
+            },
+            {
+              "description": "品牌／標誌區",
+              "name": "brand"
+            },
+            {
+              "description": "導覽區（桌機水平／行動抽屜）",
+              "name": "nav"
+            },
+            {
+              "description": "行動區",
+              "name": "actions"
+            },
+            {
+              "description": "漢堡按鈕（行動裝置）",
+              "name": "toggle"
+            },
+            {
+              "description": "行動抽屜面板（即 nav 於行動裝置的呈現）",
+              "name": "drawer"
+            }
+          ],
+          "slots": [
+            {
+              "description": "品牌標誌／站名（置於 inline-start）",
+              "name": "brand"
+            },
+            {
+              "description": "主要導覽項目（桌機水平排列，行動裝置收合為垂直抽屜）",
+              "name": ""
+            },
+            {
+              "description": "行動區（搜尋、語言、登入等，置於 inline-end）",
+              "name": "actions"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "variant",
+              "type": {
+                "text": "'brand' | 'light'"
+              },
+              "default": "'light'",
+              "description": "視覺變體：`light`（白底、預設文字）或 `brand`（品牌深藍底、on-brand 文字）。",
+              "attribute": "variant",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "sticky",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "是否黏附於捲動容器頂部（`position: sticky; top: 0`）。",
+              "attribute": "sticky",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "open",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "行動抽屜是否開啟。切換時派發 `tc-menu-toggle`。",
+              "attribute": "open",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "#toggle",
+              "privacy": "private",
+              "description": "Toggle the mobile drawer and announce the new state."
+            },
+            {
+              "kind": "method",
+              "name": "#close",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Close the drawer (no-op when already closed); emits when it actually closes."
+            },
+            {
+              "kind": "field",
+              "name": "#onDocKeydown",
+              "privacy": "private",
+              "description": "Escape closes the drawer."
+            },
+            {
+              "kind": "field",
+              "name": "#onDocPointerDown",
+              "privacy": "private",
+              "description": "Click / tap outside the navbar closes the drawer. Uses capture +\ncomposedPath so it works across the shadow boundary."
+            },
+            {
+              "kind": "field",
+              "name": "#onSlotChange",
+              "privacy": "private",
+              "description": "Toggle a `data-empty` flag on a slot's wrapper so empty regions can be\nhidden via CSS without unreliable `:has(::slotted())` selectors."
+            },
+            {
+              "kind": "field",
+              "name": "shadowRootOptions",
+              "type": {
+                "text": "ShadowRootInit"
+              },
+              "static": true,
+              "default": "{ ...LitElement.shadowRootOptions, delegatesFocus: true, }",
+              "inheritedFrom": {
+                "name": "TcElement",
+                "module": "src/base/tc-element.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "name": "tc-menu-toggle",
+              "type": {
+                "text": "CustomEvent<{ open: boolean }>"
+              },
+              "description": "行動選單開合時派發（composed, bubbles）。"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "variant",
+              "type": {
+                "text": "'brand' | 'light'"
+              },
+              "default": "'light'",
+              "description": "視覺變體：`light`（白底、預設文字）或 `brand`（品牌深藍底、on-brand 文字）。",
+              "fieldName": "variant"
+            },
+            {
+              "name": "sticky",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "是否黏附於捲動容器頂部（`position: sticky; top: 0`）。",
+              "fieldName": "sticky"
+            },
+            {
+              "name": "open",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "行動抽屜是否開啟。切換時派發 `tc-menu-toggle`。",
+              "fieldName": "open"
+            }
+          ],
+          "superclass": {
+            "name": "TcElement",
+            "module": "/src/base/tc-element.js"
+          },
+          "summary": "Tzu Chi responsive top application bar / site header.",
+          "customElement": true,
+          "tagName": "tc-navbar"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "TcNavbar",
+          "declaration": {
+            "name": "TcNavbar",
+            "module": "src/navbar/tc-navbar.ts"
           }
         }
       ]

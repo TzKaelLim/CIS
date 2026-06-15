@@ -133,13 +133,20 @@ export const articleCardStyles = css`
   }
 
   .actions {
-    display: flex;
-    align-items: center;
-    gap: var(--tc-space-12, 12px);
     margin-top: var(--tc-space-4, 4px);
     /* action controls must sit above the stretched link */
     position: relative;
     z-index: 1;
+  }
+  /* The flex row + gap must live on the slot itself: gap on the wrapper would
+     only space the single slot box, never the assigned action controls. With
+     display:flex the slot becomes the flex parent of the elements slotted into
+     slot="actions", so multiple action controls are spaced correctly. */
+  .actions slot {
+    display: flex;
+    align-items: center;
+    gap: var(--tc-space-12, 12px);
+    flex-wrap: wrap;
   }
 
   /* hide empty slot wrappers (data-empty set on slotchange) so they
