@@ -4,7 +4,9 @@
   "type": "module",
   "sideEffects": [
     "**/*.css",
+    "**/*-define.ts",
     "**/*-define.js",
+    "src/index.ts",
     "./dist/index.js",
     "./dist/cdn/*"
   ],

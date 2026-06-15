@@ -11,6 +11,8 @@ export default defineConfig({
       fileName: () => 'tc-components.js',
       formats: ['es'],
     },
-    rollupOptions: { external: [] },
+    // CDN bundle must register every element — never tree-shake the
+    // customElements.define() side effects out of the barrel.
+    rollupOptions: { external: [], treeshake: { moduleSideEffects: true } },
   },
 });

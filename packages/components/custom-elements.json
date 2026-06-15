@@ -9,10 +9,10 @@
       "exports": [
         {
           "kind": "js",
-          "name": "*",
+          "name": "TcButton",
           "declaration": {
-            "name": "*",
-            "module": "src/button/index.js"
+            "name": "TcButton",
+            "module": "./button/tc-button.js"
           }
         }
       ]
@@ -98,21 +98,6 @@
           "declaration": {
             "name": "TcElement",
             "module": "src/base/tc-element.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/button/index.ts",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "TcButton",
-          "declaration": {
-            "name": "TcButton",
-            "module": "./tc-button.js"
           }
         }
       ]
