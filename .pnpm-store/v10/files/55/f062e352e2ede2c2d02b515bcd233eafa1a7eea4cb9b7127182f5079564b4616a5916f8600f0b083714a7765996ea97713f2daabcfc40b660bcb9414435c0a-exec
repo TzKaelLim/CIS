@@ -27,7 +27,7 @@ function installUsingNPM() {
 
   child_process.execSync(
     `npm install --loglevel=error --prefer-offline --no-audit --progress=false`,
-    { cwd: turboPath, stdio: 'pipe', env },
+    { cwd: turboPath, stdio: "pipe", env }
   );
 }
 
@@ -48,7 +48,10 @@ function binaryPaths(platform, arch) {
 }
 
 function packageNames(platform, arch) {
-  return [`@turbo/${platform}-${arch}`, `turbo-${platform}-${arch}`];
+  return [
+    `@turbo/${platform}-${arch}`,
+    `turbo-${platform}-${arch}`,
+  ];
 }
 
 // Try require.resolve on each candidate, return the first that succeeds.
@@ -67,22 +70,25 @@ function getBinaryPath() {
   const TURBO_BINARY_PATH = process.env.TURBO_BINARY_PATH;
   if (TURBO_BINARY_PATH) {
     if (!fs.existsSync(TURBO_BINARY_PATH)) {
-      console.error(
-        `Turborepo was unable to find the executable specified by TURBO_BINARY_PATH:\n${TURBO_BINARY_PATH}`,
-      );
+      console.error(`Turborepo was unable to find the executable specified by TURBO_BINARY_PATH:\n${TURBO_BINARY_PATH}`);
       console.error();
-      console.error(
-        `TURBO_BINARY_PATH is intended for development use-cases. You likely want to unset the environment variable.`,
-      );
+      console.error(`TURBO_BINARY_PATH is intended for development use-cases. You likely want to unset the environment variable.`);
       process.exit(1);
     } else {
       return TURBO_BINARY_PATH;
     }
   }
 
-  const availablePlatforms = ['darwin', 'linux', 'windows'];
+  const availablePlatforms = [
+    'darwin',
+    'linux',
+    'windows',
+  ];
 
-  const availableArchs = ['64', 'arm64'];
+  const availableArchs = [
+    '64',
+    'arm64',
+  ];
 
   // We need to figure out which binary to hand the user.
   // The only place where the binary can be at this point is `require.resolve`-able
@@ -91,15 +97,14 @@ function getBinaryPath() {
   let { platform, arch } = process;
   // Node uses `win32` but we want to use `windows` for consistency with
   // our package naming conventions (i.e. `@turbo/windows-64`).
-  if (platform === 'win32') {
-    platform = 'windows';
+  if (platform === "win32") {
+    platform = "windows";
   }
   const resolvedArch = arch === 'x64' ? '64' : arch;
 
   // Try all places in order until we get a hit.
 
-  const isSupported =
-    availablePlatforms.includes(platform) && availableArchs.includes(resolvedArch);
+  const isSupported = availablePlatforms.includes(platform) && availableArchs.includes(resolvedArch);
 
   // 1. The package which contains the binary we _should_ be running.
   //    Try the scoped name (@turbo/<os>-<arch>) first, then the legacy name (turbo-<os>-<arch>).
@@ -126,8 +131,9 @@ function getBinaryPath() {
   }
 
   // 3. Both Windows and macOS ARM boxes can run x64 binaries. Attempt to run under emulation.
-  const alternateCandidates =
-    arch === 'arm64' && ['darwin', 'windows'].includes(platform) ? binaryPaths(platform, '64') : [];
+  const alternateCandidates = (arch === "arm64" && ['darwin', 'windows'].includes(platform))
+    ? binaryPaths(platform, '64')
+    : [];
   if (SHOULD_ATTEMPT_EMULATED && alternateCandidates.length > 0) {
     const resolvedPath = tryResolve(alternateCandidates);
     if (resolvedPath !== null) {
@@ -163,9 +169,7 @@ function getBinaryPath() {
   } else if (!availableArchs.includes(resolvedArch)) {
     if (availablePlatforms.includes(platform)) {
       console.error();
-      console.error(
-        'Turborepo supports your platform, but does not support your processor architecture.',
-      );
+      console.error('Turborepo supports your platform, but does not support your processor architecture.');
       process.exit(1);
     } else {
       console.error();
@@ -188,9 +192,7 @@ function getBinaryPath() {
     console.error('***');
     console.error();
     console.error(`Your platform (${platform}) can sometimes run x86 under emulation.`);
-    console.error(
-      `We did not find a possibly-compatible binary at:\n${alternateCandidates.join('\nor: ')}`,
-    );
+    console.error(`We did not find a possibly-compatible binary at:\n${alternateCandidates.join('\nor: ')}`);
     console.error();
     console.error(`We looked for it at:`);
     console.error(require.resolve.paths(alternateCandidates[0]).join('\n'));
@@ -200,11 +202,9 @@ function getBinaryPath() {
 
   // Has the wrong platform's binaries available.
   const ownCandidates = new Set([...correctCandidates, ...alternateCandidates]);
-  const allBinaries = availablePlatforms.flatMap((p) =>
-    availableArchs.flatMap((a) => binaryPaths(p, a)),
-  );
-  const wrongPlatformBinaries = allBinaries.filter((b) => !ownCandidates.has(b));
-  const otherInstalled = wrongPlatformBinaries.filter((binaryPath) => {
+  const allBinaries = availablePlatforms.flatMap(p => availableArchs.flatMap(a => binaryPaths(p, a)));
+  const wrongPlatformBinaries = allBinaries.filter(b => !ownCandidates.has(b));
+  const otherInstalled = wrongPlatformBinaries.filter(binaryPath => {
     try {
       return require.resolve(binaryPath);
     } catch (e) {}
@@ -216,9 +216,7 @@ function getBinaryPath() {
 
   if (otherInstalled.length > 0) {
     console.error('Turborepo checked to see if binaries for another platform are installed.');
-    console.error(
-      'This typically indicates an error in sharing of pre-resolved node_modules across platforms.',
-    );
+    console.error('This typically indicates an error in sharing of pre-resolved node_modules across platforms.');
     console.error('One common reason for this is copying files to Docker.');
     console.error();
     console.error(`We found these unnecessary binaries:`);
@@ -248,41 +246,35 @@ function getBinaryPath() {
         // If we don't show up in the lockfile it's the wrong lockfile.
         if (hasPackage(sourceObject, 'turbo')) {
           // A platform is covered if either the scoped or legacy package name is in the lockfile.
-          const hasAllPlatforms = availablePlatforms.every((p) =>
-            availableArchs.every((a) =>
-              packageNames(p, a).some((name) => hasPackage(sourceObject, name)),
-            ),
+          const hasAllPlatforms = availablePlatforms.every(p =>
+            availableArchs.every(a =>
+              packageNames(p, a).some(name => hasPackage(sourceObject, name))
+            )
           );
           if (!hasAllPlatforms) {
             console.error();
             console.error('***');
             console.error();
-            console.error(
-              `Turborepo detected that your lockfile (${current}) does not enumerate all available platforms.`,
-            );
-            console.error(
-              'This is likely a consequence of an npm issue: https://github.com/npm/cli/issues/4828.',
-            );
+            console.error(`Turborepo detected that your lockfile (${current}) does not enumerate all available platforms.`);
+            console.error('This is likely a consequence of an npm issue: https://github.com/npm/cli/issues/4828.');
 
             // Let's build their repair command:
             let version = '';
             let environment = '';
-            if (parsedLockfile?.packages['']?.dependencies?.turbo) {
-              version = `@${parsedLockfile.packages[''].dependencies.turbo}`;
+            if (parsedLockfile?.packages[""]?.dependencies?.turbo) {
+              version = `@${parsedLockfile.packages[""].dependencies.turbo}`;
               environment = ' --save-prod';
-            } else if (parsedLockfile?.packages['']?.devDependencies?.turbo) {
-              version = `@${parsedLockfile.packages[''].devDependencies.turbo}`;
+            } else if (parsedLockfile?.packages[""]?.devDependencies?.turbo) {
+              version = `@${parsedLockfile.packages[""].devDependencies.turbo}`;
               environment = ' --save-dev';
-            } else if (parsedLockfile?.packages['']?.optionalDependencies?.turbo) {
-              version = `@${parsedLockfile.packages[''].optionalDependencies.turbo}`;
+            } else if (parsedLockfile?.packages[""]?.optionalDependencies?.turbo) {
+              version = `@${parsedLockfile.packages[""].optionalDependencies.turbo}`;
               environment = ' --save-optional';
             }
 
             console.error();
             console.error('To resolve this issue for your repository, run:');
-            console.error(
-              `npm install turbo${version} --package-lock-only${environment} && npm install`,
-            );
+            console.error(`npm install turbo${version} --package-lock-only${environment} && npm install`);
             console.error();
             console.error(`You will need to commit the updated lockfile.`);
           }
@@ -319,7 +311,11 @@ function exitWithCodeOrSignal(code, signal) {
 }
 
 function runTurbo() {
-  const child = child_process.spawn(getBinaryPath(), process.argv.slice(2), { stdio: 'inherit' });
+  const child = child_process.spawn(
+    getBinaryPath(),
+    process.argv.slice(2),
+    { stdio: "inherit" }
+  );
 
   const handleSigint = () => {
     // The child shares our process group, so Ctrl+C already reached it.
@@ -328,24 +324,24 @@ function runTurbo() {
 
   const handleSigterm = () => {
     if (!child.killed) {
-      child.kill('SIGTERM');
+      child.kill("SIGTERM");
     }
   };
 
   const cleanup = () => {
-    process.off('SIGINT', handleSigint);
-    process.off('SIGTERM', handleSigterm);
+    process.off("SIGINT", handleSigint);
+    process.off("SIGTERM", handleSigterm);
   };
 
-  process.on('SIGINT', handleSigint);
-  process.on('SIGTERM', handleSigterm);
+  process.on("SIGINT", handleSigint);
+  process.on("SIGTERM", handleSigterm);
 
-  child.once('error', (error) => {
+  child.once("error", (error) => {
     cleanup();
     throw error;
   });
 
-  child.once('exit', (code, signal) => {
+  child.once("exit", (code, signal) => {
     cleanup();
     exitWithCodeOrSignal(code, signal);
   });

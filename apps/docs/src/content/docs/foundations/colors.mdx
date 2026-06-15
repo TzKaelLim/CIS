@@ -1,0 +1,18 @@
+---
+title: Colors
+description: 慈濟入口網設計系統的色彩 primitive 與語意色。
+---
+
+import ColorSwatches from '../../../components/ColorSwatches.astro';
+
+色彩採三層模型：**Primitive**（純色票）→ **Semantic**（語意別名）→ **Component**（元件級）。
+元件只引用 semantic / component 層，因此換主題只需覆寫 semantic 變數，無需改元件。
+
+下列色票直接從 `@tzuchi/tokens` 的 DTCG 原始檔渲染：
+
+<ColorSwatches />
+
+## 主色（Brand）
+
+`color.blue.900`（`#1B2D58`）為主要品牌色，對應 Figma「Primary」。語意層 `color.brand.primary` 指向它，
+filled 按鈕底色 `button.filled.bg` 再指向 `color.brand.primary` —— 形成 `var()` 串接，主題化即可級聯。

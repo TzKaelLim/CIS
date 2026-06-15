@@ -1,0 +1,40 @@
+---
+// Auto-generated API table from the Custom Elements Manifest — the same source
+// that drives the React wrappers and Storybook autodocs.
+import cem from '@tzuchi/components/custom-elements.json';
+
+interface Props {
+  tag: string;
+}
+const { tag } = Astro.props;
+
+type Attr = { name: string; type?: { text?: string }; default?: string; description?: string };
+const modules = (cem as { modules: { declarations?: { tagName?: string; attributes?: Attr[] }[] }[] }).modules;
+const decl = modules.flatMap((m) => m.declarations ?? []).find((d) => d.tagName === tag);
+const attrs: Attr[] = decl?.attributes ?? [];
+---
+
+<table>
+  <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>Type</th>
+      <th>Default</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    {
+      attrs.map((a) => (
+        <tr>
+          <td>
+            <code>{a.name}</code>
+          </td>
+          <td>{a.type?.text ? <code>{a.type.text}</code> : '—'}</td>
+          <td>{a.default ? <code>{a.default}</code> : '—'}</td>
+          <td>{a.description ?? ''}</td>
+        </tr>
+      ))
+    }
+  </tbody>
+</table>

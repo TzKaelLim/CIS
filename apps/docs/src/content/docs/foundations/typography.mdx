@@ -1,0 +1,14 @@
+---
+title: Typography
+description: 字級階層，對應 Figma Typography。
+---
+
+import TypeScale from '../../../components/TypeScale.astro';
+
+字級以語意 token（`typography.*`）表達，每個角色是一個 DTCG `typography` composite，
+編譯為單一 CSS `font` shorthand 變數（含 line-height）。下列每一行皆以實際的
+`var(--tc-typography-*)` 渲染：
+
+<TypeScale />
+
+字型家族預設 `Noto Sans TC` + 系統 fallback，可由 `--tc-font-family-base` 覆寫。

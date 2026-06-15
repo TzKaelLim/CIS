@@ -1,0 +1,61 @@
+---
+title: Button
+description: tc-button — 主要按鈕，filled / outlined / tonal 三種變體。
+---
+
+import Demo from '../../../components/Demo.astro';
+import PropsTable from '../../../components/PropsTable.astro';
+
+`<tc-button>` 是主要按鈕，提供三種變體與 form-associated 表單提交。下方為**可互動的真實元件**：
+
+<Demo>
+  <tc-button variant="filled">送出</tc-button>
+  <tc-button variant="outlined">取消</tc-button>
+  <tc-button variant="tonal">更多</tc-button>
+  <tc-button disabled>停用</tc-button>
+</Demo>
+
+## 用法
+
+### 純 HTML
+
+```html
+<link rel="stylesheet" href="@tzuchi/tokens/tokens.css" />
+<script type="module" src="@tzuchi/components/cdn"></script>
+
+<tc-button variant="filled">送出</tc-button>
+```
+
+### React
+
+```tsx
+import { TcButton } from '@tzuchi/react';
+
+<TcButton variant="filled" onClick={handleSubmit}>送出</TcButton>;
+```
+
+## 表單
+
+`type="submit"` 時，`tc-button` 透過 Form-Associated Custom Elements（ElementInternals）提交所屬 `<form>`：
+
+<Demo>
+  <form
+    onsubmit="event.preventDefault(); this.querySelector('output').textContent='✅ 已提交';"
+    style="display:flex; gap:.75rem; align-items:center;"
+  >
+    <tc-button type="submit" variant="filled">提交表單</tc-button>
+    <output></output>
+  </form>
+</Demo>
+
+## API
+
+下表自 Custom Elements Manifest 自動產生：
+
+<PropsTable tag="tc-button" />
+
+## 無障礙（Accessibility）
+
+- 內含原生 `<button>`，支援鍵盤 Enter / Space。
+- `:focus-visible` 焦點環使用 `--tc-focus-ring-*` token。
+- `disabled` 透過停用內部原生控件實作（非 `pointer-events:none`）。

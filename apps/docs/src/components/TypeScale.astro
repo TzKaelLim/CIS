@@ -1,0 +1,42 @@
+---
+// Foundations: each row uses the real --tc-typography-* shorthand var, so the
+// type scale is rendered by the tokens themselves.
+const roles = [
+  'heading-1',
+  'heading-2',
+  'heading-3',
+  'heading-4',
+  'title',
+  'subtitle',
+  'body',
+] as const;
+---
+
+<div class="type-scale">
+  {
+    roles.map((r) => (
+      <div class="type-row">
+        <code>typography.{r}</code>
+        <p style={`font: var(--tc-typography-${r}); margin:0`}>慈濟 Tzu Chi — 大愛無國界</p>
+      </div>
+    ))
+  }
+</div>
+
+<style>
+  .type-scale {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    margin-block: 1rem;
+  }
+  .type-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .type-row code {
+    font-size: 0.75rem;
+    color: var(--sl-color-gray-3);
+  }
+</style>

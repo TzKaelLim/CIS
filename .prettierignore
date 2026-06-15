@@ -8,3 +8,6 @@ pnpm-lock.yaml
 docs/**
 packages/react/src/generated/**
 packages/react/src/index.ts
+**/*.astro
+apps/docs/src/content/**
+**/.astro/**

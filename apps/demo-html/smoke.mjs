@@ -14,7 +14,9 @@ if (/from\s*['"]lit['"]/.test(cdn)) {
 // Assert the registration side effect actually survived bundling (a string
 // match on the tag name alone passes even when the define() is tree-shaken).
 if (!cdn.includes('customElements.define')) {
-  console.error('FAIL: CDN bundle contains no customElements.define — registration was tree-shaken');
+  console.error(
+    'FAIL: CDN bundle contains no customElements.define — registration was tree-shaken',
+  );
   process.exit(1);
 }
 if (!cdn.includes('tc-button')) {

@@ -1,0 +1,58 @@
+---
+// Foundations: render color swatches straight from the DTCG token sources, so
+// this page can never drift from the published tokens.
+import primitive from '../../../../packages/tokens/src/primitive/color.tokens.json';
+
+type Tok = { $value?: string } & Record<string, unknown>;
+
+function flatten(obj: Record<string, unknown>, prefix: string): { name: string; value: string }[] {
+  const out: { name: string; value: string }[] = [];
+  for (const [k, v] of Object.entries(obj)) {
+    if (k.startsWith('$')) continue;
+    const node = v as Tok;
+    if (node && typeof node === 'object' && '$value' in node && typeof node.$value === 'string') {
+      out.push({ name: `${prefix}-${k}`, value: node.$value });
+    } else if (node && typeof node === 'object') {
+      out.push(...flatten(node as Record<string, unknown>, `${prefix}-${k}`));
+    }
+  }
+  return out;
+}
+
+const swatches = flatten(primitive.color as Record<string, unknown>, 'color');
+---
+
+<div class="swatches">
+  {
+    swatches.map((s) => (
+      <div class="swatch">
+        <div class="chip" style={`background:${s.value}`} />
+        <code>--tc-{s.name}</code>
+        <span>{s.value}</span>
+      </div>
+    ))
+  }
+</div>
+
+<style>
+  .swatches {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 0.75rem;
+    margin-block: 1rem;
+  }
+  .swatch {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-size: 0.78rem;
+  }
+  .chip {
+    height: 52px;
+    border-radius: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+  }
+  .swatch span {
+    color: var(--sl-color-gray-3);
+  }
+</style>

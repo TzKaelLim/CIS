@@ -1,0 +1,26 @@
+---
+// Live example wrapper. The client <script> registers every <tc-*> element,
+// so the slotted custom elements below are real, interactive components —
+// not screenshots. Same CDN source as production.
+---
+
+<div class="tc-demo not-content">
+  <slot />
+</div>
+
+<script>
+  import '@tzuchi/components';
+</script>
+
+<style>
+  .tc-demo {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+    padding: 1.5rem;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.5rem;
+    background: var(--sl-color-gray-7, #fff);
+  }
+</style>

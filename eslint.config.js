@@ -8,6 +8,8 @@ export default [
       '**/storybook-static/**',
       '**/*.config.*',
       '**/.storybook/**',
+      '**/.astro/**',
+      '**/*.astro',
       '**/custom-elements.json',
       '**/coverage/**',
     ],

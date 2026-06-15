@@ -5,5 +5,5 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": ["@tzuchi/storybook", "@tzuchi/demo-html"]
+  "ignore": ["@tzuchi/storybook", "@tzuchi/demo-html", "@tzuchi/docs"]
 }
