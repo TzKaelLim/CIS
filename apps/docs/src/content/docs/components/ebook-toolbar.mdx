@@ -1,0 +1,83 @@
+---
+title: EbookToolbar
+description: tc-ebook-toolbar — 電子書閱讀器上排功能列（慈濟書庫）：返回鍵、置中書名與尾端工具列。
+---
+
+import Demo from '../../../components/Demo.astro';
+import PropsTable from '../../../components/PropsTable.astro';
+
+`<tc-ebook-toolbar>` 是電子書閱讀器的上排功能列（慈濟書庫）。版面為三段式：內建**返回鍵**（inline-start）、**書籍名稱**（桌機置中）、以及尾端**工具列**（inline-end，由使用者以預設插槽放入 `<tc-icon-button>`，例如搜尋／書籤／語音／筆記／個人）。於平板斷點（`--tc-breakpoint-tablet` = 768px）以下，書名會由置中改為靠左貼近返回鍵。點擊返回鍵會派發 `tc-back` 事件。下方為**可互動的真實元件**：
+
+<Demo>
+  <tc-ebook-toolbar book-title="書籍名稱">
+    <tc-icon-button label="搜尋"><tc-icon name="search"></tc-icon></tc-icon-button>
+    <tc-icon-button label="書籤"><tc-icon name="check"></tc-icon></tc-icon-button>
+    <tc-icon-button label="語音朗讀"><tc-icon name="mail"></tc-icon></tc-icon-button>
+    <tc-icon-button label="筆記"><tc-icon name="calendar"></tc-icon></tc-icon-button>
+    <tc-icon-button label="個人"><tc-icon name="menu"></tc-icon></tc-icon-button>
+  </tc-ebook-toolbar>
+</Demo>
+
+## 變體（variant）
+
+`brand` 變體以品牌深藍底搭配 on-brand 文字／圖示；`light`（預設）為淺底（surface.subtle）搭配品牌色文字。
+
+<Demo>
+  <tc-ebook-toolbar variant="brand" book-title="無量義經">
+    <tc-icon-button label="搜尋"><tc-icon name="search"></tc-icon></tc-icon-button>
+    <tc-icon-button label="書籤"><tc-icon name="check"></tc-icon></tc-icon-button>
+    <tc-icon-button label="個人"><tc-icon name="menu"></tc-icon></tc-icon-button>
+  </tc-ebook-toolbar>
+</Demo>
+
+## 書名（book-title 與 title 插槽）
+
+以 `book-title` 屬性設定置中書名；若需自訂排版，可改用 `title` 插槽覆寫（插槽優先）。過長的書名會以省略號截斷，避免擠壓工具列。
+
+<Demo>
+  <tc-ebook-toolbar>
+    <span slot="title" style="font:var(--tc-typography-title,700 20px/1.4 sans-serif)">自訂書名（title 插槽）</span>
+    <tc-icon-button label="搜尋"><tc-icon name="search"></tc-icon></tc-icon-button>
+    <tc-icon-button label="個人"><tc-icon name="menu"></tc-icon></tc-icon-button>
+  </tc-ebook-toolbar>
+</Demo>
+
+## 用法
+
+### 純 HTML
+
+```html
+<link rel="stylesheet" href="@tzuchi/tokens/tokens.css" />
+<script type="module" src="@tzuchi/components/cdn"></script>
+
+<tc-ebook-toolbar book-title="書籍名稱" back-label="返回">
+  <tc-icon-button label="搜尋"><tc-icon name="search"></tc-icon></tc-icon-button>
+  <tc-icon-button label="書籤"><tc-icon name="check"></tc-icon></tc-icon-button>
+  <tc-icon-button label="個人"><tc-icon name="menu"></tc-icon></tc-icon-button>
+</tc-ebook-toolbar>
+```
+
+### React
+
+```tsx
+import { TcEbookToolbar, TcIconButton, TcIcon } from '@tzuchi/react';
+
+<TcEbookToolbar bookTitle="書籍名稱" onTcBack={() => history.back()}>
+  <TcIconButton label="搜尋">
+    <TcIcon name="search" />
+  </TcIconButton>
+</TcEbookToolbar>;
+```
+
+## API
+
+下表自 Custom Elements Manifest 自動產生：
+
+<PropsTable tag="tc-ebook-toolbar" />
+
+## 無障礙（Accessibility）
+
+- host 取得 `role="toolbar"` 與 `aria-label`（電子書工具列）。
+- 返回鍵為原生 `<button>`，其 `aria-label` 由 `back-label` 控制（預設 `返回`），點擊派發 `tc-back`（composed、bubbles）。
+- 尾端工具控制項由使用者提供，建議使用 `<tc-icon-button>` 並各自設定 `label`。
+- `:focus-visible` 焦點環使用 `--tc-focus-ring-*` token。

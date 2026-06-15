@@ -166,6 +166,30 @@
             "name": "TcFooterColumn",
             "module": "./footer/tc-footer.js"
           }
+        },
+        {
+          "kind": "js",
+          "name": "TcEbookToolbar",
+          "declaration": {
+            "name": "TcEbookToolbar",
+            "module": "./ebook-toolbar/tc-ebook-toolbar.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "TcContainer",
+          "declaration": {
+            "name": "TcContainer",
+            "module": "./container/tc-container.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "TcGrid",
+          "declaration": {
+            "name": "TcGrid",
+            "module": "./grid/tc-grid.js"
+          }
         }
       ]
     },
@@ -669,6 +693,91 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/base/define-element.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "defineElement",
+          "return": {
+            "type": {
+              "text": "void"
+            }
+          },
+          "parameters": [
+            {
+              "name": "tag",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "ctor",
+              "type": {
+                "text": "CustomElementConstructor"
+              }
+            }
+          ],
+          "description": "Register a custom element once; a no-op if the tag is already defined\n(prevents \"already defined\" crashes on double-load / HMR)."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "defineElement",
+          "declaration": {
+            "name": "defineElement",
+            "module": "src/base/define-element.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "tag",
+          "declaration": {
+            "name": "ctor",
+            "module": "src/base/define-element.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/base/tc-element.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Shared base for all `<tc-*>` components.\n`delegatesFocus` forwards external `.focus()` and label clicks to the inner\nnative control inside the shadow root.",
+          "name": "TcElement",
+          "members": [
+            {
+              "kind": "field",
+              "name": "shadowRootOptions",
+              "type": {
+                "text": "ShadowRootInit"
+              },
+              "static": true,
+              "default": "{ ...LitElement.shadowRootOptions, delegatesFocus: true, }"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "TcElement",
+          "declaration": {
+            "name": "TcElement",
+            "module": "src/base/tc-element.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/book-card/tc-book-card-define.ts",
       "declarations": [],
       "exports": []
@@ -894,91 +1003,6 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/base/define-element.ts",
-      "declarations": [
-        {
-          "kind": "function",
-          "name": "defineElement",
-          "return": {
-            "type": {
-              "text": "void"
-            }
-          },
-          "parameters": [
-            {
-              "name": "tag",
-              "type": {
-                "text": "string"
-              }
-            },
-            {
-              "name": "ctor",
-              "type": {
-                "text": "CustomElementConstructor"
-              }
-            }
-          ],
-          "description": "Register a custom element once; a no-op if the tag is already defined\n(prevents \"already defined\" crashes on double-load / HMR)."
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "defineElement",
-          "declaration": {
-            "name": "defineElement",
-            "module": "src/base/define-element.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "tag",
-          "declaration": {
-            "name": "ctor",
-            "module": "src/base/define-element.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/base/tc-element.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "Shared base for all `<tc-*>` components.\n`delegatesFocus` forwards external `.focus()` and label clicks to the inner\nnative control inside the shadow root.",
-          "name": "TcElement",
-          "members": [
-            {
-              "kind": "field",
-              "name": "shadowRootOptions",
-              "type": {
-                "text": "ShadowRootInit"
-              },
-              "static": true,
-              "default": "{ ...LitElement.shadowRootOptions, delegatesFocus: true, }"
-            }
-          ],
-          "superclass": {
-            "name": "LitElement",
-            "package": "lit"
-          },
-          "customElement": true
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "TcElement",
-          "declaration": {
-            "name": "TcElement",
-            "module": "src/base/tc-element.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
       "path": "src/button/tc-button-define.ts",
       "declarations": [],
       "exports": []
@@ -1149,231 +1173,6 @@
           "declaration": {
             "name": "TcButton",
             "module": "src/button/tc-button.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/card/tc-card-define.ts",
-      "declarations": [],
-      "exports": []
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/card/tc-card.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "卡片容器，含媒體、標題、內文與動作區，支援 elevated / outlined 變體與可互動／連結模式。",
-          "name": "TcCard",
-          "cssProperties": [
-            {
-              "description": "卡片底色",
-              "name": "--tc-card-bg"
-            },
-            {
-              "description": "卡片寬度（亦可用 width 屬性設定）",
-              "name": "--tc-card-width"
-            },
-            {
-              "description": "圓角",
-              "name": "--tc-card-radius"
-            },
-            {
-              "description": "內文區內距",
-              "name": "--tc-card-padding"
-            },
-            {
-              "description": "outlined 變體邊框色",
-              "name": "--tc-card-border"
-            },
-            {
-              "description": "elevated 變體靜止陰影",
-              "name": "--tc-card-elevation"
-            },
-            {
-              "description": "互動時的提升陰影",
-              "name": "--tc-card-elevation-hover"
-            },
-            {
-              "description": "標題文字色",
-              "name": "--tc-card-headline-fg"
-            },
-            {
-              "description": "互動 hover 時的標題色",
-              "name": "--tc-card-headline-fg-hover"
-            }
-          ],
-          "cssParts": [
-            {
-              "description": "卡片外層容器",
-              "name": "base"
-            },
-            {
-              "description": "href 模式下覆蓋整張卡片的 <a>（stretched link）",
-              "name": "link"
-            }
-          ],
-          "slots": [
-            {
-              "description": "頂部圖片／媒體區（建議放置 <img>）",
-              "name": "media"
-            },
-            {
-              "description": "卡片主標題",
-              "name": "headline"
-            },
-            {
-              "description": "卡片內文（預設插槽）",
-              "name": ""
-            },
-            {
-              "description": "動作區（按鈕等，於連結模式下仍可獨立點擊）",
-              "name": "footer"
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "variant",
-              "type": {
-                "text": "'elevated' | 'outlined'"
-              },
-              "default": "'elevated'",
-              "description": "視覺變體：elevated（陰影）或 outlined（邊框）。",
-              "attribute": "variant",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "interactive",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "是否可互動（無 href 時：host 可聚焦並回應 Enter／Space）。",
-              "attribute": "interactive",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "href",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "連結目標。設定後整張卡片以 stretched-link 方式變成連結。",
-              "attribute": "href",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "width",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "卡片寬度（CSS 長度，如 `320px` 或 `100%`）。未設定時由內容／容器決定。",
-              "attribute": "width",
-              "reflects": true
-            },
-            {
-              "kind": "method",
-              "name": "#syncInteractivity",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "description": "Make the host focusable + announce a role when interactive without an href.\n(With an href the inner <a> is the real focus/interaction target.)"
-            },
-            {
-              "kind": "field",
-              "name": "#onKeydown",
-              "privacy": "private"
-            },
-            {
-              "kind": "field",
-              "name": "#onSlotChange",
-              "privacy": "private",
-              "description": "Toggle a `data-empty` flag on the slot's wrapper so empty regions\n(no assigned nodes) can be hidden via CSS without unreliable\n`:has(::slotted())` selectors."
-            },
-            {
-              "kind": "field",
-              "name": "shadowRootOptions",
-              "type": {
-                "text": "ShadowRootInit"
-              },
-              "static": true,
-              "default": "{ ...LitElement.shadowRootOptions, delegatesFocus: true, }",
-              "inheritedFrom": {
-                "name": "TcElement",
-                "module": "src/base/tc-element.ts"
-              }
-            }
-          ],
-          "events": [
-            {
-              "description": "可互動卡片（無 href）以鍵盤 Enter／Space 或點擊觸發",
-              "name": "tc-card-click"
-            }
-          ],
-          "attributes": [
-            {
-              "name": "variant",
-              "type": {
-                "text": "'elevated' | 'outlined'"
-              },
-              "default": "'elevated'",
-              "description": "視覺變體：elevated（陰影）或 outlined（邊框）。",
-              "fieldName": "variant"
-            },
-            {
-              "name": "interactive",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "是否可互動（無 href 時：host 可聚焦並回應 Enter／Space）。",
-              "fieldName": "interactive"
-            },
-            {
-              "name": "href",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "連結目標。設定後整張卡片以 stretched-link 方式變成連結。",
-              "fieldName": "href"
-            },
-            {
-              "name": "width",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "卡片寬度（CSS 長度，如 `320px` 或 `100%`）。未設定時由內容／容器決定。",
-              "fieldName": "width"
-            }
-          ],
-          "superclass": {
-            "name": "TcElement",
-            "module": "/src/base/tc-element.js"
-          },
-          "summary": "Tzu Chi card surface with media, headline, body and footer.",
-          "customElement": true,
-          "tagName": "tc-card"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "TcCard",
-          "declaration": {
-            "name": "TcCard",
-            "module": "src/card/tc-card.ts"
           }
         }
       ]
@@ -1614,6 +1413,372 @@
           "declaration": {
             "name": "TcChip",
             "module": "src/chip/tc-chip.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/card/tc-card-define.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/card/tc-card.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "卡片容器，含媒體、標題、內文與動作區，支援 elevated / outlined 變體與可互動／連結模式。",
+          "name": "TcCard",
+          "cssProperties": [
+            {
+              "description": "卡片底色",
+              "name": "--tc-card-bg"
+            },
+            {
+              "description": "卡片寬度（亦可用 width 屬性設定）",
+              "name": "--tc-card-width"
+            },
+            {
+              "description": "圓角",
+              "name": "--tc-card-radius"
+            },
+            {
+              "description": "內文區內距",
+              "name": "--tc-card-padding"
+            },
+            {
+              "description": "outlined 變體邊框色",
+              "name": "--tc-card-border"
+            },
+            {
+              "description": "elevated 變體靜止陰影",
+              "name": "--tc-card-elevation"
+            },
+            {
+              "description": "互動時的提升陰影",
+              "name": "--tc-card-elevation-hover"
+            },
+            {
+              "description": "標題文字色",
+              "name": "--tc-card-headline-fg"
+            },
+            {
+              "description": "互動 hover 時的標題色",
+              "name": "--tc-card-headline-fg-hover"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "卡片外層容器",
+              "name": "base"
+            },
+            {
+              "description": "href 模式下覆蓋整張卡片的 <a>（stretched link）",
+              "name": "link"
+            }
+          ],
+          "slots": [
+            {
+              "description": "頂部圖片／媒體區（建議放置 <img>）",
+              "name": "media"
+            },
+            {
+              "description": "卡片主標題",
+              "name": "headline"
+            },
+            {
+              "description": "卡片內文（預設插槽）",
+              "name": ""
+            },
+            {
+              "description": "動作區（按鈕等，於連結模式下仍可獨立點擊）",
+              "name": "footer"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "variant",
+              "type": {
+                "text": "'elevated' | 'outlined'"
+              },
+              "default": "'elevated'",
+              "description": "視覺變體：elevated（陰影）或 outlined（邊框）。",
+              "attribute": "variant",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "interactive",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "是否可互動（無 href 時：host 可聚焦並回應 Enter／Space）。",
+              "attribute": "interactive",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "href",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "連結目標。設定後整張卡片以 stretched-link 方式變成連結。",
+              "attribute": "href",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "width",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "卡片寬度（CSS 長度，如 `320px` 或 `100%`）。未設定時由內容／容器決定。",
+              "attribute": "width",
+              "reflects": true
+            },
+            {
+              "kind": "method",
+              "name": "#syncInteractivity",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Make the host focusable + announce a role when interactive without an href.\n(With an href the inner <a> is the real focus/interaction target.)"
+            },
+            {
+              "kind": "field",
+              "name": "#onKeydown",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "#onSlotChange",
+              "privacy": "private",
+              "description": "Toggle a `data-empty` flag on the slot's wrapper so empty regions\n(no assigned nodes) can be hidden via CSS without unreliable\n`:has(::slotted())` selectors."
+            },
+            {
+              "kind": "field",
+              "name": "shadowRootOptions",
+              "type": {
+                "text": "ShadowRootInit"
+              },
+              "static": true,
+              "default": "{ ...LitElement.shadowRootOptions, delegatesFocus: true, }",
+              "inheritedFrom": {
+                "name": "TcElement",
+                "module": "src/base/tc-element.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "description": "可互動卡片（無 href）以鍵盤 Enter／Space 或點擊觸發",
+              "name": "tc-card-click"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "variant",
+              "type": {
+                "text": "'elevated' | 'outlined'"
+              },
+              "default": "'elevated'",
+              "description": "視覺變體：elevated（陰影）或 outlined（邊框）。",
+              "fieldName": "variant"
+            },
+            {
+              "name": "interactive",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "是否可互動（無 href 時：host 可聚焦並回應 Enter／Space）。",
+              "fieldName": "interactive"
+            },
+            {
+              "name": "href",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "連結目標。設定後整張卡片以 stretched-link 方式變成連結。",
+              "fieldName": "href"
+            },
+            {
+              "name": "width",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "卡片寬度（CSS 長度，如 `320px` 或 `100%`）。未設定時由內容／容器決定。",
+              "fieldName": "width"
+            }
+          ],
+          "superclass": {
+            "name": "TcElement",
+            "module": "/src/base/tc-element.js"
+          },
+          "summary": "Tzu Chi card surface with media, headline, body and footer.",
+          "customElement": true,
+          "tagName": "tc-card"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "TcCard",
+          "declaration": {
+            "name": "TcCard",
+            "module": "src/card/tc-card.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/container/tc-container-define.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/container/tc-container.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "響應式、水平置中的最大寬度版心容器。依 `size` 套用 `--tc-container-*` 斷點寬度，\n`gutter` 提供隨視窗增長的左右內距，`centered` 以 `margin-inline:auto` 置中。",
+          "name": "TcContainer",
+          "cssProperties": [
+            {
+              "description": "覆寫最大寬度（預設由 size 決定，對應 --tc-container-sm/md/lg/xl/full）",
+              "name": "--tc-container-max"
+            },
+            {
+              "description": "行動裝置左右內距",
+              "name": "--tc-container-padding-inline-mobile"
+            },
+            {
+              "description": "平板（≥768px）左右內距",
+              "name": "--tc-container-padding-inline-tablet"
+            },
+            {
+              "description": "桌機（≥1024px）左右內距",
+              "name": "--tc-container-padding-inline"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "受最大寬度／內距／置中約束的內層版心容器",
+              "name": "base"
+            }
+          ],
+          "slots": [
+            {
+              "description": "版心內容（置於受最大寬度與內距約束的 .inner 內）",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "size",
+              "type": {
+                "text": "'sm' | 'md' | 'lg' | 'xl' | 'full'"
+              },
+              "default": "'xl'",
+              "description": "最大寬度尺寸：`sm`/`md`/`lg`/`xl`/`full`，對應 `--tc-container-*` 斷點寬度。",
+              "attribute": "size",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "gutter",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "是否套用隨視窗增長的左右內距（gutter）。",
+              "attribute": "gutter",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "centered",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "是否水平置中（`margin-inline:auto`）。",
+              "attribute": "centered",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "shadowRootOptions",
+              "type": {
+                "text": "ShadowRootInit"
+              },
+              "static": true,
+              "default": "{ ...LitElement.shadowRootOptions, delegatesFocus: true, }",
+              "inheritedFrom": {
+                "name": "TcElement",
+                "module": "src/base/tc-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "size",
+              "type": {
+                "text": "'sm' | 'md' | 'lg' | 'xl' | 'full'"
+              },
+              "default": "'xl'",
+              "description": "最大寬度尺寸：`sm`/`md`/`lg`/`xl`/`full`，對應 `--tc-container-*` 斷點寬度。",
+              "fieldName": "size"
+            },
+            {
+              "name": "gutter",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "是否套用隨視窗增長的左右內距（gutter）。",
+              "fieldName": "gutter"
+            },
+            {
+              "name": "centered",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "是否水平置中（`margin-inline:auto`）。",
+              "fieldName": "centered"
+            }
+          ],
+          "superclass": {
+            "name": "TcElement",
+            "module": "/src/base/tc-element.js"
+          },
+          "summary": "Tzu Chi responsive, horizontally-centered max-width layout container.",
+          "customElement": true,
+          "tagName": "tc-container"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "TcContainer",
+          "declaration": {
+            "name": "TcContainer",
+            "module": "src/container/tc-container.ts"
           }
         }
       ]
@@ -2001,6 +2166,206 @@
           "declaration": {
             "name": "TcDropdown",
             "module": "src/dropdown/tc-dropdown.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/ebook-toolbar/tc-ebook-toolbar-define.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/ebook-toolbar/tc-ebook-toolbar.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "電子書閱讀器上排功能列（慈濟書庫）。版面為 [返回鍵（inline-start）｜書籍名稱（置中）｜工具列（inline-end）]。",
+          "name": "TcEbookToolbar",
+          "cssProperties": [
+            {
+              "description": "容器底色",
+              "name": "--tc-ebook-toolbar-bg"
+            },
+            {
+              "description": "文字／圖示色",
+              "name": "--tc-ebook-toolbar-fg"
+            },
+            {
+              "description": "容器邊框色",
+              "name": "--tc-ebook-toolbar-border"
+            },
+            {
+              "description": "書名文字色",
+              "name": "--tc-ebook-toolbar-title-fg"
+            },
+            {
+              "description": "容器高度",
+              "name": "--tc-ebook-toolbar-height"
+            },
+            {
+              "description": "圓角",
+              "name": "--tc-ebook-toolbar-radius"
+            },
+            {
+              "description": "左右內距",
+              "name": "--tc-ebook-toolbar-padding-inline"
+            },
+            {
+              "description": "工具列項目間距",
+              "name": "--tc-ebook-toolbar-tools-gap"
+            },
+            {
+              "description": "返回鍵 hover 底色",
+              "name": "--tc-ebook-toolbar-back-bg-hover"
+            },
+            {
+              "description": "焦點環顏色",
+              "name": "--tc-ebook-toolbar-focus-ring-color"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "圓角藥丸容器",
+              "name": "base"
+            },
+            {
+              "description": "內建返回按鈕（原生 <button>）",
+              "name": "back"
+            },
+            {
+              "description": "書名區",
+              "name": "title"
+            },
+            {
+              "description": "尾端工具列",
+              "name": "tools"
+            }
+          ],
+          "slots": [
+            {
+              "description": "尾端工具控制項（搜尋／書籤／語音／筆記／個人等，通常放置 <tc-icon-button>，置於 inline-end）",
+              "name": ""
+            },
+            {
+              "description": "覆寫 book-title 的自訂書名內容（置中）",
+              "name": "title"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "variant",
+              "type": {
+                "text": "'brand' | 'light'"
+              },
+              "default": "'light'",
+              "description": "視覺變體：`light`（淺底、品牌色文字）或 `brand`（品牌深藍底、on-brand 文字）。",
+              "attribute": "variant",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "bookTitle",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "置中顯示的書籍名稱。亦可改用 `title` 插槽覆寫。",
+              "attribute": "book-title"
+            },
+            {
+              "kind": "field",
+              "name": "backLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'返回'",
+              "description": "返回鍵的無障礙標籤（aria-label）。",
+              "attribute": "back-label"
+            },
+            {
+              "kind": "field",
+              "name": "#onBack",
+              "privacy": "private",
+              "description": "Emit `tc-back` when the built-in back button is pressed."
+            },
+            {
+              "kind": "field",
+              "name": "#onSlotChange",
+              "privacy": "private",
+              "description": "Toggle a `data-empty` flag on a slot's wrapper so empty regions can be\nhidden via CSS without unreliable `:has(::slotted())` selectors."
+            },
+            {
+              "kind": "field",
+              "name": "shadowRootOptions",
+              "type": {
+                "text": "ShadowRootInit"
+              },
+              "static": true,
+              "default": "{ ...LitElement.shadowRootOptions, delegatesFocus: true, }",
+              "inheritedFrom": {
+                "name": "TcElement",
+                "module": "src/base/tc-element.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "CustomEvent<void>"
+              },
+              "description": "點擊返回鍵時派發（composed, bubbles）。",
+              "name": "tc-back"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "variant",
+              "type": {
+                "text": "'brand' | 'light'"
+              },
+              "default": "'light'",
+              "description": "視覺變體：`light`（淺底、品牌色文字）或 `brand`（品牌深藍底、on-brand 文字）。",
+              "fieldName": "variant"
+            },
+            {
+              "name": "book-title",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "置中顯示的書籍名稱。亦可改用 `title` 插槽覆寫。",
+              "fieldName": "bookTitle"
+            },
+            {
+              "name": "back-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'返回'",
+              "description": "返回鍵的無障礙標籤（aria-label）。",
+              "fieldName": "backLabel"
+            }
+          ],
+          "superclass": {
+            "name": "TcElement",
+            "module": "/src/base/tc-element.js"
+          },
+          "summary": "Tzu Chi e-book reader top toolbar: back button, centered book title and trailing tool controls.",
+          "customElement": true,
+          "tagName": "tc-ebook-toolbar"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "TcEbookToolbar",
+          "declaration": {
+            "name": "TcEbookToolbar",
+            "module": "src/ebook-toolbar/tc-ebook-toolbar.ts"
           }
         }
       ]
@@ -2408,6 +2773,189 @@
           "declaration": {
             "name": "TcFooterColumn",
             "module": "./tc-footer-column.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/grid/tc-grid-define.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/grid/tc-grid.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "響應式 CSS Grid 版面容器。預設為固定欄數（columns，預設 12），於平板斷點（768px）以下收合為\nmobile-columns（預設 1）欄；設定 min-col-width 時改用 auto-fit/minmax 自動填滿模式。",
+          "name": "TcGrid",
+          "cssProperties": [
+            {
+              "description": "預設欄列間距（gap 屬性未設定時採用）",
+              "name": "--tc-grid-gap-default"
+            },
+            {
+              "description": "桌機固定欄數（由 columns 屬性設定）",
+              "name": "--tc-grid-columns"
+            },
+            {
+              "description": "行動裝置固定欄數（由 mobile-columns 屬性設定）",
+              "name": "--tc-grid-mobile-columns"
+            },
+            {
+              "description": "auto-fit 模式下每欄最小寬度（由 min-col-width 屬性設定）",
+              "name": "--tc-grid-min-col-width"
+            },
+            {
+              "description": "實際採用的間距（由 gap 屬性設定）",
+              "name": "--tc-grid-gap"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "內層 grid 容器（display: grid）",
+              "name": "base"
+            }
+          ],
+          "slots": [
+            {
+              "description": "網格項目（直接子元素即為各 grid cell）",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "columns",
+              "type": {
+                "text": "number"
+              },
+              "default": "12",
+              "description": "桌機固定欄數。設定 `min-col-width` 後此值不生效。",
+              "attribute": "columns",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "mobileColumns",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "平板斷點（768px）以下使用的固定欄數（僅固定欄數模式生效）。",
+              "attribute": "mobile-columns",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "minColWidth",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "每欄最小寬度（CSS 長度，如 `\"240px\"`）。設定後改用\n`repeat(auto-fit, minmax(min-col-width, 1fr))` 響應式自動填滿模式，並覆寫固定欄數。",
+              "attribute": "min-col-width",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "gap",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "欄列間距：space token 名稱（如 `\"16\"`）或任意 CSS 長度。預設對應 `var(--tc-space-16)`。",
+              "attribute": "gap",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "align",
+              "type": {
+                "text": "'stretch' | 'start' | 'center' | 'end' | undefined"
+              },
+              "description": "各列項目的區塊方向對齊。未設定時 grid 預設為 `stretch`。",
+              "attribute": "align",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "shadowRootOptions",
+              "type": {
+                "text": "ShadowRootInit"
+              },
+              "static": true,
+              "default": "{ ...LitElement.shadowRootOptions, delegatesFocus: true, }",
+              "inheritedFrom": {
+                "name": "TcElement",
+                "module": "src/base/tc-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "columns",
+              "type": {
+                "text": "number"
+              },
+              "default": "12",
+              "description": "桌機固定欄數。設定 `min-col-width` 後此值不生效。",
+              "fieldName": "columns"
+            },
+            {
+              "name": "mobile-columns",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "平板斷點（768px）以下使用的固定欄數（僅固定欄數模式生效）。",
+              "fieldName": "mobileColumns"
+            },
+            {
+              "name": "min-col-width",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "每欄最小寬度（CSS 長度，如 `\"240px\"`）。設定後改用\n`repeat(auto-fit, minmax(min-col-width, 1fr))` 響應式自動填滿模式，並覆寫固定欄數。",
+              "fieldName": "minColWidth"
+            },
+            {
+              "name": "gap",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "欄列間距：space token 名稱（如 `\"16\"`）或任意 CSS 長度。預設對應 `var(--tc-space-16)`。",
+              "fieldName": "gap"
+            },
+            {
+              "name": "align",
+              "type": {
+                "text": "'stretch' | 'start' | 'center' | 'end' | undefined"
+              },
+              "description": "各列項目的區塊方向對齊。未設定時 grid 預設為 `stretch`。",
+              "fieldName": "align"
+            }
+          ],
+          "superclass": {
+            "name": "TcElement",
+            "module": "/src/base/tc-element.js"
+          },
+          "summary": "Tzu Chi responsive CSS-grid layout primitive.",
+          "customElement": true,
+          "tagName": "tc-grid"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "TcGrid",
+          "declaration": {
+            "name": "TcGrid",
+            "module": "src/grid/tc-grid.ts"
           }
         }
       ]

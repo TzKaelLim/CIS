@@ -159,6 +159,30 @@
       "types": "./dist/footer/tc-footer.d.ts",
       "default": "./dist/footer/tc-footer.js"
     },
+    "./ebook-toolbar": {
+      "types": "./dist/ebook-toolbar/tc-ebook-toolbar-define.d.ts",
+      "default": "./dist/ebook-toolbar/tc-ebook-toolbar-define.js"
+    },
+    "./ebook-toolbar/class": {
+      "types": "./dist/ebook-toolbar/tc-ebook-toolbar.d.ts",
+      "default": "./dist/ebook-toolbar/tc-ebook-toolbar.js"
+    },
+    "./container": {
+      "types": "./dist/container/tc-container-define.d.ts",
+      "default": "./dist/container/tc-container-define.js"
+    },
+    "./container/class": {
+      "types": "./dist/container/tc-container.d.ts",
+      "default": "./dist/container/tc-container.js"
+    },
+    "./grid": {
+      "types": "./dist/grid/tc-grid-define.d.ts",
+      "default": "./dist/grid/tc-grid-define.js"
+    },
+    "./grid/class": {
+      "types": "./dist/grid/tc-grid.d.ts",
+      "default": "./dist/grid/tc-grid.js"
+    },
     "./cdn": {
       "types": "./dist/cdn/tc-components.d.ts",
       "default": "./dist/cdn/tc-components.js"

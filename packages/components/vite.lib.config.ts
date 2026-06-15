@@ -65,6 +65,18 @@ export default defineConfig({
         'footer/tc-footer': resolve(__dirname, 'src/footer/tc-footer.ts'),
         'footer/tc-footer-column': resolve(__dirname, 'src/footer/tc-footer-column.ts'),
         'footer/tc-footer-define': resolve(__dirname, 'src/footer/tc-footer-define.ts'),
+        'ebook-toolbar/tc-ebook-toolbar': resolve(
+          __dirname,
+          'src/ebook-toolbar/tc-ebook-toolbar.ts',
+        ),
+        'ebook-toolbar/tc-ebook-toolbar-define': resolve(
+          __dirname,
+          'src/ebook-toolbar/tc-ebook-toolbar-define.ts',
+        ),
+        'container/tc-container': resolve(__dirname, 'src/container/tc-container.ts'),
+        'container/tc-container-define': resolve(__dirname, 'src/container/tc-container-define.ts'),
+        'grid/tc-grid': resolve(__dirname, 'src/grid/tc-grid.ts'),
+        'grid/tc-grid-define': resolve(__dirname, 'src/grid/tc-grid-define.ts'),
       },
       formats: ['es'],
     },

@@ -1,0 +1,95 @@
+---
+title: Container
+description: tc-container — 響應式、水平置中的最大寬度版心容器，依 size 套用斷點寬度，gutter 提供隨視窗增長的左右內距。
+---
+
+import Demo from '../../../components/Demo.astro';
+import PropsTable from '../../../components/PropsTable.astro';
+
+`<tc-container>` 是版心（layout）容器：將內容約束在最大寬度內、水平置中，並提供隨視窗增長的左右內距（gutter）。`size` 對應設計系統的斷點寬度（`--tc-container-sm/md/lg/xl/full`），分別為 375 / 768 / 1024 / 1280 / 1920px。下方為**可互動的真實元件**（虛線框示意版心邊界）：
+
+<Demo>
+  <div style="background:#f5f5f5;padding-block:16px;width:100%">
+    <tc-container size="lg">
+      <div style="background:#eaf0ff;border:1px dashed #1b2d58;color:#1b2d58;padding:24px;border-radius:12px;text-align:center">
+        版心容器 size="lg"（最大寬度 1024px，水平置中，左右內距隨視窗增長）
+      </div>
+    </tc-container>
+  </div>
+</Demo>
+
+## 尺寸（size）
+
+`size` 設定最大寬度，對應 `--tc-container-*` 斷點寬度原語。`full` 對應 1920px 寬版（桌機全幅）。
+
+<Demo>
+  <div style="background:#f5f5f5;padding-block:16px;display:flex;flex-direction:column;gap:12px;width:100%">
+    <tc-container size="sm">
+      <div style="background:#eaf0ff;border:1px dashed #1b2d58;color:#1b2d58;padding:12px;border-radius:12px;text-align:center">sm · 375px</div>
+    </tc-container>
+    <tc-container size="md">
+      <div style="background:#eaf0ff;border:1px dashed #1b2d58;color:#1b2d58;padding:12px;border-radius:12px;text-align:center">md · 768px</div>
+    </tc-container>
+    <tc-container size="lg">
+      <div style="background:#eaf0ff;border:1px dashed #1b2d58;color:#1b2d58;padding:12px;border-radius:12px;text-align:center">lg · 1024px</div>
+    </tc-container>
+  </div>
+</Demo>
+
+## 內距（gutter）與置中（centered）
+
+`gutter`（預設開啟）提供隨視窗增長的左右內距：行動裝置 `--tc-space-16`、平板（≥768px）`--tc-space-24`、桌機（≥1024px）`--tc-space-32`。`gutter` 是布林屬性——移除整個屬性即可關閉內距（例如讓全幅媒體貼齊邊緣）；以 JS 設定 `el.gutter = false` 亦可。`centered`（預設開啟）以 `margin-inline:auto` 水平置中。
+
+> 注意：`gutter` 與 `centered` 為布林屬性，**屬性存在即為 true**（`gutter="false"` 仍為開啟）。需關閉時請移除屬性或以 property 設為 `false`。
+
+<Demo>
+  <div style="background:#f5f5f5;padding-block:16px;width:100%">
+    <tc-container size="md" style="--tc-container-padding-inline-mobile:0;--tc-container-padding-inline-tablet:0;--tc-container-padding-inline:0">
+      <div style="background:#eaf0ff;border:1px dashed #1b2d58;color:#1b2d58;padding:12px;border-radius:12px;text-align:center">無 gutter：內容貼齊版心邊界</div>
+    </tc-container>
+  </div>
+</Demo>
+
+## 用法
+
+### 純 HTML
+
+```html
+<link rel="stylesheet" href="@tzuchi/tokens/tokens.css" />
+<script type="module" src="@tzuchi/components/cdn"></script>
+
+<tc-container size="xl">
+  <h1>頁面標題</h1>
+  <p>版心內容會被約束在最大寬度內並水平置中。</p>
+</tc-container>
+```
+
+### React
+
+```tsx
+import { TcContainer } from '@tzuchi/react';
+
+<TcContainer size="lg">
+  <h1>頁面標題</h1>
+  <p>版心內容</p>
+</TcContainer>;
+```
+
+## 自訂最大寬度
+
+`size` 變體會設定內部的 `--tc-container-max`；若需自訂任意寬度，可直接覆寫此變數：
+
+```html
+<tc-container style="--tc-container-max: 960px">…</tc-container>
+```
+
+## API
+
+下表自 Custom Elements Manifest 自動產生：
+
+<PropsTable tag="tc-container" />
+
+## 無障礙（Accessibility）
+
+- `<tc-container>` 純為版面（layout）容器，不引入額外的語意角色；請在其內容中使用適當的地標（如 `<main>`、`<section>`）與標題結構。
+- 內距與最大寬度皆使用設計 token（`--tc-container-*`、`--tc-space-*`），確保跨頁面一致的版心與留白。

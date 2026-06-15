@@ -1,0 +1,95 @@
+---
+title: Grid
+description: tc-grid — 響應式 CSS Grid 版面容器，支援固定欄數與 auto-fit/minmax 自動填滿兩種模式。
+---
+
+import Demo from '../../../components/Demo.astro';
+import PropsTable from '../../../components/PropsTable.astro';
+
+`<tc-grid>` 是 layout 原語：以單一預設插槽包裹直接子元素，套用 CSS Grid。預設為**固定欄數**模式（`columns`，預設 12），於平板斷點（768px）以下收合為 `mobile-columns`（預設 1）欄以利閱讀。設定 `min-col-width` 後改用 **auto-fit/minmax** 自動填滿模式（此時 `columns` 不生效）。下方為**可互動的真實元件**：
+
+<Demo>
+  <tc-grid columns="3" gap="16" style="--tc-color-brand-surface:#eaf0ff">
+    <div style="background:#eaf0ff;color:#1b2d58;border-radius:8px;padding:16px;text-align:center">1</div>
+    <div style="background:#eaf0ff;color:#1b2d58;border-radius:8px;padding:16px;text-align:center">2</div>
+    <div style="background:#eaf0ff;color:#1b2d58;border-radius:8px;padding:16px;text-align:center">3</div>
+    <div style="background:#eaf0ff;color:#1b2d58;border-radius:8px;padding:16px;text-align:center">4</div>
+    <div style="background:#eaf0ff;color:#1b2d58;border-radius:8px;padding:16px;text-align:center">5</div>
+    <div style="background:#eaf0ff;color:#1b2d58;border-radius:8px;padding:16px;text-align:center">6</div>
+  </tc-grid>
+</Demo>
+
+## 自動填滿模式（auto-fit / minmax）
+
+設定 `min-col-width`（CSS 長度，如 `240px`）後，版面以 `repeat(auto-fit, minmax(min-col-width, 1fr))` 自動依容器寬度增減欄數，無需斷點。此模式優先於 `columns`：
+
+<Demo>
+  <tc-grid min-col-width="200px" gap="16">
+    <div style="background:#eaf0ff;color:#1b2d58;border-radius:8px;padding:16px;text-align:center">A</div>
+    <div style="background:#eaf0ff;color:#1b2d58;border-radius:8px;padding:16px;text-align:center">B</div>
+    <div style="background:#eaf0ff;color:#1b2d58;border-radius:8px;padding:16px;text-align:center">C</div>
+    <div style="background:#eaf0ff;color:#1b2d58;border-radius:8px;padding:16px;text-align:center">D</div>
+    <div style="background:#eaf0ff;color:#1b2d58;border-radius:8px;padding:16px;text-align:center">E</div>
+  </tc-grid>
+</Demo>
+
+## 間距（gap）
+
+`gap` 接受 space token 名稱（如 `"16"`、`"24"`，對應 `--tc-space-*`）或任意 CSS 長度（如 `2rem`）。未設定時採用 `--tc-grid-gap-default`（預設 `--tc-space-16`）。
+
+## 行動裝置欄數（mobile-columns）
+
+固定欄數模式下，平板斷點（768px）以下會收合為 `mobile-columns` 欄（預設 1）。例如桌機 4 欄、行動 2 欄：
+
+<Demo>
+  <tc-grid columns="4" mobile-columns="2" gap="12">
+    <div style="background:#eaf0ff;color:#1b2d58;border-radius:8px;padding:16px;text-align:center">1</div>
+    <div style="background:#eaf0ff;color:#1b2d58;border-radius:8px;padding:16px;text-align:center">2</div>
+    <div style="background:#eaf0ff;color:#1b2d58;border-radius:8px;padding:16px;text-align:center">3</div>
+    <div style="background:#eaf0ff;color:#1b2d58;border-radius:8px;padding:16px;text-align:center">4</div>
+  </tc-grid>
+</Demo>
+
+## 用法
+
+### 純 HTML
+
+```html
+<link rel="stylesheet" href="@tzuchi/tokens/tokens.css" />
+<script type="module" src="@tzuchi/components/cdn"></script>
+
+<!-- 固定 3 欄、行動 1 欄 -->
+<tc-grid columns="3" gap="24">
+  <div>項目 1</div>
+  <div>項目 2</div>
+  <div>項目 3</div>
+</tc-grid>
+
+<!-- 自動填滿：每欄至少 240px -->
+<tc-grid min-col-width="240px" gap="16">
+  <div>項目 A</div>
+  <div>項目 B</div>
+</tc-grid>
+```
+
+### React
+
+```tsx
+import { TcGrid } from '@tzuchi/react';
+
+<TcGrid columns={3} gap="24" mobileColumns={1}>
+  <div>項目 1</div>
+  <div>項目 2</div>
+</TcGrid>;
+```
+
+## API
+
+下表自 Custom Elements Manifest 自動產生：
+
+<PropsTable tag="tc-grid" />
+
+## 無障礙（Accessibility）
+
+- `tc-grid` 為純視覺版面容器，不引入 ARIA 角色，子元素的語意與順序維持原樣（DOM 順序即視覺順序）。
+- 固定欄數模式於小螢幕自動收合為 `mobile-columns`，避免欄位過窄影響可讀性。

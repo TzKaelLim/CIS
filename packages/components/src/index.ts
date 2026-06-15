@@ -20,6 +20,9 @@ import './badge/tc-badge-define.js';
 import './search-bar/tc-search-bar-define.js';
 import './navbar/tc-navbar-define.js';
 import './footer/tc-footer-define.js';
+import './ebook-toolbar/tc-ebook-toolbar-define.js';
+import './container/tc-container-define.js';
+import './grid/tc-grid-define.js';
 
 export { TcButton } from './button/tc-button.js';
 export { TcIcon } from './icon/tc-icon.js';
@@ -40,3 +43,6 @@ export { TcBadge } from './badge/tc-badge.js';
 export { TcSearchBar } from './search-bar/tc-search-bar.js';
 export { TcNavbar } from './navbar/tc-navbar.js';
 export { TcFooter, TcFooterColumn } from './footer/tc-footer.js';
+export { TcEbookToolbar } from './ebook-toolbar/tc-ebook-toolbar.js';
+export { TcContainer } from './container/tc-container.js';
+export { TcGrid } from './grid/tc-grid.js';

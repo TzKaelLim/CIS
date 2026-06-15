@@ -65,8 +65,17 @@
   },
   "breakpoint": {
     "$type": "dimension",
-    "mobile": { "$value": "0px" },
+    "mobile": { "$value": "375px" },
     "tablet": { "$value": "768px" },
-    "desktop": { "$value": "1024px" }
+    "desktop": { "$value": "1024px" },
+    "wide": { "$value": "1920px" }
+  },
+  "container": {
+    "$type": "dimension",
+    "sm": { "$value": "375px" },
+    "md": { "$value": "768px" },
+    "lg": { "$value": "1024px" },
+    "xl": { "$value": "1280px" },
+    "full": { "$value": "1920px" }
   }
 }
