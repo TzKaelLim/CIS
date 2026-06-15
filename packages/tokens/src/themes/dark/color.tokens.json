@@ -17,7 +17,7 @@
       "subtle": { "$value": "{color.gray.980}" }
     },
     "border": {
-      "default": { "$value": "{color.gray.700}" },
+      "default": { "$value": "{color.gray.750}" },
       "strong": { "$value": "{color.gray.500}" },
       "focus": { "$value": "{color.blue.300}" }
     },
