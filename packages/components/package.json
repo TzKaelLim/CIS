@@ -23,6 +23,46 @@
       "types": "./dist/button/tc-button.d.ts",
       "default": "./dist/button/tc-button.js"
     },
+    "./icon": {
+      "types": "./dist/icon/tc-icon-define.d.ts",
+      "default": "./dist/icon/tc-icon-define.js"
+    },
+    "./icon/class": {
+      "types": "./dist/icon/tc-icon.d.ts",
+      "default": "./dist/icon/tc-icon.js"
+    },
+    "./icon-button": {
+      "types": "./dist/icon-button/tc-icon-button-define.d.ts",
+      "default": "./dist/icon-button/tc-icon-button-define.js"
+    },
+    "./icon-button/class": {
+      "types": "./dist/icon-button/tc-icon-button.d.ts",
+      "default": "./dist/icon-button/tc-icon-button.js"
+    },
+    "./input": {
+      "types": "./dist/input/tc-input-define.d.ts",
+      "default": "./dist/input/tc-input-define.js"
+    },
+    "./input/class": {
+      "types": "./dist/input/tc-input.d.ts",
+      "default": "./dist/input/tc-input.js"
+    },
+    "./card": {
+      "types": "./dist/card/tc-card-define.d.ts",
+      "default": "./dist/card/tc-card-define.js"
+    },
+    "./card/class": {
+      "types": "./dist/card/tc-card.d.ts",
+      "default": "./dist/card/tc-card.js"
+    },
+    "./tabs": {
+      "types": "./dist/tabs/tc-tabs-define.d.ts",
+      "default": "./dist/tabs/tc-tabs-define.js"
+    },
+    "./tabs/class": {
+      "types": "./dist/tabs/tc-tabs.d.ts",
+      "default": "./dist/tabs/tc-tabs.js"
+    },
     "./cdn": {
       "types": "./dist/cdn/tc-components.d.ts",
       "default": "./dist/cdn/tc-components.js"

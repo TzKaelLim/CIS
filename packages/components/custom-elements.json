@@ -14,6 +14,54 @@
             "name": "TcButton",
             "module": "./button/tc-button.js"
           }
+        },
+        {
+          "kind": "js",
+          "name": "TcIcon",
+          "declaration": {
+            "name": "TcIcon",
+            "module": "./icon/tc-icon.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "TcIconButton",
+          "declaration": {
+            "name": "TcIconButton",
+            "module": "./icon-button/tc-icon-button.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "TcInput",
+          "declaration": {
+            "name": "TcInput",
+            "module": "./input/tc-input.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "TcCard",
+          "declaration": {
+            "name": "TcCard",
+            "module": "./card/tc-card.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "TcTabs",
+          "declaration": {
+            "name": "TcTabs",
+            "module": "./tabs/tc-tabs.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "TcTab",
+          "declaration": {
+            "name": "TcTab",
+            "module": "./tabs/tc-tab.js"
+          }
         }
       ]
     },
@@ -274,6 +322,1237 @@
           "declaration": {
             "name": "TcButton",
             "module": "src/button/tc-button.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/card/tc-card-define.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/card/tc-card.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "卡片容器，含媒體、標題、內文與動作區，支援 elevated / outlined 變體與可互動／連結模式。",
+          "name": "TcCard",
+          "cssProperties": [
+            {
+              "description": "卡片底色",
+              "name": "--tc-card-bg"
+            },
+            {
+              "description": "圓角",
+              "name": "--tc-card-radius"
+            },
+            {
+              "description": "內文區內距",
+              "name": "--tc-card-padding"
+            },
+            {
+              "description": "outlined 變體邊框色",
+              "name": "--tc-card-border"
+            },
+            {
+              "description": "elevated 變體靜止陰影",
+              "name": "--tc-card-elevation"
+            },
+            {
+              "description": "互動時的提升陰影",
+              "name": "--tc-card-elevation-hover"
+            },
+            {
+              "description": "標題文字色",
+              "name": "--tc-card-headline-fg"
+            },
+            {
+              "description": "互動 hover 時的標題色",
+              "name": "--tc-card-headline-fg-hover"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "卡片外層容器",
+              "name": "base"
+            },
+            {
+              "description": "href 模式下覆蓋整張卡片的 <a>（stretched link）",
+              "name": "link"
+            }
+          ],
+          "slots": [
+            {
+              "description": "頂部圖片／媒體區（建議放置 <img>）",
+              "name": "media"
+            },
+            {
+              "description": "卡片主標題",
+              "name": "headline"
+            },
+            {
+              "description": "卡片內文（預設插槽）",
+              "name": ""
+            },
+            {
+              "description": "動作區（按鈕等，於連結模式下仍可獨立點擊）",
+              "name": "footer"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "variant",
+              "type": {
+                "text": "'elevated' | 'outlined'"
+              },
+              "default": "'elevated'",
+              "description": "視覺變體：elevated（陰影）或 outlined（邊框）。",
+              "attribute": "variant",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "interactive",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "是否可互動（無 href 時：host 可聚焦並回應 Enter／Space）。",
+              "attribute": "interactive",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "href",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "連結目標。設定後整張卡片以 stretched-link 方式變成連結。",
+              "attribute": "href",
+              "reflects": true
+            },
+            {
+              "kind": "method",
+              "name": "#syncInteractivity",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Make the host focusable + announce a role when interactive without an href.\n(With an href the inner <a> is the real focus/interaction target.)"
+            },
+            {
+              "kind": "field",
+              "name": "#onKeydown",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "#onSlotChange",
+              "privacy": "private",
+              "description": "Toggle a `data-empty` flag on the slot's wrapper so empty regions\n(no assigned nodes) can be hidden via CSS without unreliable\n`:has(::slotted())` selectors."
+            },
+            {
+              "kind": "field",
+              "name": "shadowRootOptions",
+              "type": {
+                "text": "ShadowRootInit"
+              },
+              "static": true,
+              "default": "{ ...LitElement.shadowRootOptions, delegatesFocus: true, }",
+              "inheritedFrom": {
+                "name": "TcElement",
+                "module": "src/base/tc-element.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "description": "可互動卡片（無 href）以鍵盤 Enter／Space 或點擊觸發",
+              "name": "tc-card-click"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "variant",
+              "type": {
+                "text": "'elevated' | 'outlined'"
+              },
+              "default": "'elevated'",
+              "description": "視覺變體：elevated（陰影）或 outlined（邊框）。",
+              "fieldName": "variant"
+            },
+            {
+              "name": "interactive",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "是否可互動（無 href 時：host 可聚焦並回應 Enter／Space）。",
+              "fieldName": "interactive"
+            },
+            {
+              "name": "href",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "連結目標。設定後整張卡片以 stretched-link 方式變成連結。",
+              "fieldName": "href"
+            }
+          ],
+          "superclass": {
+            "name": "TcElement",
+            "module": "/src/base/tc-element.js"
+          },
+          "summary": "Tzu Chi card surface with media, headline, body and footer.",
+          "customElement": true,
+          "tagName": "tc-card"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "TcCard",
+          "declaration": {
+            "name": "TcCard",
+            "module": "src/card/tc-card.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/icon/tc-icon-define.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/icon/tc-icon.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "內嵌 SVG 圖示。",
+          "name": "TcIcon",
+          "cssProperties": [
+            {
+              "description": "圖示尺寸（由 size 屬性設定，可手動覆寫）",
+              "name": "--tc-icon-size"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "內部 <svg> 元素",
+              "name": "svg"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "TcIconName | ''"
+              },
+              "default": "''",
+              "description": "Registry key of the icon to render.",
+              "attribute": "name",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "type": {
+                "text": "'sm' | 'md' | 'lg'"
+              },
+              "default": "'md'",
+              "description": "Visual size; maps to the `--tc-size-icon-*` tokens.",
+              "attribute": "size",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Accessible name. When set, the icon is exposed as `role=\"img\"` with this\nlabel; otherwise it is decorative and hidden from assistive tech.",
+              "attribute": "label",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "shadowRootOptions",
+              "type": {
+                "text": "ShadowRootInit"
+              },
+              "static": true,
+              "default": "{ ...LitElement.shadowRootOptions, delegatesFocus: true, }",
+              "inheritedFrom": {
+                "name": "TcElement",
+                "module": "src/base/tc-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "name",
+              "type": {
+                "text": "TcIconName | ''"
+              },
+              "default": "''",
+              "description": "Registry key of the icon to render.",
+              "fieldName": "name"
+            },
+            {
+              "name": "size",
+              "type": {
+                "text": "'sm' | 'md' | 'lg'"
+              },
+              "default": "'md'",
+              "description": "Visual size; maps to the `--tc-size-icon-*` tokens.",
+              "fieldName": "size"
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Accessible name. When set, the icon is exposed as `role=\"img\"` with this\nlabel; otherwise it is decorative and hidden from assistive tech.",
+              "fieldName": "label"
+            }
+          ],
+          "superclass": {
+            "name": "TcElement",
+            "module": "/src/base/tc-element.js"
+          },
+          "summary": "Tzu Chi inline-SVG icon from a built-in registry, sized by token and inheriting text color.",
+          "customElement": true,
+          "tagName": "tc-icon"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "TcIcon",
+          "declaration": {
+            "name": "TcIcon",
+            "module": "src/icon/tc-icon.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/icon-button/tc-icon-button-define.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/icon-button/tc-icon-button.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "圖示按鈕：以圓形容器包裹單一圖示的按鈕。",
+          "name": "TcIconButton",
+          "cssProperties": [
+            {
+              "description": "圓角（預設為全圓）",
+              "name": "--tc-icon-button-radius"
+            },
+            {
+              "description": "停用透明度",
+              "name": "--tc-icon-button-disabled-opacity"
+            },
+            {
+              "description": "焦點環顏色",
+              "name": "--tc-icon-button-focus-ring-color"
+            },
+            {
+              "description": "tonal 變體底色",
+              "name": "--tc-icon-button-tonal-bg"
+            },
+            {
+              "description": "tonal 變體 hover 底色",
+              "name": "--tc-icon-button-tonal-bg-hover"
+            },
+            {
+              "description": "tonal 變體圖示色",
+              "name": "--tc-icon-button-tonal-fg"
+            },
+            {
+              "description": "filled 變體底色",
+              "name": "--tc-icon-button-filled-bg"
+            },
+            {
+              "description": "filled 變體 hover 底色",
+              "name": "--tc-icon-button-filled-bg-hover"
+            },
+            {
+              "description": "filled 變體圖示色",
+              "name": "--tc-icon-button-filled-fg"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "內部原生 <button>",
+              "name": "base"
+            }
+          ],
+          "slots": [
+            {
+              "description": "圖示內容（例如 <tc-icon>）",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "variant",
+              "type": {
+                "text": "'tonal' | 'filled'"
+              },
+              "default": "'tonal'",
+              "attribute": "variant",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "type": {
+                "text": "'md' | 'lg'"
+              },
+              "default": "'md'",
+              "attribute": "size",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "disabled",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "無障礙標籤，套用至內部 <button> 的 aria-label（必填）。",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "#onClick",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "shadowRootOptions",
+              "type": {
+                "text": "ShadowRootInit"
+              },
+              "static": true,
+              "default": "{ ...LitElement.shadowRootOptions, delegatesFocus: true, }",
+              "inheritedFrom": {
+                "name": "TcElement",
+                "module": "src/base/tc-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "variant",
+              "type": {
+                "text": "'tonal' | 'filled'"
+              },
+              "default": "'tonal'",
+              "fieldName": "variant"
+            },
+            {
+              "name": "size",
+              "type": {
+                "text": "'md' | 'lg'"
+              },
+              "default": "'md'",
+              "fieldName": "size"
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "disabled"
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "無障礙標籤，套用至內部 <button> 的 aria-label（必填）。",
+              "fieldName": "label"
+            }
+          ],
+          "superclass": {
+            "name": "TcElement",
+            "module": "/src/base/tc-element.js"
+          },
+          "summary": "Tzu Chi circular icon button wrapping a single icon.",
+          "customElement": true,
+          "tagName": "tc-icon-button"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "TcIconButton",
+          "declaration": {
+            "name": "TcIconButton",
+            "module": "src/icon-button/tc-icon-button.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/input/tc-input-define.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/input/tc-input.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "表單輸入欄位。",
+          "name": "TcInput",
+          "cssProperties": [
+            {
+              "description": "輸入框底色",
+              "name": "--tc-input-bg"
+            },
+            {
+              "description": "預設邊框色",
+              "name": "--tc-input-border"
+            },
+            {
+              "description": "hover 邊框色",
+              "name": "--tc-input-border-hover"
+            },
+            {
+              "description": "focus 邊框色",
+              "name": "--tc-input-border-focused"
+            },
+            {
+              "description": "invalid 邊框 / 訊息色",
+              "name": "--tc-input-border-invalid"
+            },
+            {
+              "description": "圓角",
+              "name": "--tc-input-radius"
+            },
+            {
+              "description": "輸入文字色",
+              "name": "--tc-input-text"
+            },
+            {
+              "description": "placeholder / 輔助文字色",
+              "name": "--tc-input-placeholder"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "上方 <label> 標籤",
+              "name": "label"
+            },
+            {
+              "description": "包覆原生 input 的外框",
+              "name": "control"
+            },
+            {
+              "description": "內部原生 <input>",
+              "name": "input"
+            },
+            {
+              "description": "下方輔助 / 錯誤訊息 <p>",
+              "name": "helper"
+            }
+          ],
+          "slots": [
+            {
+              "description": "輸入框前置內容（圖示、單位等）",
+              "name": "prefix"
+            },
+            {
+              "description": "輸入框後置內容（圖示、清除鈕等）",
+              "name": "suffix"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "formAssociated",
+              "type": {
+                "text": "boolean"
+              },
+              "static": true,
+              "default": "true"
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "attribute": "value"
+            },
+            {
+              "kind": "field",
+              "name": "placeholder",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "attribute": "placeholder"
+            },
+            {
+              "kind": "field",
+              "name": "type",
+              "type": {
+                "text": "'text' | 'email' | 'password' | 'number' | 'search' | 'tel'"
+              },
+              "default": "'text'",
+              "attribute": "type",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "attribute": "name",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "disabled",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "readonly",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "readonly",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "required",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "required",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "invalid",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "invalid",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "helperText",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "attribute": "helper-text"
+            },
+            {
+              "kind": "field",
+              "name": "errorText",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "attribute": "error-text"
+            },
+            {
+              "kind": "field",
+              "name": "#internals",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "#inputId",
+              "privacy": "private",
+              "default": "`tc-input-${++inputUid}`"
+            },
+            {
+              "kind": "field",
+              "name": "#helperId",
+              "privacy": "private",
+              "default": "`${this.#inputId}-help`"
+            },
+            {
+              "kind": "field",
+              "name": "form",
+              "type": {
+                "text": "HTMLFormElement | null"
+              },
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "validity",
+              "type": {
+                "text": "ValidityState"
+              },
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "validationMessage",
+              "type": {
+                "text": "string"
+              },
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "#syncFormState",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "#onInput",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "#onChange",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "shadowRootOptions",
+              "type": {
+                "text": "ShadowRootInit"
+              },
+              "static": true,
+              "default": "{ ...LitElement.shadowRootOptions, delegatesFocus: true, }",
+              "inheritedFrom": {
+                "name": "TcElement",
+                "module": "src/base/tc-element.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "description": "每次輸入時觸發，detail: { value }",
+              "name": "tc-input"
+            },
+            {
+              "description": "內部 input change 時觸發，detail: { value }",
+              "name": "tc-change"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "fieldName": "value"
+            },
+            {
+              "name": "placeholder",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "fieldName": "placeholder"
+            },
+            {
+              "name": "type",
+              "type": {
+                "text": "'text' | 'email' | 'password' | 'number' | 'search' | 'tel'"
+              },
+              "default": "'text'",
+              "fieldName": "type"
+            },
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "fieldName": "name"
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "disabled"
+            },
+            {
+              "name": "readonly",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "readonly"
+            },
+            {
+              "name": "required",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "required"
+            },
+            {
+              "name": "invalid",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "invalid"
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "fieldName": "label"
+            },
+            {
+              "name": "helper-text",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "fieldName": "helperText"
+            },
+            {
+              "name": "error-text",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "fieldName": "errorText"
+            }
+          ],
+          "superclass": {
+            "name": "TcElement",
+            "module": "/src/base/tc-element.js"
+          },
+          "summary": "Tzu Chi form-associated text input.",
+          "customElement": true,
+          "tagName": "tc-input"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "TcInput",
+          "declaration": {
+            "name": "TcInput",
+            "module": "src/input/tc-input.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/tabs/tc-tab.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "單一頁籤，置於 `<tc-tabs>` 內。",
+          "name": "TcTab",
+          "cssProperties": [
+            {
+              "description": "未選取頁籤文字色",
+              "name": "--tc-tabs-tab-fg"
+            },
+            {
+              "description": "選取頁籤文字色",
+              "name": "--tc-tabs-tab-fg-selected"
+            },
+            {
+              "description": "頁籤 hover 底色",
+              "name": "--tc-tabs-tab-bg-hover"
+            },
+            {
+              "description": "選取指示線顏色",
+              "name": "--tc-tabs-indicator"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "標籤文字容器",
+              "name": "label"
+            }
+          ],
+          "slots": [
+            {
+              "description": "頁籤標籤文字",
+              "name": ""
+            },
+            {
+              "description": "前置圖示",
+              "name": "icon"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "頁籤值（必填），由 `<tc-tabs>` 用來判斷選取狀態。",
+              "attribute": "value",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "停用：以 `aria-disabled` 表示，仍可被鍵盤瀏覽（roving tabindex），但無法選取。",
+              "attribute": "disabled",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "selected",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "是否為目前選取的頁籤（由 `<tc-tabs>` 管理）。",
+              "attribute": "selected",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "shadowRootOptions",
+              "type": {
+                "text": "ShadowRootInit"
+              },
+              "static": true,
+              "default": "{ ...LitElement.shadowRootOptions, delegatesFocus: true, }",
+              "inheritedFrom": {
+                "name": "TcElement",
+                "module": "src/base/tc-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "頁籤值（必填），由 `<tc-tabs>` 用來判斷選取狀態。",
+              "fieldName": "value"
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "停用：以 `aria-disabled` 表示，仍可被鍵盤瀏覽（roving tabindex），但無法選取。",
+              "fieldName": "disabled"
+            },
+            {
+              "name": "selected",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "是否為目前選取的頁籤（由 `<tc-tabs>` 管理）。",
+              "fieldName": "selected"
+            }
+          ],
+          "superclass": {
+            "name": "TcElement",
+            "module": "/src/base/tc-element.js"
+          },
+          "summary": "Tzu Chi tab, used inside `<tc-tabs>`.",
+          "customElement": true,
+          "tagName": "tc-tab"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "TcTab",
+          "declaration": {
+            "name": "TcTab",
+            "module": "src/tabs/tc-tab.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/tabs/tc-tabs-define.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/tabs/tc-tabs.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "頁籤容器：管理選取狀態、roving tabindex 與鍵盤瀏覽。",
+          "name": "TcTabs",
+          "cssProperties": [
+            {
+              "description": "底部分隔線顏色",
+              "name": "--tc-tabs-divider"
+            },
+            {
+              "description": "選取指示線顏色",
+              "name": "--tc-tabs-indicator"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "內部 tablist 容器",
+              "name": "base"
+            }
+          ],
+          "slots": [
+            {
+              "description": "`<tc-tab>` 子元素",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "variant",
+              "type": {
+                "text": "'web' | 'mobile'"
+              },
+              "default": "'web'",
+              "description": "版面變體：`web`（水平、桌機）或 `mobile`（等寬、行動）。",
+              "attribute": "variant",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "目前選取頁籤的 value。設定時會同步更新子頁籤的選取狀態。",
+              "attribute": "value",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "_tabs",
+              "type": {
+                "text": "TcTab[]"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "#onSlotChange",
+              "privacy": "private",
+              "description": "Called once children are assigned to the default slot."
+            },
+            {
+              "kind": "method",
+              "name": "#syncTabs",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Reflect the current `value` onto children (selected + roving tabindex)."
+            },
+            {
+              "kind": "method",
+              "name": "#select",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "tab",
+                  "type": {
+                    "text": "TcTab"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "field",
+              "name": "#onClick",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "#onKeydown",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "#nextEnabled",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "number"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "from",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "dir",
+                  "type": {
+                    "text": "1 | -1"
+                  }
+                }
+              ],
+              "description": "Find the next non-disabled tab from `from` moving by `dir` (wraps)."
+            },
+            {
+              "kind": "field",
+              "name": "shadowRootOptions",
+              "type": {
+                "text": "ShadowRootInit"
+              },
+              "static": true,
+              "default": "{ ...LitElement.shadowRootOptions, delegatesFocus: true, }",
+              "inheritedFrom": {
+                "name": "TcElement",
+                "module": "src/base/tc-element.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "name": "tc-tab-change",
+              "type": {
+                "text": "CustomEvent<{ value: string }>"
+              },
+              "description": "選取的頁籤改變時派發（composed, bubbles）。"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "variant",
+              "type": {
+                "text": "'web' | 'mobile'"
+              },
+              "default": "'web'",
+              "description": "版面變體：`web`（水平、桌機）或 `mobile`（等寬、行動）。",
+              "fieldName": "variant"
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "目前選取頁籤的 value。設定時會同步更新子頁籤的選取狀態。",
+              "fieldName": "value"
+            }
+          ],
+          "superclass": {
+            "name": "TcElement",
+            "module": "/src/base/tc-element.js"
+          },
+          "summary": "Tzu Chi tabs container managing selection and keyboard navigation.",
+          "customElement": true,
+          "tagName": "tc-tabs"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "TcTabs",
+          "declaration": {
+            "name": "TcTabs",
+            "module": "src/tabs/tc-tabs.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "TcTab",
+          "declaration": {
+            "name": "TcTab",
+            "module": "./tc-tab.js"
           }
         }
       ]

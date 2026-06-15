@@ -1,0 +1,74 @@
+---
+title: Card
+description: tc-card — 卡片容器，elevated / outlined 兩種變體，支援可互動與連結模式。
+---
+
+import Demo from '../../../components/Demo.astro';
+import PropsTable from '../../../components/PropsTable.astro';
+
+`<tc-card>` 是卡片容器，提供 media／headline／內文／footer 插槽，以及 elevated 與 outlined 兩種變體。互動時提升陰影（elevation）。下方為**可互動的真實元件**：
+
+<Demo>
+  <tc-card variant="elevated" style="max-width:360px">
+    <div slot="media" style="aspect-ratio:16/10;background:#e0e0e0"></div>
+    <span slot="headline">專案名稱</span>
+    <p style="margin:0;color:#616161">2022-03-21 ｜ TCnews 慈善新聞網</p>
+    <tc-button slot="footer" variant="filled">捐款</tc-button>
+  </tc-card>
+  <tc-card variant="outlined" style="max-width:360px">
+    <span slot="headline">文章標題（建議字數在 15 字以內）</span>
+    <p style="margin:0;color:#616161">2022-03-21 ｜ TCnews 慈善新聞網</p>
+  </tc-card>
+</Demo>
+
+## 用法
+
+### 純 HTML
+
+```html
+<link rel="stylesheet" href="@tzuchi/tokens/tokens.css" />
+<script type="module" src="@tzuchi/components/cdn"></script>
+
+<tc-card variant="elevated">
+  <img slot="media" src="cover.jpg" alt="" />
+  <span slot="headline">專案名稱</span>
+  <p>卡片內文</p>
+  <tc-button slot="footer">捐款</tc-button>
+</tc-card>
+```
+
+### React
+
+```tsx
+import { TcCard } from '@tzuchi/react';
+
+<TcCard variant="elevated" href="/news/1">
+  <span slot="headline">專案名稱</span>
+  <p>卡片內文</p>
+</TcCard>;
+```
+
+## 連結模式（Stretched Link）
+
+設定 `href` 後，整張卡片透過覆蓋層 `<a>` 變成連結；`footer` 內的控件仍可獨立點擊，不會被連結攔截：
+
+<Demo>
+  <tc-card href="#article" variant="elevated" style="max-width:360px">
+    <span slot="headline">點整張卡片即可前往</span>
+    <p style="margin:0;color:#616161">footer 按鈕仍可獨立點擊</p>
+    <tc-button slot="footer" variant="outlined">分享</tc-button>
+  </tc-card>
+</Demo>
+
+## API
+
+下表自 Custom Elements Manifest 自動產生：
+
+<PropsTable tag="tc-card" />
+
+## 無障礙（Accessibility）
+
+- `href` 模式以原生 `<a>` 為焦點與互動目標，支援鍵盤 Enter。
+- `interactive`（無 `href`）模式下，host 取得 `tabindex="0"` 與 `role="button"`，並以 Enter／Space 觸發 `tc-card-click`。
+- `footer` 內的可聚焦控件不會被巢狀於連結中，可獨立鍵盤操作。
+- `:focus-visible` 焦點環使用 `--tc-focus-ring-*` token。

@@ -1,0 +1,17 @@
+{
+  "icon-button": {
+    "radius": { "$type": "dimension", "$value": "{radius.full}" },
+    "disabled-opacity": { "$type": "number", "$value": "{opacity.disabled}" },
+    "focus-ring-color": { "$type": "color", "$value": "{focus-ring.color}" },
+    "tonal": {
+      "bg": { "$type": "color", "$value": "{color.brand.surface}" },
+      "bg-hover": { "$type": "color", "$value": "{color.brand.surface-hover}" },
+      "fg": { "$type": "color", "$value": "{color.brand.primary}" }
+    },
+    "filled": {
+      "bg": { "$type": "color", "$value": "{color.brand.primary}" },
+      "bg-hover": { "$type": "color", "$value": "{color.brand.primary-hover}" },
+      "fg": { "$type": "color", "$value": "{color.text.on-brand}" }
+    }
+  }
+}

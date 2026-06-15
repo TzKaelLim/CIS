@@ -8,10 +8,19 @@ const cem = JSON.parse(await readFile(cemPath, 'utf8'));
 
 const pascal = (s) => s.replace(/(^|-)([a-z])/g, (_, __, c) => c.toUpperCase());
 
-const decls = cem.modules
-  .flatMap((m) => m.declarations ?? [])
-  .filter((d) => d.customElement && d.tagName)
-  .sort((a, b) => a.tagName.localeCompare(b.tagName));
+// Collect custom elements, deriving the npm subpath from the source directory
+// (src/<dir>/...) so multi-element components (e.g. tabs -> tc-tabs + tc-tab)
+// resolve to the same subpath rather than tag-name-derived ones.
+const decls = [];
+for (const m of cem.modules) {
+  for (const d of m.declarations ?? []) {
+    if (!d.customElement || !d.tagName) continue;
+    const dirMatch = (m.path || '').match(/src\/([^/]+)\//);
+    const subpath = dirMatch ? dirMatch[1] : d.tagName.replace(/^tc-/, '');
+    decls.push({ ...d, subpath });
+  }
+}
+decls.sort((a, b) => a.tagName.localeCompare(b.tagName));
 
 const genDir = resolve(here, '../src/generated');
 await rm(genDir, { recursive: true, force: true });
@@ -21,7 +30,7 @@ const indexLines = [];
 for (const d of decls) {
   const tag = d.tagName; // tc-button
   const cls = d.name; // TcButton
-  const subpath = tag.replace(/^tc-/, ''); // button
+  const subpath = d.subpath; // component directory (e.g. button, tabs)
   const events = (d.events ?? []).map((e) => `    on${pascal(e.name)}: '${e.name}'`).join(',\n');
   const eventsBlock = events ? `\n${events}\n  ` : '';
   const out = `'use client';

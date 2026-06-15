@@ -1,0 +1,74 @@
+---
+title: Input
+description: tc-input — form-associated 文字輸入欄位，支援 label、helper / error 訊息與驗證。
+---
+
+import Demo from '../../../components/Demo.astro';
+import PropsTable from '../../../components/PropsTable.astro';
+
+`<tc-input>` 是 form-associated 的文字輸入欄位，內含原生 `<input>`，支援 `label`、`helper-text`、`error-text` 與表單驗證。下方為**可互動的真實元件**：
+
+<Demo>
+  <tc-input placeholder="請輸入關鍵字" style="width:478px;"></tc-input>
+  <tc-input label="關鍵字" placeholder="請輸入關鍵字" helper-text="輸入後按 Enter 搜尋" style="width:478px;"></tc-input>
+  <tc-input value="輸入關鍵字後" style="width:478px;"></tc-input>
+  <tc-input label="信箱" value="not-an-email" invalid error-text="信箱格式錯誤" style="width:478px;"></tc-input>
+  <tc-input value="無法編輯" disabled style="width:478px;"></tc-input>
+</Demo>
+
+## 用法
+
+### 純 HTML
+
+```html
+<link rel="stylesheet" href="@tzuchi/tokens/tokens.css" />
+<script type="module" src="@tzuchi/components/cdn"></script>
+
+<tc-input name="keyword" label="關鍵字" placeholder="請輸入關鍵字"></tc-input>
+```
+
+### React
+
+```tsx
+import { TcInput } from '@tzuchi/react';
+
+<TcInput
+  name="keyword"
+  label="關鍵字"
+  placeholder="請輸入關鍵字"
+  onTcInput={(e) => console.log(e.detail.value)}
+/>;
+```
+
+## 事件
+
+- `tc-input`：每次鍵入時觸發，`detail: { value }`。
+- `tc-change`：內部 `<input>` change 時觸發，`detail: { value }`。
+
+## 表單
+
+`<tc-input>` 透過 Form-Associated Custom Elements（ElementInternals）參與表單：`name` / `value` 會被序列化到 `FormData`，`required`、`invalid` 會回報驗證狀態。
+
+<Demo>
+  <form
+    onsubmit="event.preventDefault(); this.querySelector('output').textContent='搜尋：' + new FormData(this).get('keyword');"
+    style="display:flex; gap:.75rem; align-items:center;"
+  >
+    <tc-input name="keyword" placeholder="請輸入關鍵字" required style="width:320px;"></tc-input>
+    <tc-button type="submit" variant="filled">搜尋</tc-button>
+    <output></output>
+  </form>
+</Demo>
+
+## API
+
+下表自 Custom Elements Manifest 自動產生：
+
+<PropsTable tag="tc-input" />
+
+## 無障礙（Accessibility）
+
+- 內含原生 `<input>`，`label` 透過 `for` / `id` 與輸入框關聯。
+- `delegatesFocus` 讓點擊 `label` 自動聚焦輸入框。
+- `helper-text` / `error-text` 透過 `aria-describedby` 關聯；`invalid` 時設定 `aria-invalid="true"`。
+- `disabled` 透過停用內部原生控件實作（非 `pointer-events:none`）。

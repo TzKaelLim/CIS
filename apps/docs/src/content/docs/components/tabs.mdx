@@ -1,0 +1,82 @@
+---
+title: Tabs
+description: tc-tabs / tc-tab — 頁籤導覽，web / mobile 兩種版面，支援鍵盤瀏覽。
+---
+
+import Demo from '../../../components/Demo.astro';
+import PropsTable from '../../../components/PropsTable.astro';
+
+`<tc-tabs>` 是頁籤容器，內含多個 `<tc-tab>`，管理選取狀態、roving tabindex 與鍵盤瀏覽（方向鍵切換、Home / End 跳至首末）。下方為**可互動的真實元件**：
+
+<Demo>
+  <tc-tabs value="overview">
+    <tc-tab value="overview">總覽</tc-tab>
+    <tc-tab value="news">最新消息</tc-tab>
+    <tc-tab value="donate">前往捐款</tc-tab>
+    <tc-tab value="contact" disabled>聯絡我們</tc-tab>
+  </tc-tabs>
+</Demo>
+
+## 版面變體
+
+`variant="mobile"` 時頁籤等寬撐滿容器：
+
+<Demo>
+  <tc-tabs variant="mobile" value="a" style="max-width:360px;">
+    <tc-tab value="a">列表</tc-tab>
+    <tc-tab value="b">地圖</tc-tab>
+    <tc-tab value="c">我的</tc-tab>
+  </tc-tabs>
+</Demo>
+
+## 用法
+
+### 純 HTML
+
+```html
+<link rel="stylesheet" href="@tzuchi/tokens/tokens.css" />
+<script type="module" src="@tzuchi/components/cdn"></script>
+
+<tc-tabs value="overview">
+  <tc-tab value="overview">總覽</tc-tab>
+  <tc-tab value="news">最新消息</tc-tab>
+</tc-tabs>
+```
+
+切換時會派發 `tc-tab-change` 事件（`composed`、`bubbles`），`detail.value` 為新選取的值：
+
+```js
+document.querySelector('tc-tabs').addEventListener('tc-tab-change', (e) => {
+  console.log(e.detail.value);
+});
+```
+
+### React
+
+```tsx
+import { TcTabs, TcTab } from '@tzuchi/react';
+
+<TcTabs value="overview" onTcTabChange={(e) => setTab(e.detail.value)}>
+  <TcTab value="overview">總覽</TcTab>
+  <TcTab value="news">最新消息</TcTab>
+</TcTabs>;
+```
+
+## API
+
+下表自 Custom Elements Manifest 自動產生：
+
+### `<tc-tabs>`
+
+<PropsTable tag="tc-tabs" />
+
+### `<tc-tab>`
+
+<PropsTable tag="tc-tab" />
+
+## 無障礙（Accessibility）
+
+- `<tc-tabs>` 為 `role="tablist"`，`<tc-tab>` 為 `role="tab"`。
+- 鍵盤瀏覽：方向鍵切換頁籤、Home / End 跳至首末，採 roving tabindex（僅選取項在 Tab 順序中）。
+- `disabled` 以 `aria-disabled` 表示，仍可被方向鍵掠過但不會被選取（非 `pointer-events:none`）。
+- 選取狀態以 `aria-selected` 反映，選取頁籤顯示品牌主色底線指示。

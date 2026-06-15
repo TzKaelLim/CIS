@@ -1,0 +1,82 @@
+---
+title: Icon
+description: tc-icon — 內嵌 SVG 圖示，三種尺寸（sm / md / lg），以 currentColor 繼承文字色。
+---
+
+import Demo from '../../../components/Demo.astro';
+import PropsTable from '../../../components/PropsTable.astro';
+
+`<tc-icon>` 從內建圖示登錄表渲染內嵌 SVG，依 `size` 對應 `--tc-size-icon-*` token，並以 `currentColor` 繼承周圍文字色。下方為**可互動的真實元件**：
+
+<Demo>
+  <tc-icon name="search"></tc-icon>
+  <tc-icon name="menu"></tc-icon>
+  <tc-icon name="calendar"></tc-icon>
+  <tc-icon name="mail"></tc-icon>
+  <tc-icon name="check"></tc-icon>
+</Demo>
+
+## 尺寸
+
+`size` 提供 `sm`（20px）、`md`（32px，預設）、`lg`（40px）：
+
+<Demo>
+  <tc-icon name="calendar" size="sm"></tc-icon>
+  <tc-icon name="calendar" size="md"></tc-icon>
+  <tc-icon name="calendar" size="lg"></tc-icon>
+</Demo>
+
+## 顏色
+
+圖示以 `currentColor` 繪製，因此繼承父層的文字色：
+
+<Demo>
+  <span style="color: var(--tc-color-feedback-error)">
+    <tc-icon name="close"></tc-icon>
+  </span>
+  <span style="color: var(--tc-color-brand-primary)">
+    <tc-icon name="check"></tc-icon>
+  </span>
+  <span style="color: var(--tc-color-feedback-success)">
+    <tc-icon name="check"></tc-icon>
+  </span>
+</Demo>
+
+## 用法
+
+### 純 HTML
+
+```html
+<link rel="stylesheet" href="@tzuchi/tokens/tokens.css" />
+<script type="module" src="@tzuchi/components/cdn"></script>
+
+<!-- 裝飾性圖示（對輔助技術隱藏） -->
+<tc-icon name="search"></tc-icon>
+
+<!-- 具語意的圖示（提供 label 後 role=img + aria-label） -->
+<tc-icon name="mail" label="收件匣"></tc-icon>
+```
+
+### React
+
+```tsx
+import { TcIcon } from '@tzuchi/react';
+
+<TcIcon name="search" size="md" />;
+```
+
+## 可用圖示
+
+`search`、`close`、`menu`、`plus`、`check`、`chevron-down`、`chevron-up`、`chevron-left`、`chevron-right`、`calendar`、`mail`。
+
+## API
+
+下表自 Custom Elements Manifest 自動產生：
+
+<PropsTable tag="tc-icon" />
+
+## 無障礙（Accessibility）
+
+- 未設定 `label` 時，圖示視為裝飾性，套用 `aria-hidden="true"`，不會被螢幕報讀。
+- 設定 `label` 後，內部 `<svg>` 取得 `role="img"` 與 `aria-label`，並含 `<title>`。
+- `focusable="false"` 避免 IE/舊版瀏覽器將 SVG 加入 Tab 順序。
