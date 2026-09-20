@@ -1,0 +1,14 @@
+{
+  "modal": {
+    "bg": { "$type": "color", "$value": "{color.surface.default}" },
+    "fg": { "$type": "color", "$value": "{color.text.default}" },
+    "radius": { "$type": "dimension", "$value": "{radius.lg}" },
+    "padding": { "$type": "dimension", "$value": "{space.24}" },
+    "width": { "$type": "dimension", "$value": "560px" },
+    "shadow": { "$type": "shadow", "$value": "{elevation.4}" },
+    "scrim": { "$type": "color", "$value": "rgba(0,0,0,0.5)" },
+    "close-fg": { "$type": "color", "$value": "{color.text.muted}" },
+    "header-fg": { "$type": "color", "$value": "{color.text.default}" },
+    "z": { "$type": "number", "$value": "{z.modal}" }
+  }
+}

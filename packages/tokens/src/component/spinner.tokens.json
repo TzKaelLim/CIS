@@ -1,0 +1,11 @@
+{
+  "spinner": {
+    "size-sm": { "$type": "dimension", "$value": "{size.icon.sm}" },
+    "size-md": { "$type": "dimension", "$value": "{size.icon.md}" },
+    "size-lg": { "$type": "dimension", "$value": "{size.icon.lg}" },
+    "color": { "$type": "color", "$value": "{color.brand.primary}" },
+    "track-color": { "$type": "color", "$value": "{color.border.default}" },
+    "thickness": { "$type": "dimension", "$value": "4px" },
+    "duration": { "$type": "duration", "$value": "0.8s" }
+  }
+}
