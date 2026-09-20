@@ -1,0 +1,145 @@
+/*
+ * Tabs — Tzu Chi shape over HeroUI's structure.
+ * Scope: [data-theme^="tzuchi"] only; upstream's own themes are untouched.
+ *
+ * VARIANT MAPPING
+ *   tc-tabs[variant="web"]     ↔ HeroUI `secondary` (underline + bottom divider).
+ *                                Tabs hug in tc, stretch in HeroUI — see below.
+ *   tc-tabs[variant="mobile"]  ↔ HeroUI `secondary` too: HeroUI's tabs are
+ *                                `w-full`, i.e. already the equal-width layout
+ *                                tc-tabs gets from `flex: 1 1 0`. Kept as is.
+ *   HeroUI `primary` (segmented pill) has no tc counterpart. It keeps its shape
+ *                                and gets the same tokens: tc type ramp, tc
+ *                                density, the 8px tc corner (like .button), the
+ *                                tc hover fill and the tc inset focus ring.
+ *
+ * WHAT THIS CHANGES
+ *   1. Type: 14px/500 → the tc tab ramp (--tc-typography-tab-sm = 500 20px/1.5);
+ *      the selected tab goes bold (700), as in tc-tab.styles.ts.
+ *   2. Density: HeroUI's fixed 32px tab becomes auto height + 12px block padding
+ *      (tc padding: 12px 16px — the 16px inline padding already matched px-4).
+ *   3. Hover: HeroUI fades the tab to 70%; tc fills it with the brand surface
+ *      (--accent-soft) and keeps the label at full opacity.
+ *   4. Focus: HeroUI's outer 2px ring (+2px offset) becomes tc's INSET 2px
+ *      outline — it also stops the ring being clipped by the tab scroller.
+ *   5. `primary` corners: 24px pill / 20px container → 8px / 12px concentric.
+ *   6. `secondary`: 4px gap between tabs, selected label in --accent (tc
+ *      brand.primary; HeroUI used plain --foreground), and the underline is
+ *      inset 8px per side with fully rounded ends (tc's ::after indicator).
+ *
+ * UNCHANGED ON PURPOSE: divider/underline colours (--border / --accent already
+ * resolve to tc border.default / brand.primary), disabled (0.38 + not-allowed
+ * already identical), 150ms transitions, separators, scroll chevrons, panels.
+ *
+ * Reviewed: no changes. Verified against styles/components/tabs.css,
+ * react/src/components/tabs/{tabs.tsx,tabs.stories.tsx},
+ * styles/src/components/tabs/tabs.styles.ts (class names + variant wiring),
+ * styles/themes/tzuchi/variables.css, packages/tokens/dist/tokens.css, and
+ * node_modules' react-aria-components SharedElementTransition source (confirms
+ * the indicator's width/height/translate are set inline during the 250ms FLIP
+ * move, which is why the indicator is inset via padding + background-clip
+ * instead of width/inset-inline). Every selector exists in the base file or is
+ * emitted by tabs.tsx/tabs.styles.ts; every rule is scoped by
+ * [data-theme^="tzuchi"]; only HeroUI theme variables and mode-independent
+ * --tc-space-* /--tc-radius-* /--tc-typography-* /--tc-font-weight-* /
+ * --tc-focus-ring-* tokens are referenced (no --tc-color-*, no component
+ * colour tokens, no hex/rgb literals); each override selector carries strictly
+ * higher specificity than the base declaration it must beat, in the same
+ * "components" layer, so it wins in every state (hover incl. both :hover and
+ * [data-hovered], focus-visible incl. both native and [data-focus-visible],
+ * disabled-excluded hover, primary vs. secondary, horizontal vs. vertical);
+ * no variant, size, or state is hidden or broken. All six assertions were
+ * re-derived independently (font shorthand → font-size 20px; padding-block →
+ * padding-block-start 12px; block-size:auto + 1.5 line-height + 24px padding →
+ * height 54px; --tc-radius-md → 8px tab radius; bold selected weight 700;
+ * concentric list-container radius calc(8px + 4px) → 12px) against the
+ * `components-navigation-tabs--default` story (confirmed in index.json; its
+ * DefaultTemplate renders the default `primary` variant with no per-consumer
+ * utility classes, so nothing in the later "utilities" layer competes here).
+ * extraThemeVars stays empty: --accent, --accent-soft and --focus already
+ * resolve, in both tzuchi and tzuchi-dark, to the exact hex values tc-tab's
+ * own tokens specify (--tc-color-brand-primary / -surface / -border-focus all
+ * alias the same --tc-color-blue-* primitives as HeroUI's --accent/-soft/
+ * --focus in the generated theme), so no invented variable is needed.
+ */
+
+/* ── Tab: tc type ramp + tc density (both variants) ─────────────────────── */
+[data-theme^="tzuchi"] .tabs__tab {
+  /* tc-tab: no fixed height — padding + line-height define it (→ 54px) */
+  block-size: auto;
+  padding-block: var(--tc-space-12, 12px);
+  /* icon ↔ label gap (tc-tab.styles.ts :host gap) */
+  gap: var(--tc-space-8, 8px);
+  /* 500 20px/1.5 Noto Sans TC — the family already equals --font-sans */
+  font: var(--tc-typography-tab-sm, 500 20px / 1.5 var(--font-sans));
+}
+
+[data-theme^="tzuchi"] .tabs__tab[data-selected="true"] {
+  font-weight: var(--tc-font-weight-bold, 700);
+}
+
+/* Hover: tc fills with the brand surface instead of fading to 70%. */
+@media (hover: hover) {
+  [data-theme^="tzuchi"]
+    .tabs__tab:not([data-selected="true"]):not([data-disabled="true"]):hover,
+  [data-theme^="tzuchi"]
+    .tabs__tab[data-hovered="true"]:not([data-selected="true"]):not([data-disabled="true"]) {
+    opacity: 1;
+    background-color: var(--accent-soft);
+  }
+}
+
+/* Focus: tc draws the ring inside the tab (outline-offset is negative), so it
+   survives the ScrollShadow's overflow clipping. `box-shadow: none` drops
+   HeroUI's ring, which the tab uses for nothing else. */
+[data-theme^="tzuchi"] .tabs__tab:focus-visible:not([data-focused]),
+[data-theme^="tzuchi"] .tabs__tab[data-focus-visible="true"] {
+  outline: var(--tc-focus-ring-width, 2px) solid var(--focus);
+  outline-offset: calc(-1 * var(--tc-focus-ring-offset, 2px));
+  box-shadow: none;
+}
+
+/* ── primary (segmented): the 8px Tzu Chi corner, as on .button ──────────── */
+[data-theme^="tzuchi"] .tabs:not(.tabs--secondary) > .tabs__list-container {
+  /* concentric with the tab: 8px + the list's 4px inset */
+  border-radius: calc(var(--tc-radius-md, 8px) + var(--tc-space-4, 4px));
+}
+
+[data-theme^="tzuchi"] .tabs:not(.tabs--secondary) .tabs__tab,
+[data-theme^="tzuchi"] .tabs:not(.tabs--secondary) .tabs__indicator {
+  border-radius: var(--tc-radius-md, var(--radius));
+}
+
+/* ── secondary (underline) = tc-tabs web/mobile ──────────────────────────── */
+
+/* tc-tabs[variant="web"] gap */
+[data-theme^="tzuchi"] .tabs--secondary .tabs__list[data-orientation="horizontal"] {
+  column-gap: var(--tc-space-4, 4px);
+}
+
+/* tc selected label is brand.primary, not plain foreground */
+[data-theme^="tzuchi"] .tabs--secondary > .tabs__list-container .tabs__tab[data-selected="true"] {
+  color: var(--accent);
+}
+
+/* tc's underline is inset 8px per side with fully rounded ends. The indicator's
+   box is sized by React Aria, so inset it with padding + a content-box clip
+   rather than with width/inset-inline, which an inline width would override. */
+[data-theme^="tzuchi"] .tabs--secondary > .tabs__list-container .tabs__indicator {
+  border-radius: var(--tc-radius-full, 9999px);
+  background-clip: content-box;
+}
+
+[data-theme^="tzuchi"]
+  .tabs--secondary[data-orientation="horizontal"]
+  > .tabs__list-container
+  .tabs__indicator {
+  padding-inline: var(--tc-space-8, 8px);
+}
+
+[data-theme^="tzuchi"]
+  .tabs--secondary[data-orientation="vertical"]
+  > .tabs__list-container
+  .tabs__indicator {
+  padding-block: var(--tc-space-8, 8px);
+}

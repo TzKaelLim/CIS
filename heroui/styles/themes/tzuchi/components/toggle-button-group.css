@@ -1,0 +1,154 @@
+/* ------------------------------------------------------------------------------------------------
+ * Tzu Chi theme — ToggleButtonGroup
+ * ------------------------------------------------------------------------------------------------
+ * Destination: heroui/styles/themes/tzuchi/components/toggle-button-group.css, imported into the
+ * `components` layer after HeroUI's own styles/components/toggle-button-group.css. Every rule here
+ * out-specifies ./toggle-button.css by at least one compound, so the two files may be imported in
+ * either order; importing this one second (as HeroUI's own base index.css orders them) is still
+ * the tidier arrangement.
+ *
+ * WHY THIS FILE EXISTS — it is the ToggleButtonGroup half of the bug ./button.css already fixes
+ * for ButtonGroup. The base neutraliser `.toggle-button-group .toggle-button { rounded-none }`
+ * (toggle-button-group.css:35-37) and its four corner rules are (0,2,0) / (0,3,0), while
+ * `[data-theme^="tzuchi"] .toggle-button { border-radius: 8px }` is (0,2,0) in a LATER file. Left
+ * alone, every cell of a joined group would take 8px corners — and every icon-only cell a full
+ * circle — and the group would stop reading as one control. So the group's corner logic is
+ * restated at the Tzu Chi radius, at a specificity that cannot lose.
+ *
+ * WHAT THIS CHANGES — HeroUI's markup, class names, orientations and states stay untouched:
+ *
+ *   attached group, every cell        rounded-none          ->  border-radius: 0 (unchanged value,
+ *                                                               restated to beat the theme's own
+ *                                                               .toggle-button radius)
+ *   attached group, outer corners     24px (rounded-*-3xl)  ->  8px                (R22)
+ *   icon-only cell inside an ATTACHED
+ *   group                             48 / 36 / 64px box,   ->  the group's own 42 / 34 / 50px
+ *                                     32 / 20 / 40px glyph      rhythm, glyph back to 20px  (R48)
+ *
+ * DETACHED MODE is excluded from BOTH the corner rules and the icon-only size guard, by
+ * `:not(.toggle-button-group--detached)` on every selector in this file. A detached group's cells
+ * are separate controls, so they fall straight through to ./toggle-button.css: 8px for a labelled
+ * toggle (R22), a circle for an icon-only one (R24), and the standalone R45–R47 box sizes
+ * (36/48/64px). The base's own `.toggle-button-group--detached .toggle-button { rounded-3xl }`
+ * (0,2,0) loses to ./toggle-button.css's own (0,2,0) rules purely on source order (the theme's
+ * component files as a whole are imported after every HeroUI base component file into the same
+ * `components` layer), which is the intended result — so no detached restore rule is needed here.
+ *
+ * CORRECTION ON REVIEW — the icon-only SIZE guard is now excluded from detached mode too, matching
+ * the corner rules. The draft this file started from left the size guard un-conditional, on the
+ * claim that "the stories mix icon-only and labelled toggles in one group
+ * (toggle-button-group.stories.tsx FullWidth, SelectionMode, WithLabels)". That claim does not hold:
+ * opening the story file shows every group in FullWidth, SelectionMode and WithLabels is
+ * homogeneous — FullWidth and SelectionMode each pair one all-icon-only group with a separate
+ * all-labelled group, and WithLabels has no icon-only toggle at all. No story mixes the two variants
+ * inside a single ToggleButtonGroup, detached or attached. R48's own wording ("inside a joined
+ * group…a 48px cell next to a 42px one tears the group apart") is about cells whose borders
+ * physically touch, which is what "attached" means here — a detached cell already has an 8px gap
+ * (R154, `gap-1`) and its own full circle on every side, so there is no seam for a size mismatch to
+ * tear. The one real, verifiable case for the guard is a Toolbar: `toolbar.stories.tsx`'s Default,
+ * Vertical, WithButtonGroup and Attached stories all put a ToggleButtonGroup next to a ButtonGroup,
+ * and neither sets `isDetached` — both groups are attached by default, and `button.css:336-339`
+ * already pins the ButtonGroup's icon-only cells to its own 34/42/50px rhythm. That comparison only
+ * requires the guard to apply to ATTACHED ToggleButtonGroups, so the fix scopes it there and lets a
+ * detached group's icon-only cells render at the standalone 36/48/64px circle instead — visually
+ * indistinguishable from four independent IconOnly ToggleButtons, which is the point of "detached".
+ *
+ * KEPT AS HEROUI'S (the spec gives no rule for any of them):
+ *   · `.toggle-button-group__separator` — 1px x 50% of `bg-current` at `opacity-15`. It inherits
+ *     the cell's own label colour, so it re-tints itself per variant and per selected state; there
+ *     is no Tzu Chi divider decision for the inside of a joined control to transfer. Its
+ *     `rounded-sm` end caps are 4px = --tc-radius-sm already, and invisible on a 1px line (D24).
+ *   · the inset focus ring (`--tw-ring-offset-width: 0px` + `ring-inset`,
+ *     toggle-button-group.css:76-80) — this is already R72 / I8's answer for a ring that would
+ *     spill past a joined edge, applied by HeroUI itself.
+ *   · `transform: none` on a pressed cell, `flex-1` on a full-width cell, `gap-0` attached /
+ *     `gap-1` detached (4px = R154, already on the Tzu Chi rhythm), both orientations, and the
+ *     `display: none` that hides separators when detached.
+ *   · every colour — R85 disabled, R88 the neutral `--default` rest fill, R76 the `--accent-soft`
+ *     selected fill. Nothing colour-valued is declared in this file.
+ *
+ * NOTE the only custom properties read here (--tzuchi-toggle-button-block-size,
+ * --tzuchi-toggle-button-size, --tzuchi-toggle-button-icon-size) are ./toggle-button.css's LOCAL
+ * calc helpers, so the group's height is never restated and can never drift from the ladder in
+ * that file. No colour token, no shadow token and no new --tzuchi-* theme variable is used.
+ *
+ * CASCADE (hand-derived against styles/components/toggle-button-group.css):
+ *   :not(--detached) .toggle-button                (0,4,0)  beats base (0,2,0) and the theme's own
+ *                                                            .toggle-button / --icon-only (0,2,0)
+ *   --horizontal:not(--detached) .toggle-button:first-child / :last-child
+ *                                                   (0,5,0)  beats base (0,3,0) and the rule above
+ *   :first-child:last-child branches                (0,6,0) beat the two single-edge rules
+ *   .toggle-button-group:not(--detached) .toggle-button.toggle-button--icon-only
+ *                                                   (0,5,0)  beats ./toggle-button.css's
+ *                                                            .toggle-button--icon-only.toggle-button--sm
+ *                                                            / --lg (0,3,0) without relying on order
+ * ------------------------------------------------------------------------------------------------ */
+
+/* ---------------------------------------------------------------------------
+ * Attached group — one joined control with 8px outer corners (R22)
+ * ------------------------------------------------------------------------ */
+
+[data-theme^="tzuchi"]
+  .toggle-button-group:not(.toggle-button-group--detached)
+  .toggle-button {
+  border-radius: 0;
+}
+
+[data-theme^="tzuchi"]
+  .toggle-button-group--horizontal:not(.toggle-button-group--detached)
+  .toggle-button:first-child {
+  border-start-start-radius: var(--tc-button-radius, var(--radius));
+  border-end-start-radius: var(--tc-button-radius, var(--radius));
+}
+
+[data-theme^="tzuchi"]
+  .toggle-button-group--horizontal:not(.toggle-button-group--detached)
+  .toggle-button:last-child {
+  border-start-end-radius: var(--tc-button-radius, var(--radius));
+  border-end-end-radius: var(--tc-button-radius, var(--radius));
+}
+
+[data-theme^="tzuchi"]
+  .toggle-button-group--vertical:not(.toggle-button-group--detached)
+  .toggle-button:first-child {
+  border-start-start-radius: var(--tc-button-radius, var(--radius));
+  border-start-end-radius: var(--tc-button-radius, var(--radius));
+}
+
+[data-theme^="tzuchi"]
+  .toggle-button-group--vertical:not(.toggle-button-group--detached)
+  .toggle-button:last-child {
+  border-end-start-radius: var(--tc-button-radius, var(--radius));
+  border-end-end-radius: var(--tc-button-radius, var(--radius));
+}
+
+/* A group of one is a standalone control again. */
+[data-theme^="tzuchi"]
+  .toggle-button-group--horizontal:not(.toggle-button-group--detached)
+  .toggle-button:first-child:last-child,
+[data-theme^="tzuchi"]
+  .toggle-button-group--vertical:not(.toggle-button-group--detached)
+  .toggle-button:first-child:last-child {
+  border-radius: var(--tc-button-radius, var(--radius));
+}
+
+/* ---------------------------------------------------------------------------
+ * R48 — an icon-only cell inside an ATTACHED group follows the group's rhythm,
+ * not the icon-button scale. Detached is excluded (see header CORRECTION).
+ * ------------------------------------------------------------------------ */
+
+/*
+ * A 48px cell next to a 42px one tears an ATTACHED group apart, so the cell is re-pointed at
+ * ./toggle-button.css's own per-size block height (34 / 42 / 50px) and the glyph falls back to
+ * HeroUI's base 20px. No value is restated here, so this can never drift from that file.
+ * This is the same guard ./button.css applies to `.button-group .button--icon-only`, which is what
+ * keeps a Toolbar's ToggleButtonGroup and ButtonGroup on one line height. A detached cell has no
+ * touching neighbour to tear apart from, so it is excluded and falls through to
+ * ./toggle-button.css's own standalone icon-only ladder (36/48/64px).
+ */
+[data-theme^="tzuchi"]
+  .toggle-button-group:not(.toggle-button-group--detached)
+  .toggle-button.toggle-button--icon-only {
+  --tzuchi-toggle-button-size: var(--tzuchi-toggle-button-block-size);
+  --tzuchi-toggle-button-icon-size: var(--tc-size-icon-sm, 20px);
+}

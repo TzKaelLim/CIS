@@ -1,0 +1,65 @@
+/* ==========================================================================
+   TagGroup — Tzu Chi inline-list gap
+   --------------------------------------------------------------------------
+   Destination: styles/themes/tzuchi/components/tag-group.css, imported into
+   the "components" layer AFTER heroui/styles/components/tag-group.css. The one
+   rule is scoped by [data-theme^="tzuchi"], so upstream's own light/dark
+   themes are untouched.
+
+   WHAT THIS CHANGES — one declaration
+     .tag-group__list gap   tag-group.css:7 `gap-1.5` = 6px  ->  8px
+   Spec §9 R153, "inline list gap (breadcrumbs, chips, tags):
+   `gap: var(--tc-space-8, 8px)` on the container and on the item; add
+   `flex-wrap: wrap`" (evidence breadcrumbs.css:63-76). `flex-wrap` is already
+   on the base rule, and the gap INSIDE a tag is settled at 4px by §9 R154 /
+   §10 D29, so the container gap is the only part of R153 left to apply.
+   6px is the single gap in this family that is not on the Tzu Chi 4px rhythm.
+
+   NOTE — THIS REVISITS A PASS-2 "KEPT"
+   gap-audit/tag-group.md's "TagGroup: why no file" table kept 6px, reasoning
+   "tc ships no chip-group component … with no Figma decision to port, 6px is
+   not a gap, it is upstream's default". That reasoning is about tc evidence;
+   the design-language spec now supplies the missing rule from the breadcrumb
+   list, which is the same role (a wrapping inline row of pills). Flagged in
+   the report as the one place this pass overrides a pass-2 note. It does not
+   contradict any DECLARATION in tag.css — that file never touches
+   `.tag-group__list`. tag.css:136-141's tolerance argument still holds and
+   improves: the 20px remove button's 24px `touch-target` ::after overhangs by
+   2px per side, now inside an 8px gap instead of a 6px one.
+
+   DELIBERATELY NOT CHANGED
+     `.tag-group` `gap-1` = 4px (label -> list, and list -> description/error):
+       §9 R141 "already correct theme-wide, do not restate" and R142 (4px).
+     `.tag-group [data-slot="description"] / [data-slot="error-message"]`
+       `p-1` = 4px: spec is silent on this padding, and the TYPE of those two
+       slots (R6 / R7, 16px/1.6) belongs to the `.description` and
+       `.error-message` components themselves — styling it from here would
+       pre-empt those files and apply the rule to TagGroup only. Left alone.
+     `relative`, `flex`, `flex-col`, `flex-wrap` — structural.
+     Everything about the Tag pill itself: ./tag.css owns it.
+
+   CASCADE
+     [data-theme^="tzuchi"] .tag-group__list = (0,2,0) beats base
+     `.tag-group__list` (0,1,0). No other theme file targets this class.
+
+   Reviewed: no changes. Verified against the live files — `.tag-group__list`
+   is the class `tagGroupVariants.slots.list` emits (tag-group.styles.ts:8)
+   and the base rule (tag-group.css:6-8, `gap-1.5`) matches; `tag.css` (read
+   in full) never selects `.tag-group` or `.tag-group__list`, so nothing here
+   duplicates or contradicts a declaration it makes. The rule is scoped under
+   [data-theme^="tzuchi"]; the one token used (--tc-space-8) is confirmed
+   mode-independent (8px, :root only) in packages/tokens/dist/tokens.css — no
+   colour, no shadow, no `!important`, no physical left/right, no comment
+   closed early. `gap` sets both row- and column-gap, matching R153's
+   "container and item" wording as far as this unit owns it — the analogous
+   "item" gap (icon/label/remove-button spacing inside one Tag) is a
+   different, already-settled rule (R154 / D29) owned by tag.css, not
+   restated here. No variant/size/state is hidden. No corrections required.
+   ========================================================================== */
+
+[data-theme^="tzuchi"] .tag-group__list {
+  /* R153 — the inline pill row runs on the 8px step, like the breadcrumb list
+     (breadcrumbs.css:63-76). Row and column gap both move; the list already
+     wraps, so the row gap matters when it does. */
+  gap: var(--tc-space-8, 8px);
+}

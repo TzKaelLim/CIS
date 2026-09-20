@@ -1,0 +1,221 @@
+/*
+ * Tzu Chi theme — Slider
+ * ---------------------------------------------------------------------------
+ * Base:   styles/components/slider.css (`.slider`, `.slider__track` /
+ *         `__fill` / `__thumb` + its `::after` / `__output`, the horizontal and
+ *         vertical orientation blocks and the disabled block), plus
+ *         styles/components/label.css for the label slot.
+ * Model:  no tc-slider exists. Every rule below is taken from the
+ *         design-language spec's *role* tables, not from a Figma file:
+ *         §7 R124 (interactive track), §7 R125 + §2 R32/R26 (pill track and
+ *         handle), §1 R19 (numeric readout and its row-mate), §6 "Shadows"
+ *         (resting elevation) as applied by themes/tzuchi/components/switch.css.
+ *
+ * WHAT THIS CHANGES — three things, nothing else:
+ *   1. TRACK COLOUR (the only visible repaint). `bg-default` becomes
+ *      `--border`. R124: a Slider track is an INTERACTIVE track — you have to
+ *      locate and grab it — so it does not get ProgressBar's passive
+ *      `--default`. Under this theme `--default` is gray-100 (#f2f2f2) light /
+ *      gray-900 (#333333) dark, which is 1.12:1 against a card and 1.05:1
+ *      against the page in light: effectively invisible. `--border` is
+ *      gray-300 (#bdbdbd) / gray-750 (#6b6b6e) — 1.88 / 3.20 against a card,
+ *      1.77 / 3.40 against the page — and it is the exact token Tzu Chi itself
+ *      uses for the one track it draws under a moving indicator (the spinner
+ *      ring, spinner.css:58-61). `border.strong` is rejected by R124 because
+ *      the `--accent` fill would collapse to 1.63:1 against it in dark.
+ *      Residual, already recorded as spec Q5: light still misses WCAG 1.4.11's
+ *      3:1 (1.88), and dark fill-vs-track is 2.93. Closing either needs a new
+ *      track token, not a component override.
+ *   2. READOUT AND LABEL TYPE. R19: `.slider__output` is a numeric readout —
+ *      16px / 400 / 1.6 in `--muted`, where HeroUI has 14px / 500 in the
+ *      inherited foreground; and its row-mate `[data-slot="label"]` takes the
+ *      same two metrics so the two keep a shared baseline in the grid row
+ *      (they sit in one row, `grid-template-areas: "label output"`). This is
+ *      byte-for-byte the treatment progress-bar.css:126-138 already ships, and
+ *      §1's mechanical rule — Tzu Chi has no 14px step. Weight and colour of
+ *      the LABEL stay HeroUI's, exactly as in progress-bar.css.
+ *   3. THUMB ELEVATION. The visible handle is `.slider__thumb::after`, whose
+ *      `shadow-field` resolves through `--shadow-field` to `--field-shadow`,
+ *      which THIS theme sets to `0 0 0 0 transparent` (variables.css:22) — so
+ *      today the themed handle has no elevation at all. That is the identical
+ *      trap switch.css item 3 fixes for the switch thumb, and §6's shadow
+ *      table names "card, switch thumb" as the resting-elevation role with
+ *      `--surface-shadow`. A slider handle is the same object, so it gets the
+ *      same token. Set as `--tw-shadow`, not `box-shadow`, per R104, so
+ *      Tailwind's inset / ring composition on that pseudo-element survives.
+ *
+ * ALSO DECLARED, BUT A NO-OP TODAY (canonicalisation, not a repaint):
+ *   R32 and R125 require the track and the handle to carry the pill radius,
+ *   set on the root scope. Under HeroUI's current dimensions every one of them
+ *   ALREADY renders as a stadium, because CSS clamps a radius to half the
+ *   shorter side: the 20px track and the 28x20 thumb take `rounded-xl` (12px)
+ *   and render at 10px; the 24x16 handle takes `rounded-lg` (8px) and renders
+ *   at 8px. Declaring `--tc-radius-full` changes the computed value from 12px
+ *   / 8px to 9999px and changes no pixel on screen. It is written anyway
+ *   because R32 is explicit that the role's radius belongs on the root scope,
+ *   so the shape survives if a thickness is ever retuned.
+ *
+ * NOT CHANGED — and why:
+ *   - `.slider__fill` keeps its SQUARE corners, deliberately diverging from
+ *     R32's "track AND fill". A ProgressBar fill is a free-standing bar; a
+ *     Slider fill is a SEGMENT BETWEEN CAPS. The track carries 12px
+ *     transparent inline borders that React Aria repaints `--accent` via
+ *     `data-fill-start` / `data-fill-end` (slider.css:99-105), and the fill's
+ *     start edge butts directly against that accent border at the padding-box
+ *     origin. Rounding the fill would open a grey crescent between the accent
+ *     end cap and the fill in the default story (value 30, data-fill-start is
+ *     true whenever value is above min). Its other end is covered by the
+ *     28px-wide thumb. So the rounding would be invisible where it helps and
+ *     damaging where it shows. Listed as a spec gap.
+ *   - THUMB SIZE. The brief says "thumb per the switch.css thumb treatment",
+ *     and switch.css's treatment is two things: pill radius and
+ *     `--surface-shadow`. Both are applied. Its THIRD property — that a tc
+ *     switch thumb is a CIRCLE — is not transferred: making HeroUI's 24x16
+ *     handle circular means choosing a diameter with no evidence (R126 says
+ *     keep HeroUI's slider dimensions) and shrinks a 24px grab handle to 16px,
+ *     against §3.6's touch-target rule. Geometry stays HeroUI's.
+ *   - MOTION. R140 forbids choreography, and R138 warns that adding to a
+ *     positional `transition-*` list means repeating the whole list. The thumb
+ *     transitions `background-color` (a colour that never changes here),
+ *     `transform` and `box-shadow`; its `::after` transitions the drag scale.
+ *     None of that is R131's "colour fade on a control" or R132's "value
+ *     travelling" — the thumb's position is an inline style React Aria writes
+ *     per pointer move and is deliberately NOT transitioned. Left verbatim,
+ *     which also leaves both reduced-motion guards untouched (R136).
+ *   - FOCUS. R70 / D3: `status-focused` already draws 2px `--focus` at a 2px
+ *     offset from `--ring-offset-width`, both theme-wide. Nothing to restate.
+ *     R73's inset ring is not needed: no ancestor clips overflow, and the
+ *     track's 12px transparent borders leave room for the ring at both ends.
+ *   - FILL COLOUR (`--accent`, already brand.primary in both modes, R125),
+ *     the root `gap-1` (4px = R141), the vertical `gap-2`, both
+ *     `grid-template-areas`, the 20px track thickness and the 28x20 / 24x16
+ *     thumb boxes (R126), the disabled block (R85 / D2: `--disabled-opacity`
+ *     is already 0.38 and `status-disabled` sets the cursor), `tabular-nums`,
+ *     the drag `scale(0.9)`, `cursor: grab/grabbing`, `.slider__marks` (never
+ *     rendered — marks are a TODO in slider.tsx).
+ *
+ * VARIANT / STATE COVERAGE — Slider has no size or colour variants:
+ *   horizontal (default) and vertical  — both keep their geometry; the track
+ *     colour, both radii, the readout type and the handle elevation apply to
+ *     each, because every rule is scoped to `.slider` and not to an
+ *     orientation.
+ *   range (two thumbs, the Range story) — `.slider__thumb` is selected by
+ *     class, so both handles get the radius and the elevation; the fill
+ *     between them is untouched.
+ *   dragging / focus-visible / disabled — untouched.
+ *
+ * CASCADE NOTES
+ *   - Base selectors compile to `.slider [data-slot=label]`,
+ *     `.slider .slider__output`, `.slider .slider__track`,
+ *     `.slider .slider__thumb` and `.slider .slider__thumb:after`, all (0,2,0).
+ *     Every rule below is (0,3,0) — plus the pseudo-element, which does not
+ *     affect specificity — and wins on specificity alone, so it does not
+ *     depend on the import order.
+ *   - The orientation blocks that also touch the track and the thumb
+ *     (`.slider[data-orientation=horizontal] .slider__track`, (0,4,0)) declare
+ *     `height` / `width` / `border-inline-width` / `border-color` only. They
+ *     never declare `background-color`, `border-radius` or `--tw-shadow`, so
+ *     nothing below is contested by them and nothing of theirs is lost.
+ *   - `--tw-shadow` is registered `syntax: "*"; inherits: false`, and the base
+ *     `::after` rule composes it into `box-shadow: ..., var(--tw-shadow)`.
+ *     Re-declaring the variable therefore repaints the shadow without
+ *     re-declaring `box-shadow`.
+ *
+ * COLOURS — only `--border`, `--muted` and `--surface-shadow` are used, all
+ * HeroUI theme variables the generated theme resolves per mode. No
+ * `--tc-color-` token, no colour-valued `--tc-slider-` token (none exists),
+ * no hex / rgb / hsl / oklch literal, no `!important`, logical properties only.
+ * Every `--tc-` token referenced (radius-full, font-size-16,
+ * font-weight-regular, line-height-relaxed) was checked in
+ * packages/tokens/dist/tokens.css: present, and absent from both dark blocks.
+ *
+ * Story ids used for verification: "components-controls-slider--default",
+ * "--vertical", "--disabled", "--range" (all present in index.json).
+ *
+ * Reviewed: no changes. Re-verified against the real files, not just the
+ * report: every selector (`.slider__output`, `.slider [data-slot="label"]`,
+ * `.slider__track`, `.slider__thumb`, `.slider__thumb::after`) exists in
+ * styles/components/slider.css or is emitted by Label/SliderOutput via
+ * slider.styles.ts's `tv()` slot map (output → `slider__output`); confirmed
+ * `--tw-shadow` really is the variable the base `::after` rule composes into
+ * `box-shadow` (`shadow-field` compiles to
+ * `--tw-shadow:var(--field-shadow);box-shadow:…,var(--tw-shadow)`) and that
+ * `--field-shadow` is `0 0 0 0 transparent` under both `tzuchi` and
+ * `tzuchi-dark` (variables.css:22). Re-derived every base selector's compiled
+ * specificity from the built storybook CSS: `.slider .slider__output` /
+ * `.slider [data-slot=label]` / `.slider .slider__track` /
+ * `.slider .slider__thumb` / `.slider .slider__thumb:after` are all (0,2,0);
+ * the orientation blocks are `.slider[data-orientation=…] .slider__track(:…)`
+ * / `…__thumb(:after)` at (0,3,0) and touch a disjoint property set
+ * (height/width/border-inline-width/border-color only) — confirmed, not just
+ * asserted. This file's rules are uniformly (0,3,0)/(0,3,0,1) and beat every
+ * base rule they target, with no property collision against the (0,3,0)-tier
+ * orientation rules. Confirmed `--tc-radius-full` (9999px), `--tc-font-size-16`
+ * (16px), `--tc-font-weight-regular` (400) and `--tc-line-height-relaxed`
+ * (1.6) all exist in packages/tokens/dist/tokens.css above its
+ * `[data-theme="dark"]` block and are not redeclared inside it or the
+ * `prefers-color-scheme` block. Confirmed `--border`, `--muted` and
+ * `--surface-shadow` are declared for both `tzuchi` and `tzuchi-dark` in
+ * themes/tzuchi/variables.css. Grepped for `!important`, hex/rgb/hsl/oklch
+ * literals, `--tc-color-`, and physical `left`/`right` — none found outside
+ * this comment. Scanned every comment for a premature comment close — none.
+ * Confirmed all four story ids exist in storybook-static/index.json, and that
+ * Default/Vertical/Disabled/Range each render Label + Slider.Output +
+ * Slider.Track > Slider.Fill + Slider.Thumb, so the two assertions' selectors
+ * resolve in the initial render with no interaction needed. Agree with the
+ * unit's two documented spec deviations (fill stays square-cornered; thumb
+ * elevation follows switch.css's `--surface-shadow` over R125's literal
+ * "keeps shadow-field" wording, per this unit's explicit brief) — both are
+ * argued from the real base CSS/geometry, not asserted, and both are already
+ * recorded as spec gaps for the owner. No corrections needed.
+ *
+ * Consistency pass: fixed a PREMATURE COMMENT CLOSE. The "Reviewed" paragraph
+ * above used to quote the comment-terminator sequence literally, inside
+ * backticks, in the sentence that claimed no such sequence existed. CSS does
+ * not know about backticks: the header comment ended there, the eight prose
+ * lines that followed became a selector, and the stray terminator plus
+ * `[data-theme^="tzuchi"] .slider` were swallowed into it — so the ONE rule
+ * block in this file was attached to an invalid selector and dropped whole.
+ * Every declaration below was dead. With ProgressBar and Meter themed and
+ * Slider silently un-themed, the track would have kept `--default` (1.12:1 on
+ * a card) while the sibling tracks moved, the readout would have stayed
+ * 14px/500 beside 16px/1.6 readouts, and the handle would have kept the
+ * theme's empty `--field-shadow`. The sentence now names the sequence instead
+ * of spelling it (brief rule 8). No selector, declaration or value changed.
+ */
+
+[data-theme^="tzuchi"] .slider {
+  /* 2. R19 — the readout is tc's `.value`: 16 / 400 / 1.6, muted. */
+  & .slider__output {
+    font-size: var(--tc-font-size-16, 16px);
+    font-weight: var(--tc-font-weight-regular, 400);
+    line-height: var(--tc-line-height-relaxed, 1.6);
+    color: var(--muted);
+  }
+
+  /* 2. R19 — the row-mate takes the same metrics so the two share a baseline.
+     Weight, colour and `w-fit` stay HeroUI's, as in progress-bar.css. */
+  & [data-slot="label"] {
+    font-size: var(--tc-font-size-16, 16px);
+    line-height: var(--tc-line-height-relaxed, 1.6);
+  }
+
+  /* 1. R124 — interactive track. 3. R32/R125 — pill, on the root scope. */
+  & .slider__track {
+    background-color: var(--border);
+    border-radius: var(--tc-radius-full, 9999px);
+  }
+
+  /* R125/R26 — the handle and its accent frame are pills at any thickness. */
+  & .slider__thumb {
+    border-radius: var(--tc-radius-full, 9999px);
+  }
+
+  /* 3. The visible handle. `shadow-field` is empty under this theme, so the
+     resting elevation is restored with the same token switch.css gives the
+     switch thumb. `--tw-shadow` rather than `box-shadow`, per R104. */
+  & .slider__thumb::after {
+    border-radius: var(--tc-radius-full, 9999px);
+    --tw-shadow: var(--surface-shadow);
+  }
+}

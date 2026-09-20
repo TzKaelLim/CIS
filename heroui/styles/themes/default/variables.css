@@ -189,10 +189,14 @@
       0 0 1px 0 rgba(0, 0, 0, 0.06);
   }
 
+  /* LOCAL CHANGE: [data-theme$="-dark"] lets any custom "<name>-dark" theme
+     inherit these dark defaults; upstream only matched the literal "dark". */
   .dark,
   [data-theme="dark"],
+  [data-theme$="-dark"],
   :host(.dark),
-  :host([data-theme="dark"]) {
+  :host([data-theme="dark"]),
+  :host([data-theme$="-dark"]) {
     color-scheme: dark;
     /* == Dark Theme Variables == */
 

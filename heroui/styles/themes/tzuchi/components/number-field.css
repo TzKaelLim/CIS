@@ -1,0 +1,153 @@
+/*
+ * Tzu Chi theme — NumberField
+ * ---------------------------------------------------------------------------
+ * Base:   styles/components/number-field.css — `.number-field` (the label /
+ *         group / description stack), `.number-field__group` (the field shell,
+ *         a grid: [40px] 1fr [40px]), `.number-field__input`,
+ *         `.number-field__increment-button`, `.number-field__decrement-button`,
+ *         `.number-field--primary`, `.number-field--secondary`,
+ *         `.number-field--full-width`, `.number-field__group--full-width`.
+ * Model:  there is no `tc-number-field`. Per spec §3.4 ("New field-family
+ *         components … follow R49-R54 — the Input shape, not the Select
+ *         shape") the model is tc-input's `.control`
+ *         (packages/components/src/input/tc-input.styles.ts:24-35, :47-57) and
+ *         the pass-1/2 overrides input.css, textarea.css and search-field.css.
+ *         gap-audit/README.md:135 names NumberField as one of the field-family
+ *         members still to be aligned to Input's 43.6px height and 20px inset.
+ *
+ * VARIANT MAPPING
+ *   tc-input's `.control`            <->  .number-field__group in
+ *                                         .number-field--primary
+ *   — no tc equivalent —             <->  .number-field--secondary (neutral
+ *        `--default` fill; it inherits every rule below because they hang off
+ *        the shared BEM classes, and it keeps the theme-wide 1px
+ *        `--field-border`: every Tzu Chi field is bordered). Spec D13.
+ *   — no tc equivalent —             <->  the stepper buttons. Tzu Chi has no
+ *        in-field stepper; they keep HeroUI's box, icon and states entirely.
+ *   tc `:host { display: block }`    <->  .number-field--full-width and
+ *                                         .number-field__group--full-width
+ *                                         (untouched)
+ *
+ * WHAT THIS CHANGES — the field shell only: height, density, type, invalid edge.
+ * Radius (8px via --field-radius), border width (1px), border / background /
+ * text colour, the flattened field shadow, the focus ring, the focus border
+ * (number-field.css:58 already repaints it), the disabled opacity and cursor
+ * and the font family already resolve to the Tzu Chi values through
+ * themes/tzuchi/variables.css. None of it is repeated here (N5, D1, D21).
+ *
+ *   1. HEIGHT   the fixed `h-9` (36px) becomes content-driven with the 43.6px
+ *      field floor — R41/R49, the same expression search-field.css:102-105
+ *      uses and the same number input.css, textarea.css and tc's `.control`
+ *      land on (1 + 8 + 25.6 + 8 + 1).
+ *   2. TYPE     the value is 16px/1.6 at every width; HeroUI's `text-base
+ *      sm:text-sm` steps down to 14px/20px from 40rem up — R2 and §1's
+ *      mechanical "no 14px step" rule. `tabular-nums` is left in place.
+ *   3. DENSITY  the value's inline inset becomes 20px — R50. (HeroUI keeps its
+ *      full inset next to a stepper too — number-field.css:94-102 only strips
+ *      the corner radius — so this is applied on both sides, as upstream does.)
+ *   4. INVALID  the border turns `--danger` and survives hover — R68, R69.
+ *      Upstream points it at `--color-field-border-invalid`, a variable no
+ *      theme or stylesheet in styles/ defines (gap-audit/search-field.md:
+ *      141-146), so the declaration is invalid at computed-value time and the
+ *      edge falls back to currentColor.
+ *
+ * KEPT DELIBERATELY
+ *   · The steppers: 40px grid columns, 16px `size-4` glyphs, transparent fill,
+ *     the pressed `scale(0.97)`, the faint inner divider, the cursor and every
+ *     state. There is no tc counterpart and the spec gives no rule for an
+ *     in-field stepper (rule 6, restraint); R46/R47's 48/64px icon-button boxes
+ *     are for standalone Buttons and would not fit a 43.6px field, and R48 says
+ *     a joined group re-points at the shell height, which `h-full` already does.
+ *   · The focus ring — HeroUI's 2px `--focus`, not tc's 3px halo (§11 I1, D21).
+ *   · Block padding (8px, already `py-2` — R51), the radius, `overflow-hidden`,
+ *     the grid template, `items-center`, the autofill handling, the 150ms
+ *     transitions (already R131's duration), disabled (R85/D2), the
+ *     `--secondary` fill (D13) and the stack's `gap-1` (4px = R141/R142).
+ *
+ * CASCADE NOTES (hand-derived, spec N7)
+ *   · `[data-theme^="tzuchi"] .number-field__group` (0,2,0) beats the base
+ *     (0,1,0). `block-size` / `min-block-size` cascade together with
+ *     `height` / `min-height` (logical-physical mapping) and this file is
+ *     imported after @heroui/styles in the same "components" layer.
+ *   · `.number-field__input` (0,2,0) beats the base (0,1,0) and its `sm:` twin
+ *     (also (0,1,0); media queries carry no specificity), so 16px survives
+ *     above 40rem. It stays weaker than the base's (0,3,0) `:has([slot=
+ *     "decrement"])` corner rules, which only touch border-radius anyway.
+ *   · The invalid rule is (0,3,0): it clears the base (0,2,0) and the base
+ *     focus rules (0,2,0) outright, and ties with
+ *     `.number-field--secondary .number-field__group[data-invalid="true"]`
+ *     (0,3,0, number-field.css:204-208), which source order resolves in this
+ *     file's favour (N7). Declared after the focus rule so a focused invalid
+ *     field keeps the danger edge (tc-input.styles.ts:65-69).
+ *   · The hover mirror is (0,5,0) against the base hover rule's (0,3,0) —
+ *     R69's trap.
+ *
+ * Reviewed: no changes. Selectors, scoping, colour rule, token
+ * mode-independence and cascade math re-derived by hand against the live
+ * base CSS, styles.ts slot names and the real story markup (unit fields-a),
+ * including the `.number-field--secondary .number-field__group[data-invalid]`
+ * (0,3,0) tie claim, which is correct as written (it is a two-class
+ * descendant compound, unlike InputGroup's single-compound secondary rule).
+ * The `align-self: stretch` consequence guard was checked against the grid's
+ * `overflow: hidden` and `items-center` and does not clip or misalign the
+ * steppers in any state.
+ */
+
+[data-theme^="tzuchi"] {
+  /* ---------------------------------------------------------------- shell -- */
+  .number-field__group {
+    /* R41 / R49 — a 16px/1.6 line box + 2x8px block padding + 2x1px border =
+       43.6px, the themed Input's height. HeroUI pins `h-9` = 36px, which only
+       fits its own 14px/20px text; with `overflow: hidden` on this element a
+       fixed height would clip a taller value instead of growing. */
+    block-size: auto;
+    min-block-size: calc(
+      var(--tc-font-size-16, 16px) * var(--tc-line-height-relaxed, 1.6) + 2 *
+        var(--tc-space-8, 8px) + 2 * var(--field-border-width, 1px)
+    );
+
+    /* R68 — tc-input.styles.ts:65-69: the border itself carries the error and
+       survives hover AND focus. HeroUI's 1px danger outline
+       (`status-invalid-field`) is left on top of it. */
+    &[data-invalid="true"] {
+      border-color: var(--danger);
+
+      /* R69 — the hover-vs-invalid trap, same fix as input.css:74-82,
+         textarea.css:94-101 and search-field.css:137-142. */
+      @media (hover: hover) {
+        &:hover:not(:focus-within),
+        &[data-hovered="true"]:not([data-focus-within="true"]) {
+          border-color: var(--danger);
+        }
+      }
+    }
+  }
+
+  /* ----------------------------------------------------------------- text -- */
+  .number-field__input {
+    /* R50 — tc `.control` pads 20px inline; the 8px block padding already
+       matches HeroUI's `py-2` (R51) and is not restated. */
+    padding-inline: var(--tc-space-20, 20px);
+
+    /* R2 — 400 16px/1.6 at every width, in place of `text-base sm:text-sm`.
+       Longhands, not the `font` shorthand, so the inherited family, the 400
+       weight and `font-variant-numeric: tabular-nums` all survive. */
+    font-size: var(--tc-font-size-16, 16px);
+    line-height: var(--tc-line-height-relaxed, 1.6);
+  }
+
+  /* -------------------------------------------------------------- steppers -- */
+  .number-field__increment-button,
+  .number-field__decrement-button {
+    /* Consequence guard for the height change above, not a restyle: the
+       steppers are `h-full` (number-field.css:132) inside a grid whose row was
+       definite while the shell was `h-9`. Now that the shell is content-driven,
+       a percentage block-size resolved against an auto-sized grid area is
+       treated as `auto` in the intrinsic pass, and the base's `items-center`
+       would leave a 16px-tall button floating in a 43.6px shell — a shrunken
+       hit area and a stub divider. `stretch` is a no-op wherever the
+       percentage does resolve (it only applies to an auto block-size), so the
+       stepper is full-height either way. Rule 5: no state or size is lost. */
+    align-self: stretch;
+  }
+}

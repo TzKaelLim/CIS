@@ -1,5 +1,10 @@
 @import "@heroui/styles";
 
+/* LOCAL CHANGE: Tzu Chi design tokens, then the "tzuchi" / "tzuchi-dark" themes
+   built from them (pick them in the Theme toolbar). */
+@import "@tzuchi/tokens/tokens.css";
+@import "../../styles/themes/tzuchi/index.css";
+
 @source "../../react/src/components/**/*.{ts,tsx,js,jsx}";
 
 /* Important: This source is important to make sure storybook styles are compiled */

@@ -1,0 +1,372 @@
+/*
+ * Tzu Chi theme — Button
+ * ======================
+ * Destination: heroui/styles/themes/tzuchi/components/button.css, imported into
+ * the `components` layer after HeroUI's own styles/components/button.css.
+ * Self-contained: it carries the `.button` radius rule that currently lives in
+ * ../index.css, so that rule can be deleted there.
+ *
+ * WHAT THIS CHANGES — HeroUI's markup, class names, variants, sizes, states and
+ * base CSS stay untouched; only shape / density / typography and two variants'
+ * colour pointers move onto the decisions already recorded in tc-button:
+ *
+ *   border-radius    24px pill (rounded-3xl)  →  8px  (--tc-button-radius)
+ *   typography       14px / 500 / 1.4286      →  16px / 700 / 1.5
+ *                                                 (= --tc-typography-subtitle)
+ *   padding-inline   16px (px-4)              →  24px (--tc-space-24)
+ *   height           40px, 36px at ≥768px     →  42px at every width
+ *   .button--secondary   neutral --default fill  →  --accent-soft   (tc `tonal`)
+ *   .button--outline     neutral border/label    →  --accent        (tc `outlined`)
+ *   ButtonGroup      corner radii restated at 8px, otherwise the `.button`
+ *                    radius above out-specifies `.button-group .button`
+ *                    (both 0,2,0, this file is later) and the group stops
+ *                    reading as one joined control.
+ *
+ * VARIANT MAPPING — tc-button has three variants and exactly one size:
+ *   tc filled    ↔ .button--primary    already identical: the generated theme
+ *                                      maps brand.primary / primary-hover /
+ *                                      text.on-brand onto --accent /
+ *                                      --accent-hover / --accent-foreground.
+ *                                      Not restyled.
+ *   tc tonal     ↔ .button--secondary  fill → --accent-soft (= brand.surface);
+ *                                      its --button-fg was already
+ *                                      --accent-soft-foreground, left alone.
+ *   tc outlined  ↔ .button--outline    1px border width already matches; border
+ *                                      and label → --accent (= brand.primary),
+ *                                      hover fill → --accent-soft.
+ *   .button--tertiary, --ghost, --danger, --danger-soft have no tc counterpart
+ *   and keep HeroUI's own variables untouched. (--danger* is themed, and so is
+ *   --default, behind tertiary/ghost: the theme maps it to the neutral-surface
+ *   token in ../variables.css, so nothing is patched per component.)
+ *   tc's single size ↔ md. sm / lg keep a Tzu Chi rhythm by stepping
+ *   padding-block 4px / 8px / 12px → 34px / 42px / 50px.
+ *
+ * NOTE --tzuchi-button-block-size is a LOCAL calc helper, not a theme variable:
+ * it resolves entirely from mode-independent --tc-* dimension tokens and never
+ * needs the theme generator. No colour is read from a --tc-* token here, because
+ * tokens.css flips those under [data-theme="dark"], which never matches
+ * [data-theme="tzuchi-dark"].
+ *
+ * Reviewed: no changes. Verified against the live files: every selector exists
+ * in heroui/styles/components/button.css / button-group.css or is emitted by
+ * button.tsx / button.styles.ts (buttonVariants default variant is "primary",
+ * confirmed in styles/src/components/button/button.styles.ts:11); every rule is
+ * scoped under [data-theme^="tzuchi"]; no --tc-color-*, no component colour
+ * token, no hex/rgb/hsl/oklch literal, no !important anywhere in the file
+ * (grepped clean); all --tc-space-* /--tc-font-* /--tc-line-height-normal/
+ * --tc-button-radius values confirmed mode-independent dimension/number tokens
+ * in packages/tokens/dist/tokens.css; the ButtonGroup radius bug this file
+ * fixes is real (.button-group .button and the pre-existing
+ * themes/tzuchi/components/index.css .button rule are both (0,2,0), and the
+ * later-imported index.css rule silently wins today); the override's own
+ * [data-theme^="tzuchi"] .button-group .button rule is (0,3,0) and correctly
+ * beats both. Cascade math re-derived by hand for every declaration (primary,
+ * secondary, outline, sm/lg sizing, icon-only, ButtonGroup corners) against
+ * the real specificities in styles/components/button.css and
+ * button-group.css; every override selector's specificity is ≥ the base
+ * declaration it must beat, at every size/state/breakpoint including the
+ * md: h-9 / md:h-8 / md:h-10 nested-media-query heights. No variant, size or
+ * state is hidden or flattened. Assertions re-verified against
+ * storybook-static/index.json (story id exists; default variant renders
+ * .button--primary) and against the resolved token chain; all six kept as-is.
+ */
+
+/* ---------------------------------------------------------------------------
+ * Shape, density and typography
+ * ------------------------------------------------------------------------ */
+
+[data-theme^="tzuchi"] .button {
+  /* tc-button.styles.ts:19 — border-radius: var(--tc-button-radius) */
+  border-radius: var(--tc-button-radius, var(--radius));
+
+  /* tc-button.styles.ts:18 — font: var(--tc-typography-subtitle) → 700 16px/1.5 */
+  font-size: var(--tc-font-size-16, 16px);
+  font-weight: var(--tc-font-weight-bold, 700);
+  line-height: var(--tc-line-height-normal, 1.5);
+
+  /* tc-button.styles.ts:20 — padding: 8px 24px (inline half) */
+  padding-inline: var(--tc-space-24, 24px);
+
+  /*
+   * 42px = 24px line box (16px × 1.5) + 2 × 8px padding-block + 2 × 1px border,
+   * i.e. exactly what tc-button's padding + border box measures. Replaces
+   * HeroUI's h-10 / md:h-9 — tc-button has one density at every viewport.
+   */
+  --tzuchi-button-block-size: calc(
+    var(--tc-font-size-16, 16px) * var(--tc-line-height-normal, 1.5) +
+      var(--tc-space-8, 8px) * 2 + 2px
+  );
+  height: var(--tzuchi-button-block-size);
+}
+
+/* Same line box, padding-block 4px → 34px. */
+[data-theme^="tzuchi"] .button--sm {
+  padding-inline: var(--tc-space-16, 16px);
+  --tzuchi-button-block-size: calc(
+    var(--tc-font-size-16, 16px) * var(--tc-line-height-normal, 1.5) +
+      var(--tc-space-4, 4px) * 2 + 2px
+  );
+}
+
+/* Same line box, padding-block 12px → 50px. (text-base is already 16px.) */
+[data-theme^="tzuchi"] .button--lg {
+  padding-inline: var(--tc-space-32, 32px);
+  --tzuchi-button-block-size: calc(
+    var(--tc-font-size-16, 16px) * var(--tc-line-height-normal, 1.5) +
+      var(--tc-space-12, 12px) * 2 + 2px
+  );
+}
+
+/*
+ * Icon-only stays square at whichever size is active. Both declarations are
+ * needed because the padding-inline and width set above out-specify HeroUI's
+ * own `.button--icon-only { p-0; w-10 }` (0,2,0 vs 0,1,0). The :not() keeps
+ * HeroUI's precedence for a button that is icon-only *and* full-width.
+ */
+[data-theme^="tzuchi"] .button--icon-only {
+  padding-inline: 0;
+}
+
+[data-theme^="tzuchi"] .button--icon-only:not(.button--full-width) {
+  width: var(--tzuchi-button-block-size);
+}
+
+/* ---------------------------------------------------------------------------
+ * Variant colours — HeroUI theme variables only, so both tzuchi and
+ * tzuchi-dark resolve correctly.
+ * ------------------------------------------------------------------------ */
+
+/*
+ * tc `tonal` (button.tokens.json:16-20): bg brand.surface, bg-hover
+ * brand.surface-hover, fg brand.primary — i.e. the accent-soft trio, not
+ * HeroUI's neutral --default.
+ */
+[data-theme^="tzuchi"] .button--secondary {
+  --button-bg: var(--accent-soft);
+  --button-bg-hover: var(--accent-soft-hover);
+  --button-bg-pressed: var(--accent-soft-hover);
+}
+
+/*
+ * tc `outlined` (button.tokens.json:11-15): transparent fill, border and label
+ * brand.primary, hover fill brand.surface. HeroUI's outline is neutral
+ * (--border / --default-foreground / 60% --default).
+ */
+[data-theme^="tzuchi"] .button--outline {
+  border-color: var(--accent);
+  --button-fg: var(--accent);
+  --button-bg-hover: var(--accent-soft);
+  --button-bg-pressed: var(--accent-soft-hover);
+}
+
+/* ---------------------------------------------------------------------------
+ * ButtonGroup — restate HeroUI's joined corners at the Tzu Chi radius.
+ * Nothing else about the group changes.
+ * ------------------------------------------------------------------------ */
+
+[data-theme^="tzuchi"] .button-group .button {
+  border-radius: 0;
+}
+
+[data-theme^="tzuchi"] .button-group--horizontal .button:first-child {
+  border-start-start-radius: var(--tc-button-radius, var(--radius));
+  border-end-start-radius: var(--tc-button-radius, var(--radius));
+}
+
+[data-theme^="tzuchi"] .button-group--horizontal .button:last-child {
+  border-start-end-radius: var(--tc-button-radius, var(--radius));
+  border-end-end-radius: var(--tc-button-radius, var(--radius));
+}
+
+[data-theme^="tzuchi"] .button-group--vertical .button:first-child {
+  border-start-start-radius: var(--tc-button-radius, var(--radius));
+  border-start-end-radius: var(--tc-button-radius, var(--radius));
+}
+
+[data-theme^="tzuchi"] .button-group--vertical .button:last-child {
+  border-end-start-radius: var(--tc-button-radius, var(--radius));
+  border-end-end-radius: var(--tc-button-radius, var(--radius));
+}
+
+[data-theme^="tzuchi"] .button-group--horizontal .button:first-child:last-child,
+[data-theme^="tzuchi"] .button-group--vertical .button:first-child:last-child {
+  border-radius: var(--tc-button-radius, var(--radius));
+}
+
+/* ===========================================================================
+ * Tzu Chi theme — Button, icon-only modifier  (tc-icon-button)
+ * ============================================================
+ * Pass 1 recorded "icon-only: no counterpart (tc has no icon-only mode)"
+ * (gap-audit/button.md:60). That is wrong: Tzu Chi ships a SEPARATE component,
+ * tc-icon-button (packages/components/src/icon-button/), whose HeroUI
+ * counterpart is Button + isIconOnly -> .button--icon-only. This fragment
+ * transfers that component's decisions; everything pass 1 already set on
+ * .button, .button--sm/--lg, the variant colours and the ButtonGroup corners
+ * is left exactly as it is.
+ *
+ * WHAT THIS CHANGES — HeroUI's markup, class names, props, variants, sizes and
+ * states stay untouched; three shape/density decisions move onto tc-icon-button:
+ *
+ *   border-radius  8px (pass 1's --tc-button-radius)  ->  9999px full circle
+ *                                                         (--tc-icon-button-radius)
+ *   box (md)       42px square (text-button rhythm)   ->  48px  (--tc-size-control-md)
+ *   box (lg)       50px square                        ->  64px  (--tc-size-control-lg)
+ *   box (sm)       34px square                        ->  36px  (20px icon + 2 x 8px ring)
+ *   icon (md)      20px, 16px at >=640px              ->  32px  (--tc-size-icon-md)
+ *   icon (lg)      20px, 16px at >=640px              ->  40px  (--tc-size-icon-lg)
+ *   icon (sm)      16px                               ->  20px  (--tc-size-icon-sm)
+ *
+ * VARIANT MAPPING — tc-icon-button has two variants and two sizes. Its colour
+ * recipes are byte-identical to tc-button's, so pass 1 already covers them and
+ * NOTHING colour-related is declared here:
+ *   tc tonal  (default) <-> .button--secondary  bg brand.surface / hover
+ *                           brand.surface-hover / fg brand.primary
+ *                           = the --accent-soft trio pass 1 already points at.
+ *   tc filled           <-> .button--primary    bg brand.primary / hover
+ *                           brand.primary-hover / fg text.on-brand
+ *                           = --accent / --accent-hover / --accent-foreground,
+ *                           already identical out of the box.
+ *   tc md               <-> HeroUI md (48px), tc lg <-> HeroUI lg (64px).
+ *                           HeroUI's sm has no tc counterpart; it keeps the
+ *                           same 8px icon ring as md (20px + 16px = 36px).
+ *   .button--tertiary / --ghost / --outline / --danger / --danger-soft have no
+ *   tc counterpart and are untouched here, exactly as in pass 1.
+ *
+ * BUTTONGROUP — an icon-only button is a CELL of a joined control there, and
+ * HeroUI mixes text and icon-only cells in one group
+ * (button-group.stories.tsx:434-446, :307-313). A 48px cell next to a 42px one
+ * would tear the group apart, so inside .button-group the icon-only cell is
+ * pointed back at pass 1's own --tzuchi-button-block-size — no value is
+ * restated, so it can never drift from pass 1. The full-circle radius rule
+ * below is deliberately (0,2,0): pass 1's .button-group .button (0,3,0) and its
+ * first-child / last-child rules (0,4,0) out-specify it, so the group's corner
+ * handling keeps winning and the group still reads as one joined control.
+ *
+ * CloseButton is a different HeroUI component (.close-button,
+ * styles/components/close-button.css) with no Tzu Chi counterpart. It is NOT
+ * touched by any selector here.
+ *
+ * NOTE --tzuchi-icon-button-size and --tzuchi-icon-button-icon-size are LOCAL
+ * calc helpers, exactly like pass 1's --tzuchi-button-block-size: they resolve
+ * only from mode-independent --tc-* dimension tokens and need nothing from the
+ * theme generator. No colour is read from a --tc-color-* token or from a
+ * colour-valued component token anywhere in this fragment; tokens.css flips
+ * those under [data-theme="dark"], which never matches [data-theme="tzuchi-dark"].
+ *
+ * Reviewed: no changes. Verified against the live files: .button--icon-only,
+ * .button--icon-only.button--sm/--lg, .button-group .button--icon-only,
+ * .button.button--icon-only(:not(.button--full-width)) and the svg exclusion
+ * selector all exist in styles/components/button.css or are emitted by
+ * button.styles.ts's buttonVariants (base "button" + isIconOnly "button--icon-only"
+ * + a size class is always present, confirmed in
+ * styles/src/components/button/button.styles.ts); every rule is scoped under
+ * [data-theme^="tzuchi"]. Colour rule: grepped clean for --tc-color-*, any
+ * colour-valued component token, hex/rgb/hsl/oklch literals and !important —
+ * only --tc-size-control-md/-lg, --tc-size-icon-sm/-md/-lg, --tc-space-8,
+ * --tc-radius-full and --tc-icon-button-radius are used, all confirmed
+ * mode-independent dimension tokens in packages/tokens/dist/tokens.css (no
+ * [data-theme="dark"] override exists for any of them), so tzuchi and
+ * tzuchi-dark resolve identically as intended; no new --tzuchi-* variable is
+ * introduced. Cascade re-derived by hand for every declaration against the
+ * real base-CSS and pass-1 specificities: border-radius (0,2,0) beats base
+ * .button (0,2,0) by later source position, exactly like pass 1's own
+ * ButtonGroup-corner trick; height/width on .button.button--icon-only(:not(...))
+ * are (0,3,0)/(0,4,0), one class more than pass 1's .button{height} (0,2,0)
+ * and .button--icon-only:not(.button--full-width){width} (0,3,0), so they
+ * supersede those two declarations for icon-only buttons only, leaving
+ * ordinary buttons on pass 1's rhythm; the svg rule (0,3,2) beats both
+ * .button svg:not(...) and .button--sm svg:not(...) (0,2,2), including at the
+ * sm: breakpoint, since this rule carries no media query. Inside .button-group,
+ * .button-group .button--icon-only (0,3,0) ties with and — by appearing later
+ * in the file — wins over .button--icon-only.button--sm/--lg (also (0,3,0)),
+ * so a grouped icon-only cell always follows pass 1's --tzuchi-button-block-size
+ * and HeroUI's own 20px icon regardless of its own size class; this matches
+ * the comment's stated intent and pass 1's box size (34/42/50px), re-verified
+ * against button-group.stories.tsx's WithIcons story (default md, no size
+ * override). No variant, size or state is hidden or flattened; CloseButton
+ * (.close-button, disjoint class names) is confirmed untouched. Scanned every
+ * comment for a premature "*" "/" — none found (9 open/9 close, counted).
+ * Assertions re-verified against storybook-static/index.json (all three story
+ * ids exist) and against the resolved values in
+ * packages/tokens/dist/tokens.css (--tc-size-control-md=48px, -lg=64px,
+ * --tc-size-icon-sm=20px/-md=32px/-lg=40px, --tc-space-8=8px,
+ * --tc-button-radius=--tc-radius-md=8px); all eight kept as-is.
+ * ------------------------------------------------------------------------ */
+
+/* ---------------------------------------------------------------------------
+ * Icon-only — shape and size scale
+ * ------------------------------------------------------------------------ */
+
+/*
+ * tc-icon-button.styles.ts:15 — border-radius: var(--tc-icon-button-radius)
+ * -> --tc-radius-full = 9999px. Also seeds the md size pair
+ * (tc-icon-button.styles.ts:11-12,23-25: 48px box, 32px icon).
+ */
+[data-theme^="tzuchi"] .button--icon-only {
+  --tzuchi-icon-button-size: var(--tc-size-control-md, 48px);
+  --tzuchi-icon-button-icon-size: var(--tc-size-icon-md, 32px);
+
+  border-radius: var(--tc-icon-button-radius, var(--tc-radius-full, 9999px));
+}
+
+/*
+ * No tc counterpart for sm. Keeps md's 8px ring around the small icon:
+ * 20px + 2 x 8px = 36px.
+ */
+[data-theme^="tzuchi"] .button--icon-only.button--sm {
+  --tzuchi-icon-button-size: calc(
+    var(--tc-size-icon-sm, 20px) + var(--tc-space-8, 8px) * 2
+  );
+  --tzuchi-icon-button-icon-size: var(--tc-size-icon-sm, 20px);
+}
+
+/* tc-icon-button.styles.ts:37-44 — :host([size='lg']) 64px box, 40px icon. */
+[data-theme^="tzuchi"] .button--icon-only.button--lg {
+  --tzuchi-icon-button-size: var(--tc-size-control-lg, 64px);
+  --tzuchi-icon-button-icon-size: var(--tc-size-icon-lg, 40px);
+}
+
+/*
+ * Inside a ButtonGroup the cell follows the group's own rhythm instead, by
+ * re-pointing at pass 1's variable — so sm / md / lg stay 34 / 42 / 50px with
+ * no value duplicated here. Icons fall back to HeroUI's own base size
+ * (size-5 = 20px = --tc-size-icon-sm).
+ * (0,3,0) and later in the file, so it beats the two size rules above.
+ */
+[data-theme^="tzuchi"] .button-group .button--icon-only {
+  --tzuchi-icon-button-size: var(--tzuchi-button-block-size);
+  --tzuchi-icon-button-icon-size: var(--tc-size-icon-sm, 20px);
+}
+
+/*
+ * The box. (0,3,0) — one class more than pass 1's `.button { height }` (0,2,0),
+ * which it intentionally supersedes for icon-only only.
+ */
+[data-theme^="tzuchi"] .button.button--icon-only {
+  height: var(--tzuchi-icon-button-size);
+}
+
+/*
+ * (0,4,0) — one class more than pass 1's
+ * `.button--icon-only:not(.button--full-width) { width }` (0,3,0), which it
+ * supersedes. The :not() is carried over for the same reason pass 1 has it:
+ * a button that is icon-only AND full-width keeps HeroUI's w-full.
+ */
+[data-theme^="tzuchi"] .button.button--icon-only:not(.button--full-width) {
+  width: var(--tzuchi-icon-button-size);
+}
+
+/*
+ * tc-icon-button.styles.ts:22-26,41-44 — the slotted icon is a fixed square per
+ * size. Mirrors HeroUI's own exclusion list so Spinner and link-icon SVGs keep
+ * their sizes (the pending / isPending state is untouched). (0,3,2) beats both
+ * `.button svg:not(…)` and `.button--sm svg:not(…)`, which are (0,2,2), so one
+ * rule covers every size; tc has no >=640px icon step, so HeroUI's `sm:size-4`
+ * densification does not apply to icon-only buttons.
+ */
+[data-theme^="tzuchi"]
+  .button--icon-only
+  svg:not([data-slot="spinner"] svg, [data-slot="link-icon"] svg) {
+  width: var(--tzuchi-icon-button-icon-size);
+  height: var(--tzuchi-icon-button-icon-size);
+}

@@ -1,0 +1,206 @@
+/* ------------------------------------------------------------------------------------------------
+ * Tzu Chi theme — ToggleButton
+ * ------------------------------------------------------------------------------------------------
+ * Destination: heroui/styles/themes/tzuchi/components/toggle-button.css, imported into the
+ * `components` layer after HeroUI's own styles/components/toggle-button.css (and therefore after
+ * styles/components/toggle-button-group.css as well).
+ *
+ * A ToggleButton is a Button that carries a selected state. DESIGN-LANGUAGE R22 names
+ * `toggle-button` in the "Control" radius role, and the Button height / padding ladder
+ * (R40, R42–R44) plus the icon-only ladder (R24, R45–R47) are the same ladder. So this file is
+ * ./button.css's geometry and type, transferred class-for-class — nothing is invented for
+ * ToggleButton on its own.
+ *
+ * WHAT THIS CHANGES — HeroUI's markup, class names, props, variants, sizes and states stay
+ * untouched; only shape, density and typography move:
+ *
+ *   border-radius    24px pill (rounded-3xl)     ->  8px                       (R22)
+ *   typography       14px / 500 / 1.4286         ->  16px / 700 / 1.5          (R1, subtitle)
+ *   padding-inline   16px (px-4)                 ->  24px                      (R43)
+ *                    sm 12px (px-3)              ->  16px                      (R42)
+ *                    lg 16px (inherited)         ->  32px                      (R44)
+ *   height           40px, 36px at >=768px       ->  42px at every width       (R40 / R43)
+ *                    sm 36px, 32px at >=768px    ->  34px                      (R42)
+ *                    lg 44px, 40px at >=768px    ->  50px                      (R44)
+ *   icon-only box    40px, 36px at >=768px       ->  48px                      (R46)
+ *                    sm 36px / 32px              ->  36px  (20px icon + 2x8px) (R45)
+ *                    lg 44px / 40px              ->  64px                      (R47)
+ *   icon-only glyph  20px, 16px at >=640px       ->  32px md / 20px sm / 40px lg (R45–R47)
+ *   icon-only radius 8px (from the rule above)   ->  full circle               (R24)
+ *
+ * NO COLOUR, NO BORDER, NO MOTION AND NO STATE RULE IS DECLARED HERE.
+ *   · selected — the base file already paints `--accent-soft` / `--accent-soft-hover` /
+ *     `--accent-soft-foreground` (toggle-button.css:29-32), which is exactly R76's tonal trio,
+ *     i.e. the same recipe pass 1 pointed `.button--secondary` at. Already correct in both modes.
+ *   · rest / hover / pressed on `--default` and `--ghost` — R88 item 1: a HeroUI-only neutral
+ *     variant with no Tzu Chi counterpart keeps `--default` / `--default-hover`. Same call D7
+ *     made for `.button--tertiary` and `.button--ghost`.
+ *   · R83 ("selected = BORDER currentColor") lists ToggleButton, but its stated condition — "use
+ *     when the item already carries a tonal fill at rest" — is false here: the rest fill is the
+ *     neutral `--default` and HeroUI already swaps the fill AND the label colour on select. Adding
+ *     a border would mean giving `.toggle-button` a border it does not have, so the conservative
+ *     reading (R76, already satisfied) is taken and the alternative is listed in the report's
+ *     spec-gap section for the owner.
+ *   · disabled — R85 / D2, `--disabled-opacity` is already 0.38 theme-wide.
+ *   · focus ring — R70 / D3, width, offset and `--focus` all arrive from ../variables.css.
+ *   · motion — the base `transition` shorthand carries the press transform and the ring, so
+ *     re-declaring it would drag both along (the same call gap-audit/button.md:57 made).
+ *
+ * VARIANT / SIZE COVERAGE — nothing is hidden or flattened:
+ *   variant `default`  neutral fill, now 8px / 16-700 / 42px
+ *   variant `ghost`    transparent fill, same geometry
+ *   size sm / md / lg  34 / 42 / 50px, one value at every viewport
+ *   isIconOnly         36 / 48 / 64px circles (see ./toggle-button-group.css for the group guard)
+ *   selected, hover, pressed, focus-visible, disabled — untouched
+ *
+ * GROUP RULES LIVE IN ./toggle-button-group.css, exactly as HeroUI splits them: its base
+ * toggle-button.css never mentions `.toggle-button-group`, while its base toggle-button-group.css
+ * owns every `.toggle-button-group .toggle-button` rule.
+ *
+ * NOTE --tzuchi-toggle-button-block-size, --tzuchi-toggle-button-size and
+ * --tzuchi-toggle-button-icon-size are LOCAL calc helpers, exactly like ./button.css's
+ * --tzuchi-button-block-size: they resolve only from mode-independent --tc-* dimension tokens
+ * (verified: the [data-theme="dark"] block of packages/tokens/dist/tokens.css redefines none of
+ * --tc-button-radius, --tc-icon-button-radius, --tc-radius-full, --tc-size-control-md / -lg,
+ * --tc-size-icon-sm / -md / -lg, --tc-space-4 / -8 / -12 / -16 / -24 / -32, --tc-font-size-16,
+ * --tc-font-weight-bold or --tc-line-height-normal), so they need nothing from generate.mjs and
+ * no new --tzuchi-* theme variable is introduced.
+ *
+ * CASCADE (hand-derived against styles/components/toggle-button.css, whose rules are all (0,1,0)
+ * or (0,2,0) and all earlier in the same layer):
+ *   .toggle-button                                  (0,2,0)  beats base .toggle-button (0,1,0)
+ *                                                            incl. its md: height variants
+ *   .toggle-button--sm / --lg                       (0,2,0)  later in this file than the rule
+ *                                                            above, so they retune it
+ *   .toggle-button--icon-only                       (0,2,0)  later still: its padding-inline: 0
+ *                                                            and circle beat both of those
+ *   .toggle-button--icon-only.toggle-button--sm/--lg (0,3,0) beat the rule above
+ *   .toggle-button.toggle-button--icon-only         (0,3,0)  beats .toggle-button { height } (0,2,0)
+ *                                                            and base .toggle-button--icon-only
+ *                                                            .toggle-button--sm/--lg (0,2,0)
+ *   .toggle-button--icon-only svg                   (0,2,1)  beats base .toggle-button svg and
+ *                                                            .toggle-button--sm svg, both (0,1,1),
+ *                                                            at every breakpoint
+ *
+ * Reviewed: no changes. Verified against the live files: every class this file touches
+ * (.toggle-button, --sm/--lg, --icon-only, --icon-only.--sm/--lg, .toggle-button.toggle-button
+ * --icon-only, and the icon-only svg) exists in heroui/styles/components/toggle-button.css or is
+ * emitted by toggle-button.styles.ts's toggleButtonVariants (base "toggle-button" + isIconOnly
+ * "toggle-button--icon-only" + one size class always present; confirmed in
+ * styles/src/components/toggle-button/toggle-button.styles.ts). Every rule is scoped under
+ * [data-theme^="tzuchi"]. Colour rule: grepped clean for --tc-color-*, any colour-valued component
+ * token, hex/rgb/hsl/oklch literals, !important and physical left/right — only --tc-button-radius,
+ * --tc-icon-button-radius, --tc-radius-full, --tc-font-size-16, --tc-font-weight-bold,
+ * --tc-line-height-normal, --tc-size-control-md/-lg, --tc-size-icon-sm/-md/-lg and
+ * --tc-space-4/-8/-12/-16/-24/-32 are used, all confirmed mode-independent dimension/number tokens
+ * in packages/tokens/dist/tokens.css (grepped both the [data-theme="dark"] and
+ * prefers-color-scheme:dark blocks — none redefine any of them); no new --tzuchi-* theme variable
+ * is introduced, only local calc helpers. Cascade re-derived by hand for every declaration against
+ * the real base-CSS specificities, including the md:/sm: breakpoint variants — every table row above
+ * checked out. No variant, size or state is hidden or flattened. Comment safety: comment-open and
+ * comment-close markers balance (14 and 14), no glob immediately followed by a slash outside a
+ * comment terminator. Assertions
+ * re-verified against storybook-static/index.json (components-buttons-togglebutton--default exists;
+ * the Default story's Template renders two <ToggleButton size="md"> instances, unselected, so
+ * `.toggle-button` matches the first one) and against the resolved values in
+ * packages/tokens/dist/tokens.css; all five kept as-is.
+ * ------------------------------------------------------------------------------------------------ */
+
+/* ---------------------------------------------------------------------------
+ * Shape, density and typography — R22, R1, R40, R43
+ * ------------------------------------------------------------------------ */
+
+[data-theme^="tzuchi"] .toggle-button {
+  /* R22 — the Control radius, the same token .button uses. */
+  border-radius: var(--tc-button-radius, var(--radius));
+
+  /* R1 — control label: subtitle, 700 16px/1.5. */
+  font-size: var(--tc-font-size-16, 16px);
+  font-weight: var(--tc-font-weight-bold, 700);
+  line-height: var(--tc-line-height-normal, 1.5);
+
+  /* R43 — md padding-inline. */
+  padding-inline: var(--tc-space-24, 24px);
+
+  /*
+   * R40 — 42px = 24px line box (16px x 1.5) + 2 x 8px padding-block + 2 x 1px border, the Control
+   * height formula. Replaces h-10 / md:h-9: Tzu Chi has one density at every viewport.
+   */
+  --tzuchi-toggle-button-block-size: calc(
+    var(--tc-font-size-16, 16px) * var(--tc-line-height-normal, 1.5) +
+      var(--tc-space-8, 8px) * 2 + 2px
+  );
+  height: var(--tzuchi-toggle-button-block-size);
+}
+
+/* R42 — same line box, padding-block 4px, padding-inline 16px -> 34px. */
+[data-theme^="tzuchi"] .toggle-button--sm {
+  padding-inline: var(--tc-space-16, 16px);
+  --tzuchi-toggle-button-block-size: calc(
+    var(--tc-font-size-16, 16px) * var(--tc-line-height-normal, 1.5) +
+      var(--tc-space-4, 4px) * 2 + 2px
+  );
+}
+
+/* R44 — same line box, padding-block 12px, padding-inline 32px -> 50px.
+ * (The base's `text-base` on this size is already 16px, so type does not change with size.) */
+[data-theme^="tzuchi"] .toggle-button--lg {
+  padding-inline: var(--tc-space-32, 32px);
+  --tzuchi-toggle-button-block-size: calc(
+    var(--tc-font-size-16, 16px) * var(--tc-line-height-normal, 1.5) +
+      var(--tc-space-12, 12px) * 2 + 2px
+  );
+}
+
+/* ---------------------------------------------------------------------------
+ * Icon-only — R24, R45–R47, mirroring ./button.css's icon-only section
+ * ------------------------------------------------------------------------ */
+
+/*
+ * R24 full circle, plus the md size pair (R46: 48px box, 32px glyph).
+ * padding-inline: 0 is needed because the `.toggle-button` rule above out-specifies the base's
+ * own `.toggle-button--icon-only { p-0 }` (0,2,0 vs 0,1,0) — the same repair ./button.css makes.
+ */
+[data-theme^="tzuchi"] .toggle-button--icon-only {
+  --tzuchi-toggle-button-size: var(--tc-size-control-md, 48px);
+  --tzuchi-toggle-button-icon-size: var(--tc-size-icon-md, 32px);
+
+  border-radius: var(--tc-icon-button-radius, var(--tc-radius-full, 9999px));
+  padding-inline: 0;
+}
+
+/* R45 — no Tzu Chi counterpart for sm; keeps md's 8px ring around a 20px glyph: 20 + 2 x 8 = 36px. */
+[data-theme^="tzuchi"] .toggle-button--icon-only.toggle-button--sm {
+  --tzuchi-toggle-button-size: calc(
+    var(--tc-size-icon-sm, 20px) + var(--tc-space-8, 8px) * 2
+  );
+  --tzuchi-toggle-button-icon-size: var(--tc-size-icon-sm, 20px);
+}
+
+/* R47 — 64px box, 40px glyph. */
+[data-theme^="tzuchi"] .toggle-button--icon-only.toggle-button--lg {
+  --tzuchi-toggle-button-size: var(--tc-size-control-lg, 64px);
+  --tzuchi-toggle-button-icon-size: var(--tc-size-icon-lg, 40px);
+}
+
+/*
+ * The box. (0,3,0) — one class more than `.toggle-button { height }` above, which it
+ * intentionally supersedes for icon-only only. width and height can share a rule here because
+ * ToggleButton has no `--full-width` modifier of its own: a full-width group stretches its cells
+ * with `flex: 1` (flex-basis 0%), which outranks `width` for a flex item, so that still works.
+ */
+[data-theme^="tzuchi"] .toggle-button.toggle-button--icon-only {
+  height: var(--tzuchi-toggle-button-size);
+  width: var(--tzuchi-toggle-button-size);
+}
+
+/*
+ * R45–R47 — the glyph is a fixed square per size. The base's own symmetric -mx-0.5 / my-0.5
+ * optical margins are left in place: on a flex-centred single child in a fixed box they move
+ * nothing. Tzu Chi has no >=640px icon step, so the base's `sm:size-4` densification does not
+ * apply to an icon-only toggle; a labelled toggle keeps it.
+ */
+[data-theme^="tzuchi"] .toggle-button--icon-only svg {
+  width: var(--tzuchi-toggle-button-icon-size);
+  height: var(--tzuchi-toggle-button-icon-size);
+}

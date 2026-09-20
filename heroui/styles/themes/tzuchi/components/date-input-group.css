@@ -1,0 +1,231 @@
+/*
+ * Tzu Chi theme — DateInputGroup
+ * ---------------------------------------------------------------------------
+ * Base:   styles/components/date-input-group.css — `.date-input-group`,
+ *         `.date-input-group__input`, `.date-input-group__input-container`,
+ *         `.date-input-group__segment`, `.date-input-group__prefix`,
+ *         `.date-input-group__suffix`, `.date-input-group--primary`,
+ *         `.date-input-group--secondary`, `.date-input-group--full-width`.
+ * Model:  no tc counterpart. DateInputGroup is the SHELL of both DateField and
+ *         TimeField (react/src/components/date-field/index.ts and
+ *         time-field/index.ts both map `.Group` onto DateInputGroupRoot), so
+ *         this one file themes both. It is styled as the Input shape, per
+ *         DESIGN-LANGUAGE §3.4: "New field-family components (InputGroup,
+ *         NumberField, DateField/DateInputGroup, ComboBox input,
+ *         ColorField/ColorInputGroup, TimeField, InputOTP) follow R49-R54 —
+ *         the Input shape, not the Select shape."
+ *         Cross-checked against the shipped input.css and search-field.css so
+ *         a DateField sitting beside an Input in a form is the same field.
+ *
+ * VARIANT MAPPING
+ *   tc-input `.control` (one single look)  <->  .date-input-group and
+ *                                               .date-input-group--primary
+ *   — no tc equivalent —                  <->  .date-input-group--secondary
+ *        (neutral `--default` fill; it inherits every rule below, because they
+ *        all hang off the shared BEM classes, and it keeps the theme-wide 1px
+ *        `--field-border`: every Tzu Chi field is bordered — D13)
+ *   host-level width in tc                <->  .date-input-group--full-width
+ *        (untouched)
+ *
+ * WHAT THIS CHANGES — height, type, density and two state edges only.
+ * Radius (8px via --field-radius), border width (1px), border/background/text/
+ * placeholder colour, the flattened field shadow, the disabled opacity and
+ * cursor and the font family all already resolve to the Tzu Chi values through
+ * themes/tzuchi/variables.css. None of that is repeated here (N5 / D1).
+ *
+ *   1. HEIGHT   `h-9` (a fixed 36px) becomes content-driven with a 43.6px
+ *      floor — R41/R49, the identical calc search-field.css:98-105 uses
+ *      (1 + 8 + 25.6 + 8 + 1). The segments' own line box lands on exactly
+ *      that number, so the shell is the themed Input's height, not taller.
+ *   2. TYPE     14px shell text and the input's `text-base sm:text-sm`
+ *      step-down both become 16px/1.6 at every width — §1 (Tzu Chi has no 14px
+ *      step) and R2 (field value = 400 16px/1.6). The segments inherit it from
+ *      `.date-input-group__input`, so the date reads at the Input's size.
+ *   3. DENSITY  the input's inline inset goes 12px -> 20px — R50, tc
+ *      `.control` (8px 20px). HeroUI's own `ps-2` / `pe-2` affix rules are
+ *      (0,3,0) and keep the 8px gap beside a prefix/suffix, which is exactly
+ *      tc's model (pad 20px at the edge, gap 8px to a slot) — R53.
+ *   4. AFFIXES  prefix/suffix move from `ms-3`/`me-3` (12px) to 20px from the
+ *      shell edge — R53, the same inset search-field.css:176-201 gives the
+ *      magnifier and the clear button.
+ *   5. SEGMENT  `rounded-md` (6px) becomes 4px. 6px is not on the Tzu Chi
+ *      radius scale (0 / 4 / 8 / 16 / 9999); the segment's corner is only ever
+ *      visible as the shape of its focused/selected fill, which is R34's role
+ *      ("focus-shape on an inline element" -> --tc-radius-sm).
+ *   6. FOCUS    the border turns `--field-border-focus` — R67. The base file
+ *      forgot it here exactly as it did on SearchField: it applies only
+ *      `status-focused-field` (the 2px ring) and leaves the edge resting grey,
+ *      while `.input` (input.css:29) and `.input-group` (input-group.css:36)
+ *      both paint it. HeroUI's guard — do not light the field up when a
+ *      DatePicker / DateRangePicker trigger INSIDE the group is what is
+ *      focused — is mirrored verbatim so that behaviour is preserved.
+ *   7. INVALID  the border turns `--danger` and survives hover — R68/R69,
+ *      mirroring tc-input and the shipped Input, Textarea and SearchField
+ *      overrides. Upstream points it at `--color-field-border-invalid`, a
+ *      variable nothing under styles/ ever defines (grep: it is referenced in
+ *      six base files and declared in none), so the declaration is invalid at
+ *      computed-value time and the edge falls back to currentColor.
+ *
+ * KEPT DELIBERATELY
+ *   · The focus RING. tc uses a 3px pale halo; HeroUI uses the 2px `--focus`
+ *     ring. D21 / §11 I1: Input, SearchField and Select all keep the ring, so
+ *     this field focuses identically to them. No box-shadow is re-declared
+ *     (R74).
+ *   · The focused-segment fill `bg-accent-soft` + `text-accent-soft-foreground`
+ *     — that is already R78 (hover / cursor on a neutral surface ->
+ *     `--accent-soft`) expressed in HeroUI's own tokens, and `--accent-soft`
+ *     already resolves to the Tzu Chi brand tint in both modes. The invalid
+ *     segment's `bg-danger-soft` is its R86 counterpart. Nothing to do.
+ *   · Segment `px-0.5` (2px), `text-end`, `text-nowrap`, the literal
+ *     separator's `text-muted`, the placeholder colour, and the segment's
+ *     `opacity-50` when disabled (D2 — disabled treatment is not re-litigated;
+ *     note it compounds with the group's own `status-disabled`, which is
+ *     upstream behaviour in every theme).
+ *   · The prefix/suffix colour and any icon sizing: in every stock story the
+ *     affix content is author-supplied with its own `size-4 text-muted`
+ *     utilities, which live in the utilities layer and outrank this file by
+ *     design. R54's 20px accent magnifier is SearchField's own mark and has no
+ *     counterpart here.
+ *   · `overflow-hidden`, `gap-px`, the input-container's scroll behaviour, the
+ *     `slot="start"` / `slot="end"` range-separator rules (they are (0,4,0) and
+ *     still win over the 20px inset), the 150ms base transitions and the
+ *     `--secondary` fill (D13).
+ *
+ * CASCADE NOTES
+ *   · The focus rule is `&:is(:focus-within, [data-focus-within="true"])` —
+ *     `:is()` takes the specificity of its most specific argument, so both
+ *     branches land on (0,3,0), and the `:not(:where(:has(...)))` guard adds
+ *     nothing (`:where()` is always zero). That is deliberate: the invalid
+ *     rule below is also (0,3,0) and, declared later in the same layer, wins —
+ *     so a focused invalid field keeps the danger edge, as tc-input does and
+ *     as search-field.css:123-127 requires.
+ *   · The base hover rule is (0,3,0) — `.date-input-group:hover:not(
+ *     :focus-within)` — a tie with the plain invalid rule that would be
+ *     decided by import order alone. R69's mirror ( +[data-invalid] on both
+ *     forms, inside `@media (hover: hover)` ) makes it (0,5,0) and win
+ *     outright, so hovering an invalid, unfocused field cannot repaint the
+ *     border `--field-border-hover`.
+ *   · Every rule here is (0,2,0) or better against base declarations that are
+ *     (0,1,0), including the `sm:` breakpoint step-down, which compiles to a
+ *     nested media query on the same (0,1,0) selector.
+ *
+ * Reviewed: no changes. Verified against styles/components/date-input-group.css,
+ * react/src/components/date-picker/date-picker.tsx (data-slot="date-picker-trigger"
+ * at :124) and date-range-picker/date-range-picker.tsx (:129), the DateField/
+ * TimeField -> DateInputGroup composition (date-field/index.ts:3-25,
+ * time-field/index.ts:3-25), tokens.css (all seven --tc-* tokens present,
+ * mode-independent, every reference carries a fallback), themes/tzuchi/
+ * variables.css (--field-border-focus/--danger present and mode-flipped at
+ * :61/:50 light, :104/:93 dark; --color-field-border-invalid confirmed
+ * referenced-and-never-declared across all six base files that use it), and
+ * the existing input.css / search-field.css overrides (R67/R68/R69 applied
+ * identically, same cascade shape). Hand-re-derived every specificity pair,
+ * including the deliberate (0,3,0) focus rule via :is()/:not(:where(:has(...)))
+ * — lower than base's (0,4,0) :not(:has(...)) form but never competing on
+ * border-color, since status-focused-field (focus-field-ring) never sets it.
+ * Brace/comment counts balanced (10/10, 15/15); no premature comment close;
+ * no colour literal, no --tc-color-*, no !important, no physical property.
+ * No file for date-field.css / time-field.css needed: confirmed against
+ * styles/components/date-field.css and time-field.css (both are the identical
+ * 20-line 4px label/group/description stack HeroUI's own `.textfield`
+ * precedent already goes unthemed for) — nothing in the spec applies to them
+ * beyond R141/R142, which are already correct theme-wide.
+ */
+
+[data-theme^="tzuchi"] {
+  /* ---------------------------------------------------------------- shell -- */
+  .date-input-group {
+    /* R41/R49 — the field height formula: a 16px/1.6 line box + 2x8px block
+       padding + 2x1px border = 43.6px. `h-9` (36px) only ever fitted HeroUI's
+       own 14px/20px text. Content-driven with a floor, as on SearchField, so a
+       granularity that stacks more segments can still grow. */
+    block-size: auto;
+    min-block-size: calc(
+      var(--tc-font-size-16, 16px) * var(--tc-line-height-relaxed, 1.6) + 2 *
+        var(--tc-space-8, 8px) + 2 * var(--field-border-width, 1px)
+    );
+
+    /* §1 — the shell's `text-sm` is a 14px role, and Tzu Chi has no 14px step.
+       R2 (field value): 400 16px/1.6. This is the text context the prefix and
+       suffix inherit; the input restates it below because it carries its own
+       `text-base sm:text-sm`. */
+    font-size: var(--tc-font-size-16, 16px);
+    line-height: var(--tc-line-height-relaxed, 1.6);
+
+    /* R67 — focus paints the border, not only a ring, as on `.input` and
+       `.input-group`. The `:not(:where(:has(...)))` guard reproduces the base
+       file's own exclusion (date-input-group.css:27-44) so that focusing a
+       DatePicker / DateRangePicker trigger inside the group still does NOT
+       light up the whole field; `:where()` keeps it specificity-free. */
+    &:is(:focus-within, [data-focus-within="true"]):not(
+        :where(
+          :has(
+            [data-slot="date-picker-trigger"]:focus,
+            [data-slot="date-picker-trigger"][data-focused="true"],
+            [data-slot="date-range-picker-trigger"]:focus,
+            [data-slot="date-range-picker-trigger"][data-focused="true"]
+          )
+        )
+      ) {
+      border-color: var(--field-border-focus);
+    }
+
+    /* R68 — tc's field rule: the edge itself turns the error colour and stays
+       there through hover AND focus. Declared after the focus rule on purpose:
+       equal specificity, later wins. */
+    &[data-invalid="true"] {
+      border-color: var(--danger);
+
+      /* R69 — the hover-vs-invalid trap. Mirror both forms of the base hover
+         selector with [data-invalid] appended so this cannot be decided by
+         import order. */
+      @media (hover: hover) {
+        &:hover:not(:focus-within),
+        &[data-hovered="true"]:not([data-focus-within="true"]) {
+          border-color: var(--danger);
+        }
+      }
+    }
+  }
+
+  /* ----------------------------------------------------------------- text -- */
+  .date-input-group__input {
+    /* R50 — tc `.control`: padding 8px 20px. The 8px block padding already
+       matches `py-2`, so only the inline inset moves (12px -> 20px). Beside an
+       affix, HeroUI's own `ps-2` / `pe-2` rules are (0,3,0) and keep the 8px
+       gap — exactly tc's "pad 20px, gap 8px" model (R53). */
+    padding-inline: var(--tc-space-20, 20px);
+
+    /* R2 — one body size at every width; HeroUI's `sm:text-sm` shrinks to
+       14px/20px above 40rem. Stated explicitly rather than inherited so the
+       field value type cannot drift if the shell's context changes. The
+       segments carry no size of their own and inherit this. */
+    font-size: var(--tc-font-size-16, 16px);
+    line-height: var(--tc-line-height-relaxed, 1.6);
+  }
+
+  /* -------------------------------------------------------------- segment -- */
+  .date-input-group__segment {
+    /* R34 — the segment's corner is only ever visible as the shape of its
+       focused / invalid fill, which is the same role link.css:40 themes at
+       --tc-radius-sm. HeroUI's `rounded-md` resolves to 6px under this theme
+       (--radius * 0.75), a step the Tzu Chi radius scale does not have
+       (0 / 4 / 8 / 16 / 9999). Everything else about the segment — its 2px
+       inline padding, its editing affordances and its accent-soft focus fill
+       (already R78) — is left exactly as HeroUI has it. */
+    border-radius: var(--tc-radius-sm, 4px);
+  }
+
+  /* -------------------------------------------------------------- affixes -- */
+  .date-input-group__prefix {
+    /* R53 — 20px from the shell edge, leaving the 8px gap to the text that the
+       base `ps-2` rule already provides. HeroUI's `ms-3` is 12px. */
+    margin-inline-start: var(--tc-space-20, 20px);
+  }
+
+  .date-input-group__suffix {
+    /* Mirror of the prefix inset so the text box is symmetrical (base `me-3`
+       is 12px, and the base `pe-2` keeps the 8px gap to the text). */
+    margin-inline-end: var(--tc-space-20, 20px);
+  }
+}

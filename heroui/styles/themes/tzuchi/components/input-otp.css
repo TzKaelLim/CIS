@@ -1,0 +1,150 @@
+/*
+ * Tzu Chi theme — InputOTP
+ * ---------------------------------------------------------------------------
+ * Base:   styles/components/input-otp.css — `.input-otp`, `.input-otp__group`,
+ *         `.input-otp__slot`, `.input-otp__slot-value`, `.input-otp__caret`,
+ *         `.input-otp__separator`, `.input-otp--primary`,
+ *         `.input-otp--secondary`.
+ * Model:  no tc counterpart (DESIGN-LANGUAGE §12 Q8 lists InputOTP among the
+ *         components with no Tzu Chi original at all). Two rules place it:
+ *         §3.4 names InputOTP among the new field-family components that
+ *         "follow R49-R54 — the Input shape, not the Select shape", and R21
+ *         files "OTP digits" under NO EVIDENCE -> derive from R1 (a label
+ *         inside a control), R5 (prose) or R16 (a dense numeric grid).
+ *         The cell is a field shell; the digit is the control's own content
+ *         and HeroUI already sets it bold, so R1 is the derivation used here.
+ *
+ * VARIANT MAPPING
+ *   — no tc equivalent —  <->  .input-otp / .input-otp--primary  (bordered
+ *        field cell; every rule below hangs off `.input-otp__slot`, so both
+ *        variants get them)
+ *   — no tc equivalent —  <->  .input-otp--secondary  (neutral `--default`
+ *        fill, which the theme already maps to the Tzu Chi neutral — D13/R88)
+ *
+ * WHAT THIS CHANGES — the cell's height, its type and two state edges.
+ * The cell's 8px radius (`rounded-field`), its 1px `--field-border`, its
+ * `--field-background`, the flattened field shadow, the 2px `--focus` ring and
+ * the 0.38 disabled opacity already resolve to the Tzu Chi values through
+ * themes/tzuchi/variables.css and are not repeated here (N5 / D1).
+ *
+ *   1. HEIGHT   `h-10` (a fixed 40px) becomes content-driven with the shared
+ *      field floor of 43.6px — R41/R49, the identical calc input.css,
+ *      textarea.css and search-field.css land on. An OTP row is a field row:
+ *      set beside a themed Input in the same form it must not read 3.6px
+ *      short. The cell has no padding of its own — it centres a single glyph —
+ *      so the formula is used as the family's height, not as a padding sum.
+ *      Width (`w-9.5` + `flex-1`) is layout geometry the spec is silent on and
+ *      is left alone, as is R50's 20px text inset, which has no meaning for a
+ *      centred single character.
+ *   2. TYPE     the cell's `text-sm font-semibold` (14px / 600) becomes
+ *      16px / 700 / 1.5 — §1 (no 14px step) and §1.2 (a control's own content
+ *      is the subtitle voice, 1.5), with 700 the Tzu Chi weight nearest 600
+ *      (the scale is 400 / 500 / 700 and R1's control text is 700).
+ *      `.input-otp__slot-value`'s `text-lg` (18px) follows to 16px: 18px is
+ *      not on the Tzu Chi type scale (16 / 20 / 24 / 26 / 34 / 46) and R21's
+ *      three candidate roles for an OTP digit are all 16px. Its `leading-6`
+ *      is left untouched because 24px is already exactly 16 x 1.5.
+ *   3. FOCUS    the active cell's border turns `--field-border-focus` — R67.
+ *      The base gives it `bg-field-focus` and the ring but leaves the edge at
+ *      the resting grey, the same omission SearchField had; `.input`
+ *      (input.css:29) paints the edge on focus, so the themed OTP cell now
+ *      focuses like the themed Input.
+ *   4. INVALID  the cell's border turns `--danger` — R68. The base invalid
+ *      rule sets a background and the 1px danger outline but never touches
+ *      border-color, so an invalid OTP row kept a neutral edge while every
+ *      other themed field turns red.
+ *
+ * KEPT DELIBERATELY
+ *   · The focus RING and the 1px danger outline (D21 / R68) — no box-shadow is
+ *     re-declared (R74).
+ *   · `bg-field-focus` on the active and filled cells, the `--secondary` fill
+ *     and every other colour (D13 / R88).
+ *   · The caret (`h-4 w-[2px] rounded-sm bg-field-placeholder`, already 4px =
+ *     --tc-radius-sm) and its blink, the separator dash, the slot-value
+ *     entrance animation and `tracking-[-0.27px]`: the spec is silent on all
+ *     of them, R140 forbids new choreography, and the letter-spacing is a
+ *     single-glyph nicety, not a type-scale value.
+ *   · Disabled. The root's `opacity-50` compounds with the slot's
+ *     `status-disabled` (0.38 under this theme) — an upstream double-dip that
+ *     exists in HeroUI's own themes too. D2 says disabled treatment is not
+ *     re-litigated per component, and lowering 0.5 to 0.38 would only make the
+ *     compound darker. Flagged in the report, not changed.
+ *   · The 8px gaps on `.input-otp` and `.input-otp__group` — already on the
+ *     Tzu Chi 4px rhythm (--tc-space-8).
+ *
+ * CASCADE NOTES
+ *   · `[data-theme^="tzuchi"] .input-otp__slot` is (0,2,0) against base
+ *     declarations at (0,1,0), and ties with `.input-otp--secondary
+ *     .input-otp__slot` (0,2,0) — but that rule only sets backgrounds, so
+ *     nothing here contradicts it.
+ *   · The state rules are (0,3,0), which beats the base hover rule
+ *     `.input-otp__slot:hover` / `[data-hovered="true"]` (0,2,0) outright —
+ *     unlike `.input`, the base hover here carries no `:not(:focus)` guard, so
+ *     an active or invalid cell could otherwise be repainted
+ *     `--field-border-hover` under the pointer. The invalid rule is declared
+ *     after the active rule (equal specificity, later wins) so an invalid cell
+ *     being edited keeps the danger edge.
+ *
+ * Reviewed: no changes. Verified against styles/components/input-otp.css
+ * (h-10/w-9.5, text-sm font-semibold, text-lg leading-6, the root opacity-50
+ * at :5-7 and slot status-disabled at :54-56, the unguarded hover rule at
+ * :35-41), react/src/components/input-otp/input-otp.stories.tsx (Default
+ * story renders exactly .input-otp__slot / .input-otp__slot-value, no
+ * selector invented), tokens.css (--tc-font-size-16, --tc-font-weight-bold,
+ * --tc-line-height-normal all present, mode-independent, fallbacks intact),
+ * and the shared field formula in input.css / search-field.css (identical
+ * 43.6px calc). Confirmed the OTP disabled double-dip (0.5 x 0.38 = 0.19) is
+ * a real upstream defect in the base file, not introduced or worsened here,
+ * and correctly left alone per D2. Brace/comment counts balanced (5/5, 8/8);
+ * no premature comment close; no colour literal, no --tc-color-*, no
+ * !important, no physical property.
+ */
+
+[data-theme^="tzuchi"] {
+  /* ----------------------------------------------------------------- cell -- */
+  .input-otp__slot {
+    /* R41/R49 — the field family's height: a 16px/1.6 line box + 2x8px block
+       padding + 2x1px border = 43.6px. The cell itself has no padding (it
+       centres one glyph), so this is applied as a floor on a content-driven
+       box, exactly as search-field.css:98-105 does, and the row lines up with
+       a themed Input beside it. HeroUI's `h-10` is a flat 40px. */
+    block-size: auto;
+    min-block-size: calc(
+      var(--tc-font-size-16, 16px) * var(--tc-line-height-relaxed, 1.6) + 2 *
+        var(--tc-space-8, 8px) + 2 * var(--field-border-width, 1px)
+    );
+
+    /* §1 / R1 via R21 — 14px and 600 are both off the Tzu Chi scale. The cell
+       is the text context its value inherits, so the size and weight are set
+       here: 16px, 700, and the control line-height 1.5 (§1.2). */
+    font-size: var(--tc-font-size-16, 16px);
+    font-weight: var(--tc-font-weight-bold, 700);
+    line-height: var(--tc-line-height-normal, 1.5);
+
+    /* R67 — the cell being edited paints its edge, as `.input` does on focus.
+       (0,3,0) also outranks the unguarded base hover rule, so the active cell
+       keeps this edge under the pointer. */
+    &[data-active="true"] {
+      border-color: var(--field-border-focus);
+    }
+
+    /* R68 — an invalid field's edge turns danger, as on Input, Textarea,
+       SearchField and Select. Declared after the active rule on purpose:
+       equal specificity, later wins, so an invalid cell being edited keeps the
+       danger edge. */
+    &[data-invalid="true"] {
+      border-color: var(--danger);
+    }
+  }
+
+  /* ---------------------------------------------------------------- digit -- */
+  .input-otp__slot-value {
+    /* R21 -> R1 — HeroUI steps the digit up to `text-lg` (18px), a size the
+       Tzu Chi scale does not have (16 / 20 / 24 / 26 / 34 / 46); all three
+       roles R21 offers for an OTP digit are 16px, and the emphasis is carried
+       by the 700 weight inherited from the cell. `leading-6` is deliberately
+       left in place: 24px is already exactly 16px x 1.5, the control line
+       box. */
+    font-size: var(--tc-font-size-16, 16px);
+  }
+}

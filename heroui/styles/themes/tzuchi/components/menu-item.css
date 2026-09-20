@@ -1,0 +1,141 @@
+/* ==========================================================================
+   Menu item — Tzu Chi option-row geometry and type (global)
+   --------------------------------------------------------------------------
+   Destination: styles/themes/tzuchi/components/menu-item.css, imported into
+   the "components" layer AFTER heroui/styles/components/menu-item.css. Every
+   rule is scoped by [data-theme^="tzuchi"], so upstream's own light/dark
+   themes are provably untouched.
+
+   MODEL: tc `.option` — packages/components/src/dropdown/tc-dropdown.styles.ts
+   :82-93 — `padding: 8px 32px`, square full-bleed rows,
+   `font: var(--tc-typography-subtitle)` = 700 16px/1.5.
+   Spec §1.1 R4 (option row) and §3.5 R57 (option row geometry).
+
+   WHY THIS FILE EXISTS — AND HOW IT SITS NEXT TO dropdown.css
+   Pass 1 gave the tc option shape to menu rows, but only inside the Dropdown:
+   every rule in dropdown.css:97-160 is scoped to `.dropdown__popover`. Pass 2
+   gave the SAME shape to `.list-box-item` GLOBALLY (list-box-item.css:50-79),
+   deliberately: "putting the row GEOMETRY here is what makes an option look
+   the same wherever it is rendered". A `.menu-item` rendered outside a
+   Dropdown — a standalone <Menu>, a Menu in a Popover — is the remaining hole:
+   it still draws HeroUI's inset 16px-rounded 14px pill. This file closes it by
+   restating list-box-item.css's rule set against `.menu-item`, so a Menu row
+   and a ListBox row are the same row.
+
+   It does not contradict dropdown.css: every declaration below that also
+   reaches a row inside `.dropdown__popover` carries the value dropdown.css
+   already gives it there (radius 0, 8px/32px padding, 16px/1.5 type, label
+   weight 700). The two additions inside a Dropdown are the ones
+   list-box-item.css makes and dropdown.css did not: `font-weight: 700` on the
+   ROW rather than only on `[data-slot="label"]`, and the 400 reset that the
+   row weight then makes necessary on `[data-slot="description"]`.
+
+   COLOUR IS DELIBERATELY ABSENT, for exactly the reason list-box-item.css
+   gives (:19-25): tc's option colours only make sense on tc's tinted listbox
+   panel, which in HeroUI is the Dropdown / Select popover — so they stay in
+   dropdown.css and select.css. A Menu on an untinted surface keeps HeroUI's
+   neutral `--default` hover, which the theme already maps to a Tzu Chi grey
+   (spec §5 R88 ①). Nothing here is mode-dependent.
+
+   WHAT THIS CHANGES
+     radius         menu-item.css:6 `rounded-2xl` = 16px  -> 0          (R57)
+     padding-block  menu-item.css:6 `py-1.5` = 6px        -> 8px        (R57)
+     padding-inline menu-item.css:6 `px-2` = 8px          -> 32px       (R57)
+     font-size      inherited; `.label` (label.css:4) re-asserts `text-sm`
+                    = 14px                                -> 16px       (R4)
+     line-height    20px via `text-sm`                    -> 1.5 = 24px (R4)
+     font-weight    `.label`'s `font-medium` = 500        -> 700        (R4)
+     Row content 24px + 16px padding = 40px; HeroUI's `min-h-9` (36px) never
+     binds but is kept as the floor for label-less rows.
+
+   LEFT AS HeroUI'S (spec §10 D16, the ListBoxItem twin of this component)
+     `min-h-9`, `gap-3` (icon-to-label, no tc equivalent), the absolutely
+     positioned 16px `.menu-item__indicator` (start-2 / end-2 — the 32px text
+     inset clears its 8+16 = 24px box), the `.menu-item__indicator--submenu`
+     chevron, the pressed `scale(0.98)`, the focus ring, `status-disabled`,
+     the `@media (hover: hover)` `bg-default` hover fill, all transitions,
+     the checkmark / dot indicator motion, and `.menu-item--danger`'s label
+     and indicator colours (D12). No variant, size or state is hidden.
+
+   CASCADE (hand-derived; the theme's components/index.css loads after
+   @heroui/styles in the same "components" layer, so ties go to this file)
+     [data-theme^="tzuchi"] .menu-item                        (0,2,0)
+       beats  .menu-item                                      (0,1,0)
+       ties   .menu-item:has(.menu-item__indicator) `ps-7`    (0,2,0) -> later
+       ties   .dropdown__popover [data-slot="menu-item"] `px-2.5` (0,2,0)
+              -> later, and dropdown.css already restates it at (0,3,0)
+       LOSES to .menu-item[data-has-submenu="true"]:has(.menu-item__indicator)
+              `ps-2 pe-7`                                     (0,3,0)
+              -> hence the second rule below, at (0,4,0).
+     [data-theme^="tzuchi"] .menu-item [data-slot="label"]    (0,3,0)
+       beats  .label                                          (0,1,0)
+       and does not touch `.menu-item--danger [data-slot="label"]`'s colour
+              (0,2,0), which is the only thing that rule sets.
+
+   Reviewed: no changes. Verified against the live files — `.menu-item`
+   carries both the class and `data-slot="menu-item"` (menu-item.tsx:34-40),
+   `.menu-item__indicator` is the class on the SAME element the submenu
+   chevron renders (menu-item.styles.ts:12, `submenuIndicator: "menu-item__
+   indicator menu-item__indicator--submenu"`, applied at menu-item.tsx:151),
+   so `:has(.menu-item__indicator)` really does match every submenu row, not
+   a rare case; `.label`
+   / `.description` and their base rules (label.css:4, description.css:2-4)
+   match. Every rule is scoped under [data-theme^="tzuchi"]. Every token
+   (--tc-space-8/-32, --tc-font-size-16, --tc-line-height-normal,
+   --tc-font-weight-bold/-regular) is confirmed mode-independent in
+   packages/tokens/dist/tokens.css (:root only, none in the [data-theme=
+   "dark"] block) — no colour, no shadow, no `!important`, no physical
+   left/right, no comment closed early. The hand-derived cascade above was
+   checked property by property against dropdown.css and list-box-item.css:
+   nothing here contradicts a declaration either file makes on the same
+   selector; the two rows that are additive inside a Dropdown (row-level
+   font-weight 700, the description's 400 reset) are recorded as a spec gap
+   (dropdown.css sets the label's weight only) in the unit report, not a
+   defect. No variant/size/state is hidden. No corrections required.
+   ========================================================================== */
+
+[data-theme^="tzuchi"] .menu-item {
+  /* tc-dropdown.styles.ts:82-93 — full-bleed square rows, where HeroUI draws
+     inset 16px-rounded pills. This also wins over the base
+     `:has(.menu-item__indicator) { ps-7 }` variant by source order: the
+     indicator is absolutely positioned and still clears the 32px text inset. */
+  border-radius: 0;
+  padding-block: var(--tc-space-8, 8px);
+  padding-inline: var(--tc-space-32, 32px);
+
+  /* tc-dropdown.styles.ts:88 — `font: var(--tc-typography-subtitle)`
+     = 700 16px/1.5. Longhands only, so the theme's --font-sans stack is not
+     re-declared. Content 24px + 16px padding = 40px per row. Identical to
+     list-box-item.css:63-65. */
+  font-size: var(--tc-font-size-16, 16px);
+  line-height: var(--tc-line-height-normal, 1.5);
+  font-weight: var(--tc-font-weight-bold, 700);
+
+  /* `.label` re-asserts `text-sm` / `font-medium` on its own (label.css:4).
+     Colour is left alone here: on an untinted Menu `text-foreground` is right,
+     and inside the Dropdown's tinted panel dropdown.css:123-128 already hands
+     the label `color: inherit`. */
+  & [data-slot="label"] {
+    font-size: inherit;
+    line-height: inherit;
+    font-weight: var(--tc-font-weight-bold, 700);
+  }
+
+  /* `.description` (description.css:2-4) sets no weight of its own, so it
+     would inherit the 700 above. tc has no description row; keep it at
+     HeroUI's normal weight, exactly as list-box-item.css:76-78 does. */
+  & [data-slot="description"] {
+    font-weight: var(--tc-font-weight-regular, 400);
+  }
+}
+
+/* The one base rule that outranks the block above: a row that both opens a
+   submenu and carries an indicator gets `ps-2 pe-7` at (0,3,0). Note that the
+   submenu chevron itself carries the `.menu-item__indicator` class
+   (menu-item.styles.ts:12), so this compound matches EVERY submenu row, not a
+   rare corner. Re-point it at the same 32px inset — the chevron is absolutely
+   positioned at `end-2` in a 16px box, i.e. 8 to 24px from the edge, so the
+   32px text inset clears it. (0,4,0). */
+[data-theme^="tzuchi"] .menu-item[data-has-submenu="true"]:has(.menu-item__indicator) {
+  padding-inline: var(--tc-space-32, 32px);
+}

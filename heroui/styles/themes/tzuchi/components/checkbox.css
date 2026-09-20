@@ -1,0 +1,142 @@
+/* ==========================================================================
+   Checkbox — Tzu Chi theme overrides
+   Destination: styles/themes/tzuchi/components/checkbox.css (layer: components,
+   imported after ../../../components/checkbox.css).
+
+   WHAT THIS CHANGES (shape / density / type only — colour comes from the
+   generated HeroUI theme variables, never from --tc-color-*):
+
+   1. Control box   16px  -> 32px  (--tc-checkbox-size = size.icon.md)
+   2. Control radius 6px  ->  4px  (--tc-checkbox-radius = radius.sm; HeroUI's
+                                    rounded-md resolves to 6px under --radius: 8px)
+   3. Border width   1px  ->  2px  (tc-checkbox.styles.ts:25)
+   4. Unselected border  --field-border (gray-300) -> the "strong" border the
+      Tzu Chi checkbox uses, via --tzuchi-checkbox-border (fallback --muted)
+   5. Selected/indeterminate borders now join the fill colour (--accent /
+      --danger), matching tc (border == fill == brand.primary). HeroUI leaves
+      the selected border `transparent` (relying on the `::before` fill), which
+      at 2px shows a ring of --field-background around the accent square; for
+      indeterminate HeroUI never touches the border at all, so it would
+      otherwise stay the default gray field-border around an accent-filled box.
+      Both are re-pointed at the fill colour here.
+   6. Hover border  --field-border-hover (blue-500) -> --accent (brand primary)
+   7. Indicator + default check/dash SVGs sized as a PERCENTAGE of the control,
+      so they track the 32px box and still follow the per-story control sizes in
+      "Full Rounded" / "Features And Add Ons". 75% reproduces the exact glyph
+      scale and stroke weight of tc-checkbox's 24-unit viewBox at 28px.
+   8. Label: text-sm/500 -> 16px/400/1.6 (typography.body); gap 12px -> 8px
+   9. Description & field-error indent 28px -> 40px (control + gap)
+  10. Motion 200ms cubic-bezier(0,0,.2,1) -> 150ms motion.easing.standard.
+      Only the duration/timing longhands are set so HeroUI's
+      `motion-reduce:transition-none` keeps winning.
+
+   VARIANT MAPPING
+   - tc-checkbox has no variants. It maps to HeroUI `.checkbox--primary`
+     (the default variant).
+   - `.checkbox--secondary` (grey `--default` control fill) has no tc equivalent
+     and is left with its own colour treatment; it inherits every shape,
+     density, typography and motion change above.
+   - States without a tc counterpart (invalid-unselected, pressed) keep
+     HeroUI's treatment.
+
+   KEPT — already matching under the Tzu Chi theme: control background
+   (--field-background = surface.default), fill (--accent = brand.primary),
+   checkmark (--accent-foreground = text.on-brand), label colour
+   (--foreground = text.default), disabled (opacity .38 + not-allowed),
+   control shadow (--field-shadow is already flat), focus ring width 2px and
+   focus colour (--focus = focus-ring.color).
+
+   Reviewed: no functional changes. Verified every selector against
+   heroui/styles/components/checkbox.css and checkbox.tsx (all real), every
+   rule scoped under [data-theme^="tzuchi"], no --tc-color-* /component-colour
+   token or hex/rgb literal referenced (--accent/--danger/--muted are HeroUI
+   theme variables, exactly as required; --tzuchi-checkbox-border is listed in
+   extraThemeVars), and the cascade math against checkbox.css's base rules
+   (including the .checkbox--secondary and Full-Rounded/Custom-Indicator
+   per-story size utilities, which win over this file's components-layer rules
+   via the utilities > components layer order in styles/index.css, so they
+   stay untouched). Tightened the indeterminate-border comment above (item 5)
+   — HeroUI never uses `transparent` for plain indeterminate, only for
+   selected; the override still correctly repoints both to the fill colour.
+   ========================================================================== */
+
+/* -- Control box ---------------------------------------------------------- */
+
+[data-theme^="tzuchi"] .checkbox__control {
+  inline-size: var(--tc-checkbox-size, var(--tc-size-icon-md, 32px));
+  block-size: var(--tc-checkbox-size, var(--tc-size-icon-md, 32px));
+  border-width: 2px;
+  border-radius: var(--tc-checkbox-radius, var(--tc-radius-sm, 4px));
+  border-color: var(--tzuchi-checkbox-border, var(--muted));
+
+  /* longhands only — leaves `transition-property: none` under
+     prefers-reduced-motion in the base file untouched */
+  transition-duration: var(--tc-motion-duration-fast, 150ms);
+  transition-timing-function: var(--tc-motion-easing-standard, ease);
+
+  /* the animated fill sits inside the 2px border */
+  &::before {
+    border-radius: calc(var(--tc-checkbox-radius, var(--tc-radius-sm, 4px)) - 2px);
+    transition-duration: var(--tc-motion-duration-fast, 150ms);
+    transition-timing-function: var(--tc-motion-easing-standard, ease);
+  }
+}
+
+/* -- Border colour per state ---------------------------------------------- */
+
+/* Hover (unselected): tc turns the border brand-primary, not focus-blue */
+[data-theme^="tzuchi"] .checkbox:hover .checkbox__control,
+[data-theme^="tzuchi"] .checkbox:has([data-slot="checkbox-content"][data-hovered="true"]) .checkbox__control,
+[data-theme^="tzuchi"] .checkbox [data-slot="checkbox-content"][data-hovered="true"] .checkbox__control {
+  border-color: var(--accent);
+}
+
+/* Selected / indeterminate: border joins the fill colour */
+[data-theme^="tzuchi"] .checkbox[aria-checked="true"] .checkbox__control,
+[data-theme^="tzuchi"] .checkbox[data-selected="true"] .checkbox__control,
+[data-theme^="tzuchi"] .checkbox[data-indeterminate="true"] .checkbox__control {
+  border-color: var(--accent);
+}
+
+/* Same fix for the invalid fills */
+[data-theme^="tzuchi"] .checkbox[data-invalid="true"][aria-checked="true"] .checkbox__control,
+[data-theme^="tzuchi"] .checkbox[data-invalid="true"][data-selected="true"] .checkbox__control,
+[data-theme^="tzuchi"] .checkbox[aria-invalid="true"][aria-checked="true"] .checkbox__control,
+[data-theme^="tzuchi"] .checkbox[aria-invalid="true"][data-selected="true"] .checkbox__control,
+[data-theme^="tzuchi"] .checkbox[data-indeterminate="true"][data-invalid="true"] .checkbox__control,
+[data-theme^="tzuchi"] .checkbox[data-indeterminate="true"][aria-invalid="true"] .checkbox__control {
+  border-color: var(--danger);
+}
+
+/* -- Indicator ------------------------------------------------------------ */
+
+/* Relative sizing keeps every custom control size in the stories proportional.
+   75% of the 28px content box = 21px, which is exactly tc-checkbox's 24-unit
+   viewBox drawn at 28px: same glyph size, same 2.9px stroke. */
+[data-theme^="tzuchi"] .checkbox__indicator {
+  inline-size: 75%;
+  block-size: 75%;
+}
+
+[data-theme^="tzuchi"] .checkbox [data-slot="checkbox-default-indicator--checkmark"],
+[data-theme^="tzuchi"] .checkbox[data-indeterminate="true"] [data-slot="checkbox-default-indicator--indeterminate"] {
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+/* -- Label and help text -------------------------------------------------- */
+
+[data-theme^="tzuchi"] .checkbox__content {
+  gap: var(--tc-space-8, 8px);
+  font-size: var(--tc-font-size-16, 16px);
+  font-weight: var(--tc-font-weight-regular, 400);
+  line-height: var(--tc-line-height-relaxed, 1.6);
+}
+
+/* Re-align under the label: control + gap */
+[data-theme^="tzuchi"] .checkbox > [data-slot="description"],
+[data-theme^="tzuchi"] .checkbox > [data-slot="field-error"] {
+  padding-inline-start: calc(
+    var(--tc-checkbox-size, var(--tc-size-icon-md, 32px)) + var(--tc-space-8, 8px)
+  );
+}

@@ -1,0 +1,111 @@
+/*
+ * Tzu Chi — Textarea
+ * ===================================================================
+ * Shape / density / typography overrides for HeroUI's `.textarea`.
+ * Belongs in styles/themes/tzuchi/components/textarea.css, imported into the
+ * same "components" layer as styles/components/textarea.css but after it.
+ * Source of truth: packages/components/src/textarea/tc-textarea.styles.ts
+ * + packages/tokens/src/component/textarea.tokens.json.
+ *
+ * Variant mapping
+ *   tc-textarea (Tzu Chi has exactly one)  ->  .textarea / .textarea--primary
+ *   .textarea--secondary                   ->  no Tzu Chi counterpart. It keeps
+ *       HeroUI's --default fill (which the Tzu Chi theme maps to the
+ *       neutral-surface token) and inherits every rule below, since they all
+ *       hang off `.textarea`.
+ *   .textarea--full-width                  ->  untouched; tc-textarea's :host is
+ *       display:block, i.e. always full width, which is HeroUI's opt-in here.
+ *
+ * What this changes
+ *   1. Density  — inline padding 12px -> 20px. Block padding is already 8px.
+ *   2. Size     — min-height 38px -> the 96px text box Tzu Chi specifies. HeroUI
+ *      puts the frame on the <textarea> itself, while tc-textarea wraps a
+ *      borderless <textarea> in a padded .control, so the padding and border are
+ *      added back to keep the same visible box.
+ *   3. Type     — a flat 16px/1.6 (--tc-typography-body) in place of 16px/1.5
+ *      shrinking to 14px/1.43 at >=40rem. Tzu Chi has one body size at every width.
+ *   4. Focus    — HeroUI's 2px solid --focus ring becomes Tzu Chi's soft 3px halo.
+ *   5. Invalid  — the border itself turns danger, as in tc-textarea, and stays
+ *      danger on hover (see Reviewed note below).
+ *   6. Resize   — vertical only.
+ *
+ * Deliberately NOT changed (full table in the report): radius, border width,
+ * background, text/placeholder colour, hover & focus border colour, field
+ * shadow, disabled opacity/cursor, font family and transition duration already
+ * resolve to the Tzu Chi values through themes/tzuchi/variables.css.
+ *
+ * Reviewed: added a hover guard to the invalid border-color rule. Base
+ * `.textarea:hover:not(:focus):not(:focus-visible)` (and its
+ * `[data-hovered="true"]` twin), inside `@media (hover: hover)`, compiles to
+ * specificity (0,4,0) and repaints `border-color` to `--field-border-hover` on
+ * any hovered-but-unfocused textarea, including an invalid one. The plain
+ * `[data-theme^="tzuchi"] .textarea[data-invalid="true"] { border-color: … }`
+ * rule is only (0,3,0), so on real mouse hover it lost to the base hover rule
+ * and the invalid field's border flashed back to the accent-hover blue instead
+ * of staying danger red — the opposite of tc-textarea, which pins the invalid
+ * border through hover (`tc-textarea.styles.ts:74`, `:host([invalid])
+ * .control:hover`). Mirrored the base hover selector under `[data-invalid]` so
+ * the override's specificity is (0,6,0), clearing the base rule outright
+ * instead of depending on cascade-layer import order for a same-specificity
+ * tie. No other declaration in the file had a base rule of equal or higher
+ * specificity to beat, so nothing else changed.
+ */
+
+[data-theme^="tzuchi"] {
+  .textarea {
+    /* tc-textarea.styles.ts:29 — .control { padding: var(--tc-space-8) var(--tc-space-20) } */
+    padding-inline: var(--tc-space-20, 20px);
+
+    /* tc-textarea.styles.ts:49 — the inner <textarea> is 96px tall; here the same
+       element carries the padding and the border, so add both back. */
+    min-height: calc(
+      var(--tc-textarea-min-height, 96px) + 2 * var(--tc-space-8, 8px) + 2 *
+        var(--field-border-width, 1px)
+    );
+
+    /* tc-textarea.styles.ts:54 — font: var(--tc-typography-body) = 400 16px/1.6.
+       Set the parts, not the `font` shorthand, so the inherited (already Tzu Chi)
+       family and the 400 weight survive. Also beats the base rule's sm: shrink. */
+    font-size: var(--tc-font-size-16, 16px);
+    line-height: var(--tc-line-height-relaxed, 1.6);
+
+    /* tc-textarea.styles.ts:57 */
+    resize: vertical;
+
+    /* tc-textarea.styles.ts:42 — a soft 3px halo in the pale brand tint
+       (--tc-color-brand-surface-hover) replaces HeroUI's 2px solid --focus ring.
+       --accent-soft-hover is that exact tint in both Tzu Chi modes (blue-200
+       light / blue-700 dark), so no new theme variable is needed. The focused
+       border colour is already --field-border-focus = tc color.border.focus. */
+    &:focus,
+    &[data-focused="true"] {
+      box-shadow: 0 0 0 3px var(--accent-soft-hover);
+    }
+
+    /* tc-textarea.styles.ts:72-80 — invalid recolours the border itself, and a
+       focused invalid field swaps the pale halo for a solid danger one. HeroUI's
+       1px danger outline is left in place on top of it. */
+    &[data-invalid="true"] {
+      border-color: var(--danger);
+
+      /* Reviewed: keep the danger border on hover too. Without this, base's
+         @media (hover: hover) hover rule (0,4,0) beat the plain rule above
+         (0,3,0) and repainted the border --field-border-hover on mouse-over. */
+      @media (hover: hover) {
+        &:hover:not(:focus):not(:focus-visible),
+        &[data-hovered="true"]:not([data-focused="true"]):not(
+            [data-focus-visible="true"]
+          ) {
+          border-color: var(--danger);
+        }
+      }
+
+      &:focus,
+      &:focus-visible,
+      &[data-focused="true"],
+      &[data-focus-visible="true"] {
+        box-shadow: 0 0 0 3px var(--danger);
+      }
+    }
+  }
+}

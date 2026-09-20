@@ -1,0 +1,130 @@
+/* ==========================================================================
+   CalendarYearPicker — Tzu Chi theme overrides
+   Destination: styles/themes/tzuchi/components/calendar-year-picker.css
+   Layer: `components`, imported AFTER styles/components/calendar-year-picker.css.
+   ==========================================================================
+
+   The year picker is the Calendar's second grid: a 3-column grid of equal
+   year cells that crossfades over the day grid, plus the trigger that
+   replaces `.calendar__heading` when it is in use.  It therefore takes the
+   same two decisions the day grid takes.
+
+   WHAT THIS CHANGES
+
+   1. Year-cell   — `rounded-3xl` (calc(--radius * 3) = 24px, a full capsule on
+      shape         a 32px-tall cell) becomes the Tzu Chi square-ish cell, 4px.
+                    §2 R33 — a grid of equal cells where selection is the only
+                    state that matters is the pagination-item role (§5 R81),
+                    and the base file says so itself: its comment at
+                    calendar-year-picker.css:143 calls the selected state
+                    "same as .tag[data-selected]".  Same resolved 4px as
+                    pagination.css:93 and as the day cells in calendar.css /
+                    range-calendar.css, so the two grids that crossfade into
+                    one another share a shape.
+
+   2. Year-cell   — `text-sm font-medium` (14/500) → 16px / 400 / 1.6
+      type          (§1 R21 → R16: a dense numeric grid takes the pagination
+                    number's metrics; the Tzu Chi scale has no 14px step), and
+                    the selected year takes the `subtitle` weight 700, as
+                    pagination's current page does (§1 R16, §5 R81).  The
+                    selected FILL is untouched — HeroUI already paints it
+                    --accent / --accent-foreground, which is R81's own answer.
+                    25.6px of line box inside the base's fixed 32px `h-8` box:
+                    no reflow, no clipping.
+
+   3. Trigger     — `.calendar-year-picker__trigger-heading` off `text-sm
+      heading       font-medium` onto the control-label voice 16/700/1.5
+                    (§1 R1 — this text IS the trigger; §1.2 sends a control's
+                    own label to `subtitle`).  Identical to the rule
+                    calendar.css / range-calendar.css apply to the static
+                    `.calendar__heading`, so swapping a Calendar to the
+                    year-picker form does not change the headline.
+
+   NOT CHANGED, deliberately
+
+   - COLOUR: nothing.  Selected = --accent + --accent-foreground (§5 R81),
+     selected hover = --accent-hover, hover = --default + --default-foreground,
+     open-state trigger = --accent-soft-foreground.  All already resolve to
+     Tzu Chi values in both modes through the theme variables.
+   - HOVER stays the neutral --default and does not become --accent-soft
+     (§5 R78).  §5 R88 ③ applies across this whole component family: in the
+     day grid --accent-soft is the TODAY marker and the RangeCalendar band, so
+     a brand-tinted hover would falsely read as a date state.  The year grid
+     crossfades into that same 252px frame and shares its hover language; one
+     answer for the family beats two. Recorded as a deviation in the report.
+   - TRIGGER radius `rounded-lg` = calc(--radius * 1) = 8px — already exactly
+     §2 R22's control radius (§0 N5: do not restate).
+   - TRIGGER indicator: 12px chevron, kept (§1.3 rows 3 and 4 — a small glyph
+     beside a label keeps its size; raising it draws more ink, not less), and
+     its 90-degree open rotation, both transitions and the RTL flip are
+     HeroUI's behaviour (§10 D32).
+   - The trigger's `gap-1` (4px): the spec gives two competing rules for it —
+     §9 R147 (icon and label inside a control: 8px) and §9 R154 (micro gap:
+     4px).  Ambiguous, and 4px is already on the Tzu Chi rhythm, so it is left
+     alone (hard rule 6, restraint).  Listed in the report's spec gaps.
+   - The year-cell's `h-8` (32px = --tc-size-icon-md), its `px-2.5` (invisible:
+     the cell is a stretched `1fr` grid item), the grid's absolute positioning,
+     JS-driven height, `p-1`, `gap-1`, `overflow-y-auto`, the crossfade
+     choreography and every transition (§8 R140 — no choreography), and the
+     focus ring (§4 R70, §10 D3).
+
+   CASCADE
+
+     .calendar-year-picker__trigger-heading   base (0,1,0) -> mine (0,2,0) win
+     .calendar-year-picker__year-cell         base (0,1,0) -> mine (0,2,0) win
+     year-cell :is([data-selected],[aria-selected])
+                                              base (0,2,0) sets bg/color only;
+                                              the weight it must beat lives on
+                                              the (0,1,0) root rule, and mine
+                                              is (0,3,0) — win on both counts.
+
+   `aria-selected` is rendered on every year cell (calendar-year-picker.tsx:597
+   passes a boolean), so the `="true"` match in the selector is required and is
+   what the base file itself matches on.  No HeroUI state is hidden: hover,
+   selected, selected-hover, focus-visible, open/closed and the pointer-events
+   gating all keep their own declarations and inherit the new shape and type.
+
+   Reviewed: no changes. Verified against the live sources —
+   .calendar-year-picker__trigger-heading and .calendar-year-picker__year-cell
+   (incl. rounded-3xl, text-sm/font-medium, the [data-selected="true"]/
+   [aria-selected="true"] pair) exist exactly as cited in
+   styles/components/calendar-year-picker.css, and aria-selected is confirmed
+   rendered unconditionally by calendar-year-picker.tsx. Every rule and
+   nested `&` is scoped [data-theme^="tzuchi"]. Only --tc-radius-sm,
+   --tc-font-size-16, --tc-font-weight-regular/-bold and
+   --tc-line-height-normal/-relaxed appear, all confirmed mode-independent
+   (absent from tokens.css's dark blocks) with fallbacks; no --tc-color-*,
+   colour literal, invented --tzuchi-*, !important or physical left/right
+   property appears. Hand-derived cascade confirms
+   .calendar-year-picker__trigger-heading (0,1,0)→(0,2,0) and
+   .calendar-year-picker__year-cell (0,1,0)→(0,2,0) are clean wins, and the
+   selected-weight rule at (0,3,0) beats the base's (0,2,0)
+   background/colour-only selected rule (no competing font-weight there); no
+   HeroUI state, size or variant is hidden. All comments open and close
+   cleanly, no premature comment closure. Every assertion's storyId, selector
+   and computed value re-checked against the real base markup (the year grid
+   renders unopened but not display:none, so computed styles resolve without
+   the reveal step) and confirmed; none dropped.
+   ========================================================================== */
+
+[data-theme^="tzuchi"] .calendar-year-picker__trigger-heading {
+  /* R1 / §1.2 — the trigger's own label: subtitle 700 16px/1.5. */
+  font-size: var(--tc-font-size-16, 16px);
+  font-weight: var(--tc-font-weight-bold, 700);
+  line-height: var(--tc-line-height-normal, 1.5);
+}
+
+[data-theme^="tzuchi"] .calendar-year-picker__year-cell {
+  /* R33 — square-ish cell, the pagination item's 4px. */
+  border-radius: var(--tc-radius-sm, 4px);
+
+  /* R21 → R16 — dense numeric grid: 16px / 400 / 1.6. */
+  font-size: var(--tc-font-size-16, 16px);
+  font-weight: var(--tc-font-weight-regular, 400);
+  line-height: var(--tc-line-height-relaxed, 1.6);
+
+  /* R16 / R81 — the selected year is this grid's "current page". */
+  &:is([data-selected="true"], [aria-selected="true"]) {
+    font-weight: var(--tc-font-weight-bold, 700);
+  }
+}

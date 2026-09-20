@@ -3,14 +3,25 @@ import type {Decorator} from "@storybook/react";
 import React, {useEffect} from "react";
 import {addons, useGlobals} from "storybook/preview-api";
 
-import {THEME_ADDON_ID, THEME_EVENT_NAME, THEME_GLOBAL_TYPE_ID, ensureThemeKey} from "./constants";
+import {
+  THEME_ADDON_ID,
+  THEME_EVENT_NAME,
+  THEME_GLOBAL_TYPE_ID,
+  THEME_VALUES,
+  ensureThemeKey,
+} from "./constants";
 
-/** Update preview iframe with theme (only preview uses CSS selectors) */
-const updatePreviewTheme = (theme: string) => {
+/**
+ * Update preview iframe with theme (only preview uses CSS selectors).
+ * LOCAL CHANGE: exported — the docs container calls it too, because story
+ * decorators never run on docs-only MDX pages (e.g. Welcome).
+ */
+export const updatePreviewTheme = (theme: string) => {
   const root = document.documentElement;
 
   root.setAttribute("data-theme", theme);
-  root.classList.remove("light", "dark");
+  // LOCAL CHANGE: clear every known theme class, not just light/dark
+  root.classList.remove(...THEME_VALUES);
   root.classList.add(theme);
 };
 

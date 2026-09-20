@@ -1,0 +1,81 @@
+/*
+ * Tooltip — Tzu Chi theme overrides
+ * =================================
+ * Scoped to [data-theme^="tzuchi"]; loaded into @layer components AFTER
+ * ../../../components/tooltip.css, so upstream's own themes are untouched.
+ *
+ * WHAT THIS CHANGES
+ *   1. Inversion  — the Tzu Chi tooltip is a *contrasting* bubble: its fill is
+ *      the page text colour and its label the page surface colour
+ *      (packages/tokens/src/component/tooltip.tokens.json: bg = {color.text.default},
+ *      fg = {color.surface.default} — "so the tooltip inverts against the surface
+ *      per theme"). HeroUI's base paints it `bg-overlay`, i.e. the same colour as
+ *      a popover/menu. --foreground / --surface resolve to exactly the same
+ *      primitives per mode as the tc tokens do (#333333/#ffffff light,
+ *      #f2f2f2/#1c1c1e dark), so no new theme variable is needed.
+ *   2. Shape      — radius 12px (min(32px, --radius-xl)) → 4px (--tc-radius-sm).
+ *   3. Density    — padding 8px all round (p-2) → 4px block / 8px inline;
+ *                   max-width 320px (max-w-xs) → 240px.
+ *   4. Typography — 12px/16px (text-xs) → 16px/1.5 (=24px); `break-all` → normal
+ *                   word breaking (Tzu Chi's bubble wraps, it does not chop
+ *                   Latin words mid-word).
+ *   5. Arrow      — follows the inverted fill; its 40%-border hairline is folded
+ *                   into the fill so the arrow reads as one shape with the bubble
+ *                   (tc's arrow is the bubble background, borderless).
+ *
+ * KEPT AS HEROUI'S (see the report for the reasoning)
+ *   elevation (--overlay-shadow), enter/exit motion, open/close delay,
+ *   arrow geometry & placement rotation, .tooltip__trigger focus ring,
+ *   transform-origin / anchor positioning.
+ *
+ * VARIANT MAPPING
+ *   HeroUI's tooltip has no variants and no sizes (tooltipVariants = {base,
+ *   trigger} only), and tc-tooltip has none either — its `placement`
+ *   (top/bottom/left/right) is the same axis as HeroUI's `data-placement`, and
+ *   its `open` / `disabled` are driven by React Aria state, not by CSS.
+ *   So: tc-tooltip bubble  ↔  .tooltip        (1:1, no variant axis)
+ *       tc-tooltip arrow   ↔  [data-slot="overlay-arrow"]
+ *       tc trigger (slot)  ↔  .tooltip__trigger  (unstyled on the tc side — kept)
+ *
+ * Reviewed: no changes. Verified against the live files — selectors (.tooltip,
+ * [data-slot="overlay-arrow"]) exist in heroui/react/src/components/tooltip/tooltip.tsx
+ * and heroui/styles/components/tooltip.css; every rule is scoped under
+ * [data-theme^="tzuchi"]; no --tc-color-*, no --tc-tooltip-bg/-fg/-shadow, no hex/rgb/
+ * hsl/oklch literals, no !important; --foreground/--surface resolve (via
+ * themes/tzuchi/variables.css) to the exact same primitives per mode as
+ * --tc-tooltip-bg/-fg do via tokens.css (#333333/#ffffff light, #f2f2f2/#1c1c1e dark);
+ * all dimension fallbacks (4px, 240px, 8px, 16px, 1.5) match tokens.css's real
+ * resolved values; the override's higher-specificity selectors (0,2,0 and 0,3,0 vs
+ * the base's 0,1,0 and 0,2,0) beat the base declarations in every state/placement
+ * without depending on import order; no variant, size or state is hidden.
+ */
+
+[data-theme^="tzuchi"] .tooltip {
+  /* Inverted bubble: fill = page foreground, label = page surface. */
+  background-color: var(--foreground);
+  color: var(--surface);
+
+  /* Shape + density. */
+  border-radius: var(--tc-tooltip-radius, var(--tc-radius-sm, 4px));
+  max-inline-size: var(--tc-tooltip-max-width, 240px);
+  padding-block: var(--tc-tooltip-padding-block, 4px);
+  padding-inline: var(--tc-tooltip-padding-inline, var(--tc-space-8, 8px));
+
+  /* Typography. */
+  font-size: var(--tc-tooltip-font-size, var(--tc-font-size-16, 16px));
+  line-height: var(--tc-line-height-normal, 1.5);
+
+  /*
+   * HeroUI's `break-all` chops Latin words mid-word; the Tzu Chi bubble wraps
+   * normally. `overflow-wrap: anywhere` keeps upstream's protection against a
+   * single unbreakable token blowing past max-inline-size.
+   */
+  word-break: normal;
+  overflow-wrap: anywhere;
+
+  /* Arrow: one shape with the bubble, no hairline border. */
+  & [data-slot="overlay-arrow"] {
+    fill: var(--foreground);
+    stroke: var(--foreground);
+  }
+}

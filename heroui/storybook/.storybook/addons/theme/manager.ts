@@ -5,6 +5,7 @@ import {
   THEME_EVENT_NAME,
   THEME_GLOBAL_TYPE_ID,
   ensureThemeKey,
+  isDarkTheme,
 } from "../../addons/theme/constants";
 import {themes} from "../../styles/theme";
 
@@ -13,7 +14,8 @@ addons.register("heroui-theme-manager", (api) => {
   let lastTheme = DEFAULT_THEME;
 
   const updateManagerTheme = (theme: string) => {
-    const selectedTheme = themes[theme as keyof typeof themes] || themes.light;
+    // LOCAL CHANGE: the manager UI only has light/dark chrome; custom themes pick by darkness
+    const selectedTheme = isDarkTheme(theme) ? themes.dark : themes.light;
 
     // Get current config to preserve other settings
     const currentConfig = (addons as any).getConfig?.() || {};

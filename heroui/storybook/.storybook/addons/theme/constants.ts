@@ -3,7 +3,9 @@ export const THEME_GLOBAL_TYPE_ID = "heroui-theme";
 export const THEME_PARAM_KEY = "heroui-theme";
 export const THEME_EVENT_NAME = "heroui-theme-changed";
 
-export const THEME_VALUES = ["light", "dark"] as const;
+// LOCAL CHANGE: "tzuchi" / "tzuchi-dark" added (styles/themes/tzuchi). Custom
+// dark themes follow HeroUI's "<name>-dark" naming convention.
+export const THEME_VALUES = ["light", "dark", "tzuchi", "tzuchi-dark"] as const;
 export type ThemeKey = (typeof THEME_VALUES)[number];
 
 export const DEFAULT_THEME: ThemeKey = THEME_VALUES[0];
@@ -25,6 +27,16 @@ export const THEME_OPTIONS: ThemeOption[] = [
     title: "Dark",
     description: "Dark theme",
   },
+  {
+    value: THEME_VALUES[2],
+    title: "慈濟 Tzu Chi",
+    description: "Tzu Chi theme (light), generated from @tzuchi/tokens",
+  },
+  {
+    value: THEME_VALUES[3],
+    title: "慈濟 Tzu Chi Dark",
+    description: "Tzu Chi theme (dark), generated from @tzuchi/tokens",
+  },
 ];
 
 export const isThemeKey = (value: string | undefined | null): value is ThemeKey =>
@@ -32,3 +44,6 @@ export const isThemeKey = (value: string | undefined | null): value is ThemeKey 
 
 export const ensureThemeKey = (value: string | undefined | null): ThemeKey =>
   isThemeKey(value) ? value : DEFAULT_THEME;
+
+/** Whether a theme is a dark one ("dark" or any "<name>-dark"). */
+export const isDarkTheme = (value: string): boolean => value === "dark" || value.endsWith("-dark");

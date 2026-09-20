@@ -1,0 +1,59 @@
+/* ==========================================================================
+   ListBox — Tzu Chi listbox box (shared)
+   --------------------------------------------------------------------------
+   Scoped to [data-theme^="tzuchi"]; loaded into the "components" layer AFTER
+   heroui/styles/components/{list-box,header}.css. Upstream's light/dark are
+   untouched.
+
+   MODEL: tc `.listbox` — packages/components/src/dropdown/tc-dropdown.styles.ts
+   :75 — `padding: 8px 0`, `<li>` rows stacked with no gap.
+
+   Shared with Select, ComboBox, Autocomplete and the standalone ListBox on
+   purpose, for the same reason as list-box-item.css: the option column should
+   read the same wherever it is rendered. Geometry only — no colour, so nothing
+   here depends on the light/dark mode.
+
+   NOTE: HeroUI's own `.select__popover [data-slot="list-box"] { p-1.5 }` is
+   0,2,0, the same specificity as the rule below, so select.css re-asserts these
+   two declarations inside the popover. Same for `.combo-box__popover` and
+   `.autocomplete__popover`, which are out of scope for this pass — there the
+   rule below wins only by source order (this file loads later), which is the
+   arrangement the theme's components/index.css guarantees.
+
+   NOT CHANGED: overflow-clip, the relative positioning the Virtualizer needs,
+   and the horizontal separator's `ms-[3%] w-[94%]` — tc has no separators, and
+   narrowing them is HeroUI's own look.
+
+   Reviewed: no changes. `.list-box` (list-box.tsx) and `.header`
+   (header.tsx, data-slot="header") are confirmed against the live files. The
+   one rule is scoped under [data-theme^="tzuchi"]. --tc-space-8/-32 are
+   mode-independent dimension tokens per packages/tokens/dist/tokens.css — no
+   colour. Specificity beats every base rule it targets outright
+   ([data-theme^] + .list-box > * + * = 0,2,0 vs base's 0,1,0; [data-theme^] +
+   .list-box .header = 0,3,0 vs base's 0,1,0), and this file's popover padding
+   is re-asserted at 0,3,0 inside select.css's own `.select__popover` scope,
+   so the Select popover's 8px/0 padding does not depend on this file loading
+   before or after select.css. No variant/state hidden — overflow-clip, the
+   Virtualizer's positioning and the separator's width are untouched. No
+   corrections required.
+   ========================================================================== */
+
+[data-theme^="tzuchi"] .list-box {
+  /* tc-dropdown.styles.ts:75 — `padding: 8px 0`: rows run edge to edge and the
+     8px block padding keeps them clear of the panel's 8px corner radius.
+     HeroUI uses `p-1` = 4px on all four sides. */
+  padding-block: var(--tc-space-8, 8px);
+  padding-inline: 0;
+
+  /* tc stacks its `<li>` rows with no gap; HeroUI spaces children by `mt-1`. */
+  & > * + * {
+    margin-block-start: 0;
+  }
+
+  /* Section headers have no tc equivalent, but they must stay flush with the
+     32px option text or the column breaks. Same decision as pass-1
+     dropdown.css, which raised `.dropdown__popover .header` to 32px. */
+  & .header {
+    padding-inline: var(--tc-space-32, 32px);
+  }
+}

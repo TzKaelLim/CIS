@@ -15,6 +15,7 @@
     "@heroui/react": "workspace:*",
     "@heroui/styles": "workspace:*",
     "@iconify/react": "6.0.2",
+    "@tzuchi/tokens": "workspace:*",
     "apcach": "0.6.4",
     "culori": "4.0.2",
     "react": "19.3.0",

@@ -1,0 +1,379 @@
+/* ==========================================================================
+   Autocomplete — Tzu Chi shape/density/type overrides
+   --------------------------------------------------------------------------
+   Scoped to [data-theme^="tzuchi"]; loaded into the "components" layer AFTER
+   heroui/styles/components/autocomplete.css (and after list-box.css,
+   list-box-item.css, label.css, search-field.css). Upstream's own light/dark
+   themes are untouched.
+
+   MODEL. Autocomplete has no tc-* counterpart, but it is not a new shape: its
+   root IS react-aria's Select (autocomplete.tsx:81 renders SelectPrimitive,
+   :164 SelectValuePrimitive), and styles/components/autocomplete.css:7-129 is
+   a line-for-line sibling of select.css's trigger, value, indicator, secondary
+   variant and clear button. So its trigger takes the SELECT-trigger rules the
+   spec already settles — R56 (32px inset, 60px with an indicator, 42px tall),
+   R1/R3 (subtitle 700 16px/1.5 label, 16px/1.5 value), R68/R69 (danger edge
+   that survives hover) — which pass-2 select.css:104-226 delivers, and its
+   popover takes §6(a) R89-R97, the option-list panel. §11 I3 sends a control
+   whose popover rows are inset 32px to the 32px trigger inset, and §11 I9
+   records Autocomplete as one of the two panels pass 2 did not reach.
+
+   WHAT THIS CHANGES
+     TRIGGER (= tc `.trigger`, tc-dropdown.styles.ts:10-64, via select.css)
+       • padding-inline   12px (px-3)            -> 32px, 60px on the end so
+                                                    the chevron sits at the
+                                                    32px content inset  [R56]
+       • type             14px/20px 400 (text-sm)-> 700 16px/1.5 subtitle;
+                                                    height 38px -> 42px [R1/R40]
+       • text colour      --field-foreground     -> --field-placeholder when
+                                                    empty, --accent once a
+                                                    value exists or while open
+       • chevron          fixed --field-placeholder -> currentColor, and
+                          16px (size-4)          -> 20px (--tc-size-icon-sm)
+       • open state       (none)                 -> filled --accent-soft-hover
+                                                    + --accent border + --accent
+                                                    text (tc :host([open]))
+       • invalid          neutral border + 1px danger outline
+                                                 -> border also --danger  [R68]
+     VALUE
+       • type             text-base sm:text-sm   -> 16px/1.5 at every width [R3]
+     POPOVER (= tc `.listbox`, tc-dropdown.styles.ts:66-80)
+       • radius           24px (min(32px, --radius-3xl)) -> 8px            [R89]
+       • surface          --overlay              -> --accent-soft          [R90]
+       • text             inherited              -> --accent-soft-foreground [R90]
+       • arrow fill       --overlay              -> --accent-soft          [R91]
+       • list box         p-1.5 (6px)            -> 8px block / 0 inline   [R92]
+       • option rows      px-2.5 (10px)          -> 32px inline            [R93]
+       • virtualized row  calc(100% - 12px)      -> 100%, because the 12px it
+                          width                     subtracts was the list
+                                                    box padding R92 removes [R58]
+       • row label        text-foreground        -> inherit                [R94]
+       • hover / keyboard-cursor / selected row  -> --accent-soft-hover [R79/R96]
+       • ring offset      --background           -> --accent-soft          [R71]
+
+   THE SEARCH FIELD INSIDE THE POPOVER — NOTHING IS WRITTEN FOR IT, ON PURPOSE.
+   HeroUI insets it `px-3 py-1` inside the panel and the stories render it as
+   `variant="secondary"`. Under this theme that is already legible and already
+   aligned:
+     · pass-2 search-field.css gives it the Tzu Chi field geometry (43.6px
+       floor, 20px inner inset, 20px --accent magnifier, 16px/1.6 text,
+       --field-placeholder hint), so its TEXT COLUMN starts 12 + 1 + 20 = 33px
+       from the panel edge — flush with the 32px option text below it.
+     · its own fill is --default (light gray-100 / dark gray-900) against the
+       --accent-soft panel (blue-100 / blue-900): low-contrast as a fill, but
+       every Tzu Chi field is defined by its 1px --field-border (D13), which is
+       what draws the box in both modes.
+     · its text is --field-foreground and its hint --field-placeholder, both set
+       on `.search-field__group` / `.search-field__input` at (0,1,0)-(0,2,0), so
+       the panel's inherited --accent-soft-foreground never reaches them.
+     · its focus treatment is `status-focused-field` = `focus-field-ring`, whose
+       --tw-ring-offset-width is 0 (utilities/index.css:8-12), so R71's
+       ring-offset problem does not arise on the tinted panel.
+   Re-inseting or recolouring it here would duplicate search-field.css against a
+   selector it already owns (ownership rule) and the spec gives no rule for a
+   field nested in a popover.
+
+   DELIBERATELY LEFT AS HEROUI SHIPS IT
+     • `.autocomplete__clear-button` — the exact counterpart of
+       `.select__clear-button`, which select.css leaves alone (D22/D23); Tzu Chi
+       has no clear affordance to copy. With the chevron moved to the 32px
+       inset and 60px reserved, the in-flow clear button sits 8px clear of it.
+     • `.autocomplete--secondary`'s neutral --default fill (D13) — it inherits
+       every density/type/open/invalid rule below and keeps its own fill.
+     • `[data-slot="empty-state"]`'s `text-sm text-overlay-foreground/60`. The
+       EmptyState component is its own unit in this pass; a
+       `[data-theme^="tzuchi"] .empty-state` rule (0,2,0) ties with HeroUI's
+       popover-scoped rule and wins by source order, so it belongs there, not
+       here. Flagged in the report as a spec gap (muted prose on a tinted panel
+       has no token).
+     • The popover's `text-sm` root size, `pt-2`, `w-(--trigger-width)`,
+       `overflow-hidden`, the 320px list cap with `min-h-0`, the entering and
+       exiting choreography, the placement arrow rotation, the single-select
+       indicator transition kill, and --overlay-shadow (R97, R140) — exactly
+       the set select.css leaves alone on .select__popover.
+     • Root gap (gap-1 = 4px, R141/R142); the 150ms trigger transition; the
+       focus ring (D3, D21); disabled (D2, R85); the 180deg open rotation.
+     • Section headers: `[data-theme^="tzuchi"] .list-box .header` in
+       list-box.css (0,3,0) already insets them 32px (R8/R95) and no base rule
+       in autocomplete.css competes, so nothing is restated here.
+     • Row geometry and type: list-box-item.css owns them (R57); only the
+       popover-scoped inline padding is restated, for the (0,2,0) tie R93
+       describes.
+
+   CASCADE NOTES (hand-derived)
+     • `.autocomplete__trigger:has(.autocomplete__indicator)` is (0,2,0); the
+       60px rule below is (0,3,0).
+     • Base hover is
+       `.autocomplete__trigger:hover:not(:has(.autocomplete__clear-button:hover))`
+       = (0,4,0). The open-state rule below is (0,4,0) and wins on source order
+       for the primary variant; the invalid rules are mirrored with the hover
+       compounds at (0,5,0) so the danger edge survives hover (R69).
+     • KNOWN, INHERITED FROM select.css: for the SECONDARY variant only, the
+       base hover rule is `.autocomplete--secondary .autocomplete__trigger:hover
+       :not(:has(…))` = (0,5,0), which outranks the (0,4,0) open-state fill, so
+       hovering an OPEN secondary Autocomplete repaints --default-hover instead
+       of --accent-soft-hover. select.css:150-156 has the identical gap for
+       `.select--secondary`; kept identical on purpose rather than diverging
+       from the sibling. Recorded in the report.
+     • `.autocomplete__popover [data-slot="list-box"]` (p-1.5),
+       `… [data-slot="list-box-item"]` (px-2.5) are (0,2,0) — ties with
+       list-box.css / list-box-item.css. The popover-scoped rules below are
+       (0,3,0). `… [role="presentation"] > [data-slot="list-box-item"]` is
+       (0,3,0); its override is (0,4,0).
+     • `.autocomplete__indicator[data-slot="autocomplete-default-indicator"]` is
+       (0,2,0); the size rule below is (0,3,0), so the CustomIndicator story's
+       own glyph (which carries `data-slot="autocomplete-indicator"`) is
+       untouched.
+
+   NO VARIANT, SIZE OR STATE IS HIDDEN: primary/secondary, fullWidth, single and
+   multiple selection, sections, descriptions, disabled options, async
+   filtering, virtualization, the clear button, CustomIndicator, the item
+   indicator, the danger row variant, and every hover/press/focus/open/invalid/
+   disabled state keep their own treatment.
+   No !important, no colour literal, no --tc-color-* token, no shadow token,
+   no new --tzuchi-* variable, no physical left/right.
+
+   Reviewed: no CSS changes. Verified against the live sources — every class,
+   data-attribute and pseudo-class exists: autocomplete.tsx / autocomplete.
+   styles.ts (the tv() slot map: base/trigger/value/indicator/popover/
+   clearButton/filter ↔ .autocomplete / .autocomplete__trigger /
+   .autocomplete__value / .autocomplete__indicator / .autocomplete__popover /
+   .autocomplete__clear-button / .autocomplete__filter), and confirmed against
+   react-aria-components@1.21.1's compiled Select.mjs that `data-open`,
+   `data-invalid` and `data-disabled` are set on the SELECT ROOT div, which is
+   the `.autocomplete` element here (AutocompleteRoot renders SelectPrimitive
+   with `data-slot="autocomplete"`), so every `.autocomplete[data-open="true"]`
+   / `[data-invalid="true"]` selector below has a real match. The
+   `.autocomplete__trigger:has(.autocomplete__indicator)` and
+   `[role="presentation"] > [data-slot="list-box-item"]` selectors were checked
+   against heroui/styles/components/autocomplete.css line by line. Colour
+   rule: grepped for `--tc-color-`, hex/rgb/hsl/oklch literals and
+   `!important` — none found outside this comment's own prose; every `--tc-`
+   token used (--tc-space-8/-32, --tc-size-icon-sm, --tc-font-size-16,
+   --tc-line-height-normal, --tc-font-weight-bold, --tc-dropdown-radius →
+   --tc-radius-md) resolves in packages/tokens/dist/tokens.css to a
+   mode-independent literal with a fallback, confirmed against both of that
+   file's dark blocks; every colour (--field-placeholder, --accent,
+   --accent-soft, --accent-soft-hover, --accent-soft-foreground, --danger,
+   inherit, currentColor) is a HeroUI theme variable already used identically
+   by select.css's `.select__trigger` / `.select__popover`, which this file's
+   trigger and popover sections mirror property for property. Cascade:
+   re-derived every specificity pair in the notes above by hand against
+   autocomplete.css, list-box.css and list-box-item.css, including the
+   hover-vs-invalid trap (R69) and the open-vs-secondary-hover gap inherited
+   from select.css, which is recorded above rather than silently left. Every
+   override rule has strictly greater specificity than the base or sibling
+   rule it must beat, in every state (hover, focused, selected, invalid, open)
+   and for both the default and CustomIndicator icon paths. Comment bodies were
+   checked for a premature comment close (a glob followed by a slash) and
+   have none; open- and close-comment marker counts match. No variant, size
+   or state is hidden — see above, including virtualization (the
+   `inline-size: 100%` fix on virtualized rows is required by, not in
+   addition to, R92's list-box padding change — without it the hover fill
+   would stop 12px short of the panel edge). The only thing added by this
+   review is this "Reviewed" line, which the draft omitted; no corrections
+   were otherwise required.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Trigger box — tc `.trigger`, mirroring select.css:113-162
+   -------------------------------------------------------------------------- */
+
+/* R56 — tc-dropdown.styles.ts:24, `padding: var(--tc-space-8) var(--tc-space-32)`.
+   The 8px block padding already matches HeroUI's `py-2`, so only the inline
+   axis moves. R1/R40 — `font: var(--tc-typography-subtitle)` = 700 16px/1.5 at
+   every width, so content 24px + 16px padding + 2px border = 42px, above
+   HeroUI's min-h-9. Longhands only, so the theme's --font-sans survives.
+   The collapsed trigger reads muted; the value span (`text-current`) and the
+   chevron follow it. */
+[data-theme^="tzuchi"] .autocomplete__trigger {
+  padding-inline: var(--tc-space-32, 32px);
+
+  font-size: var(--tc-font-size-16, 16px);
+  line-height: var(--tc-line-height-normal, 1.5);
+  font-weight: var(--tc-font-weight-bold, 700);
+
+  color: var(--field-placeholder);
+}
+
+/* R56 — in tc the chevron is an in-flow flex item at the content edge, so the
+   label stops 32px + 20px chevron + 8px gap = 60px short of the trigger's end.
+   HeroUI reserves only `pe-7` = 28px for its absolutely positioned 16px
+   chevron. An Autocomplete composed without an Indicator keeps the symmetric
+   32px. */
+[data-theme^="tzuchi"] .autocomplete__trigger:has(.autocomplete__indicator) {
+  padding-inline-end: calc(
+    var(--tc-space-32, 32px) + var(--tc-size-icon-sm, 20px) + var(--tc-space-8, 8px)
+  );
+}
+
+/* tc-dropdown.styles.ts:32-34 `.trigger.has-value` and :48-52
+   `:host([open]) .trigger` both switch the whole trigger to brand-primary;
+   --accent resolves to exactly that primitive in both modes. */
+[data-theme^="tzuchi"]
+  .autocomplete__trigger:has(.autocomplete__value:not([data-placeholder="true"])),
+[data-theme^="tzuchi"] .autocomplete[data-open="true"] .autocomplete__trigger {
+  color: var(--accent);
+}
+
+/* tc-dropdown.styles.ts:48-52 — Figma "Expanded=True": filled brand-surface-hover
+   with a brand-primary edge (R79's fill, R77's edge). HeroUI shows no open
+   state on the trigger at all, so this is additive. `data-open` is on the
+   Select ROOT (react-aria-components@1.21.1 dist/private/Select.mjs:212), which
+   is the `.autocomplete` element here. */
+[data-theme^="tzuchi"] .autocomplete[data-open="true"] .autocomplete__trigger {
+  background-color: var(--accent-soft-hover);
+  border-color: var(--accent);
+}
+
+/* While open, tc colours the label brand-primary whether or not a value is set;
+   HeroUI keeps `text-field-placeholder` on the placeholder span (0,2,0). */
+[data-theme^="tzuchi"] .autocomplete[data-open="true"] .autocomplete__value[data-placeholder="true"] {
+  color: inherit;
+}
+
+/* --------------------------------------------------------------------------
+   2. Value + chevron
+   -------------------------------------------------------------------------- */
+
+/* R3 — `.autocomplete__value` re-asserts `text-base sm:text-sm`, dropping the
+   value to 14px/20px from 640px up. Tzu Chi has one size at every width.
+   Weight and colour are inherited from the trigger. */
+[data-theme^="tzuchi"] .autocomplete__value {
+  font-size: var(--tc-font-size-16, 16px);
+  line-height: var(--tc-line-height-normal, 1.5);
+}
+
+[data-theme^="tzuchi"] .autocomplete__indicator {
+  /* In tc the chevron is `stroke="currentColor"`, so it tracks the trigger
+     colour (muted -> brand-primary). HeroUI pins it to --field-placeholder. */
+  color: inherit;
+
+  /* HeroUI parks it at `end-2` = 8px from the padding box. In tc it is an
+     in-flow flex item at the 32px content inset — which is what the 60px end
+     padding above leaves room for. */
+  inset-inline-end: var(--tc-space-32, 32px);
+
+  /* R54 — --tc-size-icon-sm = 20px, against HeroUI's `size-4` = 16px. Scoped
+     to the DEFAULT indicator, so CustomIndicator keeps its own icon size.
+     The 180deg rotation on [data-open="true"] and the 150ms transition already
+     match tc and are left alone. */
+  &[data-slot="autocomplete-default-indicator"] {
+    width: var(--tc-size-icon-sm, 20px);
+    height: var(--tc-size-icon-sm, 20px);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   3. Invalid trigger — R68/R69, mirroring select.css:207-226
+   -------------------------------------------------------------------------- */
+
+/* tc-dropdown has no invalid state; this is tc-input's field rule, the one the
+   themed Input, Textarea, SearchField and Select all carry, so every field
+   fails the same way. HeroUI's `status-invalid-field` outline is KEPT (it
+   survives forced-colors mode and is what thickens into the focus ring) and the
+   border turns danger as well. The [data-open="true"] compounds outrank the
+   open-state border in section 1. */
+[data-theme^="tzuchi"] .autocomplete[data-invalid="true"] .autocomplete__trigger,
+[data-theme^="tzuchi"] .autocomplete[aria-invalid="true"] .autocomplete__trigger,
+[data-theme^="tzuchi"] .autocomplete[data-invalid="true"][data-open="true"] .autocomplete__trigger,
+[data-theme^="tzuchi"] .autocomplete[aria-invalid="true"][data-open="true"] .autocomplete__trigger {
+  border-color: var(--danger);
+}
+
+/* R69, the hover-vs-invalid trap: HeroUI's hover rule on `.autocomplete__trigger`
+   is class + :hover + :not(:has(.autocomplete__clear-button:hover)) = (0,4,0),
+   which ties or beats the plain invalid override above and would repaint the
+   border --field-border-hover while hovering an invalid field. These selectors
+   are (0,5,0), so the danger edge always survives hover. */
+@media (hover: hover) {
+  [data-theme^="tzuchi"] .autocomplete[data-invalid="true"] .autocomplete__trigger:hover,
+  [data-theme^="tzuchi"] .autocomplete[data-invalid="true"] .autocomplete__trigger[data-hovered="true"],
+  [data-theme^="tzuchi"] .autocomplete[aria-invalid="true"] .autocomplete__trigger:hover,
+  [data-theme^="tzuchi"] .autocomplete[aria-invalid="true"] .autocomplete__trigger[data-hovered="true"] {
+    border-color: var(--danger);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   4. Popover = tc `.listbox` shell — R89-R97, identical to select.css:231-261
+   -------------------------------------------------------------------------- */
+[data-theme^="tzuchi"] .autocomplete__popover {
+  /* R89 — tc-dropdown.styles.ts:78, --tc-dropdown-radius = --tc-radius-md = 8px. */
+  border-radius: var(--tc-dropdown-radius, var(--radius));
+
+  /* R90 — tc's listbox-bg = brand-surface, option-fg = brand-primary;
+     --accent-soft / --accent-soft-foreground resolve to exactly those
+     primitives in BOTH tzuchi and tzuchi-dark. R97: elevation stays HeroUI's
+     --overlay-shadow. */
+  background-color: var(--accent-soft);
+  color: var(--accent-soft-foreground);
+
+  /* R91 */
+  & [data-slot="popover-overlay-arrow"] {
+    fill: var(--accent-soft);
+  }
+
+  /* R58/R92 — `padding: 8px 0`: rows run edge to edge and the 8px block
+     padding keeps them clear of the 8px corner radius. Restated inside the
+     popover scope because HeroUI's own popover-scoped `p-1.5` ties with
+     list-box.css at (0,2,0). The 320px cap, `min-h-0`, the scrollbar and the
+     overflow behaviour are untouched. */
+  & [data-slot="list-box"] {
+    padding-block: var(--tc-space-8, 8px);
+    padding-inline: 0;
+  }
+
+  /* R57/R93 — same tie, same fix. */
+  & [data-slot="list-box-item"] {
+    padding-inline: var(--tc-space-32, 32px);
+  }
+
+  /* R58 — HeroUI subtracts the list box's 2 x 6px inline padding from each
+     virtualized row (autocomplete.css:208-215) so the rows stay inside it.
+     That padding is now 0, so the subtraction would leave a 12px strip at the
+     row's end where the hover fill stops short of the panel edge. */
+  & [role="presentation"] > [data-slot="list-box-item"] {
+    inline-size: 100%;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   5. Option rows inside the tinted panel
+   -------------------------------------------------------------------------- */
+
+/* R94 — label.css:4 hard-codes `text-foreground`; on the brand panel the row
+   text must come from the popover's --accent-soft-foreground. Danger rows keep
+   their own colour. */
+[data-theme^="tzuchi"]
+  .autocomplete__popover
+  [data-slot="list-box-item"]:not(.list-box-item--danger)
+  [data-slot="label"] {
+  color: inherit;
+}
+
+/* R79/R96 — tc `.option:hover`. HeroUI paints the neutral --default here.
+   Mirrors upstream's hover-capable media query so touch devices are unchanged. */
+@media (hover: hover) {
+  [data-theme^="tzuchi"] .autocomplete__popover [data-slot="list-box-item"]:hover,
+  [data-theme^="tzuchi"] .autocomplete__popover [data-slot="list-box-item"][data-hovered="true"] {
+    background-color: var(--accent-soft-hover);
+  }
+}
+
+/* R79/R82 — the keyboard cursor and the selected row share that same fill.
+   HeroUI marks selection with the checkmark indicator only, so this is
+   additive and the indicator is untouched. */
+[data-theme^="tzuchi"] .autocomplete__popover [data-slot="list-box-item"][data-focused="true"],
+[data-theme^="tzuchi"] .autocomplete__popover [data-slot="list-box-item"][data-selected="true"],
+[data-theme^="tzuchi"] .autocomplete__popover [data-slot="list-box-item"][aria-selected="true"] {
+  background-color: var(--accent-soft-hover);
+}
+
+/* R71 — `focus-ring` paints its 2px offset gap in --background, which reads as
+   a grey halo on the tinted panel. Width, offset and ring colour already come
+   from the theme (D3); only the offset colour moves onto the panel. */
+[data-theme^="tzuchi"] .autocomplete__popover [data-slot="list-box-item"]:focus-visible,
+[data-theme^="tzuchi"] .autocomplete__popover [data-slot="list-box-item"][data-focus-visible="true"] {
+  --tw-ring-offset-color: var(--accent-soft);
+}

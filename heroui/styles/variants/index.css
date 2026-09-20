@@ -80,10 +80,19 @@
 /* -------------------------------------------------------------------------------------------------
  * dark — Dark mode styles
  * Priority: .dark class / data-theme="dark" → prefers-color-scheme: dark
+ * LOCAL CHANGE: both selector lists also match custom "<name>-dark" themes
+ * ([data-theme$="-dark"]); upstream only matched the literal "dark".
  * ------------------------------------------------------------------------------------------------- */
 @custom-variant dark {
-  /* Explicit: .dark class or data-theme="dark" on element or ancestor */
-  &:is(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) {
+  /* Explicit: .dark class or data-theme="dark" / "<name>-dark" on element or ancestor */
+  &:is(
+      .dark,
+      .dark *,
+      [data-theme="dark"],
+      [data-theme="dark"] *,
+      [data-theme$="-dark"],
+      [data-theme$="-dark"] *
+    ) {
     @slot;
 
     &::before,
@@ -94,7 +103,17 @@
 
   /* Fallback: system prefers dark color scheme */
   @media (prefers-color-scheme: dark) {
-    &:not(:is(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *)) & {
+    &:not(
+        :is(
+          .dark,
+          .dark *,
+          [data-theme="dark"],
+          [data-theme="dark"] *,
+          [data-theme$="-dark"],
+          [data-theme$="-dark"] *
+        )
+      )
+      & {
       @slot;
 
       &::before,

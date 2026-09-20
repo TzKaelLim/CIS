@@ -1,0 +1,75 @@
+/* ------------------------------------------------------------------------------------------------
+ * Chip — Tzu Chi shape overrides
+ * ------------------------------------------------------------------------------------------------
+ * WHAT THIS CHANGES (shape / density / type only — no colour):
+ *   - radius   16px (rounded-2xl = --radius * 2) → full pill, per --tc-chip-radius (= --tc-radius-full)
+ *   - box      adds tc-chip's 1px transparent border (it is part of the Figma box model)
+ *   - density  padding 2px/8px → 4px/12px (--tc-space-4 / --tc-space-12); label's own 2px inline
+ *              padding moved into the chip's gap so the text inset is exactly 12px like tc
+ *   - type     12px/20px → 20px/1.5 (= --tc-typography-tab-sm: 500 20px/1.5); weight 500 already matched
+ *   - result   the default (sizeless) chip is a 40px pill, identical to tc-chip's rendered box
+ *
+ * COLOURS ARE DELIBERATELY UNTOUCHED, but the "zero colour work" claim only holds for one specific
+ * combination: `<Chip color="accent" variant="soft">` — that alone reproduces tc-chip's palette
+ * (--tc-chip-bg → color.brand.surface, --tc-chip-fg → color.brand.primary) exactly, because
+ * `.chip--accent.chip--soft` maps --accent-soft / --accent-soft-foreground straight to the same
+ * primitives (blue-100/blue-900 light, blue-900/blue-300 dark) in ../variables.css.
+ * `variant` DEFAULTS to "secondary" (chip.styles.ts), which has no compound rule with `--accent` —
+ * so plain `<Chip color="accent">` (and the chip.stories.tsx "Default" story, which explicitly sets
+ * variant="secondary") keeps the neutral `--default` background from the base rule and only picks
+ * up `--accent-soft-foreground` as text colour via `.chip--accent`. That mismatched grey-bg/blue-text
+ * combo is a pre-existing HeroUI/theme-mapping quirk, not something shape overrides can or should
+ * paper over — call it out to whoever consumes this: reach for `variant="soft"` to get the tc-chip
+ * look. The Default story is still the right anchor for SIZE (it is what `<Chip>` renders with no
+ * size prop), just not for colour.
+ *
+ * tc ↔ HeroUI MAPPING
+ *   tc-chip (the one tonal look; variant="assist" and variant="filter" are visually identical)
+ *       ↔  <Chip color="accent" variant="soft">      — exact colour match, no rule needed
+ *   tc-chip (single size)            ↔  .chip / .chip--md (HeroUI's sizeless default)  → 40px
+ *   no tc counterpart                ↔  .chip--sm  → one step down the same scale (16px type) → 34px
+ *   no tc counterpart                ↔  .chip--lg  → one density step up (8px/16px)          → 48px
+ *   no tc counterpart                ↔  color default|success|warning|danger,
+ *                                       variant primary|secondary|tertiary — shape only, colours kept
+ *
+ * NOT TRANSFERABLE (HeroUI Chip is a static label; tc-chip is interactive — see TagGroup):
+ *   hover bg, selected border, focus-visible ring, disabled opacity, the remove button,
+ *   and the 150ms background/border transition that drives them.
+ *
+ * Reviewed: verified every selector/attribute against heroui/styles/components/chip.css and
+ * react/src/components/chip/{chip.tsx,chip.styles.ts,chip.stories.tsx}, the [data-theme^="tzuchi"]
+ * scoping and cascade math (specificity + layer/import order) on every rule and every size/variant
+ * it must beat, and that no --tc-color-* /component-colour/shadow token is referenced. The CSS rules
+ * were correct as drafted; only the header comment was corrected — it overstated colour parity by
+ * citing the "Default" story (color=accent, variant=secondary) as proof of an exact colour match,
+ * when that combination actually resolves to `--default` background + `--accent-soft-foreground`
+ * text (see paragraph above), not tc-chip's accent-soft tonal fill. No CSS rule was changed.
+ * ------------------------------------------------------------------------------------------------ */
+
+/* Base = tc-chip. Also wins over .chip--sm/--md/--lg (0,2,0 vs 0,1,0), so each size that must
+   still differ is restated below. */
+[data-theme^="tzuchi"] .chip {
+  border: 1px solid transparent;
+  border-radius: var(--tc-chip-radius, 9999px);
+  padding-block: var(--tc-space-4, 4px);
+  padding-inline: var(--tc-space-12, 12px);
+  gap: var(--tc-space-4, 4px);
+  font-size: var(--tc-font-size-20, 20px);
+  font-weight: var(--tc-font-weight-medium, 500);
+  line-height: var(--tc-line-height-normal, 1.5);
+}
+
+/* tc-chip spaces its slots with gap alone; the chip's padding is the real text inset. */
+[data-theme^="tzuchi"] .chip__label {
+  padding-inline: 0;
+}
+
+[data-theme^="tzuchi"] .chip--sm {
+  padding-inline: var(--tc-space-8, 8px);
+  font-size: var(--tc-font-size-16, 16px);
+}
+
+[data-theme^="tzuchi"] .chip--lg {
+  padding-block: var(--tc-space-8, 8px);
+  padding-inline: var(--tc-space-16, 16px);
+}

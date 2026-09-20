@@ -1,0 +1,71 @@
+/* ------------------------------------------------------------------------------------------------
+ * Tzu Chi theme — Toolbar
+ * ------------------------------------------------------------------------------------------------
+ * Destination: heroui/styles/themes/tzuchi/components/toolbar.css, imported into the `components`
+ * layer after HeroUI's own styles/components/toolbar.css.
+ *
+ * ONE DECLARATION. Toolbar has no Tzu Chi counterpart (DESIGN-LANGUAGE Q8 lists it), and almost
+ * everything the base file sets is already on the Tzu Chi system. The single exception is the
+ * attached variant's corner.
+ *
+ * WHAT THIS CHANGES — HeroUI's markup, class names, props, orientations and states stay untouched:
+ *
+ *   .toolbar--attached  border-radius  24px (rounded-3xl)  ->  12px   (R38)
+ *
+ * R38 — "Inner item concentric with a padded container: border-radius: calc(<inner role radius> +
+ * <container inset>) on the container". `.toolbar--attached` pads its content by `p-1` = 4px
+ * (= --tc-space-4, already the Tzu Chi micro inset, R154), and what it pads is a row of joined
+ * ButtonGroup / ToggleButtonGroup controls whose outer corners are the 8px Control radius
+ * (R22, applied by ./button.css and ./toggle-button-group.css). 8px + 4px = 12px, written exactly
+ * as tabs.css:103-106 writes the same relationship for the segmented tab container over its 8px
+ * tabs with a 4px inset. That precedent is why --tc-radius-md is read directly here rather than
+ * --tc-button-radius; the two resolve to the same 8px.
+ *
+ * KEPT AS HEROUI'S — every one of these is already the Tzu Chi answer, or the spec is silent:
+ *   · `gap-2` = 8px between groups — R150's action-row gap, already matching; not restated.
+ *   · `p-1` = 4px inset — R154's micro gap, already matching; not restated, and it is read (not
+ *     re-declared) by the radius calc above so the two can never disagree.
+ *   · `bg-surface` — a toolbar is a resting panel, so `--surface` is the correct fill; the theme
+ *     already maps it. `shadow-overlay` is the section-6 shadow rule for a floating bar
+ *     (`--overlay-shadow`), and in dark mode it correctly falls through to HeroUI's inset hairline,
+ *     which the spec says explicitly not to "fix" per component.
+ *   · the grid layout, `w-fit`, `grid-flow-col` / `grid-flow-row`, and both orientation variants.
+ *   · the `.separator--vertical { h-1/2 }` / `.separator--horizontal { w-1/2 }` insets — D24: the
+ *     Separator's geometry and the fact that spacing around it belongs to the consumer are settled,
+ *     and this grid IS that consumer.
+ *   · `.toolbar--vertical .button-group { justify-start }` — layout, no design-language rule.
+ *   · every colour and every state. Nothing colour-valued, no shadow token and no new --tzuchi-*
+ *     theme variable is declared in this file.
+ *
+ * CASCADE — `[data-theme^="tzuchi"] .toolbar--attached` is (0,2,0) against the base's (0,1,0)
+ * `.toolbar--attached` in the same layer, earlier — and (0,2,0) beats (0,1,0) on specificity alone,
+ * so this also holds regardless of import order. No breakpoint, `:has()` or per-size variant of
+ * that rule exists upstream.
+ *
+ * SPEC GAP (recorded, not resolved) — R38 (12px) assumes the attached content is a row of joined
+ * 8px-cornered controls, which is what every current story puts inside `.toolbar--attached`
+ * (`toolbar.stories.tsx`'s Attached story: an attached ToggleButtonGroup + Separator + attached
+ * ButtonGroup, both 8px-cornered per ./toggle-button-group.css and ./button.css). A toolbar holding
+ * loose circular icon buttons instead would leave R38's "inner role radius" undefined, and R27's
+ * flat 16px surface radius would be the competing answer. Toolbar is on the spec's own Q8 "no Tzu
+ * Chi counterpart at all" list, so this is flagged for the owner rather than guessed at.
+ *
+ * Reviewed: no changes. Verified against the live files: `.toolbar--attached` exists in
+ * heroui/styles/components/toolbar.css and is emitted by toolbar.styles.ts's toolbarVariants
+ * (isAttached: true -> "toolbar--attached"); the rule is scoped under [data-theme^="tzuchi"].
+ * Colour rule: grepped clean for --tc-color-*, any colour-valued component token, hex/rgb/hsl/oklch
+ * literals, !important and physical left/right — only --tc-radius-md and --tc-space-4 are used,
+ * both confirmed mode-independent dimension tokens in packages/tokens/dist/tokens.css (no
+ * [data-theme="dark"] or prefers-color-scheme:dark override for either). No variant, size or state
+ * is hidden or flattened — the only other classes toolbar.css declares (.toolbar, .toolbar--
+ * horizontal/--vertical) are untouched. Comment safety: comment-open and comment-close markers
+ * balance (2 and 2), no premature closer. Assertion re-verified against storybook-static/index.json
+ * (components-layout-toolbar--attached exists; the Attached story's Toolbar renders with
+ * isAttached, orientation defaulting to horizontal, so `.toolbar--attached` matches the root
+ * element with reveal: none) and against the resolved calc (8px + 4px = 12px); kept as-is.
+ * ------------------------------------------------------------------------------------------------ */
+
+[data-theme^="tzuchi"] .toolbar--attached {
+  /* R38 — concentric with the 8px joined-group corner it pads by 4px. */
+  border-radius: calc(var(--tc-radius-md, 8px) + var(--tc-space-4, 4px));
+}

@@ -1,0 +1,79 @@
+/* ==========================================================================
+   ListBox item — Tzu Chi option geometry (shared)
+   --------------------------------------------------------------------------
+   Scoped to [data-theme^="tzuchi"]; loaded into the "components" layer AFTER
+   heroui/styles/components/list-box-item.css. Upstream's light/dark are
+   untouched.
+
+   MODEL: tc `.option` — packages/components/src/dropdown/tc-dropdown.styles.ts
+   :82-93 — `padding: 8px 32px`, square full-bleed rows,
+   `font: var(--tc-typography-subtitle)` = 700 16px/1.5.
+
+   WHY HERE AND NOT IN select.css
+   `.list-box-item` is shared by Select, ComboBox, Autocomplete and the
+   standalone ListBox. Putting the row GEOMETRY here is what makes an option
+   look the same wherever it is rendered, which is the same reason pass 1 gave
+   HeroUI's menu rows the tc `.option` shape in dropdown.css. It is also what
+   keeps a Select and a Dropdown looking alike.
+
+   COLOUR IS DELIBERATELY ABSENT. tc's option colours (brand-surface panel,
+   brand-primary text, brand-surface-hover fill) only make sense on tc's tinted
+   listbox panel, which in HeroUI is the Select popover — so those live in
+   select.css, scoped to `.select__popover`. A standalone ListBox keeps HeroUI's
+   surface and its neutral `--default` hover, which the Tzu Chi theme already
+   maps to a Tzu Chi grey (gray-100 light / gray-900 dark). Nothing here is
+   mode-dependent, so nothing here can go wrong under "tzuchi-dark".
+
+   NOT CHANGED: min-h-9 (never binds once the row is 40px, but it keeps the
+   floor for label-less rows), gap-3, the absolute 16px `.list-box-item__indicator`
+   at `end-2` (the 32px text inset clears its 8+16 = 24px box), the pressed
+   scale(0.98), the disabled treatment (--disabled-opacity is already 0.38),
+   the focus ring, and the danger variant's colours — tc has no equivalent for
+   any of them.
+
+   Reviewed: no changes. `.list-box-item` and its `[data-slot="label"]` /
+   `[data-slot="description"]` children are confirmed against list-box-item.tsx,
+   label.css and description.css. The one rule is scoped under
+   [data-theme^="tzuchi"]. Every token used (--tc-space-8/-32,
+   --tc-font-size-16, --tc-line-height-normal, --tc-font-weight-bold/-regular)
+   is a mode-independent dimension/weight token per packages/tokens/dist/
+   tokens.css — no colour, so nothing here can differ between "tzuchi" and
+   "tzuchi-dark". Specificity ([data-theme^] + .list-box-item = 0,2,0) beats
+   the base `.list-box-item` rule (0,1,0) outright, and select.css's own
+   0,3,0 popover-scoped padding rule makes the popover's 32px inset correct
+   regardless of this file's import order relative to select.css. No variant/
+   size/state is hidden — danger colours, the indicator, the pressed scale
+   and the focus ring are all left as HeroUI ships them. No corrections
+   required.
+   ========================================================================== */
+
+[data-theme^="tzuchi"] .list-box-item {
+  /* tc-dropdown.styles.ts:82-93 — full-bleed square rows on the panel, where
+     HeroUI draws inset 16px-rounded pills (`rounded-2xl px-2 py-1.5`).
+     This also wins over the base `:has(.list-box-item__indicator) { pe-7 }`:
+     the absolutely positioned indicator still clears the 32px text inset. */
+  border-radius: 0;
+  padding-block: var(--tc-space-8, 8px);
+  padding-inline: var(--tc-space-32, 32px);
+
+  /* tc-dropdown.styles.ts:88 — `font: var(--tc-typography-subtitle)`
+     = 700 16px/1.5, against HeroUI's inherited `text-sm` (14px/20px) and
+     `.label`'s `font-medium`. Longhands only, so the theme's --font-sans stack
+     is not re-declared. Content 24px + 16px padding = 40px per row. */
+  font-size: var(--tc-font-size-16, 16px);
+  line-height: var(--tc-line-height-normal, 1.5);
+  font-weight: var(--tc-font-weight-bold, 700);
+
+  /* `.label` re-asserts `text-sm`/`font-medium` on its own (label.css:4). */
+  & [data-slot="label"] {
+    font-size: inherit;
+    line-height: inherit;
+    font-weight: var(--tc-font-weight-bold, 700);
+  }
+
+  /* `.description` sets no weight of its own, so it would inherit the 700
+     above. tc has no description; keep it at HeroUI's normal weight. */
+  & [data-slot="description"] {
+    font-weight: var(--tc-font-weight-regular, 400);
+  }
+}

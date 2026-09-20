@@ -30,3 +30,14 @@ body {
   --background: lab(1.54547% 0.178337 -0.64671);
   --foreground: lab(98.9676% -0.0000298023 -0.0000119209);
 }
+
+/*
+ * LOCAL CHANGE: the three overrides above are unlayered, so they would beat any
+ * theme (themes live in @layer theme). Hand them back to the layered value for
+ * the Tzu Chi themes, which define their own page colours and font.
+ */
+[data-theme^="tzuchi"] {
+  --background: revert-layer;
+  --foreground: revert-layer;
+  --font-sans: revert-layer;
+}

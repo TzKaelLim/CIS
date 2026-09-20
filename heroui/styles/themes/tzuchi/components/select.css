@@ -1,0 +1,302 @@
+/* ==========================================================================
+   Select — Tzu Chi shape/density/type overrides
+   --------------------------------------------------------------------------
+   Scoped to [data-theme^="tzuchi"]; loaded into the "components" layer AFTER
+   heroui/styles/components/{select,list-box,list-box-item,label}.css.
+   Upstream's own light/dark themes are untouched.
+
+   MODEL: packages/components/src/dropdown/tc-dropdown.styles.ts — tc-dropdown
+   is a form SELECT (combobox trigger + listbox popup), so HeroUI's Select is
+   its true counterpart. Pass 1 (components/dropdown.css) already transferred
+   the tc LISTBOX half onto HeroUI's action Dropdown; this file gives the same
+   panel treatment to Select's popover, and adds the half pass 1 could not:
+   the TRIGGER.
+
+   WHAT THIS CHANGES
+     TRIGGER (tc `.trigger`, tc-dropdown.styles.ts:10-64)
+       • padding-inline   12px (px-3)             -> 32px, 60px on the end so
+                                                     the chevron sits at the
+                                                     32px content inset
+       • type             14px/20px 400 (sm:text-sm) -> 700 16px/1.5
+                          (= --tc-typography-subtitle); height 38px -> 42px
+       • text colour      --field-foreground       -> --field-placeholder when
+                                                     empty, --accent once a
+                                                     value exists or while open
+       • chevron          fixed --field-placeholder -> currentColor, and
+                          16px (size-4)            -> 20px (--tc-icon-size-sm)
+       • open state       (none)                   -> filled --accent-soft-hover
+                                                     + --accent border + --accent
+                                                     text (tc :host([open]))
+       • invalid          neutral border + 1px danger outline
+                                                  -> border also --danger, as
+                                                     the themed Input does
+     POPOVER (tc `.listbox`, :66-80) — same treatment as pass-1 dropdown.css
+       • radius           24px (min(32px, --radius-3xl)) -> 8px
+       • surface          --overlay                -> --accent-soft
+       • text             inherited --foreground   -> --accent-soft-foreground
+       • listbox box      p-1.5 (6px)              -> 8px block / 0 inline
+       • option rows      px-2.5 (10px)            -> 32px (geometry itself
+                                                     lives in list-box-item.css)
+       • hover / focused / selected row            -> --accent-soft-hover
+       • focus ring offset colour --background     -> --accent-soft
+
+   NOT CHANGED (already correct through themes/tzuchi/variables.css, exactly as
+   pass-1 input.css found for the Input): --field-radius 8px = --tc-dropdown-radius,
+   --field-border-width 1px, --field-border / -hover / -focus, --field-background,
+   --field-placeholder, --field-shadow (none), --disabled-opacity 0.38, --font-sans,
+   the 2px focus ring at 2px offset, and the 150ms trigger transition.
+
+   VARIANT MAPPING
+     tc-dropdown has ONE look, and it maps to Select's default `primary`.
+       tc `.trigger`                ↔ .select__trigger  (.select--primary)
+       tc `.trigger.has-value`      ↔ .select__trigger:has(.select__value
+                                       :not([data-placeholder="true"]))
+       tc `:host([open]) .trigger`  ↔ .select[data-open="true"] .select__trigger
+       tc `.chevron` / rotate(180)  ↔ .select__indicator / [data-open="true"]
+       tc `.listbox`                ↔ .select__popover
+       tc `.option`                 ↔ [data-slot="list-box-item"]
+       tc `.option:hover/.active`   ↔ [data-hovered] / [data-focused]
+       tc `.option[aria-selected]`  ↔ [data-selected] / [aria-selected]
+       tc `.empty`                  ↔ (none — HeroUI uses renderEmptyState)
+       — no tc equivalent —         ↔ .select--secondary (neutral --default fill;
+                                       inherits every density/type/open/invalid
+                                       rule below and keeps its own fill, which
+                                       the theme already maps to a Tzu Chi grey)
+       — no tc equivalent —         ↔ .select__clear-button, multi-select chips,
+                                       sections, headers, descriptions, the
+                                       item indicator, async loading: left as
+                                       HeroUI ships them.
+
+   Reviewed: no changes. Verified against the live files — every class,
+   data-attribute and aria selector exists: select.tsx / list-box.tsx /
+   list-box-item.tsx (composeSlotClassName + data-slot props), label.css,
+   description.css, header.css, and react-aria-components@1.21.1's compiled
+   output (dist/private/Select.mjs:212 puts data-open on the .select ROOT
+   div, :293 puts data-placeholder on .select__value; dist/private/
+   ListBox.mjs:385-390 puts data-selected/-disabled/-hovered/-focused on
+   list-box items; aria-selected is native ARIA, already used the same way
+   by the base CSS). Every rule is scoped under [data-theme^="tzuchi"].
+   Every colour is a HeroUI theme variable (--field-placeholder, --accent,
+   --accent-soft, --accent-soft-hover, --accent-soft-foreground, --danger,
+   inherit, currentColor) — each an exact match to the tc token it replaces
+   in BOTH tzuchi and tzuchi-dark per packages/tokens/dist/tokens.css, whose
+   dark block (lines 409-431) only re-maps --tc-color- tokens and
+   --tc-elevation- tokens. Every dimension token used (--tc-space-8, -32;
+   --tc-icon-size-sm; --tc-font-size-16; --tc-line-height-normal;
+   --tc-font-weight-bold/-regular; --tc-dropdown-radius) resolves through
+   that same file to a mode-independent literal, never a colour. Cascade
+   checked property by property against every base rule it must beat,
+   including the two intentional specificity ties with list-box.css and
+   list-box-item.css that §5 of the gap-audit report explains (resolved by
+   this file's own 0,3,0 popover-scoped rules, so the result no longer
+   depends on components/index.css's import order), and the
+   [data-invalid][data-open] / hover-while-invalid compounds that mirror the
+   same cascade fix pass-1 input.css needed. No variant, size or state is
+   hidden: .select--secondary keeps its own fill and inherits every rule
+   below unchanged, .select__clear-button is untouched and never overlaps
+   the relocated chevron, and the width/height override is scoped to
+   [data-slot="select-default-indicator"] only, so CustomIndicator keeps its
+   own icon size. No !important, no colour literals, no --tzuchi-* additions
+   — every tc colour already has an exact per-mode HeroUI theme variable.
+   No corrections required.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Trigger box — tc `.trigger`
+   -------------------------------------------------------------------------- */
+
+/* tc-dropdown.styles.ts:24 — `padding: var(--tc-space-8) var(--tc-space-32)`.
+   The 8px block padding already matches HeroUI's `py-2`, so only the inline
+   axis moves. 32px is wider than the themed Input's 20px on purpose: it is
+   tc-dropdown's own Figma value, and it is the same inset pass 1 gave the
+   option rows, so the label does not jump when the panel opens. */
+[data-theme^="tzuchi"] .select__trigger {
+  padding-inline: var(--tc-space-32, 32px);
+
+  /* tc-dropdown.styles.ts:18 — `font: var(--tc-typography-subtitle)`
+     = 700 16px/1.5, one size at every width (HeroUI's `text-sm` is 14px/20px).
+     Longhands only, so the theme's --font-sans stack is not re-declared.
+     Content 24px + 16px padding + 2px border = 42px, above HeroUI's min-h-9. */
+  font-size: var(--tc-font-size-16, 16px);
+  line-height: var(--tc-line-height-normal, 1.5);
+  font-weight: var(--tc-font-weight-bold, 700);
+
+  /* tc-dropdown.styles.ts:20 — the collapsed trigger reads muted; the value
+     span (`text-current`) and the chevron (`currentColor` in tc) follow it. */
+  color: var(--field-placeholder);
+}
+
+/* In tc the chevron is an in-flow flex item sitting at the content edge, so the
+   label stops 32px + 20px chevron + tc's 8px trigger gap (:14) = 60px short of
+   the trigger's end. HeroUI reserves only `pe-7` = 28px for its absolutely
+   positioned 16px chevron, in a rule (0,2,0) that would otherwise tie with the
+   one above; this selector is 0,3,0, so it wins outright. A Select composed
+   without a Select.Indicator keeps the symmetric 32px. */
+[data-theme^="tzuchi"] .select__trigger:has(.select__indicator) {
+  padding-inline-end: calc(
+    var(--tc-space-32, 32px) + var(--tc-icon-size-sm, 20px) + var(--tc-space-8, 8px)
+  );
+}
+
+/* tc-dropdown.styles.ts:32-34 `.trigger.has-value` and :48-52
+   `:host([open]) .trigger` — both switch the whole trigger to brand-primary.
+   --accent resolves to exactly that primitive (blue-900 light, blue-300 dark),
+   the same one pass-1 dropdown.css reached for the option text. */
+[data-theme^="tzuchi"] .select__trigger:has(.select__value:not([data-placeholder="true"])),
+[data-theme^="tzuchi"] .select[data-open="true"] .select__trigger {
+  color: var(--accent);
+}
+
+/* tc-dropdown.styles.ts:48-52 — Figma "Expanded=True": filled brand-surface-hover
+   with a brand-primary edge. HeroUI shows no open state on the trigger at all,
+   so this is additive; it also wins over `.select--secondary`'s own fill. */
+[data-theme^="tzuchi"] .select[data-open="true"] .select__trigger {
+  background-color: var(--accent-soft-hover);
+  border-color: var(--accent);
+}
+
+/* While open, tc colours the label brand-primary whether or not a value is set;
+   HeroUI keeps `text-field-placeholder` on the placeholder span (0,2,0). */
+[data-theme^="tzuchi"] .select[data-open="true"] .select__value[data-placeholder="true"] {
+  color: inherit;
+}
+
+/* --------------------------------------------------------------------------
+   2. Value + chevron
+   -------------------------------------------------------------------------- */
+
+/* `.select__value` re-asserts `text-base sm:text-sm`, which drops the value to
+   14px/20px from 640px up. tc has one size at every width (same decision as
+   pass-1 input.css). Weight and colour are inherited from the trigger. */
+[data-theme^="tzuchi"] .select__value {
+  font-size: var(--tc-font-size-16, 16px);
+  line-height: var(--tc-line-height-normal, 1.5);
+}
+
+[data-theme^="tzuchi"] .select__indicator {
+  /* tc-dropdown.ts:224-227 — the chevron is `stroke="currentColor"`, so it
+     tracks the trigger colour (muted → brand-primary). HeroUI pins it to
+     `text-field-placeholder`. */
+  color: inherit;
+
+  /* HeroUI parks the chevron at `end-2` = 8px from the padding box. In tc it is
+     an in-flow flex item, so it sits at the 32px content inset instead — which
+     is what the trigger's 60px end padding above leaves room for. */
+  inset-inline-end: var(--tc-space-32, 32px);
+
+  /* tc-dropdown.styles.ts:54-60 — `--tc-icon-size-sm` = 20px, where HeroUI's
+     default chevron is `size-4` = 16px. Scoped to the DEFAULT indicator only,
+     so the CustomIndicator story keeps whatever size its own icon brings.
+     The 180° rotation on [data-open="true"] and the 150ms transition already
+     match tc (:58-64) and are left alone. */
+  &[data-slot="select-default-indicator"] {
+    width: var(--tc-icon-size-sm, 20px);
+    height: var(--tc-icon-size-sm, 20px);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   3. Invalid trigger
+   -------------------------------------------------------------------------- */
+
+/* tc-dropdown has no invalid state; this mirrors what pass-1 input.css did for
+   the themed Input, so the two fields fail the same way. HeroUI's
+   `status-invalid-field` outline is kept (it survives forced-colors mode and is
+   what thickens into the focus ring) and the border turns danger as well.
+   The [data-open="true"] compounds are here to outrank §1's open-state border. */
+[data-theme^="tzuchi"] .select[data-invalid="true"] .select__trigger,
+[data-theme^="tzuchi"] .select[aria-invalid="true"] .select__trigger,
+[data-theme^="tzuchi"] .select[data-invalid="true"][data-open="true"] .select__trigger,
+[data-theme^="tzuchi"] .select[aria-invalid="true"][data-open="true"] .select__trigger {
+  border-color: var(--danger);
+}
+
+/* Cascade fix, the same one pass-1 input.css needed: HeroUI's `:hover` rule on
+   `.select__trigger` is `class + :hover + :not(:has(.select__clear-button:hover))`
+   = specificity 0,4,0, which ties or beats the plain invalid override above and
+   would repaint the border `--field-border-hover` while hovering an invalid
+   field. These selectors are 0,5,0, so the danger edge always survives hover. */
+@media (hover: hover) {
+  [data-theme^="tzuchi"] .select[data-invalid="true"] .select__trigger:hover,
+  [data-theme^="tzuchi"] .select[data-invalid="true"] .select__trigger[data-hovered="true"],
+  [data-theme^="tzuchi"] .select[aria-invalid="true"] .select__trigger:hover,
+  [data-theme^="tzuchi"] .select[aria-invalid="true"] .select__trigger[data-hovered="true"] {
+    border-color: var(--danger);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   4. Popover = tc `.listbox` shell — identical treatment to pass-1 dropdown.css
+   -------------------------------------------------------------------------- */
+[data-theme^="tzuchi"] .select__popover {
+  /* tc-dropdown.styles.ts:78 — `--tc-dropdown-radius` = 8px. */
+  border-radius: var(--tc-dropdown-radius, var(--radius));
+
+  /* tc-dropdown.styles.ts:77/89 — listbox-bg = brand-surface, option-fg =
+     brand-primary. --accent-soft / --accent-soft-foreground resolve to exactly
+     those primitives in both tzuchi and tzuchi-dark. Elevation stays HeroUI's
+     --overlay-shadow (tc's --tc-elevation-2 is a light-only literal). */
+  background-color: var(--accent-soft);
+  color: var(--accent-soft-foreground);
+
+  & [data-slot="popover-overlay-arrow"] {
+    fill: var(--accent-soft);
+  }
+
+  /* tc-dropdown.styles.ts:75 — `padding: 8px 0`: rows run edge to edge and the
+     8px block padding keeps them clear of the 8px corner radius. This repeats
+     list-box.css's value on purpose: HeroUI's own
+     `.select__popover [data-slot="list-box"] { p-1.5 }` (0,2,0) would otherwise
+     win over that file at equal specificity. */
+  & [data-slot="list-box"] {
+    padding-block: var(--tc-space-8, 8px);
+    padding-inline: 0;
+  }
+
+  /* Same reason: `.select__popover [data-slot="list-box-item"] { px-2.5 }`
+     outranks list-box-item.css, which owns the rest of the row geometry. */
+  & [data-slot="list-box-item"] {
+    padding-inline: var(--tc-space-32, 32px);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   5. Option rows inside the tinted panel
+   -------------------------------------------------------------------------- */
+
+/* `.label` hard-codes `text-foreground`; on the brand panel the row text must
+   come from the popover's --accent-soft-foreground. Danger items keep theirs. */
+[data-theme^="tzuchi"]
+  .select__popover
+  [data-slot="list-box-item"]:not(.list-box-item--danger)
+  [data-slot="label"] {
+  color: inherit;
+}
+
+/* tc-dropdown.styles.ts:96-98 `.option:hover` (HeroUI uses the neutral
+   --default here). Mirrors upstream's hover-capable media query so touch
+   devices keep their behaviour. */
+@media (hover: hover) {
+  [data-theme^="tzuchi"] .select__popover [data-slot="list-box-item"]:hover,
+  [data-theme^="tzuchi"] .select__popover [data-slot="list-box-item"][data-hovered="true"] {
+    background-color: var(--accent-soft-hover);
+  }
+}
+
+/* tc-dropdown.styles.ts:97 `.option.active` (keyboard cursor) and :102-104
+   `.option[aria-selected="true"]` share that same fill. HeroUI marks selection
+   with the checkmark indicator only, so the fill is additive. */
+[data-theme^="tzuchi"] .select__popover [data-slot="list-box-item"][data-focused="true"],
+[data-theme^="tzuchi"] .select__popover [data-slot="list-box-item"][data-selected="true"],
+[data-theme^="tzuchi"] .select__popover [data-slot="list-box-item"][aria-selected="true"] {
+  background-color: var(--accent-soft-hover);
+}
+
+/* focus-ring paints its 2px offset gap in --background; on the tinted panel
+   that reads as a grey halo. tc draws the gap over the listbox itself
+   (tc-dropdown.styles.ts:36-40). Width/offset/colour already come from the
+   theme (--ring-offset-width = --tc-focus-ring-offset, ring-focus = --focus). */
+[data-theme^="tzuchi"] .select__popover [data-slot="list-box-item"]:focus-visible,
+[data-theme^="tzuchi"] .select__popover [data-slot="list-box-item"][data-focus-visible="true"] {
+  --tw-ring-offset-color: var(--accent-soft);
+}

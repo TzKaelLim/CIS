@@ -1,0 +1,105 @@
+/*
+ * Tzu Chi theme — ProgressCircle
+ * ---------------------------------------------------------------------------
+ * Base:   styles/components/progress-circle.css — `.progress-circle`,
+ *         `.progress-circle__track` (the <svg>), `__track-circle`,
+ *         `__fill-circle`, the `--sm` `--md` `--lg` sizes, the five colour
+ *         variants and the `progress-circle-spin` keyframes.
+ * Model:  no tc counterpart. The two nearest themed neighbours are the themed
+ *         ProgressBar (determinate value travelling over a passive track) and
+ *         the themed Spinner (a circular mark that spins).
+ *
+ * WHAT THIS CHANGES — motion only, two longhands:
+ *   1. R132 (a value/indicator travelling) — the determinate fill's
+ *      `stroke-dashoffset` transition moves from 300ms --ease-out to
+ *      motion.duration.base (200ms) + motion.easing.standard. The base file
+ *      gives the ProgressBar fill, the Meter fill and this fill the identical
+ *      `300ms var(--ease-out)`; the theme already retimed the first two
+ *      (progress-bar.css:143-146), so leaving this one behind would split one
+ *      family across two timings.
+ *   2. R135 (spin) — the indeterminate spin takes the theme's single spin
+ *      rate, --tc-spinner-duration = 0.8s, the same value spinner.css:69 gives
+ *      the Spinner. An indeterminate ProgressCircle and a Spinner are the same
+ *      gesture; two different revolution rates read as a bug. Its timing
+ *      function is already `linear`, which is what R134 asks for, so it is not
+ *      restated.
+ *
+ * DELIBERATELY LEFT ALONE — this is most of the component:
+ *   · Track colour. `--progress-circle-track-stroke: var(--default)` already
+ *     is R123's answer: ProgressCircle is named there as a PASSIVE track
+ *     ("the track is scenery; you read the fill"), so it keeps `--default`,
+ *     exactly like the themed ProgressBar and Meter. The Spinner's --border
+ *     ring (§7.1 row 2) is not borrowed — see the spec gap in the report for
+ *     the indeterminate case.
+ *   · Stroke width. R126: "Slider/Meter/ProgressCircle — NO EVIDENCE, keep
+ *     HeroUI's thicknesses." STROKE_WIDTH = 4 on an 18-unit-radius viewBox
+ *     lives in progress-circle.tsx:18-21 anyway, not in CSS.
+ *   · Radius. R32's pill is already there and is not expressible as
+ *     border-radius on an SVG stroke: progress-circle.tsx:159 sets
+ *     `strokeLinecap="round"` on the fill circle, so the fill's leading edge is
+ *     already round.
+ *   · Sizes 20 / 28 / 36px (`size-5` / `size-7` / `size-9`). The spec gives no
+ *     rule for them and §6 RESTRAINT says leave what it is silent on; the
+ *     off-scale `md` and `lg` are recorded as a spec gap instead.
+ *   · Fill colour --accent and all five colour variants (R75 / R88), the
+ *     `inline-flex` centring, the indeterminate 75%-circumference dash, the
+ *     -90° rotation and the disabled block (R85 / D2).
+ *
+ * VARIANT MAPPING — nothing is hidden or flattened: every size, every colour
+ * variant, the determinate and indeterminate states and disabled all keep
+ * their own treatment; only two timing values move.
+ *
+ * CASCADE NOTES
+ *   · `.progress-circle .progress-circle__fill-circle` is (0,2,0) → the first
+ *     rule below is (0,3,0). `.progress-circle:not([aria-valuenow])
+ *     .progress-circle__track` is (0,3,0) → the second rule is (0,4,0). Both
+ *     win on specificity alone.
+ *   · Only transition-duration / -timing-function and animation-duration are
+ *     set, never transition-property or animation-name (R136), so
+ *     `motion-reduce:transition-none` (transition-property: none) and
+ *     `motion-reduce:animate-none` (the `animation` shorthand, i.e.
+ *     animation-name: none) both keep winning where it matters: with no
+ *     animation-name nothing runs, whatever duration is declared.
+ *
+ * COLOURS — this file sets none at all. Only two mode-independent duration
+ * tokens and one easing token are referenced, each with a fallback.
+ *
+ * Reviewed: no changes. Verified against the live files: `.progress-circle`,
+ * `.progress-circle__track` / `__track-circle` / `__fill-circle` and the
+ * `:not([aria-valuenow])` indeterminate branch all exist in
+ * heroui/styles/components/progress-circle.css and are emitted by
+ * progress-circle.tsx (STROKE_WIDTH = 4 and strokeLinecap="round" on the fill
+ * circle confirmed in-source; the track circle draws a full, uncapped ring,
+ * so a linecap declaration would be a no-op — correctly left out); every rule
+ * is scoped [data-theme^="tzuchi"]; --tc-motion-duration-base,
+ * --tc-motion-easing-standard and --tc-spinner-duration all resolve in
+ * packages/tokens/dist/tokens.css to :root-only values, never restated under
+ * [data-theme="dark"] — mode-independent, each with a fallback, and no
+ * --tc-color-* or literal colour anywhere. Specificity: the fill-circle rule
+ * is (0,3,0) against the base's (0,2,0)
+ * (.progress-circle .progress-circle__fill-circle); the indeterminate-track
+ * rule is (0,4,0) against the base's (0,3,0)
+ * (.progress-circle:not([aria-valuenow]) .progress-circle__track), both
+ * confirmed by hand. Only transition-duration/-timing-function and
+ * animation-duration are set, never transition-property or animation-name,
+ * so motion-reduce:transition-none / motion-reduce:animate-none keep
+ * deciding whether anything runs at all — an animation-duration set outside
+ * their media query cannot make a `animation-name: none` element spin. No
+ * size, colour variant, determinate/indeterminate state or disabled
+ * treatment is touched, hidden or flattened. No "*" immediately followed by
+ * "/" outside a comment's own close.
+ */
+
+/* 1. R132 — the value travels at motion.duration.base with the standard
+   easing, exactly as the themed ProgressBar and Meter fills do. */
+[data-theme^="tzuchi"] .progress-circle .progress-circle__fill-circle {
+  transition-duration: var(--tc-motion-duration-base, 200ms);
+  transition-timing-function: var(--tc-motion-easing-standard, cubic-bezier(0.2, 0, 0, 1));
+}
+
+/* 2. R135 — one spin rate for the whole theme (spinner.css:69 sets the same
+   token on `.spinner`). Scoped to the indeterminate state, mirroring the base
+   rule, so the determinate track element is never given a stray duration. */
+[data-theme^="tzuchi"] .progress-circle:not([aria-valuenow]) .progress-circle__track {
+  animation-duration: var(--tc-spinner-duration, 0.8s);
+}

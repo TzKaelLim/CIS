@@ -1,0 +1,66 @@
+/* ==========================================================================
+   Header — Tzu Chi section-header inset (global)
+   --------------------------------------------------------------------------
+   Destination: styles/themes/tzuchi/components/header.css, imported into the
+   "components" layer AFTER heroui/styles/components/header.css. The one rule
+   is scoped by [data-theme^="tzuchi"], so upstream's own light/dark themes are
+   provably untouched.
+
+   WHAT `.header` IS
+   The React Aria <Header> a collection Section renders (header.tsx:15,
+   header.styles.ts:4). It is used in exactly one role across the library —
+   the label above a group of option rows — in Dropdown, ListBox, Select,
+   ComboBox and Autocomplete sections (the only five files that import it).
+   It is not a page header and not a Card header.
+
+   WHAT THIS CHANGES — one declaration
+     padding-inline   header.css:6 `px-2` = 8px  ->  32px
+   Spec §1.3 / §1.1 R8 and §9 R146: "section header in a list —
+   `padding-inline: var(--tc-space-32, 32px)`, flush with the option text;
+   block padding stays HeroUI's `pt-1.5 pb-1`."
+
+   WHY GLOBAL, WHEN TWO FILES ALREADY DO IT LOCALLY
+   dropdown.css:89-91 and list-box.css:56-58 each re-inset `.header` inside
+   their own column, with the identical value and the identical justification
+   ("must stay flush with the 32px option text"). Both remain correct and are
+   not contradicted — the value is the same. Moving the rule onto `.header`
+   itself makes it true for the one column neither of them reaches, the
+   standalone <Menu>, and for any future host, which is what pass 3 is for.
+
+   DELIBERATELY NOT CHANGED
+     font-size 12px (`text-xs`) — spec §1.3 keeps it: "It is a structural label
+       ABOVE 16/700 rows. Raising it would make it compete with the rows it
+       introduces. Only its inset moves."
+     font-weight 500, `text-muted` colour, `text-start`, `w-full`, and the
+       `pt-1.5 pb-1` (6px / 4px) block padding — R8/R146 move the inset only.
+
+   CASCADE
+     [data-theme^="tzuchi"] .header = (0,2,0) beats base `.header` (0,1,0).
+     It is out-ranked by dropdown.css's `.dropdown__popover .header` and
+     list-box.css's `.list-box .header`, both (0,3,0) — which set the same
+     32px, so the resolved value is 32px everywhere either way.
+
+   Reviewed: no changes. Verified against the live files — `.header` carries
+   `data-slot="header"` (header.tsx:15) and is imported by exactly the five
+   story files named above (dropdown, autocomplete, combo-box, list-box,
+   select — confirmed by grepping every React source for an import from
+   `components/header`); the base rule (header.css:6) matches. The rule is
+   scoped under [data-theme^="tzuchi"]; the one token used (--tc-space-32) is
+   confirmed mode-independent (32px, :root only) in packages/tokens/dist/
+   tokens.css; no colour, no shadow, no `!important`, no physical left/right,
+   no comment closed early. Checked against dropdown.css and list-box.css:
+   both already set the identical 32px on `.header` inside their own scope at
+   higher specificity, so this file changes nothing about what a Dropdown or
+   ListBox header renders (which also covers Select/ComboBox/Autocomplete,
+   since their popovers' listbox element carries the shared `.list-box`
+   class that `.list-box .header` targets — confirmed by list-box.css's own
+   header comment and gap-audit/select.md:176). What this file newly reaches
+   is the standalone <Menu>, the one column neither existing file scopes
+   into. No variant/size/state is hidden. No corrections required.
+   ========================================================================== */
+
+[data-theme^="tzuchi"] .header {
+  /* Flush with the 32px option-row text inset (R146). Size, weight and colour
+     stay HeroUI's; R8 keeps the 12px caption step on purpose. */
+  padding-inline: var(--tc-space-32, 32px);
+}

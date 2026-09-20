@@ -1,0 +1,154 @@
+/* ==========================================================================
+ * Tzu Chi theme — Switch
+ * --------------------------------------------------------------------------
+ * WHAT THIS CHANGES (everything else is HeroUI's and stays HeroUI's):
+ *   1. Track shape     — pill (radius.full) instead of rounded-xl (12px),
+ *                        44 × 24 instead of 40 × 20 at the default size.
+ *   2. Thumb shape     — an 18px CIRCLE instead of a 22 × 16 rounded rect,
+ *                        3px inset each side instead of 2px (ms-0.5).
+ *   3. Thumb elevation — --surface-shadow (= tc elevation.1, and it darkens
+ *                        in dark mode) in BOTH states, instead of the
+ *                        theme's empty --field-shadow when off and a
+ *                        hard-coded light-mode glow when on.
+ *   4. Off-track fill  — the tc "strong border" grey instead of --default,
+ *                        which in this theme is near-white and left the off
+ *                        state almost invisible.
+ *   5. Label type/gap  — body type (16px / 1.6 / 400) and an 8px gap instead
+ *                        of text-sm / medium / 12px.
+ *   6. Motion          — the tc duration + standard easing token.
+ *
+ * VARIANT MAPPING — tc-switch has ONE size and no variants:
+ *   tc-switch (44 × 24, thumb 18)  ↔  HeroUI size="md"  (the default)
+ *   HeroUI size="sm" / size="lg"   ↔  no tc equivalent; scaled from the same
+ *     geometry (track height ∓4px, width ∓8px, thumb = height − 2 × inset)
+ *     so the family stays coherent: sm 36 × 20 / 14, lg 52 × 28 / 22.
+ *   Untouched: checked / hover / pressed / focus-visible / disabled /
+ *   invalid colours, the Icon slot, SwitchGroup.
+ *
+ * Reviewed: no changes. Verified against the real files (not just the
+ * report): every class/attribute selector exists in
+ * heroui/styles/components/switch.css or is emitted by react-aria-components
+ * Switch (aria-checked / data-selected / data-disabled / data-reduce-motion,
+ * the latter per styles/variants/index.css's motion-reduce custom variant);
+ * every rule's outermost selector is [data-theme^="tzuchi"]; no --tc-color-*,
+ * no colour-valued --tc-switch-* token, no hex/rgb/hsl/oklch literal, no
+ * !important, only logical properties. Traced every dimension token used
+ * (--tc-switch-width/height/thumb-size/radius, --tc-space-8,
+ * --tc-font-size-16/-weight-regular, --tc-line-height-relaxed,
+ * --tc-motion-duration-base/-easing-standard, --tc-radius-full) through
+ * tokens.css — none resolve through a colour or a shadow. Confirmed
+ * --tzuchi-switch-track-bg's target (color.border.strong → light #828282,
+ * dark #95969b) and its --muted fallback both trace correctly.
+ * Re-derived the specificity of every override rule against the base rule(s)
+ * it must beat, including per-state and per-size ones: all overrides sit at
+ * (0,3,0)–(0,4,0) against a base of (0,1,0)–(0,3,0) and win in every case,
+ * with two specificity TIES at (0,3,0) that are both provably resolved:
+ * (a) this file's own checked-state rule for the thumb (0,4,0) supersedes
+ * both this file's unconditional thumb margin/box-shadow rule and the base's
+ * checked-state rule wherever they'd otherwise tie, so the tie never actually
+ * decides anything; (b) the sm/lg description/field-error indent rules tie
+ * the base's per-size rules at (0,3,0) and are decided by source order, which
+ * holds because styles/themes/tzuchi/index.css imports this theme's component
+ * layer after @heroui/styles into the same unlayered "components" layer
+ * (verified by reading that file). Confirmed the description/field-error
+ * indent formula (control-width + content-gap) reproduces the exact same
+ * 52/44/60px the base hard-codes today, and that the thumb-travel formula
+ * (100% − thumb-size − inset) reproduces tc-switch.styles.ts's own
+ * translateX formula byte-for-byte at md. storyId
+ * "components-controls-switch--default" confirmed present in index.json.
+ * ========================================================================== */
+
+[data-theme^="tzuchi"] .switch {
+  /* Geometry, default (md). --tc-switch-* are dimension tokens, mode-independent. */
+  --switch-control-width: var(--tc-switch-width, 44px);
+  --switch-control-height: var(--tc-switch-height, 24px);
+  --switch-thumb-size: var(--tc-switch-thumb-size, 18px);
+  --switch-thumb-inset: 3px;
+  --switch-content-gap: var(--tc-space-8, 8px);
+
+  /* Off-track fill. HeroUI's --default is the faint neutral fill here; tc uses
+     its strong-border grey, which is what makes the off state readable.
+     No HeroUI theme variable carries "strong border", hence the new name —
+     the fallback is the closest one that is already resolved per mode. */
+  --switch-control-bg: var(--tzuchi-switch-track-bg, var(--muted));
+
+  &.switch--sm {
+    --switch-control-width: 36px;
+    --switch-control-height: 20px;
+    --switch-thumb-size: 14px;
+  }
+
+  &.switch--lg {
+    --switch-control-width: 52px;
+    --switch-control-height: 28px;
+    --switch-thumb-size: 22px;
+  }
+
+  & .switch__control {
+    inline-size: var(--switch-control-width);
+    block-size: var(--switch-control-height);
+    border-radius: var(--tc-switch-radius, var(--tc-radius-full, 9999px));
+    transition:
+      background-color var(--tc-motion-duration-base, 200ms)
+        var(--tc-motion-easing-standard, ease),
+      box-shadow 150ms var(--ease-out);
+  }
+
+  & .switch__thumb {
+    inline-size: var(--switch-thumb-size);
+    block-size: var(--switch-thumb-size);
+    border-radius: var(--tc-radius-full, 9999px);
+    margin-inline-start: var(--switch-thumb-inset);
+    /* elevation.1, resolved per mode by the theme */
+    box-shadow: var(--surface-shadow);
+    transition:
+      margin var(--tc-motion-duration-base, 200ms) var(--tc-motion-easing-standard, ease),
+      background-color var(--tc-motion-duration-base, 200ms)
+        var(--tc-motion-easing-standard, ease);
+  }
+
+  /* On. Colours (bg-accent-foreground / text-accent) stay HeroUI's; only the
+     travel and the elevation change. 100% = the control's inline size. */
+  &[aria-checked="true"] .switch__thumb,
+  &[data-selected="true"] .switch__thumb {
+    margin-inline-start: calc(100% - var(--switch-thumb-size) - var(--switch-thumb-inset));
+    box-shadow: var(--surface-shadow);
+  }
+
+  & .switch__content {
+    gap: var(--switch-content-gap);
+    font-size: var(--tc-font-size-16, 16px);
+    font-weight: var(--tc-font-weight-regular, 400);
+    line-height: var(--tc-line-height-relaxed, 1.6);
+  }
+
+  /* Keeps the help text aligned under the label. Resolves to the same
+     52 / 44 / 60px the base already hard-codes, but re-derived so it follows
+     --tc-switch-width if that token is ever retuned. */
+  & > [data-slot="description"],
+  & > [data-slot="field-error"] {
+    padding-inline-start: calc(var(--switch-control-width) + var(--switch-content-gap));
+  }
+}
+
+/* The two transitions above out-specify HeroUI's own motion-reduce guard, so
+   restate it with the same semantics as the `motion-reduce` custom variant:
+   an explicit data-reduce-motion="true" first, the system preference second. */
+[data-theme^="tzuchi"]
+  .switch
+  :is(.switch__control, .switch__thumb):is(
+    [data-reduce-motion="true"],
+    [data-reduce-motion="true"] *
+  ) {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme^="tzuchi"]
+    .switch
+    :is(.switch__control, .switch__thumb):not(
+      :is([data-reduce-motion="true"], [data-reduce-motion="true"] *)
+    ) {
+    transition: none;
+  }
+}

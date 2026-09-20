@@ -1,0 +1,163 @@
+/*
+ * Tzu Chi theme — ColorInputGroup
+ * ---------------------------------------------------------------------------
+ * Base:   styles/components/color-input-group.css — `.color-input-group`,
+ *         `.color-input-group__input`, `.color-input-group__prefix`,
+ *         `.color-input-group__suffix`, `.color-input-group--primary`,
+ *         `.color-input-group--secondary`, `.color-input-group--full-width`.
+ * Model:  no tc counterpart. ColorInputGroup is the SHELL of ColorField
+ *         (react/src/components/color-field/index.ts maps `.Group` onto
+ *         ColorInputGroupRoot). DESIGN-LANGUAGE §3.4 names
+ *         "ColorField/ColorInputGroup" among the new field-family components
+ *         that "follow R49-R54 — the Input shape, not the Select shape", and
+ *         R21 files the colour-field hex under "derive" — a value typed into a
+ *         text field, i.e. R2. So this file is the same set of changes
+ *         date-input-group.css makes, minus the segment rule.
+ *
+ * VARIANT MAPPING
+ *   tc-input `.control` (one single look)  <->  .color-input-group and
+ *                                               .color-input-group--primary
+ *   — no tc equivalent —                  <->  .color-input-group--secondary
+ *        (neutral `--default` fill; inherits every rule below through the
+ *        shared BEM classes and keeps the theme-wide 1px `--field-border` —
+ *        every Tzu Chi field is bordered, D13)
+ *   host-level width in tc                <->  .color-input-group--full-width
+ *        (untouched)
+ *
+ * WHAT THIS CHANGES — height, type, density and two state edges only.
+ * Radius (8px via --field-radius), border width (1px), every colour, the
+ * flattened field shadow, the disabled opacity and cursor and the font family
+ * already resolve to the Tzu Chi values through themes/tzuchi/variables.css
+ * and are not repeated here (N5 / D1).
+ *
+ *   1. HEIGHT   `h-9` (a fixed 36px) becomes content-driven with a 43.6px
+ *      floor — R41/R49, the identical calc search-field.css:98-105 uses.
+ *   2. TYPE     the shell's 14px and the input's `text-base sm:text-sm`
+ *      step-down both become 16px/1.6 at every width — §1 + R2 (field value).
+ *   3. DENSITY  the input's inline inset goes 12px -> 20px — R50 (tc
+ *      `.control`: 8px 20px; the 8px block padding already matches `py-2`).
+ *      Beside an affix HeroUI's own `ps-2` / `pe-2` rules are (0,3,0) and keep
+ *      the 8px gap, which is tc's model exactly (R53).
+ *   4. AFFIXES  prefix/suffix move from `ms-3`/`me-3` (12px) to 20px from the
+ *      shell edge — R53, as on the themed SearchField.
+ *   5. FOCUS    the border turns `--field-border-focus` — R67; the base file
+ *      forgot it here exactly as it did on SearchField, applying only
+ *      `status-focused-field` and leaving the edge resting grey.
+ *   6. INVALID  the border turns `--danger` and survives hover — R68/R69.
+ *      Upstream points it at `--color-field-border-invalid`, a variable
+ *      nothing under styles/ ever defines, so today the declaration is invalid
+ *      at computed-value time and the edge falls back to currentColor.
+ *
+ * KEPT DELIBERATELY
+ *   · The focus RING (D21 / §11 I1) — Input, SearchField and Select all keep
+ *     HeroUI's 2px `--focus` ring rather than tc's 3px halo, and no box-shadow
+ *     is re-declared here (R74).
+ *   · The prefix / suffix colour (`text-field-placeholder`). In the stock
+ *     stories the prefix holds a ColorSwatch, which paints itself; R54's
+ *     accent-coloured 20px glyph is SearchField's own magnifier and has no
+ *     counterpart here.
+ *   · `overflow-hidden`, the input's `h-full`, the placeholder colour (already
+ *     `--field-placeholder`), the 150ms base transitions, `status-disabled`
+ *     (D2) and the `--secondary` fill (D13).
+ *
+ * CASCADE NOTES
+ *   · The focus rule is `&:is(:focus-within, [data-focus-within="true"])`;
+ *     `:is()` takes its most specific argument, so both branches are (0,3,0).
+ *     The invalid rule is also (0,3,0) and is declared after it, so a focused
+ *     invalid field keeps the danger edge (search-field.css:123-127).
+ *   · The base hover rule `.color-input-group:hover:not(:focus-within)` is
+ *     (0,3,0) — a tie with the plain invalid rule that import order alone
+ *     would decide. R69's mirror makes the invalid+hover pair (0,5,0).
+ *   · Everything else is (0,2,0) against (0,1,0) base declarations, including
+ *     the `sm:` step-down, which compiles to a nested media query on the same
+ *     (0,1,0) selector.
+ *
+ * Reviewed: no changes. Verified against styles/components/color-input-group.css
+ * (no :has()-guarded trigger to reproduce — confirmed react/src/components/
+ * color-input-group/color-input-group.tsx has no trigger slot at all, so the
+ * simpler unguarded focus rule here is correct, not an omission), the
+ * ColorField -> ColorInputGroup composition (color-field/index.ts:3-21),
+ * tokens.css (all four --tc-* tokens present, mode-independent, fallbacks
+ * intact), themes/tzuchi/variables.css (--field-border-focus/--danger
+ * confirmed mode-flipped), and --color-field-border-invalid confirmed
+ * referenced-and-never-declared (also hit in input-group.css, number-field.css,
+ * search-field.css, date-input-group.css). Brace/comment counts balanced
+ * (9/9, 13/13); no premature comment close; no colour literal, no
+ * --tc-color-*, no !important, no physical property.
+ * No file for color-field.css needed: confirmed against
+ * styles/components/color-field.css — the same 20-line 4px stack as
+ * date-field.css/time-field.css, and the hex value's own type lives on
+ * .color-input-group__input above, not on the field stack.
+ */
+
+[data-theme^="tzuchi"] {
+  /* ---------------------------------------------------------------- shell -- */
+  .color-input-group {
+    /* R41/R49 — a 16px/1.6 line box + 2x8px block padding + 2x1px border =
+       43.6px, the number input.css, textarea.css and search-field.css all land
+       on. `h-9` (36px) only fitted HeroUI's 14px/20px text. */
+    block-size: auto;
+    min-block-size: calc(
+      var(--tc-font-size-16, 16px) * var(--tc-line-height-relaxed, 1.6) + 2 *
+        var(--tc-space-8, 8px) + 2 * var(--field-border-width, 1px)
+    );
+
+    /* §1 — the shell's `text-sm` is a 14px role and Tzu Chi has no 14px step;
+       R2 (field value) is 400 16px/1.6. This is the context the prefix and
+       suffix inherit; the input restates it below because it carries its own
+       `text-base sm:text-sm`. */
+    font-size: var(--tc-font-size-16, 16px);
+    line-height: var(--tc-line-height-relaxed, 1.6);
+
+    /* R67 — focus paints the border, not only a ring, as `.input`
+       (input.css:29) and `.input-group` (input-group.css:36) already do. */
+    &:is(:focus-within, [data-focus-within="true"]) {
+      border-color: var(--field-border-focus);
+    }
+
+    /* R68 — the edge itself turns the error colour and stays there through
+       hover AND focus (tc-input). Declared after the focus rule: equal
+       specificity, later wins. */
+    &[data-invalid="true"] {
+      border-color: var(--danger);
+
+      /* R69 — the hover-vs-invalid trap: mirror both forms of the base hover
+         selector with [data-invalid] appended so the result cannot depend on
+         import order. */
+      @media (hover: hover) {
+        &:hover:not(:focus-within),
+        &[data-hovered="true"]:not([data-focus-within="true"]) {
+          border-color: var(--danger);
+        }
+      }
+    }
+  }
+
+  /* ----------------------------------------------------------------- text -- */
+  .color-input-group__input {
+    /* R50 — tc `.control`: padding 8px 20px; only the inline inset moves.
+       Beside a prefix/suffix the base `ps-2` / `pe-2` rules (0,3,0) keep the
+       8px gap to the hex value, which is tc's "pad 20px, gap 8px" model. */
+    padding-inline: var(--tc-space-20, 20px);
+
+    /* R2 / R21 (colour-field hex = a value typed into a field) — one body size
+       at every width, where HeroUI's `sm:text-sm` shrinks to 14px/20px above
+       40rem. Stated explicitly rather than inherited so the field value type
+       cannot drift if the shell's context changes. */
+    font-size: var(--tc-font-size-16, 16px);
+    line-height: var(--tc-line-height-relaxed, 1.6);
+  }
+
+  /* -------------------------------------------------------------- affixes -- */
+  .color-input-group__prefix {
+    /* R53 — 20px from the shell edge; the base `ps-2` rule keeps the 8px gap
+       to the value. HeroUI's `ms-3` is 12px. */
+    margin-inline-start: var(--tc-space-20, 20px);
+  }
+
+  .color-input-group__suffix {
+    /* Mirror of the prefix inset so the text box is symmetrical (base `me-3`
+       is 12px, base `pe-2` keeps the 8px gap). */
+    margin-inline-end: var(--tc-space-20, 20px);
+  }
+}

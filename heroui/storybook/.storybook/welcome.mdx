@@ -1,6 +1,8 @@
 import {Meta} from "@storybook/addon-docs/blocks";
 import {buttonVariants} from "@heroui/react";
 
+import {HeroUILogo} from "./components/heroui-logo";
+
 <Meta title="Welcome" />
 
 <br />
@@ -25,12 +27,15 @@ import {buttonVariants} from "@heroui/react";
         variant: "primary",
       })}
     >
-      <span className="[&>p]:text-white! [&>p]:font-semibold!">
+      {/* LOCAL CHANGE: was a forced text-white!. The force is still needed (Storybook's
+          docs typography otherwise recolours the label), but it now follows the theme:
+          white upstream, blue-900 on the light-blue tzuchi-dark accent. */}
+      <span className="[&>p]:text-accent-foreground! [&>p]:font-semibold!">
        Website
       </span>
       <svg
         aria-hidden="true"
-        className="flex stroke-current text-white! self-center"
+        className="flex stroke-current text-accent-foreground! self-center"
         fill="none"
         height="1em"
         shapeRendering="geometricPrecision"
@@ -103,7 +108,9 @@ import {buttonVariants} from "@heroui/react";
   </div>
 
   <div className="flex items-center gap-2">
-    <img src="/logo-dark.svg" style={{width: "120px", height: "auto"}} />
+    {/* LOCAL CHANGE: was a hard-coded /logo-dark.svg (#18181B), invisible on any
+        dark theme. This one is drawn in currentColor, so it follows every theme. */}
+    <HeroUILogo className="text-foreground" height={38} width={120} />
   </div>
 </div>
 

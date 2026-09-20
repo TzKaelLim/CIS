@@ -1,0 +1,238 @@
+/* ==========================================================================
+   ComboBox — Tzu Chi shape/density/type overrides
+   --------------------------------------------------------------------------
+   Scoped to [data-theme^="tzuchi"]; loaded into the "components" layer AFTER
+   heroui/styles/components/combo-box.css (and after input.css, list-box.css,
+   list-box-item.css, label.css). Upstream's own light/dark themes are
+   untouched.
+
+   MODEL. ComboBox has no tc-* counterpart. It is assembled from two roles the
+   design-language spec already settles:
+     • its TRIGGER is a real text field you type into, so DESIGN-LANGUAGE.md
+       §3.4 ("New field-family components … ComboBox input … follow R49-R54 —
+       the Input shape, not the Select shape") and §11 I3 ("FOLLOW 20px") put
+       it on the themed Input, which pass-1 input.css already delivers:
+       padding-inline 20px, 16px/1.6 at every width, 43.6px shell, the danger
+       edge on invalid. Nothing of that is repeated here.
+     • its POPOVER is an option-list popover, so §6(a) R89-R97 applies — the
+       identical treatment pass-2 select.css gives .select__popover. §11 I9
+       records ComboBox as one of the two panels pass 2 did not reach.
+
+   WHAT THIS CHANGES
+     DISCLOSURE AFFIX (the only part of the field shell still stock)
+       • chevron size     16px (size-4)       -> 20px (--tc-size-icon-sm) [R54]
+       • chevron inset    8px  (pe-2)         -> 20px (--tc-space-20)     [R53]
+       • text reserved    28px (pe-7)         -> 48px = 20 + 20 + 8, so the
+                          on the Input                 value keeps tc's 8px gap
+                          shell                        to the affix           [R53]
+     VALUE SUMMARY (multi-select only)
+       • type             14px (text-sm)      -> 16px/1.6 body    [§1 R2, R5]
+     POPOVER (= tc `.listbox`, tc-dropdown.styles.ts:66-80)
+       • radius           24px (min(32px, --radius-3xl)) -> 8px            [R89]
+       • surface          --overlay           -> --accent-soft             [R90]
+       • text             inherited           -> --accent-soft-foreground  [R90]
+       • arrow fill       --overlay           -> --accent-soft             [R91]
+       • list box         p-1.5 (6px)         -> 8px block / 0 inline      [R92]
+       • option rows      px-2.5 (10px)       -> 32px inline               [R93]
+       • row label        text-foreground     -> inherit                   [R94]
+       • hover / keyboard-cursor / selected row -> --accent-soft-hover  [R79/R96]
+       • ring offset      --background        -> --accent-soft             [R71]
+
+   DELIBERATELY LEFT AS HEROUI SHIPS IT
+     • The chevron's COLOURS. --field-placeholder at rest is already exactly
+       the colour the themed Select trigger's chevron resolves to at rest
+       (select.css:126 + :180), so the two pickers already agree. tc-dropdown's
+       "value present / expanded turns the whole trigger brand-primary" is a
+       SELECT-trigger rule (select.css:141-162); a ComboBox shell is an Input
+       you type into, and filling or recolouring it while open would fight the
+       text being entered. §6 RESTRAINT: the spec gives no rule for an open
+       text-field shell, so nothing is invented here.
+     • Root gap (gap-1 = 4px) — already R141/R142.
+     • Shell height, inline padding, border, hover/focus/invalid edges, the
+       focus ring: they all come from the Input, i.e. from input.css and from
+       themes/tzuchi/variables.css (D1, D21, §11 I1 "FOLLOW Input").
+     • The trigger button's own 4px focus-ring shape (`rounded`, already
+       --tc-radius-sm), its 150ms transition, its pressed opacity, its
+       disabled treatment (D2), and the 180deg open rotation.
+     • The popover's `text-sm` root size, its entering/exiting choreography,
+       `scroll-py-1`, `overscroll-contain`, `min-w-(--trigger-width)`, the
+       placement-based arrow rotation and --overlay-shadow (R97, R140) —
+       exactly the set select.css leaves alone on .select__popover.
+     • Section headers: `[data-theme^="tzuchi"] .list-box .header` in
+       list-box.css (0,3,0) already insets them 32px (R8/R95) and no base rule
+       in combo-box.css competes, so nothing is restated here.
+     • Row geometry and type (40px rows, 700 16px/1.5): list-box-item.css owns
+       them (R57). Only the popover-scoped inline padding is restated, for the
+       (0,2,0) tie R93 describes.
+
+   CASCADE NOTES (hand-derived)
+     • `.combo-box [data-slot="input"]:has(+ .combo-box__trigger)` is (0,3,0)
+       — it outranks `[data-theme^="tzuchi"] .input { padding-inline }` (0,2,0)
+       from input.css, which is why the reserved end padding must be restated
+       here at (0,4,0) rather than left to input.css.
+     • `.combo-box__trigger [data-slot="combo-box-trigger-default-icon"]` is
+       (0,2,0); the rule below is (0,3,0). It is scoped to the DEFAULT icon
+       only, so the CustomIndicator story's own `size-3` glyph is untouched.
+     • `.combo-box__popover [data-slot="list-box"]` (p-1.5) and
+       `… [data-slot="list-box-item"]` (px-2.5) are both (0,2,0) — a tie with
+       list-box.css / list-box-item.css that would otherwise be decided by
+       import order alone. The popover-scoped rules below are (0,3,0), so the
+       result no longer depends on it (R92/R93, same fix as select.css:246-260).
+     • Base `.list-box-item:hover` is (0,2,0) and its `[aria-selected]` rule is
+       empty; the state rules below are (0,4,0).
+
+   NO VARIANT, SIZE OR STATE IS HIDDEN: fullWidth, menuTrigger, single and
+   multiple selection, sections, descriptions, disabled options, async loading,
+   the item indicator, the danger row variant, CustomIndicator, and every
+   hover/press/focus/invalid/disabled state keep their own treatment.
+   No !important, no colour literal, no --tc-color-* token, no shadow token,
+   no new --tzuchi-* variable, no physical left/right.
+
+   Reviewed: no CSS changes. Verified against the live sources — every class,
+   data-attribute and pseudo-class exists: combo-box.tsx / combo-box.styles.ts
+   (the tv() slot map: base/inputGroup/popover/trigger/value ↔ .combo-box /
+   .combo-box__input-group / .combo-box__popover / .combo-box__trigger /
+   .combo-box__value), input.tsx (`data-slot="input"`), list-box.tsx
+   (`data-slot="list-box"`), and heroui/styles/components/combo-box.css line
+   by line against every "Replaces" claim above. Colour rule: grepped for
+   `--tc-color-`, hex/rgb/hsl/oklch literals and `!important` — none found
+   outside this comment's own prose; every `--tc-` token used (--tc-space-8/
+   -20/-32, --tc-size-icon-sm, --tc-font-size-16, --tc-line-height-relaxed,
+   --tc-dropdown-radius → --tc-radius-md) resolves in
+   packages/tokens/dist/tokens.css to a mode-independent literal with a
+   fallback, confirmed against both of that file's dark blocks; every colour
+   (--accent-soft, --accent-soft-foreground, --accent-soft-hover) is a HeroUI
+   theme variable already used identically by select.css's `.select__popover`,
+   which this file's popover section mirrors property for property. Cascade:
+   re-derived every specificity pair in the notes above by hand against
+   combo-box.css, input.css, list-box.css and list-box-item.css; every
+   override rule has strictly greater specificity than the base or sibling
+   rule it must beat, in every state (hover, focused, selected, invalid) and
+   for both the default and CustomIndicator icon paths. Comment bodies were
+   checked for a premature comment close (a glob followed by a slash) and
+   have none; open- and close-comment marker counts match. No variant, size
+   or state is hidden — see above. The only thing added by this review is
+   this "Reviewed" line, which the draft omitted; no corrections were
+   otherwise required.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. The field shell's disclosure affix
+   -------------------------------------------------------------------------- */
+
+/* R53 — an affix sits 20px from the shell edge and 8px from the text, which is
+   what the themed Input + SearchField pair already does (search-field.css:
+   176-201). HeroUI reserves `pe-7` = 28px for a 16px chevron parked at 8px;
+   the 20px chevron at a 20px inset needs 20 + 20 + 8 = 48px. Same construction
+   as select.css:135-139, with the Input's 20px inset instead of the Select
+   trigger's 32px (§11 I3 -> FOLLOW 20px). */
+[data-theme^="tzuchi"] .combo-box [data-slot="input"]:has(+ .combo-box__trigger) {
+  padding-inline-end: calc(
+    var(--tc-space-20, 20px) + var(--tc-size-icon-sm, 20px) + var(--tc-space-8, 8px)
+  );
+}
+
+[data-theme^="tzuchi"] .combo-box__trigger {
+  /* R53 — HeroUI's `pe-2` (8px) reads lopsided against the themed Input's 20px
+     leading inset; this is the mirror of search-field.css:194-201's clear
+     button. The trigger stays `end-0`/`h-full`, so only the padding moves. */
+  padding-inline-end: var(--tc-space-20, 20px);
+
+  /* R54 — the affix glyph is --tc-size-icon-sm (20px) square; HeroUI's default
+     chevron is `size-4` = 16px. Scoped to the DEFAULT icon so a custom child
+     keeps whatever size it brings. Width/height (not the logical pair) mirrors
+     select.css:192-195 for this exact role. */
+  & [data-slot="combo-box-trigger-default-icon"] {
+    width: var(--tc-size-icon-sm, 20px);
+    height: var(--tc-size-icon-sm, 20px);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   2. Multi-select value summary
+   -------------------------------------------------------------------------- */
+
+/* `.combo-box__value` is the block BELOW the input group that lists what is
+   selected (MultipleSelection stories). It is read as prose, not as a control
+   label, so §1.2 puts it on the body voice: 16px/1.6, weight inherited (R2/R5,
+   and the mechanical "every 14px role moves to 16px" rule of §1).
+   Its `[data-placeholder]` colour and the hidden item indicator are untouched. */
+[data-theme^="tzuchi"] .combo-box__value {
+  font-size: var(--tc-font-size-16, 16px);
+  line-height: var(--tc-line-height-relaxed, 1.6);
+}
+
+/* --------------------------------------------------------------------------
+   3. Popover = tc `.listbox` shell — R89-R97, identical to select.css:231-261
+   -------------------------------------------------------------------------- */
+[data-theme^="tzuchi"] .combo-box__popover {
+  /* R89 — tc-dropdown.styles.ts:78, --tc-dropdown-radius = --tc-radius-md = 8px. */
+  border-radius: var(--tc-dropdown-radius, var(--radius));
+
+  /* R90 — tc's listbox-bg = brand-surface and option-fg = brand-primary;
+     --accent-soft / --accent-soft-foreground resolve to exactly those
+     primitives in BOTH tzuchi and tzuchi-dark. R97: elevation stays HeroUI's
+     --overlay-shadow. */
+  background-color: var(--accent-soft);
+  color: var(--accent-soft-foreground);
+
+  /* R91 */
+  & [data-slot="popover-overlay-arrow"] {
+    fill: var(--accent-soft);
+  }
+
+  /* R58/R92 — `padding: 8px 0`: rows run edge to edge and the 8px block
+     padding keeps them clear of the 8px corner radius. Restated inside the
+     popover scope because HeroUI's own popover-scoped `p-1.5` ties with
+     list-box.css at (0,2,0). */
+  & [data-slot="list-box"] {
+    padding-block: var(--tc-space-8, 8px);
+    padding-inline: 0;
+  }
+
+  /* R57/R93 — same tie, same fix: the 32px option inset owned by
+     list-box-item.css is restated here so `px-2.5` cannot win. */
+  & [data-slot="list-box-item"] {
+    padding-inline: var(--tc-space-32, 32px);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   4. Option rows inside the tinted panel
+   -------------------------------------------------------------------------- */
+
+/* R94 — label.css:4 hard-codes `text-foreground`; on the brand panel the row
+   text must come from the popover's --accent-soft-foreground. Danger rows keep
+   their own colour. */
+[data-theme^="tzuchi"]
+  .combo-box__popover
+  [data-slot="list-box-item"]:not(.list-box-item--danger)
+  [data-slot="label"] {
+  color: inherit;
+}
+
+/* R79/R96 — tc `.option:hover`. HeroUI paints the neutral --default here.
+   Mirrors upstream's hover-capable media query so touch devices are unchanged. */
+@media (hover: hover) {
+  [data-theme^="tzuchi"] .combo-box__popover [data-slot="list-box-item"]:hover,
+  [data-theme^="tzuchi"] .combo-box__popover [data-slot="list-box-item"][data-hovered="true"] {
+    background-color: var(--accent-soft-hover);
+  }
+}
+
+/* R79/R82 — the keyboard cursor and the selected row share that same fill.
+   HeroUI marks selection with the checkmark indicator only, so this is
+   additive and the indicator is untouched. */
+[data-theme^="tzuchi"] .combo-box__popover [data-slot="list-box-item"][data-focused="true"],
+[data-theme^="tzuchi"] .combo-box__popover [data-slot="list-box-item"][data-selected="true"],
+[data-theme^="tzuchi"] .combo-box__popover [data-slot="list-box-item"][aria-selected="true"] {
+  background-color: var(--accent-soft-hover);
+}
+
+/* R71 — `focus-ring` paints its 2px offset gap in --background, which reads as
+   a grey halo on the tinted panel. Width, offset and ring colour already come
+   from the theme (D3); only the offset colour moves onto the panel. */
+[data-theme^="tzuchi"] .combo-box__popover [data-slot="list-box-item"]:focus-visible,
+[data-theme^="tzuchi"] .combo-box__popover [data-slot="list-box-item"][data-focus-visible="true"] {
+  --tw-ring-offset-color: var(--accent-soft);
+}
