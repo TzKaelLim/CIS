@@ -36,6 +36,25 @@
    before or after select.css. No variant/state hidden — overflow-clip, the
    Virtualizer's positioning and the separator's width are untouched. No
    corrections required.
+   Pass 5 (2026-09-20): the section-header inset below drops 32px -> 20px, for
+   the reason header.css records: 32px is tc-dropdown's POPOVER inset, and this
+   rule applied it to every list box, including the bare, width-constrained one
+   whose rows are now inset 20px (list-box-item.css, pass 5). The Select and
+   Autocomplete popovers re-assert 32px in their own files at (0,4,0), one step
+   above this rule, so the tinted panels are unaffected; the ComboBox popover
+   deliberately keeps 20px so its results line up with the typed query. The
+   separator's `ms-[3%] w-[94%]` is still untouched HERE — the four tinted
+   popovers full-bleed it in their own files, a bare list box keeps HeroUI's
+   look. Nothing else in this file changed.
+   Pass 5 reviewed (2026-09-20): diffed against the live theme file — only the
+   one briefed padding value differs. Rule scoped, no colour involved, no
+   !important, no physical property, comment markers balanced. Cascade
+   re-derived and confirmed live: `.list-box .header` is (0,3,0) and now loses
+   to select.css's / autocomplete.css's `.select__popover [data-slot="list-box"]
+   .header` / `.autocomplete__popover [data-slot="list-box"] .header` at
+   (0,4,0) (both probed at 32px), while a bare ListBox / a ComboBox popover
+   header sit at the new 20px. No other state or variant touched. No
+   corrections needed.
    ========================================================================== */
 
 [data-theme^="tzuchi"] .list-box {
@@ -51,9 +70,10 @@
   }
 
   /* Section headers have no tc equivalent, but they must stay flush with the
-     32px option text or the column breaks. Same decision as pass-1
-     dropdown.css, which raised `.dropdown__popover .header` to 32px. */
+     option text or the column breaks. PASS 5: outside a tinted popover that
+     text is inset 20px, not 32px, so the header follows it down; the Select
+     and Autocomplete popovers re-assert 32px at (0,4,0) in their own files. */
   & .header {
-    padding-inline: var(--tc-space-32, 32px);
+    padding-inline: var(--tc-space-20, 20px);
   }
 }

@@ -50,7 +50,47 @@
  *   that the tzuchi import order would otherwise let this file win), and no
  *   HeroUI size/colour variant is broken or hidden. All 5 assertions verified
  *   against real story ids in index.json and the resolved values above.
+ *
+ * PASS 5 (2026-09-20) — the tinted-surface guard now covers the Alert too.
+ * The `.spinner--current` rule below already derives the track from the
+ * inherited colour "because it rides on filled surfaces (Button pending,
+ * Toast)". The theme's Alert is exactly such a surface — alert.css:108-126
+ * repainted it with the *-soft washes — but an Alert's custom indicator is an
+ * ordinary `<Spinner size="sm">`, i.e. colour variant `accent`, not `current`,
+ * so it kept the neutral --border track: a grey donut on pale blue in light and
+ * on navy in dark, where the moving arc was barely lighter than the ring
+ * (reproduced on `components-feedback-alert--default`, the "Processing your
+ * request" card, in both themes). The new rule gives any spinner inside an
+ * `.alert__indicator` the same currentColor-derived track the toast case
+ * already gets, so the ring tints with the status instead of staying neutral.
+ * currentColor is the right channel: base alert.css:31-66 colours
+ * `.alert__indicator` per status and alert.css (theme):131-136 overrides the
+ * four toned ones to the raw tone, while the spinner's own
+ * `.spinner--accent { color: var(--accent) }` supplies the colour on the
+ * element itself — either way it is the card's own tone, never a neutral.
+ * Cascade: (0,3,0) against this file's `.spinner` (0,2,0) and the base's
+ * `.spinner--accent` (0,1,0), so it wins on specificity; the radial-gradient
+ * that paints the band stays on `.spinner` and simply reads the winning value
+ * of --spinner-track. Nothing else about the Alert spinner changes — the 20px
+ * `sm` size, the arc colour and the spin rate are untouched, and the
+ * `.toast__indicator` size guard below is a different selector on a different
+ * property and is unaffected.
  * =============================================================================
+ *
+ * Pass 5 reviewed (2026-09-20): diffed against the live
+ * styles/themes/tzuchi/components/spinner.css — only the new
+ * `.alert__indicator .spinner` guard and this header differ; every other
+ * rule (sizes, `--current`, the toast guard) is untouched. Confirmed the
+ * Alert story's loading indicator really is an unnamed-colour `<Spinner
+ * size="sm">` (default variant `accent`, not `current`), so it needed its
+ * own rule rather than relying on `.spinner--current`; confirmed the
+ * specificity math ((0,3,0) beats this file's own `.spinner` at (0,2,0) and
+ * the base's `.spinner--accent` at (0,1,0)). Verified live with the browser
+ * tool on the "Processing your request" alert in both themes: the ring is
+ * now a currentColor-tinted band instead of a neutral grey donut on the
+ * tinted card, while a plain Spinner outside an alert keeps its neutral
+ * `--border` track. Scoping, colour-token and comment-safety scans clean.
+ * No changes made — the fix matches the brief exactly.
  */
 
 /* Default size = tc `md`. `.spinner--md` carries no declarations of its own in
@@ -100,6 +140,16 @@
 /* `current` inherits the surface it sits on (Button pending, Toast), where a
    neutral --border track would be wrong. Derive it from that colour instead. */
 [data-theme^="tzuchi"] .spinner--current {
+  --spinner-track: color-mix(in oklab, currentColor 20%, transparent);
+}
+
+/* Pass 5 — same guard, for the Alert. An Alert's indicator slot sits on the
+   status-tinted alert surface, so a neutral --border ring is the wrong value
+   there for exactly the reason `.spinner--current` exists. The spinner in that
+   slot is colour variant `accent` (the component default), not `current`, so
+   it needs its own rule; (0,3,0) beats both `.spinner` (0,2,0) above and the
+   base's `.spinner--accent` (0,1,0). Size, arc colour and spin rate untouched. */
+[data-theme^="tzuchi"] .alert__indicator .spinner {
   --spinner-track: color-mix(in oklab, currentColor 20%, transparent);
 }
 

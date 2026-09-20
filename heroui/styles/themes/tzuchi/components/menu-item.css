@@ -29,6 +29,9 @@
    list-box-item.css makes and dropdown.css did not: `font-weight: 700` on the
    ROW rather than only on `[data-slot="label"]`, and the 400 reset that the
    row weight then makes necessary on `[data-slot="description"]`.
+   [Pass 5 changed the inline inset to 20px here and left 32px to
+   dropdown.css — see the pass-5 note below. The two files no longer agree on
+   that one value, on purpose.]
 
    COLOUR IS DELIBERATELY ABSENT, for exactly the reason list-box-item.css
    gives (:19-25): tc's option colours only make sense on tc's tinted listbox
@@ -36,11 +39,12 @@
    dropdown.css and select.css. A Menu on an untinted surface keeps HeroUI's
    neutral `--default` hover, which the theme already maps to a Tzu Chi grey
    (spec §5 R88 ①). Nothing here is mode-dependent.
+   [SUPERSEDED by Pass 5, note 3 — the row's STATE fills are now set here.]
 
    WHAT THIS CHANGES
      radius         menu-item.css:6 `rounded-2xl` = 16px  -> 0          (R57)
      padding-block  menu-item.css:6 `py-1.5` = 6px        -> 8px        (R57)
-     padding-inline menu-item.css:6 `px-2` = 8px          -> 32px       (R57)
+     padding-inline menu-item.css:6 `px-2` = 8px          -> 20px  (Pass 5)
      font-size      inherited; `.label` (label.css:4) re-asserts `text-sm`
                     = 14px                                -> 16px       (R4)
      line-height    20px via `text-sm`                    -> 1.5 = 24px (R4)
@@ -50,12 +54,11 @@
 
    LEFT AS HeroUI'S (spec §10 D16, the ListBoxItem twin of this component)
      `min-h-9`, `gap-3` (icon-to-label, no tc equivalent), the absolutely
-     positioned 16px `.menu-item__indicator` (start-2 / end-2 — the 32px text
-     inset clears its 8+16 = 24px box), the `.menu-item__indicator--submenu`
-     chevron, the pressed `scale(0.98)`, the focus ring, `status-disabled`,
-     the `@media (hover: hover)` `bg-default` hover fill, all transitions,
-     the checkmark / dot indicator motion, and `.menu-item--danger`'s label
-     and indicator colours (D12). No variant, size or state is hidden.
+     positioned 16px `.menu-item__indicator` (start-2 / end-2), the
+     `.menu-item__indicator--submenu` chevron, the pressed `scale(0.98)`,
+     the focus ring, `status-disabled`, all transitions, the checkmark / dot
+     indicator motion, and `.menu-item--danger`'s label and indicator colours
+     (D12). No variant, size or state is hidden.
 
    CASCADE (hand-derived; the theme's components/index.css loads after
    @heroui/styles in the same "components" layer, so ties go to this file)
@@ -92,16 +95,57 @@
    font-weight 700, the description's 400 reset) are recorded as a spec gap
    (dropdown.css sets the label's weight only) in the unit report, not a
    defect. No variant/size/state is hidden. No corrections required.
+   Pass 4 (2026-09-20): the focus ring, listed above as "left as HeroUI ships
+   it", is now drawn INSIDE the row, for the reason and by the construction
+   list-box-item.css records: this file made the row edge to edge (radius 0,
+   full width) and HeroUI paints the ring and its offset OUTSIDE the padding
+   box, so a clipping host cut its left and right segments off. Direction
+   only — the colour is still --focus, the width still 2px, and this file
+   still sets no colour of its own.
+   Pass 5 (2026-09-20): the three changes list-box-item.css records, because a
+   Menu row and a ListBox row are the same row and must not drift apart.
+     1. The inline inset is 20px (--tc-space-20, the field inset), not
+        tc-dropdown's 32px POPOVER inset. 32px stays inside the Dropdown,
+        which re-asserts it in dropdown.css at (0,3,0) — and, because the
+        submenu compound below is (0,4,0) and would otherwise drag a submenu
+        row back to 20px inside the panel, dropdown.css now re-asserts the
+        compound too, at (0,5,0).
+     2. `[data-slot="description"]` takes `overflow-wrap: anywhere`, so an
+        unbreakable string wraps instead of being clipped by the column.
+     3. STATE FILLS: hover --accent-soft, pressed / selected
+        --accent-soft-hover, mirroring the base's `@media (hover: hover)`
+        structure and its `[data-hovered]` / `[data-pressed]` /
+        `[aria-checked]` / `[aria-selected]` / `[data-selected]` hooks. A bare
+        Menu row answered a hover in HeroUI's neutral grey while the identical
+        row inside a Dropdown answered in the brand tint; now they agree.
+        `[aria-checked]` is included because a Menu's single-selection rows
+        use it where a ListBox uses `[aria-selected]` (menu-item.css:72-74).
+   Pass 5 reviewed (2026-09-20): diffed against the live theme file — only the
+   briefed changes differ (row inset, description wrap, submenu compound split
+   into start/end, and the new state-fill block); nothing else lost, reordered
+   or reformatted. Every rule scoped, every colour a HeroUI theme variable, no
+   !important, no physical box property, comment markers balanced. Verified
+   the submenu-compound arithmetic against the base file: base's own
+   `[data-has-submenu="true"]:has(.menu-item__indicator) { ps-2 pe-7 }` reads
+   as "no start reserve (indicator moved to the end), 28px end reserve for the
+   chevron" — this file's 20px start / 28px end is that same shape at the
+   theme's own text inset, not an invented number. Injection-verified live on
+   `components-collections-dropdown--with-submenus` (with dropdown.css's
+   pass-5 (0,5,0) re-assertion also loaded): the "Other" submenu row sits at
+   32px flush with its siblings, chevron clear. No variant, size or state
+   broken. No corrections needed.
    ========================================================================== */
 
 [data-theme^="tzuchi"] .menu-item {
   /* tc-dropdown.styles.ts:82-93 — full-bleed square rows, where HeroUI draws
      inset 16px-rounded pills. This also wins over the base
      `:has(.menu-item__indicator) { ps-7 }` variant by source order: the
-     indicator is absolutely positioned and still clears the 32px text inset. */
+     indicator is absolutely positioned and still clears the text inset.
+     PASS 5: the inline inset is the 20px FIELD inset; the Dropdown's own
+     32px is re-asserted in dropdown.css. */
   border-radius: 0;
   padding-block: var(--tc-space-8, 8px);
-  padding-inline: var(--tc-space-32, 32px);
+  padding-inline: var(--tc-space-20, 20px);
 
   /* tc-dropdown.styles.ts:88 — `font: var(--tc-typography-subtitle)`
      = 700 16px/1.5. Longhands only, so the theme's --font-sans stack is not
@@ -123,9 +167,12 @@
 
   /* `.description` (description.css:2-4) sets no weight of its own, so it
      would inherit the 700 above. tc has no description row; keep it at
-     HeroUI's normal weight, exactly as list-box-item.css:76-78 does. */
+     HeroUI's normal weight, exactly as list-box-item.css:76-78 does.
+     PASS 5 — and let it break inside a word, so an unbreakable string wraps
+     instead of being clipped by the menu's `overflow-clip`. */
   & [data-slot="description"] {
     font-weight: var(--tc-font-weight-regular, 400);
+    overflow-wrap: anywhere;
   }
 }
 
@@ -133,9 +180,94 @@
    submenu and carries an indicator gets `ps-2 pe-7` at (0,3,0). Note that the
    submenu chevron itself carries the `.menu-item__indicator` class
    (menu-item.styles.ts:12), so this compound matches EVERY submenu row, not a
-   rare corner. Re-point it at the same 32px inset — the chevron is absolutely
-   positioned at `end-2` in a 16px box, i.e. 8 to 24px from the edge, so the
-   32px text inset clears it. (0,4,0). */
+   rare corner. HeroUI's shape for it is "text inset on the start side, room
+   for the chevron on the end side", and that is what is reproduced here at the
+   pass-5 20px: the chevron is absolutely positioned at `end-2` in a 16px box,
+   i.e. 8 to 24px from the edge, so an end inset of 20 + 8 = 28px (HeroUI's own
+   `pe-7`) clears it. (0,4,0). */
 [data-theme^="tzuchi"] .menu-item[data-has-submenu="true"]:has(.menu-item__indicator) {
-  padding-inline: var(--tc-space-32, 32px);
+  padding-inline-start: var(--tc-space-20, 20px);
+  padding-inline-end: calc(var(--tc-space-20, 20px) + var(--tc-space-8, 8px));
 }
+
+/* --------------------------------------------------------------------------
+   State fills — PASS 5
+   -------------------------------------------------------------------------- */
+
+/* tc-dropdown.styles.ts:96-98 `.option:hover` and :102-104
+   `.option[aria-selected="true"]`, the twin of list-box-item.css's pass-5
+   block and identical to it declaration for declaration, because a Menu row
+   and a ListBox row are the same row. HeroUI paints the neutral --default on
+   hover and nothing at all on selection (menu-item.css:63-90, which only
+   animates the indicator), so a bare Menu answered a hover in grey while the
+   identical row inside a Dropdown answered in the brand tint.
+   The `@media (hover: hover)` wrapper and both state hooks mirror the base
+   rule exactly, so touch devices keep HeroUI's behaviour.
+   CASCADE: (0,3,0) against the base's `.menu-item:hover` (0,2,0). The
+   Dropdown's own fills are (0,4,0), so a row on the tinted panel is
+   unaffected. */
+@media (hover: hover) {
+  [data-theme^="tzuchi"] .menu-item:hover,
+  [data-theme^="tzuchi"] .menu-item[data-hovered="true"] {
+    background-color: var(--accent-soft);
+  }
+}
+
+/* Declared AFTER the hover block on purpose: same specificity, so a row that
+   is both selected and hovered keeps the stronger selected fill. A Menu marks
+   single selection with `[aria-checked]` and multiple with `[aria-selected]` /
+   `[data-selected]` (menu-item.css:72-74), so all three are covered. The
+   pressed branch mirrors the base's own `:active, [data-pressed="true"]` rule,
+   which only scales the row, so the scale is untouched. */
+[data-theme^="tzuchi"] .menu-item:active,
+[data-theme^="tzuchi"] .menu-item[data-pressed="true"],
+[data-theme^="tzuchi"] .menu-item[aria-checked="true"],
+[data-theme^="tzuchi"] .menu-item[aria-selected="true"],
+[data-theme^="tzuchi"] .menu-item[data-selected="true"] {
+  background-color: var(--accent-soft-hover);
+}
+
+/* --------------------------------------------------------------------------
+   Focus ring — PASS 4
+   -------------------------------------------------------------------------- */
+
+/* CLIPPED RING, the `.menu-item` twin of list-box-item.css's pass-4 rule and
+   identical to it declaration for declaration, because a Menu row and a ListBox
+   row are the same row (see WHY THIS FILE EXISTS above).
+   The rules above make an option edge to edge (radius 0, full width);
+   `focus-ring` (utilities/index.css:2-6, applied by menu-item.css:46-49) paints
+   BOTH its 2px ring and its 2px offset OUTSIDE the padding box, so any host
+   that clips — the Dropdown popover, or a Menu inside a Popover — removes the
+   ring's left and right segments and the keyboard user sees two horizontal
+   lines instead of a ring. Tailwind composes the ring from three custom
+   properties —
+     --tw-ring-offset-shadow: var(--tw-ring-inset,) 0 0 0 OFFSETW OFFSETC
+     --tw-ring-shadow:        var(--tw-ring-inset,) 0 0 0 calc(2px + OFFSETW) RINGC
+   — so giving --tw-ring-inset a value flips both layers inward, and a 0 offset
+   width leaves exactly one 2px band of --focus hugging the row edge on all four
+   sides (`focus-field-ring`, utilities/index.css:8-12, is HeroUI's own use of
+   the same idea). NO COLOUR IS INTRODUCED: a 0 offset width paints nothing, so
+   the row needs no knowledge of the fill behind it and the rule is as correct on
+   an untinted Menu as on the Dropdown's brand panel.
+   CASCADE: the base is `.menu-item:focus-visible:not([data-focused])` (0,3,0)
+   and `.menu-item[data-focus-visible="true"]` (0,2,0); mirroring the
+   `:not([data-focused])` branch makes this (0,4,0) / (0,3,0), so it wins
+   outright instead of depending on import order. Inside a Dropdown it agrees
+   with dropdown.css's own popover-scoped pass-4 rule (0,4,0) — same two
+   declarations, same values — so neither file contradicts the other. */
+[data-theme^="tzuchi"] .menu-item:focus-visible:not([data-focused]),
+[data-theme^="tzuchi"] .menu-item[data-focus-visible="true"] {
+  --tw-ring-inset: inset;
+  --tw-ring-offset-width: 0px;
+}
+
+/* Pass 4 reviewed (2026-09-20): verified against the live file — only the new
+   focus-ring block was added; nothing above it moved, reordered or
+   reformatted. Selector mirrors the base's :not([data-focused]) branch:
+   (0,4,0)/(0,3,0) against the base's (0,3,0)/(0,2,0) — wins outright, and it
+   agrees declaration-for-declaration with dropdown.css's own popover-scoped
+   rule, so the two files do not contradict each other where both apply
+   (verified on the Dropdown's danger row, dark theme — the ring is one clean
+   rectangle, "Delete file" keeps --danger). Comment safety scanned (marker
+   counts match). No colour introduced. No variant/size/state broken. No
+   corrections needed. */

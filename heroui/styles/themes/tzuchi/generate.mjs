@@ -84,6 +84,13 @@ const THEMED = {
   "--tzuchi-checkbox-border": "--tc-color-border-strong",
   "--tzuchi-radio-ring": "--tc-color-border-strong",
   "--tzuchi-switch-track-bg": "--tc-color-border-strong",
+  // An INTERACTIVE track the user has to find and grab (Slider; no tc counterpart).
+  // Light follows tc-switch's off-track, color.border.strong: 3.62:1 on the page,
+  // 3.84:1 on a card, and the --accent fill is 3.54:1 against it — all clear WCAG
+  // 1.4.11, where --border (1.77:1) and --default (1.05:1) do not. Dark is replaced
+  // in DARK_EXTRA: border.strong there is gray-500, which the light-blue fill
+  // collapses against (1.63:1); --border is 3.4:1 on the page and 2.93:1 to the fill.
+  "--tzuchi-slider-track-bg": "--tc-color-border-strong",
   "--tzuchi-accordion-trigger-hover-bg": "--tc-color-surface-subtle",
   "--tzuchi-modal-shadow": "--tc-elevation-4",
 };
@@ -116,6 +123,20 @@ const DARK_EXTRA = {
   "--danger-hover": "color-mix(in oklab, var(--danger) 88%, var(--tc-color-white) 12%)",
   "--success-hover": "color-mix(in oklab, var(--success) 88%, var(--tc-color-white) 12%)",
   "--segment": "var(--tc-color-gray-800)",
+  // Text on a STATUS fill. There is no on-error / on-success token, so text.on-brand
+  // stands in (THEMED above). In dark that is blue-900 — the brand ink — which paints a
+  // destructive button's label navy on salmon: legible (5.5:1) but the wrong hue
+  // family, and unlike light, where it is white on red. A neutral near-black keeps the
+  // status identity: 7.8:1 on red-300, 7.9:1 on green-400, 10.9:1 on amber-300.
+  "--danger-foreground": "var(--tc-color-gray-980)",
+  "--success-foreground": "var(--tc-color-gray-980)",
+  "--warning-foreground": "var(--tc-color-gray-980)",
+  // tc-accordion's header hover is color.surface.subtle. In dark that token is the PAGE
+  // colour (gray-980), i.e. DARKER than the card (gray-950) by 6/255: the row does not
+  // appear to react at all. Use the dark neutral fill instead, one step above the card.
+  "--tzuchi-accordion-trigger-hover-bg": "var(--tc-color-gray-900)",
+  // See THEMED: in dark the Slider track is the ordinary border colour.
+  "--tzuchi-slider-track-bg": "var(--border)",
 };
 
 /** Mode-independent values, shared by both themes. */
@@ -196,7 +217,8 @@ const lines = (pairs) => pairs.map(([name, value]) => `  ${name}: ${value};`).jo
 const themed = (mode) =>
   lines([
     ...Object.entries(THEMED)
-      .filter(([hv]) => !(mode === "dark" && DARK_OMIT.has(hv)))
+      // In dark, a DARK_EXTRA entry REPLACES the token lookup rather than following it.
+      .filter(([hv]) => !(mode === "dark" && (DARK_OMIT.has(hv) || hv in DARK_EXTRA)))
       .map(([hv, tc]) => [hv, resolve(tc, mode)]),
     ...(mode === "dark" ? Object.entries(DARK_EXTRA) : []),
   ]);

@@ -75,6 +75,15 @@ and selected the documented HeroUI way: `data-theme="tzuchi"` / `"tzuchi-dark"`.
     colour pickers, table, avatar / kbd / typography, disclosure); 16 components were
     confirmed to need none. All 84 upstream component style files are now accounted for:
     68 overridden, 16 deliberately not.
+  - Passes 4–5 — polish, no new files: a completeness sweep (all 583 stories × both
+    themes: sub-16px text, off-ladder radii, low-contrast text) and a screenshot-based
+    visual QA of the ten component families (1,523 screenshots incl. keyboard focus,
+    hover, open, invalid, disabled) found 69 defects; the triaged fixes went into 37 of the
+    override files — clipped focus rings on edge-to-edge option rows, one focus style for
+    every field shell (Tzu Chi's border + 3px halo), text on a fill taking that fill's
+    foreground, constant-white switch / slider thumbs, InputGroup affix overflow and
+    dividers, bare-list row inset, table row states, the today marker, and more. What was
+    deliberately NOT changed, and why, is in `gap-audit/README.md`.
 - **Added** `styles/themes/tzuchi/DESIGN-LANGUAGE.md` — the Tzu Chi design language as
   154 traceable rules (type scale, radius by role, control metrics, borders and focus,
   state colour grammar, overlay shells, tracks, motion, spacing, a do-not-touch list),
@@ -138,8 +147,12 @@ neutral twin of `color.brand.surface` / `-hover` and feed HeroUI's `--default` /
 `--default-hover` (tertiary and ghost buttons, the `secondary` field variants, tab and
 slider tracks, tags, kbd …). The values are a proposal backed by contrast numbers
 (`gap-audit/neutral-token-impact.md`), not a Figma decision — designers should confirm.
-The generator also sets `--segment` to gray.800 in the dark theme only (a primitive;
-documented at `DARK_EXTRA` in `generate.mjs`).
+The generator also sets a few values in the dark theme only, where no semantic token has
+the right pair (each documented at `DARK_EXTRA` in `generate.mjs`): `--segment` (gray.800),
+the three status foregrounds `--danger/-success/-warning-foreground` (gray.980 — text.on-brand
+is the navy brand ink in dark), the accordion hover fill (gray.900 — tc's token is the page
+colour there, darker than the card) and the Slider track (`--border`; light uses
+`color.border.strong`).
 
 ## Known state inherited from upstream
 

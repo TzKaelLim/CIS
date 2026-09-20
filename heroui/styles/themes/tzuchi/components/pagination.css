@@ -78,6 +78,39 @@
    suppresses hover on the current page. All 6 assertions from the audit were
    re-derived independently and confirmed against the resolved token chain and
    the `Default` story's actual markup; none were dropped.
+
+   Pass 5 (2026-09-20) — the focus ring hugs the cell: ring offset 0 here.
+   This SUPERSEDES the "focus ring (already 2px --focus at 2px offset)" entry
+   in NOT CHANGED.  WHY: the theme's other two decisions collide at this one
+   spot.  The gap between cells is HeroUI's `gap-1`, kept because it is
+   already 4px (--tc-space-4); the cell is no longer a 24px pill but a 4px
+   square that has grown from 32px to 40px.  A 2px ring at a 2px offset
+   reaches 4px outward, i.e. exactly across that gap, so tabbing to a page
+   number put its ring flush against the filled current-page chip — two
+   squares meeting corner to corner, which reads as a collision.  Upstream's
+   round pills keep daylight at the same spacing; square ones cannot.
+   Width and colour are untouched (2px --focus), so this is the same ring, a
+   ring's width closer in.  Applied to every `.pagination__link`, numbers and
+   the prev/next buttons alike, because they sit in the same 4px strip and one
+   strip should not carry two ring geometries.
+   MECHANISM: `status-focused` -> `focus-ring` reads its offset from
+   `--tw-ring-offset-width: var(--ring-offset-width)`
+   (styles/utilities/index.css:1-6), and --ring-offset-width is a theme-level
+   variable (themes/tzuchi/variables.css:24 = --tc-focus-ring-offset).
+   Re-pointing it on the link is a scoped, per-component answer that needs no
+   !important and no restating of the ring itself; the base never declares
+   --ring-offset-width on this element, so there is nothing to out-specify.
+   The value is a dimension, not a colour, and 0 has no token.
+
+   Pass 5 reviewed (2026-09-20): no changes. Diffed against the live
+   styles/themes/tzuchi/components/pagination.css — only the briefed
+   `--ring-offset-width: 0px` declaration on `.pagination__link` is new.
+   Re-probed in the browser (both themes, sm/md/lg sizes): the focus ring is
+   still 2px --focus, now at a 0px offset, hugging the cell instead of
+   reaching across the 4px gap into a neighbouring filled current-page chip;
+   focusing the current-page cell itself shows the same tight ring on its
+   navy fill. Comment safety, colour-literal, !important, physical-property
+   and scope scans: clean.
    ========================================================================== */
 
 [data-theme^="tzuchi"] .pagination {
@@ -90,6 +123,10 @@
    -------------------------------------------------------------------------- */
 
 [data-theme^="tzuchi"] .pagination__link {
+  /* Pass 5 — the ring hugs the cell: a 4px square in a 4px gap has no room
+     for a 2px offset.  `focus-ring` reads its offset from here. */
+  --ring-offset-width: 0px;
+
   border-radius: var(--tc-pagination-radius, var(--radius-sm));
   block-size: var(--pagination-item-size);
 

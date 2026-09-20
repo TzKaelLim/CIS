@@ -12,8 +12,12 @@
  *         (resting elevation) as applied by themes/tzuchi/components/switch.css.
  *
  * WHAT THIS CHANGES — three things, nothing else:
- *   1. TRACK COLOUR (the only visible repaint). `bg-default` becomes
- *      `--border`. R124: a Slider track is an INTERACTIVE track — you have to
+ *   1. TRACK COLOUR (the only visible repaint). `bg-default` became `--border`
+ *      in pass 3; PASS 5 REFINED IT PER MODE — light now uses border.strong
+ *      (3.62:1 on the page, closing the "Residual" below for light), dark keeps
+ *      `--border` for exactly the 1.63:1 reason given below. See the rule's own
+ *      comment. The pass-3 reasoning is kept as written:
+ *      R124: a Slider track is an INTERACTIVE track — you have to
  *      locate and grab it — so it does not get ProgressBar's passive
  *      `--default`. Under this theme `--default` is gray-100 (#f2f2f2) light /
  *      gray-900 (#333333) dark, which is 1.12:1 against a card and 1.05:1
@@ -182,6 +186,39 @@
  * 14px/500 beside 16px/1.6 readouts, and the handle would have kept the
  * theme's empty `--field-shadow`. The sentence now names the sequence instead
  * of spelling it (brief rule 8). No selector, declaration or value changed.
+ *
+ * Pass 5 (2026-09-20): the visible handle (.slider__thumb::after) is pinned to
+ * var(--white). It was painted bg-accent-foreground by the base
+ * (styles/components/slider.css:49), which in tzuchi-dark resolves to the dark
+ * navy #1b2d58 because the dark accent is a light blue — so the handle turned
+ * into a hole punched in the accent fill, worst at the bottom of the range
+ * where a navy handle sat on the #6b6b6e unfilled track, and all but vanished
+ * on the disabled story. In light the same variable is white, so the component
+ * did not even have one handle identity across the two modes. This is the same
+ * call switch.css takes for the switch thumb, from the same recorded decision
+ * (tc-switch.styles.ts:29-38, "a constant white reads on both track colours,
+ * in light AND dark"): a slider handle is that object. --white is a HeroUI
+ * primitive declared on :root/:host (themes/default/variables.css:12) and never
+ * re-declared per mode, so the handle is mode-independent by construction.
+ * The declaration joins the existing ::after rule, which is (0,3,0) plus a
+ * pseudo-element against the base's (0,2,0), so it wins on specificity alone
+ * and covers rest, hover, dragging, focus-visible and disabled at once — the
+ * base repaints the handle in none of those states, and the orientation blocks
+ * (0,3,0) declare only width/height on the pseudo-element, so nothing is
+ * contested. Single and range (both thumbs are selected by class) and both
+ * orientations are covered for the same reason. Verified in tzuchi and
+ * tzuchi-dark on --default, --range, --vertical and --disabled; the track
+ * colour (--tzuchi-slider-track-bg), the radii, the readout type and the
+ * --surface-shadow elevation are untouched, as is .color-slider, which has its
+ * own class names.
+ *
+ * Pass 5 reviewed (2026-09-20): diffed against the pre-Pass-5 file — only this header paragraph
+ * and the single `background-color: var(--white)` declaration differ, the integrator's
+ * track colour variable (since renamed --tzuchi-slider-track-bg) is untouched. Re-verified the pseudo-element specificity claim
+ * against heroui/styles/components/slider.css by hand. Re-rendered a state the fixer's report
+ * did not list — keyboard drag (Tab then ArrowRight) on --default in tzuchi-dark — and a fully
+ * vertical --vertical render in tzuchi-dark: the handle stayed white with its focus ring in both.
+ * No changes needed.
  */
 
 [data-theme^="tzuchi"] .slider {
@@ -200,9 +237,17 @@
     line-height: var(--tc-line-height-relaxed, 1.6);
   }
 
-  /* 1. R124 — interactive track. 3. R32/R125 — pill, on the root scope. */
+  /* 1. R124 — interactive track. 3. R32/R125 — pill, on the root scope.
+     Pass 5 (the owner delegated the call): the track colour is resolved per mode by
+     ../generate.mjs as --tzuchi-slider-track-bg, because no single token works in
+     both. LIGHT follows tc-switch's off-track, color.border.strong: 3.62:1 on the
+     page, 3.84:1 on a card, and the --accent fill is 3.54:1 against it — all clear
+     WCAG 1.4.11, where --border managed 1.77:1. DARK stays --border: 3.4:1 on the
+     page and 2.93:1 to the fill, whereas border.strong there (gray-500) leaves the
+     light-blue fill only 1.63:1 — the objection item 1 of this header records.
+     The fallback, --border, is what the file used before. */
   & .slider__track {
-    background-color: var(--border);
+    background-color: var(--tzuchi-slider-track-bg, var(--border));
     border-radius: var(--tc-radius-full, 9999px);
   }
 
@@ -217,5 +262,11 @@
   & .slider__thumb::after {
     border-radius: var(--tc-radius-full, 9999px);
     --tw-shadow: var(--surface-shadow);
+
+    /* Pass 5 — a constant white handle in both modes, replacing the base's
+       bg-accent-foreground (navy under tzuchi-dark). One declaration covers
+       rest / hover / dragging / focus-visible / disabled, single and range,
+       horizontal and vertical: no base rule repaints this pseudo-element. */
+    background-color: var(--white);
   }
 }

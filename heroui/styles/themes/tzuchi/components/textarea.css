@@ -24,7 +24,8 @@
  *      added back to keep the same visible box.
  *   3. Type     — a flat 16px/1.6 (--tc-typography-body) in place of 16px/1.5
  *      shrinking to 14px/1.43 at >=40rem. Tzu Chi has one body size at every width.
- *   4. Focus    — HeroUI's 2px solid --focus ring becomes Tzu Chi's soft 3px halo.
+ *   4. Focus    — HeroUI's 2px solid --focus ring becomes Tzu Chi's soft 3px
+ *      halo, by swapping Tailwind's --tw-ring-shadow layer (see Pass 4 below).
  *   5. Invalid  — the border itself turns danger, as in tc-textarea, and stays
  *      danger on hover (see Reviewed note below).
  *   6. Resize   — vertical only.
@@ -49,6 +50,29 @@
  * instead of depending on cascade-layer import order for a same-specificity
  * tie. No other declaration in the file had a base rule of equal or higher
  * specificity to beat, so nothing else changed.
+ *
+ * Pass 4 (2026-09-20): the halo is unchanged in appearance but is now drawn
+ * the same way every other field draws it. This file used to re-declare
+ * `box-shadow` outright — the one exception R74 records — which threw away the
+ * whole Tailwind shadow composition (--tw-inset-shadow,
+ * --tw-inset-ring-shadow, --tw-ring-offset-shadow, --tw-ring-shadow,
+ * --tw-shadow) including `shadow-field`. Now it overrides only the ring layer,
+ * --tw-ring-shadow, exactly as input.css, search-field.css and the rest of the
+ * field family do after the integrator settled (the owner delegated the call) §11 I1 / §12 Q2. Same computed
+ * result under this theme (--field-shadow is `none`, so the surviving layers
+ * are transparent), one mechanism instead of two, and R74's objection no
+ * longer applies to any field file.
+ *
+ * Pass 4 reviewed: confirmed the two halo rules now set only --tw-ring-shadow
+ * and that the raw box-shadow declaration is gone from both the pale and the
+ * danger rule. This removal cannot be injection-tested (the build still serves
+ * the old file), so it was reasoned instead: the base focus rule this file
+ * relies on (identical in shape to Input's) already establishes the five-layer
+ * composition via focus-field-ring, and Input's own conversion was
+ * injection-verified to produce the same 3px band with the other layers
+ * transparent under this theme — the two files share that base shape, so the
+ * same result follows here. Selectors and colours are byte-identical to the
+ * pre-Pass-4 file; nothing else changed. No corrections needed.
  */
 
 [data-theme^="tzuchi"] {
@@ -76,10 +100,18 @@
        (--tc-color-brand-surface-hover) replaces HeroUI's 2px solid --focus ring.
        --accent-soft-hover is that exact tint in both Tzu Chi modes (blue-200
        light / blue-700 dark), so no new theme variable is needed. The focused
-       border colour is already --field-border-focus = tc color.border.focus. */
+       border colour is already --field-border-focus = tc color.border.focus.
+       Pass 4: written as an override of Tailwind's ring LAYER rather than as a
+       `box-shadow` declaration. The base composes `box-shadow` from
+       var(--tw-inset-shadow), var(--tw-inset-ring-shadow),
+       var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+       replacing only --tw-ring-shadow puts the halo where the ring was and
+       leaves `shadow-field` and the inset layers alone. `focus-field-ring`
+       already pins --tw-ring-offset-width to 0, so no offset band survives.
+       Specificity is unchanged at (0,3,0) against the base's (0,2,0). */
     &:focus,
     &[data-focused="true"] {
-      box-shadow: 0 0 0 3px var(--accent-soft-hover);
+      --tw-ring-shadow: 0 0 0 3px var(--accent-soft-hover);
     }
 
     /* tc-textarea.styles.ts:72-80 — invalid recolours the border itself, and a
@@ -100,11 +132,15 @@
         }
       }
 
+      /* Pass 4: same layer-override mechanism as the pale halo above. At
+         (0,4,0) it clears both the base's invalid-focus ring (0,3,0) and this
+         file's own (0,3,0) pale-halo rule, so a focused invalid Textarea
+         cannot fall back to the brand tint on source order. */
       &:focus,
       &:focus-visible,
       &[data-focused="true"],
       &[data-focus-visible="true"] {
-        box-shadow: 0 0 0 3px var(--danger);
+        --tw-ring-shadow: 0 0 0 3px var(--danger);
       }
     }
   }

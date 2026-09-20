@@ -49,6 +49,43 @@
  * same pattern already used by themes/tzuchi/components/index.css for .button. No variant,
  * size or state is hidden or broken (Alert has no interactive states of its own; the
  * dismiss/CloseButton is a separate component, correctly left untouched).
+ *
+ * Pass 5 (2026-09-20): the close button is transparent AT REST inside an Alert.
+ * This SUPERSEDES the "the dismiss/CloseButton is a separate component,
+ * correctly left untouched" clause above.  `.close-button--default` keeps
+ * `bg-default` (styles/components/close-button.css:46-48) — a pale grey disc on
+ * the now-tinted status card, the one neutral element on an otherwise toned
+ * surface (reproduced on `components-feedback-alert--default`, the "Profile
+ * updated successfully" card, in both themes).  Upstream's Alert is white, so
+ * the same grey disc looks native there; this theme's does not.  The fix is the
+ * four-state guard ./modal.css:112-120 and ./tag.css:153-161 already use on the
+ * dialog close trigger and the tag remove button — transparent while none of
+ * hover / data-hovered / active / data-pressed is set, so the moment any of
+ * them is, the rule simply stops applying and close-button.css's own
+ * `bg-default-hover` (and the pressed scale) take over untouched.  None of
+ * `status-focused` / `status-disabled` / `status-pending` touches
+ * background-color, so focus, disabled and pending are unaffected too.
+ * The Alert has no close-button slot class of its own — alert.styles.ts emits
+ * only base/content/description/indicator/title and the story composes a plain
+ * `<CloseButton />` — so the descendant form `.alert .close-button--default` is
+ * the only shape available; it is still scoped to this component's subtree.
+ * Cascade: (0,4,0) (the :not() contributes its most specific argument,
+ * `[data-hovered="true"]`) against the base variant rule's (0,1,0).
+ * Measured after, tzuchi-dark: rest background rgba(0,0,0,0) (bare glyph),
+ * hover rgb(79,79,79) = --default-hover, i.e. the chip appears on hover exactly
+ * as it does on a Modal.
+ *
+ * Pass 5 reviewed (2026-09-20): diffed against the live
+ * styles/themes/tzuchi/components/alert.css — only the new Dismiss guard and
+ * this header differ; shape/density, indicator, typography and status-variant
+ * rules are byte-identical. Confirmed the story really has no dedicated
+ * close-button slot class, so the descendant selector is the closest safe
+ * shape, matching modal.css's and tag.css's guard pattern. Verified live with
+ * the browser tool on the "Profile updated successfully" alert in both
+ * themes: the close glyph is transparent at rest, fills on hover, and the
+ * focus-visible ring is untouched; disabled/pending are unaffected since
+ * the guard never touches them. Comment safety, colour-token and scope scans
+ * clean. No changes made — the fix matches the brief exactly.
  */
 
 /* ── Shape, density and the flat tinted callout ──────────────────────────── */
@@ -133,4 +170,20 @@
 [data-theme^="tzuchi"] .alert--warning .alert__indicator,
 [data-theme^="tzuchi"] .alert--danger .alert__indicator {
   color: var(--alert-accent);
+}
+
+/* ── Dismiss ─────────────────────────────────────────────────────────────── */
+/* Pass 5 — a bare glyph at rest on the tinted card; the chip appears only on
+   hover / press. The :not() list is what hands hover, pressed, focus-visible,
+   disabled and pending straight back to close-button.css: this rule stops
+   applying the moment any of them is active. Same guard shape as ./modal.css
+   and ./tag.css. `transparent` is a keyword, not a colour literal. */
+[data-theme^="tzuchi"]
+  .alert .close-button--default:not(
+    :hover,
+    [data-hovered="true"],
+    :active,
+    [data-pressed="true"]
+  ) {
+  background-color: transparent;
 }

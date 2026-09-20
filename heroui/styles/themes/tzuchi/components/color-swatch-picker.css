@@ -92,32 +92,56 @@
      rows, branch two (0,5,0) for the selected ones, both winning on
      specificity or on source order at a tie.
    - motion: mine is (0,2,0) against the base's (0,1,0).
+
+   PASS 5 (2026-09-20) — the square swatch takes the item's own 4px radius; the
+   concentric subtraction and its --tzuchi-swatch-border-width helper are gone.
+   This SUPERSEDES item 2 of WHAT THIS CHANGES above.
+   R39's `calc(<control radius> - <border-width>)` is written for a control
+   whose radius is large enough to absorb the step-down. Here the item is
+   already at the smallest ladder step (4px), so subtracting a 1/2/2/3/3px
+   border left the visible chip at 3 / 2 / 2 / 1 / 1 px — none of them a step on
+   the Tzu Chi ladder (0 / 4 / 8 / 16 / full), and, perversely, SHARPER as the
+   swatch grew, so the xl row read as hard squares while xs still looked
+   rounded. The standalone square ColorSwatch next to it is a uniform 4px, so
+   the family's two square colour chips no longer matched. Both now sit on
+   --tc-radius-sm at every size (measured: 4px at xs through xl).
+   Non-concentricity costs nothing here: on a RESTING item the border is
+   transparent (base:15), so there is no visible outer curve to be concentric
+   with, and on a SELECTED item the swatch is scaled to 0.77 to reveal the gap
+   (base:41-48), so it never touches the border either — verified live on the
+   square xl row in tzuchi-dark, ring, gap and checkmark all intact.
+   The two per-size rules that existed only to carry the helper
+   (`--square.--xs` and `--square.--lg, --square.--xl`) are removed with it; no
+   size, variant or state loses a declaration, because those rules declared
+   nothing else.
+
+   Pass 5 reviewed (2026-09-20): diffed against the live
+   styles/themes/tzuchi/components/color-swatch-picker.css — the removed
+   helper/per-size rules and the new uniform-radius rule are the only
+   difference from the live file besides this header; motion rule untouched.
+   Verified live with the browser tool: probed the square swatch's
+   border-top-left-radius at xs (14px box) and xl (34px box) in both themes —
+   both resolve to a flat 4px, including on a selected (scaled) swatch, so the
+   radius is now uniform across the whole size run instead of sharpening as
+   the swatch grows. Circle variant, colours and all-variants layout
+   unaffected. Scoping, colour-token and comment-safety scans clean. No
+   changes made — the fix matches the brief exactly.
    ========================================================================== */
 
 /* -- Square variant: radius by role (spec §2 R25/R33) ---------------------- */
 
 [data-theme^="tzuchi"] .color-swatch-picker--square .color-swatch-picker__item {
-  /* local calc helper: the border width this size actually draws */
-  --tzuchi-swatch-border-width: 2px;
-
   border-radius: var(--tc-radius-sm, 4px);
 }
 
-[data-theme^="tzuchi"] .color-swatch-picker--square.color-swatch-picker--xs .color-swatch-picker__item {
-  --tzuchi-swatch-border-width: 1px;
-}
-
-[data-theme^="tzuchi"] .color-swatch-picker--square.color-swatch-picker--lg .color-swatch-picker__item,
-[data-theme^="tzuchi"] .color-swatch-picker--square.color-swatch-picker--xl .color-swatch-picker__item {
-  --tzuchi-swatch-border-width: 3px;
-}
-
-/* Inner fill concentric with the bordered cell (spec §2 R39, as checkbox.css
-   does for its `::before`). The selected branch exists only to out-rank the
-   base file's own per-size selected rules. */
+/* Pass 5 — the inner fill takes the SAME ladder step as the cell around it.
+   4px is already the smallest Tzu Chi radius, so there is nothing to step down
+   to; see the header note for why concentricity is not needed here. The
+   selected branch exists only to out-rank the base file's own per-size
+   selected rules. */
 [data-theme^="tzuchi"] .color-swatch-picker--square .color-swatch-picker__item .color-swatch-picker__swatch,
 [data-theme^="tzuchi"] .color-swatch-picker--square .color-swatch-picker__item[data-selected="true"] .color-swatch-picker__swatch {
-  border-radius: calc(var(--tc-radius-sm, 4px) - var(--tzuchi-swatch-border-width, 2px));
+  border-radius: var(--tc-radius-sm, 4px);
 }
 
 /* -- Motion (spec §8 R131 / R136) ------------------------------------------

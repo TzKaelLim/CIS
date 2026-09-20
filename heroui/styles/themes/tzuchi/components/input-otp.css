@@ -54,9 +54,15 @@
  *      border-color, so an invalid OTP row kept a neutral edge while every
  *      other themed field turns red.
  *
+ *   5. FOCUS RING (Pass 4) the active cell's 2px `--focus` ring becomes tc's
+ *      3px pale halo, and an active cell in an invalid row gets it in
+ *      `--danger`. §11 I1 / §12 Q2 is settled: tc-input.styles.ts:42-44 /
+ *      :71-73 is the Tzu Chi field focus, and the ring every field kept under
+ *      D21 was mechanical. Still no `box-shadow` re-declaration (R74) — only
+ *      Tailwind's ring LAYER variable is swapped.
+ *
  * KEPT DELIBERATELY
- *   · The focus RING and the 1px danger outline (D21 / R68) — no box-shadow is
- *     re-declared (R74).
+ *   · The 1px danger outline (R68).
  *   · `bg-field-focus` on the active and filled cells, the `--secondary` fill
  *     and every other colour (D13 / R88).
  *   · The caret (`h-4 w-[2px] rounded-sm bg-field-placeholder`, already 4px =
@@ -98,6 +104,28 @@
  * and correctly left alone per D2. Brace/comment counts balanced (5/5, 8/8);
  * no premature comment close; no colour literal, no --tc-color-*, no
  * !important, no physical property.
+ *
+ * Pass 4 (2026-09-20): added the Tzu Chi focus halo (item 5 above) on the
+ * active cell, plus a `--danger` halo on an active cell in an invalid row.
+ * The invalid rule also resets --tw-ring-offset-width to 0: base
+ * `invalid-field-ring`'s UNFOCUSED branch (utilities/index.css:14-17) sets it
+ * to 3px on `.input-otp__slot[data-invalid="true"]`, and because the OTP cell
+ * is never itself `:focus`/`[data-focused]` — its state attribute is
+ * `[data-active]` — none of that utility's focused branches ever match to
+ * reset it, so the offset band would otherwise leak into the halo. Both rules
+ * override Tailwind's --tw-ring-shadow layer only; nothing declares
+ * `box-shadow`.
+ *
+ * Pass 4 reviewed: diffed against the pre-Pass-4 file — only the two halo
+ * lines and the offset-width reset were added, inside the existing active and
+ * invalid blocks; nothing else moved. The offset-width defect was confirmed
+ * for real, not only reasoned about: driving `inputotp--with-validation` to a
+ * genuine submit-time invalid state and probing the active cell showed the
+ * fix in place (no visible offset band, the halo hugging the border); forcing
+ * --tw-ring-offset-width back to 3px on that same cell as a control
+ * reproduced the pre-fix defect exactly (a solid 3px white band appearing
+ * before the danger halo), confirming the reset is necessary, not decorative.
+ * No corrections needed.
  */
 
 [data-theme^="tzuchi"] {
@@ -126,6 +154,20 @@
        keeps this edge under the pointer. */
     &[data-active="true"] {
       border-color: var(--field-border-focus);
+
+      /* Pass 4 — tc-input.styles.ts:42-44: the cell being edited carries a 3px
+         halo in color.brand.surface-hover over its focused border.
+         --accent-soft-hover is that tint in both modes (blue-200 / blue-700).
+         MECHANISM: `status-focused-field` is Tailwind's `ring-2 ring-focus`,
+         which sets --tw-ring-shadow; the base composes `box-shadow` from
+         var(--tw-inset-shadow), var(--tw-inset-ring-shadow),
+         var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow),
+         so overriding that one layer swaps the ring for the halo and leaves
+         `shadow-field` and the inset layers alone (R74).
+         SPECIFICITY: (0,3,0) against the base's `.input-otp__slot[
+         data-active="true"]` (0,2,0), the same margin the border declaration
+         above relies on. */
+      --tw-ring-shadow: 0 0 0 3px var(--accent-soft-hover);
     }
 
     /* R68 — an invalid field's edge turns danger, as on Input, Textarea,
@@ -134,6 +176,21 @@
        danger edge. */
     &[data-invalid="true"] {
       border-color: var(--danger);
+
+      /* Pass 4 — tc-input.styles.ts:71-73: the cell being edited in an invalid
+         row swaps the pale halo for a solid danger one. (0,4,0), so it clears
+         this file's own (0,3,0) halo rule above.
+         The offset reset is not decoration: base
+         `.input-otp__slot[data-invalid="true"]` (utilities/index.css:14-17,
+         the UNFOCUSED branch of `invalid-field-ring`) sets
+         --tw-ring-offset-width to 3px, and the utility's focused branches all
+         key off `:focus`/`[data-focused]`/`:focus-within`, none of which an
+         OTP cell ever carries — its state is `[data-active]`. Left alone, that
+         3px would paint an opaque offset band under the halo. */
+      &[data-active="true"] {
+        --tw-ring-offset-width: 0px;
+        --tw-ring-shadow: 0 0 0 3px var(--danger);
+      }
     }
   }
 

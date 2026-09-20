@@ -719,3 +719,62 @@ class:
 figures and "no evidence" disclaimers all held up against the live sources. This log exists so the
 16 implementing agents (and the owner) know the spec was adversarially checked, not merely
 authored — not because anything was found broken.
+
+---
+
+## 13. Amendments from passes 4–5 (2026-09-20)
+
+Passes 4–5 were a completeness sweep (every story × both themes, flagging sub-16px text, off-ladder
+radii and low-contrast text) and a screenshot-based visual QA of all ten component families
+(1,523 screenshots incl. keyboard focus, hover, open, invalid and disabled states). The owner
+delegated the design calls below to the integrator; each follows the design of a same-name Tzu Chi
+component where one exists. **Where an amendment contradicts an earlier rule, the amendment wins.**
+
+### 13.1 New rules
+
+| # | Rule | Declaration / value | Evidence | Supersedes |
+|---|---|---|---|---|
+| A1 | **Text on a FILL never uses `--muted`** — it uses that fill's own foreground; hierarchy is carried by weight. On a plain surface / page `--muted` stays. | tinted option panels → `--accent-soft-foreground`; `--surface-secondary` table header band → `--foreground`; `--default` segmented-tabs track → `--default-foreground`; Kbd on `--default` → `--default-foreground` | tc-dropdown option text on `brand.surface` is `brand.primary`; tc-search-bar's category label on `surface.subtle` is `text.default` — no tc component puts muted text on a fill. Measured before: 3.31:1 on the tinted panel, 2.86:1 on its hover fill, 3.34:1 on the table header | — |
+| A2 | **Edge-to-edge rows draw their focus ring INSIDE the row** | `--tw-ring-inset: inset; --tw-ring-offset-width: 0px` on the row's focus-visible state (2px `--focus`) | an outset ring on a full-bleed row is clipped left and right by the popover's overflow, leaving two horizontal lines | R71 inside the tinted popovers (no offset → nothing to colour) |
+| A3 | **Every field shell focuses the Tzu Chi way**: focus border colour + a 3px halo; invalid + focused = 3px `--danger` halo | override ONLY the ring layer: `--tw-ring-shadow: 0 0 0 3px var(--accent-soft-hover)` (never re-declare `box-shadow` — it would drop Tailwind's other shadow layers) | tc-input / tc-textarea / tc-search-bar / tc-dropdown all specify `border-color: border.focus` + `box-shadow: 0 0 0 3px brand.surface-hover`. The focused border (blue-500, 3.96:1) is the WCAG 1.4.11 indicator; the halo is emphasis | §11 I1, R74; closes §12 Q2 |
+| A4 | **Interactive track (Slider)** resolves per mode | `--tzuchi-slider-track-bg`: light = `color.border.strong` (3.62:1 on the page, fill 3.54:1 against it), dark = `--border` (3.4:1 on the page, fill 2.93:1). No single token works in both: border.strong in dark leaves the fill 1.63:1 | tc-switch's off-track is `color.border.strong` — the one Tzu Chi control whose track the user must find | R124; closes §12 Q5 for light |
+| A5 | **Thumbs / handles are a constant white in every state and both modes** (Switch, Slider); only the wrapper's opacity says "disabled" | `background-color: var(--white)` | tc-switch.styles.ts:29-38 — "a constant white reads on both track colours" | R125's "thumb keeps HeroUI's fill" |
+| A6 | **Option-row inset follows the text it lines up with** | bare ListBox / Menu rows and headers: `20px` (the field inset). Inside a popover the rows align with their trigger's text: Select / Autocomplete / Dropdown `32px` (tc-dropdown), ComboBox `20px` (its query is typed in an Input shell). Row descriptions get `overflow-wrap: anywhere` | a bare ListBox is width-constrained by its consumer: 32px clipped descriptions mid-glyph and wrapped every row | R57's single 32px value |
+| A7 | **Option-row state fills**: bare rows hover `--accent-soft`, pressed / selected `--accent-soft-hover`; inside the tinted panels hover / cursor / selected all take `--accent-soft-hover` (tc-dropdown does exactly this) and are told apart by the inset ring (cursor) and the selection mark (selected), which takes `--accent-soft-foreground` | — | tc-dropdown.styles.ts `.option:hover`, `.option.active`, `[aria-selected]` share one fill | — |
+| A8 | **Table rows**: hover is NEUTRAL (`--default`); selected = `--accent-soft`; selected + hovered = `--accent-soft-hover` | — | in dark the brand tints are opaque navy: hovering recoloured every row and swallowed the row-action buttons' fills | R78 / R82 for tables only |
+| A9 | **Today** in both calendars carries an inset 1px `--accent` ring in addition to its fill | — | the range band and today were both `--accent-soft` 4px rectangles; today vanished inside a range | — |
+| A10 | **Pending ≠ disabled**: a pending Button keeps `opacity: 1` (the spinner says "working"); a disabled one still dims | `[data-pending="true"]:not([data-disabled="true"])` | tc `opacity.disabled` is 0.38 (HeroUI 0.5): a pending label fell to ~2.3:1 in dark and read as broken | — |
+| A11 | **A disabled field dims its Description too** | `opacity: var(--disabled-opacity)` keyed off the disabled field / group root, excluding hosts HeroUI already dims (no double-dimming) | at 0.38 the label and control faded while the hint stayed full strength — the hierarchy inverted | — |
+| A12 | **Affix dividers** (InputGroup): span the shell's full inner height, follow the shell's border colour on focus / invalid, disappear in the column (textarea) layout, and the value keeps an 8px gutter on the side facing an affix | `align-self: stretch; block-size: auto` (stretch alone is inert against the base's `h-full`) | upstream's divider is transparent (`--field-border`), so none of this showed there | — |
+| A13 | **Status foregrounds in dark are neutral**, not brand ink | `--danger-foreground` / `--success-foreground` / `--warning-foreground` = gray-980 (7.8:1 / 7.9:1 / 10.9:1) — dark only, in `generate.mjs` `DARK_EXTRA` | text.on-brand is blue-900 in dark: a destructive button read navy-on-salmon | — |
+| A14 | **No text below 16px remains** except: Badge's indicator count (10–14px — it is a 16–20px dot), Typography's explicit `xs` size, and text a STORY sizes with its own utility classes | calendar weekday headers and list section headers went 12px → 16px | `--tc-font-size-16` is the smallest step in tokens.css | R8's "KEEP 12px" |
+
+### 13.2 Questions now closed
+
+| Q | Outcome |
+|---|---|
+| Q1 checkbox / radio 24px vs 32px | **32px stays.** tc-checkbox / tc-radio read `var(--tc-checkbox-size, 24px)` and the token resolves to 32px, so the shipped Lit components already render at 32px; 24px is an unused fallback. (Still worth a glance from design: 32px is heavy inside a Table.) |
+| Q2 field focus halo vs ring | A3 — halo, everywhere. |
+| Q3 `--tzuchi-modal-shadow` absent in dark | Intentional (`DARK_OMIT`); modal.css's comment corrected. |
+| Q4 dark segmented-tabs pill | `--segment: gray-800` in dark (1.54:1 vs the track). Residual: a HOVERED segmented tab is `--default-hover`, also gray-800 in dark, so hover and selected differ only by the pill's weight — acceptable for a HeroUI-only variant. |
+| Q5 interactive track contrast | A4 — clears 3:1 against every surface in both modes; dark fill-vs-track 2.93:1 remains. |
+| Q9 Meter ≡ ProgressBar | Confirmed by diffing the two base files; meter.css mirrors progress-bar.css. |
+
+### 13.3 Known limits (not fixable in CSS — document for consumers)
+
+- **Virtualized lists must be given the themed row height.** `ListLayout`'s `rowHeight` is a JS number the consumer passes: under this theme a label-only row is **40px**, label + description **66px**, **92px** if the description wraps (HeroUI: 36 / 48). The upstream stories pin `rowHeight: 50`, so their two-line rows overlap under the Tzu Chi theme. Use `estimatedRowHeight`, or pass the values above.
+- **Tzu Chi's larger type needs more room**: tables want ~25% more column width than HeroUI's defaults; a horizontal RadioGroup with descriptions ~1.3×; chip rows should be allowed to wrap (`flex-wrap`) — the 20px `md` chip is ~40% wider than HeroUI's.
+- **Custom Radio indicators**: the Tzu Chi radio is ring + dot on a field-coloured control (tc-radio), not HeroUI's accent-filled disc. A custom `Radio.Indicator` glyph must use `text-accent`, not a knocked-out `text-background`.
+- **No EmptyState story exists** in the vendored Storybook, so `empty-state.css` has never been rendered on its own.
+
+### 13.4 Still open — token-level, for the design owner
+
+These are properties of `@tzuchi/tokens` itself (the Lit components share them); no component override can or should fix them.
+
+| Issue | Measured | One-line fix |
+|---|---|---|
+| `color.text.muted` (gray.700 `#828282`) — every description, placeholder, date segment, weekday header, readout in the LIGHT theme | 3.84:1 on white, 3.62:1 on the page (~950 occurrences in the sweep) — AA needs 4.5:1 | → gray.750 `#6B6B6E`: 5.30 / 4.99 / 4.74 / 4.61:1 on white / page / neutral fill / header band |
+| dark: `brand.primary` (blue-300) on `brand.surface-hover` (blue-700) — hovered / selected option rows, pressed tonal button, open Select | 3.96:1 for 16px / 700 text | a darker dark `surface-hover` step |
+| `feedback.error` (red-500) as TEXT on light surfaces; white on `feedback.error` / `feedback.success` fills | 4.06–4.32:1; 4.32 / 4.37:1 | a text-strength red; darker fills |
+| dark `surface.default` (gray-950) vs the page `surface.subtle` (gray-980) | 1.06:1 — cards, tags and popovers barely separate from the page; HeroUI's own dark keeps a 21% vs 12% lightness step | lift the dark surface one step |
+| Modal / Drawer / AlertDialog title = field label (both 16px / 700, per tc-modal and tc-input) | the dialog title does not outrank the labels inside it | a larger title step (tc `typography.title`, 20px) |

@@ -107,11 +107,41 @@
   }
 }
 
+/* Pass 5 (2026-09-20) — separator 12px -> 16px (1em).  The earlier reading compared
+   tc's "›" text glyph with HeroUI's chevron ICON and concluded the icon draws more ink at the same
+   size; what it did not weigh is that the crumbs around it had already moved from 14px to 16px
+   (change 4 above) while `size-3` held the chevron at 12px, so the separator ended up the only
+   12px mark in the line — and 12px is a step the Tzu Chi scale does not have (§1).  `1em` rather
+   than the token: this element is an <svg> whose font-size is the item's own 16px (measured), so
+   1em ties the separator to whatever the crumb type is and it can never fall behind it again.
+   Logical properties, so RTL (where the base rotates the glyph) is unaffected.  COLOUR stays
+   --muted, which is tc's separator-fg.
+   Specificity: base `.breadcrumbs .breadcrumbs__separator` is (0,2,0), this is (0,3,0).  A custom
+   `separator` element gets the same class (breadcrumbs.tsx:68-78 clones it with
+   `slots.separator()`), so a custom glyph scales with the crumbs too — checked in the browser on
+   --custom-separator. */
+[data-theme^="tzuchi"] .breadcrumbs .breadcrumbs__separator {
+  inline-size: 1em;
+  block-size: 1em;
+}
+
 /* Not overridden, on purpose:
-   - .breadcrumbs__separator — upstream is `size-3 text-muted`; tc's separator-fg is
+   - .breadcrumbs__separator — SUPERSEDED BY PASS 5 (see the rule above), which does move its size.
+     The original entry read: "upstream is `size-3 text-muted`; tc's separator-fg is
      {color.text.muted}, i.e. the same --muted, and tc's "›" glyph draws less ink at 16px than a
-     12px chevron, so the size is left alone.
+     12px chevron, so the size is left alone."  Its colour half still holds and is still not
+     overridden.
    - focus ring — upstream's status-focused is ring-2 + --ring-offset-width, which the theme
      already pins to --tc-focus-ring-offset (2px) in --focus (= {color.border.focus}); identical to
      tc's `outline: 2px solid var(--tc-focus-ring-color)` with a 2px offset.
    - disabled, pressed, RTL, transitions, decoration thickness — upstream's, unchanged. */
+
+/* Pass 5 reviewed (2026-09-20): no changes. Diffed against the live
+   styles/themes/tzuchi/components/breadcrumbs.css — only the briefed
+   inline-size/block-size rule on .breadcrumbs__separator is new; the
+   "Not overridden, on purpose" note was correctly marked superseded rather
+   than deleted. Re-probed in the browser: the separator is 16x16 next to
+   16px crumbs at level-2 and level-3 nesting, in both themes; the custom
+   separator, the focus ring and the disabled state are unaffected. Comment
+   safety, colour-literal, !important, physical-property and scope scans:
+   clean. */

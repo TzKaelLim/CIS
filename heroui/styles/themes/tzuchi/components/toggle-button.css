@@ -104,6 +104,18 @@
  * the Default story's Template renders two <ToggleButton size="md"> instances, unselected, so
  * `.toggle-button` matches the first one) and against the resolved values in
  * packages/tokens/dist/tokens.css; all five kept as-is.
+ *
+ * Pass 5 reviewed (2026-09-20): no changes. This unit's brief listed this file for the detached
+ * ToggleButtonGroup corner defect (item 4), but the defect is a group-level cascade problem — the
+ * base's `.toggle-button-group--horizontal .toggle-button:first-child` / `:last-child` corner
+ * rules (0,3,0) out-specify this file's own `.toggle-button--icon-only { border-radius: 9999px }`
+ * (0,2,0) — and the correct place to beat a group selector is the group file, whose selectors can
+ * carry the group class and therefore out-specify it without touching this file at all. Confirmed
+ * by reading heroui/styles/components/toggle-button-group.css and the corrected
+ * themes/tzuchi/components/toggle-button-group.css directly: its new detached-corner rules are
+ * (0,3,0)/(0,5,0) and (0,4,0)/(0,6,0), both above anything declared here, so they win regardless
+ * of import order. Diffed this file byte-for-byte against the pre-Pass-5 version other than this
+ * paragraph — nothing else changed.
  * ------------------------------------------------------------------------------------------------ */
 
 /* ---------------------------------------------------------------------------

@@ -82,6 +82,49 @@
  *                                                   (0,5,0)  beats ./toggle-button.css's
  *                                                            .toggle-button--icon-only.toggle-button--sm
  *                                                            / --lg (0,3,0) without relying on order
+ *
+ * Pass 5 (2026-09-20): DETACHED corners are now restated here too. The header
+ * above argues a detached cell can fall straight through to ./toggle-button.css — that holds for the
+ * SIZE, but not for the RADIUS, and the omission showed: in a detached group of icon-only cells the
+ * first and last cell rendered as half-square "D" shapes. The base's
+ * `.toggle-button-group--horizontal .toggle-button:first-child { rounded-s-3xl }` /
+ * `:last-child { rounded-e-3xl }` (toggle-button-group.css:40-47) are NOT excluded from detached mode
+ * and are (0,3,0), so they out-specified ./toggle-button.css's
+ * `[data-theme^="tzuchi"] .toggle-button--icon-only { border-radius: 9999px }` (0,2,0) on one pair of
+ * corners. A box with 24px on one pair and 9999px on the other overflows its own 48px side, so CSS's
+ * border-radius overflow scaling divides ALL FOUR radii by the same factor and the 24px pair collapses
+ * to roughly 0.1px — square. Upstream never sees it because all four of its corners are 24px and scale
+ * uniformly on a 36px box.
+ * The rules added below give every DETACHED cell its own full shape on all four corners — 8px for a
+ * labelled toggle (R22), a full circle for an icon-only one (R24) — which is what "detached" means:
+ * the cells are separate controls with an 8px gap between them. The ATTACHED variant is untouched and
+ * keeps its joined corners. Both orientations are covered by one pair of rules because
+ * `--detached` sits on the same element as `--horizontal` / `--vertical` and the rules never mention
+ * an orientation; the base's vertical first/last rules (toggle-button-group.css:55-62) are (0,3,0),
+ * exactly like the horizontal ones that were measured. Specificity: the plain branch is (0,3,0) and
+ * the `:is(:first-child, :last-child, :first-child:last-child)` branch is (0,5,0) — :is() takes its
+ * most specific argument, here two pseudo-classes — which beats the base's single-edge rules (0,3,0)
+ * AND its one-cell-group rules `…--horizontal .toggle-button:first-child:last-child` (0,4,0) without
+ * relying on import order. The icon-only pair repeats the structure one class higher, (0,4,0) /
+ * (0,6,0), so a circle always wins over the 8px within detached mode. No colour, size, gap, separator
+ * or state is touched, and the icon-only SIZE guard below still excludes detached mode as before.
+ * Verified in tzuchi and tzuchi-dark on components-buttons-togglebuttongroup--attached-vs-detached
+ * (four identical circles; the attached group above it unchanged) and
+ * --orientation / --examples (attached, both orientations, unchanged).
+ *
+ * Pass 5 reviewed (2026-09-20): diffed against the pre-Pass-5 file — only the detached-corner
+ * block and this header paragraph differ. Re-derived the specificity chain by hand against
+ * heroui/styles/components/toggle-button-group.css and it holds. Re-rendered
+ * attached-vs-detached in both themes myself (identical circles, attached group unchanged).
+ * A labelled-cell detached group and a vertical detached group appear in no story
+ * (toggle-button-group.stories.tsx has exactly one `isDetached` usage, icon-only, horizontal,
+ * and its render ignores story args, so no `&args=` URL can reach a different shape) — confirmed
+ * by reading the story source myself. Argued instead from the cascade: the base's vertical
+ * first/last rules are structurally identical to the horizontal ones that were measured, and
+ * neither of the two rules added here names an orientation or an icon-only guard beyond the
+ * dedicated icon-only pair, so the labelled (8px) branch is exercised by the same selectors.
+ * Flagging for the owner as still-unverified-by-screenshot, same as the fixer's report. No
+ * changes needed.
  * ------------------------------------------------------------------------------------------------ */
 
 /* ---------------------------------------------------------------------------
@@ -130,6 +173,33 @@
   .toggle-button-group--vertical:not(.toggle-button-group--detached)
   .toggle-button:first-child:last-child {
   border-radius: var(--tc-button-radius, var(--radius));
+}
+
+/* ---------------------------------------------------------------------------
+ * Pass 5 — detached group: every cell keeps its OWN full shape on all four
+ * corners, in both orientations (R22 for a labelled cell, R24 for icon-only).
+ *
+ * The plain branch restates the intent for every cell; the :is() branch exists
+ * only to out-specify the base's first-child / last-child / first-child:
+ * last-child corner rules, which do not exclude detached mode.
+ * ------------------------------------------------------------------------ */
+
+[data-theme^="tzuchi"] .toggle-button-group--detached .toggle-button,
+[data-theme^="tzuchi"]
+  .toggle-button-group--detached
+  .toggle-button:is(:first-child, :last-child, :first-child:last-child) {
+  border-radius: var(--tc-button-radius, var(--radius));
+}
+
+[data-theme^="tzuchi"] .toggle-button-group--detached .toggle-button.toggle-button--icon-only,
+[data-theme^="tzuchi"]
+  .toggle-button-group--detached
+  .toggle-button.toggle-button--icon-only:is(
+    :first-child,
+    :last-child,
+    :first-child:last-child
+  ) {
+  border-radius: var(--tc-icon-button-radius, var(--tc-radius-full, 9999px));
 }
 
 /* ---------------------------------------------------------------------------

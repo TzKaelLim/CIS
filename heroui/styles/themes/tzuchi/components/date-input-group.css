@@ -66,11 +66,16 @@
  *      six base files and declared in none), so the declaration is invalid at
  *      computed-value time and the edge falls back to currentColor.
  *
+ *   8. FOCUS RING (Pass 4) the 2px `--focus` ring becomes tc's 3px pale halo,
+ *      and a focused invalid shell gets it in `--danger`. §11 I1 / §12 Q2 is
+ *      settled: tc-input.styles.ts:42-44 / :71-73 is the Tzu Chi field focus,
+ *      and the ring every field kept under D21 was mechanical. HeroUI's
+ *      DatePicker/DateRangePicker-trigger exclusion is mirrored on the halo
+ *      rule too, so focusing the calendar button still leaves the shell dark.
+ *      Still no `box-shadow` re-declaration (R74) — only Tailwind's ring LAYER
+ *      variable is swapped.
+ *
  * KEPT DELIBERATELY
- *   · The focus RING. tc uses a 3px pale halo; HeroUI uses the 2px `--focus`
- *     ring. D21 / §11 I1: Input, SearchField and Select all keep the ring, so
- *     this field focuses identically to them. No box-shadow is re-declared
- *     (R74).
  *   · The focused-segment fill `bg-accent-soft` + `text-accent-soft-foreground`
  *     — that is already R78 (hover / cursor on a neutral surface ->
  *     `--accent-soft`) expressed in HeroUI's own tokens, and `--accent-soft`
@@ -130,6 +135,30 @@
  * 20-line 4px label/group/description stack HeroUI's own `.textfield`
  * precedent already goes unthemed for) — nothing in the spec applies to them
  * beyond R141/R142, which are already correct theme-wide.
+ *
+ * Pass 4 (2026-09-20): added the Tzu Chi focus halo (item 8 above). Unlike the
+ * border-colour rule above it, the halo must BEAT the base focus rule rather
+ * than merely add to it, so its guard is written with a real `:has()` instead
+ * of `:where(:has())`: base's `[data-focus-within="true"]:not(:has(...))` is
+ * (0,4,0) — `:not()` takes the specificity of `:has()`, which takes that of
+ * its most specific argument, `[data-slot=…][data-focused="true"]` = (0,2,0) —
+ * so the theme-scoped mirror lands at (0,5,0) and wins. The exclusion list is
+ * copied verbatim from the base rather than abbreviated, so the two cannot
+ * drift apart. Verified in the browser: focusing the calendar button leaves
+ * the shell unlit while the button keeps HeroUI's own ring; focusing a segment
+ * lights the shell with the halo.
+ *
+ * Pass 4 reviewed: diffed against the pre-Pass-4 file — only the halo rule and
+ * its invalid twin were added; nothing else moved, and the exclusion list in
+ * both matches the base's verbatim. Specificity re-derived: the halo's real
+ * :has() guard (not :where()-wrapped) puts it at (0,5,0), which clears the
+ * base's own focus rule (0,4,0); the invalid twin adds [data-invalid] for
+ * (0,6,0), clearing that, the base invalid-focus branch (0,3,0) and the pale
+ * halo (0,5,0). Independently re-verified live: a focused segment lights the
+ * shell with the halo in both themes and both invalid states; focusing the
+ * DatePicker trigger leaves the shell's box-shadow fully transparent while the
+ * trigger keeps its own ring, confirming the exclusion still holds. No
+ * corrections needed.
  */
 
 [data-theme^="tzuchi"] {
@@ -170,11 +199,57 @@
       border-color: var(--field-border-focus);
     }
 
+    /* Pass 4 — tc-input.styles.ts:42-44: the focused field also carries a 3px
+       halo in color.brand.surface-hover. --accent-soft-hover is that tint in
+       both modes (blue-200 / blue-700).
+       MECHANISM: `status-focused-field` is Tailwind's `ring-2 ring-focus`,
+       which sets --tw-ring-shadow; the base composes `box-shadow` from
+       var(--tw-inset-shadow), var(--tw-inset-ring-shadow),
+       var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow),
+       so overriding that one layer swaps the ring for the halo and leaves
+       `shadow-field` and the inset layers alone (R74). --tw-ring-offset-width
+       is already 0 in `focus-field-ring`.
+       SPECIFICITY: unlike the border rule above — which only has to beat a
+       (0,1,0) declaration — this has to beat the base's own focus rule
+       (date-input-group.css:27-44), which is (0,4,0): `.date-input-group`
+       (0,1,0) + `[data-focus-within="true"]` (0,1,0) + `:not(:has(...))`
+       (0,2,0, from its most specific argument). So the guard is written with a
+       plain `:has()` (not wrapped in `:where()`), giving (0,5,0). The
+       exclusion list is the base's, verbatim: focusing a DatePicker /
+       DateRangePicker trigger inside the group must not light the whole
+       field. */
+    &:is(:focus-within, [data-focus-within="true"]):not(
+        :has(
+          [data-slot="date-picker-trigger"]:focus,
+          [data-slot="date-picker-trigger"][data-focused="true"],
+          [data-slot="date-range-picker-trigger"]:focus,
+          [data-slot="date-range-picker-trigger"][data-focused="true"]
+        )
+      ) {
+      --tw-ring-shadow: 0 0 0 3px var(--accent-soft-hover);
+    }
+
     /* R68 — tc's field rule: the edge itself turns the error colour and stays
        there through hover AND focus. Declared after the focus rule on purpose:
        equal specificity, later wins. */
     &[data-invalid="true"] {
       border-color: var(--danger);
+
+      /* Pass 4 — tc-input.styles.ts:71-73: a focused invalid field swaps the
+         pale halo for a solid danger one. Same guard, plus `[data-invalid]`,
+         so it is (0,6,0): it clears the base invalid-focus ring (0,3,0), the
+         base focus rule (0,4,0) and this file's own halo rule (0,5,0) without
+         relying on source order. */
+      &:is(:focus-within, [data-focus-within="true"]):not(
+          :has(
+            [data-slot="date-picker-trigger"]:focus,
+            [data-slot="date-picker-trigger"][data-focused="true"],
+            [data-slot="date-range-picker-trigger"]:focus,
+            [data-slot="date-range-picker-trigger"][data-focused="true"]
+          )
+        ) {
+        --tw-ring-shadow: 0 0 0 3px var(--danger);
+      }
 
       /* R69 — the hover-vs-invalid trap. Mirror both forms of the base hover
          selector with [data-invalid] appended so this cannot be decided by

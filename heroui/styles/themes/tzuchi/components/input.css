@@ -43,6 +43,32 @@
  * `--field-border-hover`. Added a hover+invalid rule specific enough (0,6,0)
  * to win unconditionally, restoring tc's "invalid border survives hover"
  * behaviour. No other selector, scoping or colour issues found.
+ *
+ * Pass 4 (2026-09-20): the field FOCUS now follows Tzu Chi, not HeroUI —
+ * a 3px halo in --accent-soft-hover replaces the 2px --focus ring, and an
+ * invalid focused field gets the same halo in --danger. The integrator settled (the owner delegated the call)
+ * §11 I1 / §12 Q2: tc-input.styles.ts:42-44 (and tc-textarea, tc-search-bar)
+ * specify border-color = color.border.focus plus box-shadow 0 0 0 3px
+ * color.brand.surface-hover, and the ring this file kept under D21/R74 was a
+ * mechanical carry-over, not a design call. R74's objection is answered by the
+ * mechanism, not ignored: nothing re-declares `box-shadow`. The base composes
+ * it from five layer variables (--tw-inset-shadow, --tw-inset-ring-shadow,
+ * --tw-ring-offset-shadow, --tw-ring-shadow, --tw-shadow), so overriding only
+ * --tw-ring-shadow swaps the ring layer and leaves `shadow-field` and the
+ * inset layers untouched. The focused border colour is NOT restated: base
+ * input.css:29 already sets --field-border-focus, and that border is the
+ * accessible indicator (blue-500 on white = 3.96:1, clearing WCAG 1.4.11's
+ * 3:1); the halo is emphasis on top of it.
+ *
+ * Pass 4 reviewed: diffed against the pre-Pass-4 file — only the two halo
+ * rules were added, nothing else moved. Both are scoped, use logical-safe
+ * selectors and touch only --tw-ring-shadow, never box-shadow. Specificity
+ * re-derived: (0,3,0) clears the base focus rule (0,2,0); the invalid variant
+ * (0,4,0) clears both the base's own invalid-focus ring (0,3,0) and the pale
+ * halo above it. Injection-verified live (both themes, primary and secondary
+ * variants): focused box-shadow carries the 3px accent-soft-hover band, and
+ * invalid plus focused carries the danger band, in each case with the other
+ * four shadow layers, including shadow-field, intact. No corrections needed.
  */
 
 [data-theme^="tzuchi"] .input {
@@ -54,6 +80,40 @@
      where HeroUI's `sm:text-sm` shrinks to 14px/20px above 640px. */
   font-size: var(--tc-font-size-16, 16px);
   line-height: var(--tc-line-height-relaxed, 1.6);
+}
+
+/* tc-input.styles.ts:42-44 — `:host(:focus-within) .control { border-color:
+   color.border.focus; box-shadow: 0 0 0 3px color.brand.surface-hover }`.
+   --accent-soft-hover is that exact tint in both Tzu Chi modes (blue-200 light,
+   blue-700 dark), so no new theme variable is needed.
+   MECHANISM: HeroUI's `status-focused-field` is Tailwind's `ring-2 ring-focus`,
+   which sets --tw-ring-shadow and composes `box-shadow` out of
+   var(--tw-inset-shadow), var(--tw-inset-ring-shadow),
+   var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow).
+   Overriding the single ring layer turns the ring into the halo without
+   clobbering the other four (R74's objection to re-declaring `box-shadow`).
+   `focus-field-ring` already pins --tw-ring-offset-width to 0, so no offset
+   band survives and nothing else needs restating.
+   SPECIFICITY: base `.input:focus` / `.input[data-focused="true"]`
+   (input.css:26-31) is (0,2,0); this is (0,3,0). */
+[data-theme^="tzuchi"] .input:focus,
+[data-theme^="tzuchi"] .input[data-focused="true"] {
+  --tw-ring-shadow: 0 0 0 3px var(--accent-soft-hover);
+}
+
+/* tc: `:host([invalid]:focus-within) .control { box-shadow: 0 0 0 3px
+   color.feedback.error }` (tc-input.styles.ts:71-73) — a focused invalid field
+   swaps the pale halo for a solid danger one. HeroUI's 1px danger outline is
+   left on top of it.
+   SPECIFICITY: base `invalid-field-ring`'s focused branch compiles to
+   `.input[data-invalid="true"]:focus` etc. (0,3,0) — a tie with the rule
+   above, which this (0,4,0) rule clears outright, so the danger halo cannot
+   lose to the pale one on source order. */
+[data-theme^="tzuchi"] .input[data-invalid="true"]:focus,
+[data-theme^="tzuchi"] .input[data-invalid="true"]:focus-visible,
+[data-theme^="tzuchi"] .input[data-invalid="true"][data-focused="true"],
+[data-theme^="tzuchi"] .input[data-invalid="true"][data-focus-visible="true"] {
+  --tw-ring-shadow: 0 0 0 3px var(--danger);
 }
 
 /* tc: `:host([invalid]) .control { border-color: var(--tc-input-border-invalid) }`.

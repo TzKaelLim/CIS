@@ -56,6 +56,53 @@
  * (100% − thumb-size − inset) reproduces tc-switch.styles.ts's own
  * translateX formula byte-for-byte at md. storyId
  * "components-controls-switch--default" confirmed present in index.json.
+ *
+ * Pass 5 (2026-09-20): the thumb fill is now pinned to var(--white) in EVERY
+ * state, and the base's extra opacity on a disabled+checked thumb is released
+ * to 1, so the wrapper's --disabled-opacity is the only thing that says
+ * "disabled". Why: tc-switch.styles.ts:29-38 makes the thumb a CONSTANT WHITE
+ * ("A constant white reads on both track colours, in light AND dark themes,
+ * so it intentionally does not use a text token") in both modes and both
+ * states, and HeroUI's three separate thumb fills all contradicted that once
+ * this theme darkened the off-track (item 4 above):
+ *   rest            bg-white                     — already white, restated
+ *   checked         bg-accent-foreground         — NAVY in tzuchi-dark, because
+ *                   (base switch.css:185)          the dark accent is a light
+ *                                                  blue; the on-thumb read as a
+ *                                                  hole punched in the track
+ *   disabled        bg-default-foreground/20     — a translucent dark sized for
+ *                   (base switch.css:24-26)        HeroUI's near-white off
+ *                                                  track; on this theme's
+ *                                                  border-strong grey it landed
+ *                                                  within 2% of the track and
+ *                                                  the off state disappeared
+ *   disabled+checked  additionally opacity: 0.4  — (base switch.css:54-64) on
+ *                                                  top of the wrapper's 0.38
+ * Specificity: the three base rules compile to .switch .switch__thumb (0,2,0),
+ * .switch[aria-checked="true"] .switch__thumb (0,3,0) and
+ * .switch[data-disabled="true"] .switch__thumb (0,3,0), with the
+ * disabled+checked opacity at (0,4,0). The rules added below sit one compound
+ * higher than each of those — (0,3,0), (0,4,0) and (0,5,0) — so none of them
+ * depends on import order. :is() contributes the specificity of its most
+ * specific argument, which is one attribute selector (or :disabled, also
+ * (0,1,0)) in every list used. Nothing else about the thumb changes: size,
+ * radius, inset, travel, --surface-shadow elevation, the text colour HeroUI
+ * gives the Icon slot, the track colours and every hover/pressed/focus rule
+ * are untouched. Verified in both themes on --disabled,
+ * --disabled-default-selected, --default, --default-selected, --sizes,
+ * --with-icons and --with-custom-styles. --white is a HeroUI theme variable
+ * (themes/default/variables.css:12, declared on :root/:host as a primitive and
+ * never re-declared per mode), so it is mode-independent by construction —
+ * which is exactly what "constant white" means here.
+ *
+ * Pass 5 reviewed (2026-09-20): diffed against the pre-Pass-5 file — only the three added rules
+ * plus this header paragraph differ, nothing else lost, reordered or reformatted. Re-derived the
+ * specificity tiers by hand against heroui/styles/components/switch.css and they hold: (0,3,0),
+ * (0,4,0) and (0,5,0) each beat their base rule with no dependency on import order. Re-rendered
+ * with the browser tool beyond what the fixer showed — --disabled-default-selected in
+ * tzuchi-dark (untested by the fixer, who only shot it in tzuchi): thumb probed
+ * background-color oklch(1 0 0) (white) and opacity 1, wrapper alone dims the control. Comment
+ * balance, colour and scoping rules all hold. No changes needed.
  * ========================================================================== */
 
 [data-theme^="tzuchi"] .switch {
@@ -151,4 +198,40 @@
     ) {
     transition: none;
   }
+}
+
+/* ---------------------------------------------------------------------------
+ * Pass 5 — the thumb is a CONSTANT WHITE
+ *
+ * Three rules rather than one selector list, so each tier's specificity is
+ * visible: (0,3,0) beats the base's unconditional .switch .switch__thumb
+ * (0,2,0); (0,4,0) beats both the checked and the disabled thumb rules
+ * (0,3,0 each); (0,5,0) beats the disabled+checked opacity (0,4,0). The
+ * background-color is repeated in the last rule because that rule has to carry
+ * the opacity anyway and a disabled+checked thumb must not fall back to the
+ * translucent disabled fill.
+ * ------------------------------------------------------------------------ */
+
+[data-theme^="tzuchi"] .switch .switch__thumb {
+  background-color: var(--white);
+}
+
+[data-theme^="tzuchi"] .switch:is([aria-checked="true"], [data-selected="true"]) .switch__thumb,
+[data-theme^="tzuchi"]
+  .switch:is([data-disabled="true"], [aria-disabled="true"], :disabled)
+  .switch__thumb {
+  background-color: var(--white);
+}
+
+/* Disabled + on. Only the wrapper's --disabled-opacity says "disabled"; the
+   thumb keeps its own fill and full alpha, so an off switch and an on switch
+   still read differently while both are dimmed. */
+[data-theme^="tzuchi"]
+  .switch:is([data-disabled="true"], [aria-disabled="true"], :disabled):is(
+    [aria-checked="true"],
+    [data-selected="true"]
+  )
+  .switch__thumb {
+  background-color: var(--white);
+  opacity: 1;
 }

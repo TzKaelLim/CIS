@@ -105,12 +105,48 @@
    and computed value re-checked against the real base markup (the year grid
    renders unopened but not display:none, so computed styles resolve without
    the reveal step) and confirmed; none dropped.
+
+   Pass 5 (2026-09-20) — trigger indicator 12px -> 16px.  This SUPERSEDES the
+   "TRIGGER indicator: 12px chevron, kept" bullet above.  The reasoning there
+   ("a small glyph beside a label keeps its size") does not survive the row it
+   actually sits in: the same header carries `.calendar__nav-button-icon` at
+   16px twice, and this file already raised the heading beside the chevron to
+   16px/700, so the indicator was the only 12px mark in the row — and 12px is
+   a step the Tzu Chi scale does not have at all (§1).  It also brings this
+   sibling into line with date-picker.css:155-162, which raised the
+   DatePicker's own trigger indicator for the same reason.
+   MECHANISM: the glyph is `<IconChevronRight height="1em" width="1em">`
+   (calendar-year-picker.tsx:199), so its box is the span's font-size and the
+   base's `text-xs` is what made it 12px; moving the span to 16px moves the
+   glyph with it.  Line-height moves to 1.5, the value the trigger's heading
+   already carries, so the two parts of the trigger share one line box and the
+   24px trigger height is unchanged (measured).  COLOUR
+   (--accent-soft-foreground), the 90-degree open rotation, the transition and
+   the RTL flip are all still HeroUI's — untouched.
+   SPECIFICITY: base `.calendar-year-picker__trigger-indicator` is (0,1,0),
+   this is (0,2,0); nothing else declares type on this element.
+
+   Pass 5 reviewed (2026-09-20): no changes. Diffed against the live
+   styles/themes/tzuchi/components/calendar-year-picker.css — only the
+   briefed trigger-indicator rule is new. Re-probed in the browser: the
+   chevron is 16x16 next to the 16px nav icons and heading, closed and open,
+   in both themes; the trigger's own 24px height is unchanged. Comment
+   safety, colour-literal, !important, physical-property and scope scans:
+   clean.
    ========================================================================== */
 
 [data-theme^="tzuchi"] .calendar-year-picker__trigger-heading {
   /* R1 / §1.2 — the trigger's own label: subtitle 700 16px/1.5. */
   font-size: var(--tc-font-size-16, 16px);
   font-weight: var(--tc-font-weight-bold, 700);
+  line-height: var(--tc-line-height-normal, 1.5);
+}
+
+/* Pass 5 — the indicator is a 1em glyph, so its size IS this font-size: 16px,
+   the size of the nav chevrons on the other end of the same header row and of
+   the heading it sits beside.  1.5 is the heading's own line box. */
+[data-theme^="tzuchi"] .calendar-year-picker__trigger-indicator {
+  font-size: var(--tc-font-size-16, 16px);
   line-height: var(--tc-line-height-normal, 1.5);
 }
 

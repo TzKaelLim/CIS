@@ -114,6 +114,81 @@
    or state is hidden — see above. The only thing added by this review is
    this "Reviewed" line, which the draft omitted; no corrections were
    otherwise required.
+   Pass 4 (2026-09-20): the option-row focus ring is now drawn INSIDE the row
+   (--tw-ring-inset, 0 offset) — the popover's overflow was clipping the
+   outside ring's left and right segments, leaving two horizontal lines; and
+   the texts that sit ON the tinted panel (a Section's `.header`, a row's
+   `[data-slot="description"]`, the empty state of the async stories) take the
+   panel's own --accent-soft-foreground instead of --muted. Nothing else
+   changed.
+   Pass 4 reviewed: verified against the live file — only the two briefed
+   changes differ (section 4's ring declarations and new section 5); nothing
+   else moved, reordered or reformatted. Specificity re-derived: the ring rule
+   is (0,4,0) over base's (0,3,0); section 5 is (0,3,0) over base's (0,1,0).
+   Comment safety scanned (marker counts match). Independently re-verified
+   live in the browser, states the fixer's own screenshots did not show: dark
+   theme (with-sections story, key:Tab key:ArrowDown) — probed box-shadow
+   `rgb(169,194,234) 0 0 0 2px inset`, one layer, and the header text moved
+   from --muted (rgb(179,179,179)) to --accent-soft-foreground
+   (rgb(169,194,234)) at 16px/500/1.5. The field-level `[data-slot=
+   "description"]` help text (with-description story) is NOT inside
+   .combo-box__popover and correctly keeps --muted — confirms section 5 is
+   scoped as intended and does not overreach outside the tinted panel.
+   Disabled/invalid states untouched. No corrections needed.
+   Pass 4, field-focus unit (2026-09-20): new section 6 gives the ComboBox's
+   own input shell the Tzu Chi field focus — a 3px --accent-soft-hover halo in
+   place of the 2px --focus ring, and a 3px --danger halo when it is invalid —
+   after the integrator settled (the owner delegated the call) §11 I1 / §12 Q2. It has to be stated here and not
+   left to input.css because combo-box.css:24-30 re-applies
+   `status-focused-field` at its own (0,3,0), a tie with input.css's themed
+   focus rule that only source order would settle. Only the ring LAYER variable
+   is touched, never `box-shadow` (R74). Nothing outside section 6 changed; the
+   popover and the option rows are as the option-rows unit left them.
+   Pass 4 reviewed: diffed against css-reviewed/combo-box.css (the option-rows
+   unit's output) — only section 6 is new; sections 1-5 are byte-identical.
+   Specificity re-derived: the halo rule at (0,4,0) settles the tie the base's
+   own `[data-slot="input"]:focus` (0,3,0) has with input.css's themed rule
+   (0,3,0); the invalid variant's `:is()` gives (0,5,0), clearing that tie, the
+   halo and input.css's base invalid-focus branch (0,3,0) all at once.
+   Injection-verified live: the input shell carries the 3px pale halo focused
+   in both themes, and submitting the Required story with nothing entered
+   moved native-invalid focus onto the shell and showed the 3px danger halo —
+   a state the fixer had not verified. The disclosure button keeps HeroUI's own
+   ring, untouched. No corrections needed.
+   Pass 5 (2026-09-20): three changes.
+     1. THE POPOVER FOLLOWS THE QUERY, at 20px. §11 I3 sent the ComboBox SHELL
+        to the Input's 20px inset and pass 2 left the popover on the Select
+        panel's 32px, so the text you type sat 20px in and the options it
+        filtered sat 32px in — a 12px jog between a query and its own results,
+        inside one control, visible in every `combobox--*` story. The rows and
+        the section headers in THIS popover now take the same 20px, so a result
+        starts exactly where the query does. The Select, Autocomplete and
+        Dropdown panels keep 32px: their triggers are inset 32px, so there the
+        32px is what lines up.
+        Since list-box-item.css's global row inset is itself 20px after pass 5,
+        the row rule below is no longer strictly needed to CHANGE anything —
+        but it is kept and re-pointed, because HeroUI's own
+        `.combo-box__popover [data-slot="list-box-item"] { px-2.5 }` (0,2,0)
+        still ties with it and the tie must not be left to import order.
+     2. The selection indicator takes the panel's --accent-soft-foreground
+        instead of the neutral --default-foreground, the same rule §5 applies
+        to the header and the description.
+     3. A Section separator runs full bleed in the panel's own foreground at
+        20%, instead of HeroUI's `ms-[3%] w-[94%]` neutral grey.
+   Pass 5 reviewed (2026-09-20): diffed against the live theme file — only the
+   three briefed changes differ; nothing pre-existing lost or reformatted.
+   One placement issue found and fixed: the new indicator and "7. Section
+   separator" rules had been inserted between section 5 and section 6
+   (Input-shell FOCUS, pass 4), so the file read 1,2,3,4,5,7,6 — cosmetic only,
+   since the cascade here is specificity-driven, but confusing. Relocated both
+   rules to after section 6 and kept the "7." label, which now follows 6; no
+   selector, value, or specificity changed by the move. Every rule scoped,
+   every colour a theme variable or a color-mix of one, no !important, no
+   physical property, comment markers balanced. Injection-verified live in
+   both themes: `components-pickers-combobox--with-sections` (rows and header
+   at 20px, aligned with the typed query, separator full-bleed and tinted;
+   probed in dark too). No variant, size, or state broken. No corrections
+   needed beyond the placement fix above.
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
@@ -190,10 +265,22 @@
     padding-inline: 0;
   }
 
-  /* R57/R93 — same tie, same fix: the 32px option inset owned by
-     list-box-item.css is restated here so `px-2.5` cannot win. */
+  /* R57/R93 — same tie, same fix: the option inset owned by list-box-item.css
+     is restated here so `px-2.5` cannot win.
+     PASS 5 — at 20px, not 32px: this popover belongs to a text field the user
+     types into, and §11 I3 already put that field's own inset at 20px. A
+     result has to start where the query starts. */
   & [data-slot="list-box-item"] {
-    padding-inline: var(--tc-space-32, 32px);
+    padding-inline: var(--tc-space-20, 20px);
+  }
+
+  /* PASS 5 — and the section header with them. list-box.css's
+     `.list-box .header` (0,3,0) already carries 20px after pass 5, so this
+     rule changes nothing today; it is written at (0,4,0) for the same reason
+     as the two above — this file owns what this panel's column looks like, and
+     the sibling popovers re-assert 32px at exactly this specificity. */
+  & [data-slot="list-box"] .header {
+    padding-inline: var(--tc-space-20, 20px);
   }
 }
 
@@ -229,10 +316,151 @@
   background-color: var(--accent-soft-hover);
 }
 
-/* R71 — `focus-ring` paints its 2px offset gap in --background, which reads as
-   a grey halo on the tinted panel. Width, offset and ring colour already come
-   from the theme (D3); only the offset colour moves onto the panel. */
+/* PASS 4 — CLIPPED RING. These rows are edge to edge (radius 0, the full
+   panel width), and `focus-ring` (utilities/index.css:2-6) paints BOTH its 2px
+   ring and its 2px offset OUTSIDE the padding box, where the popover's own
+   overflow clips the left and right segments: a keyboard user saw two
+   horizontal lines above and below the row, not a ring.
+   Tailwind composes the ring from three custom properties —
+     --tw-ring-offset-shadow: var(--tw-ring-inset,) 0 0 0 OFFSETW OFFSETC
+     --tw-ring-shadow:        var(--tw-ring-inset,) 0 0 0 calc(2px + OFFSETW) RINGC
+   — so giving --tw-ring-inset a value flips both layers inward, and a 0 offset
+   width leaves exactly one 2px band of --focus hugging the row edge on all four
+   sides. That is HeroUI's own answer wherever a ring may not escape its box
+   (`focus-field-ring`, utilities/index.css:8-12, "ring sits directly against
+   the element"). Colour (--focus) and width (2px) are unchanged; only the
+   direction is, and the fill that marks tc's keyboard cursor
+   (tc-dropdown.styles.ts:96-98, `.option.active`) is untouched above.
+   This SUPERSEDES R71 in this file: with no offset left there is no offset
+   colour to move onto the panel, so --tw-ring-offset-color is dropped. */
 [data-theme^="tzuchi"] .combo-box__popover [data-slot="list-box-item"]:focus-visible,
 [data-theme^="tzuchi"] .combo-box__popover [data-slot="list-box-item"][data-focus-visible="true"] {
-  --tw-ring-offset-color: var(--accent-soft);
+  --tw-ring-inset: inset;
+  --tw-ring-offset-width: 0px;
+}
+
+/* --------------------------------------------------------------------------
+   5. Text that sits ON the tinted panel — PASS 4
+   -------------------------------------------------------------------------- */
+
+/* NEW DESIGN-LANGUAGE RULE (pass 4; the integrator's call, delegated by the owner): text that sits on a FILL
+   never uses --muted; it takes that fill's own foreground. Tzu Chi's own
+   components are built that way — tc-dropdown's option text on brand-surface is
+   brand-primary (tc-dropdown.styles.ts:82-93), tc-search-bar's category label
+   on surface-subtle is text-default — and the completeness sweep measured
+   --muted on this --accent-soft panel at 3.31:1 (2.86:1 on a hovered row's
+   --accent-soft-hover fill; 3.42:1 dark), under the 4.5:1 floor.
+   --accent-soft-foreground, the panel's own foreground, gives 11.58:1 resting /
+   9.98:1 hovered in light and 7.42:1 resting in dark.
+   HIERARCHY IS CARRIED BY WEIGHT, not by colour: the row label keeps 700, the
+   section header 500 and the description 400, so a header still reads as a
+   header and a description still reads as secondary.
+   SCOPED TO THE POPOVER ON PURPOSE. A `.header`, `.description` or empty state
+   on an untinted surface — the standalone ListBox or Menu — sits on a surface,
+   not on a fill, so it keeps --muted; header.css and description.css stay
+   colour-free.
+   CASCADE: (0,3,0), over base `.header` / `.description` / `.empty-state`
+   (0,1,0), over `[data-theme^="tzuchi"] .header` (0,2,0) and over the popover's
+   own `[data-slot="empty-state"]` rule where one exists (0,2,0). The danger
+   row's label colour lives on a different element and is untouched. */
+[data-theme^="tzuchi"] .combo-box__popover .header,
+[data-theme^="tzuchi"] .combo-box__popover [data-slot="description"],
+[data-theme^="tzuchi"] .combo-box__popover [data-slot="empty-state"] {
+  color: var(--accent-soft-foreground);
+}
+
+/* --------------------------------------------------------------------------
+   6. Input-shell FOCUS — the Tzu Chi field halo — PASS 4
+   -------------------------------------------------------------------------- */
+
+/* The owner has settled DESIGN-LANGUAGE §11 I1 / §12 Q2: the Tzu Chi field
+   focus is a focused border PLUS a soft 3px halo in color.brand.surface-hover
+   (tc-input.styles.ts:42-44), and the 2px --focus ring every field kept under
+   D21 was a mechanical carry-over, not a design decision. The ComboBox's
+   editable shell IS an `.input`, so it follows Input exactly.
+   --accent-soft-hover is color.brand.surface-hover in both modes (blue-200
+   light, blue-700 dark).
+
+   WHY IT IS RESTATED HERE rather than inherited from input.css. Base
+   combo-box.css:24-30 re-applies `status-focused-field` to
+   `[data-slot="input"]:focus` at (0,3,0) — "input.css only has focus-visible,
+   but combo-box also needs focus" — which is a tie with input.css's themed
+   `[data-theme^="tzuchi"] .input:focus` (0,3,0). A tie decided only by the
+   import order of two theme files is exactly the fragility R69 and N7 warn
+   about, so this (0,4,0) rule settles it in the file that owns the selector.
+
+   MECHANISM. `status-focused-field` is Tailwind's `ring-2 ring-focus`, which
+   sets --tw-ring-shadow; the base composes `box-shadow` from
+   var(--tw-inset-shadow), var(--tw-inset-ring-shadow),
+   var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow), so
+   overriding that one layer swaps the ring for the halo and leaves
+   `shadow-field` and the inset layers intact — R74's concern, answered by the
+   mechanism rather than ignored. `focus-field-ring` already pins
+   --tw-ring-offset-width to 0, so no offset band survives.
+
+   The focused BORDER is not restated: base combo-box.css:28 already sets
+   --field-border-focus, the accessible 3:1 indicator (WCAG 1.4.11).
+   The disclosure BUTTON (`.combo-box__trigger`) is a non-field control and
+   keeps HeroUI's own 2px ring at 2px offset, untouched. */
+[data-theme^="tzuchi"] .combo-box [data-slot="input"]:focus,
+[data-theme^="tzuchi"] .combo-box [data-slot="input"][data-focus] {
+  --tw-ring-shadow: 0 0 0 3px var(--accent-soft-hover);
+}
+
+/* tc-input.styles.ts:71-73 — a focused INVALID field swaps the pale halo for a
+   solid danger one. The danger ring reaches this element from input.css's base
+   `invalid-field-ring` at (0,3,0), which both the base combo-box focus rule
+   (0,3,0) and the halo rule above (0,4,0) would otherwise beat; `:is()` takes
+   its most specific argument, so this is (0,5,0) and clears all three. */
+[data-theme^="tzuchi"]
+  .combo-box
+  [data-slot="input"][data-invalid="true"]:is(
+    :focus,
+    :focus-visible,
+    [data-focused="true"],
+    [data-focus-visible="true"]
+  ) {
+  --tw-ring-shadow: 0 0 0 3px var(--danger);
+}
+
+/* --------------------------------------------------------------------------
+   7. Selection indicator + section separator on the tinted panel — PASS 5
+   -------------------------------------------------------------------------- */
+
+/* Reviewed-pass placement note: these two rules were written by pass 5 right
+   after section 5 (before section 6's Input-shell FOCUS, which pass 4 had
+   already appended). Moved here, after section 6, purely so the file reads
+   1-7 in order; no selector, value or specificity changed. */
+
+/* PASS 5 — the same rule for the one mark on this panel that is not text: the
+   checkmark HeroUI parks in the row's gutter (`.list-box-item__indicator`,
+   list-box-item.css:76-77, `text-default-foreground`, a 10px glyph in a 16px
+   box). Section 4 gives hover, the keyboard cursor and selection the same
+   brand fill, so that mark is what separates them, and it was the last thing
+   on the panel still drawn from the neutral ramp. The danger variant's own
+   indicator colour (0,2,0) is excluded, as §4's label rule excludes the danger
+   label. CASCADE: (0,5,0). */
+[data-theme^="tzuchi"]
+  .combo-box__popover
+  [data-slot="list-box-item"]:not(.list-box-item--danger)
+  .list-box-item__indicator {
+  color: var(--accent-soft-foreground);
+}
+
+/* HeroUI narrows a separator inside a list box to `ms-[3%] w-[94%]`
+   (list-box.css:22-24). That reads as "inset to match the rows" only while the
+   rows are HeroUI's own inset pills; here they run edge to edge, so the rule
+   lined up with neither them nor the text column and gave the panel a third
+   left edge. Full bleed agrees with the rows above and below it.
+   COLOUR: `--separator` is a neutral grey and was the only neutral left on a
+   fully blue-tinted panel; the panel's own foreground at 20% keeps the line in
+   the panel's colour family in both modes, at a hairline weight.
+   CASCADE: (0,4,0) over the base's
+   `.list-box [data-slot="separator"][data-orientation="horizontal"]` (0,3,0)
+   and over `.separator` / `.separator--default` (0,1,0). Logical properties
+   only. */
+[data-theme^="tzuchi"] .combo-box__popover [data-slot="list-box"] [data-slot="separator"] {
+  margin-inline: 0;
+  inline-size: 100%;
+  background-color: color-mix(in oklab, var(--accent-soft-foreground) 20%, transparent);
 }

@@ -57,10 +57,68 @@
    header comment and gap-audit/select.md:176). What this file newly reaches
    is the standalone <Menu>, the one column neither existing file scopes
    into. No variant/size/state is hidden. No corrections required.
+   Pass 4 (2026-09-20): SUPERSEDES the "DELIBERATELY NOT CHANGED / font-size
+   12px" paragraph above. R8 kept the 12px caption step, but §1 is mechanical
+   and the Tzu Chi scale has no step below --tc-font-size-16: 12px is not a
+   size this theme owns. The header therefore moves to 16px and keeps the
+   distance from its 16px/700 rows in WEIGHT (500) and in the tighter control
+   line box (1.5), the same pairing R13 uses for a tab label. Colour is still
+   NOT set here — on an untinted list the header sits on a surface, so --muted
+   stays right; on the four tinted option panels the popover files give it
+   --accent-soft-foreground.
+   Pass 4 reviewed: verified against the live file — only the three new
+   declarations were added to the existing rule; the padding-inline
+   declaration and its comment are unchanged. Specificity unchanged at
+   (0,2,0), still beating base `.header` (0,1,0) and still out-ranked (on the
+   same 32px value) by dropdown.css's and list-box.css's own (0,3,0) rules.
+   Comment safety scanned (marker counts match). Re-verified live in the
+   browser: probed `.header` in the ComboBox with-sections popover in DARK
+   theme (a state the fixer's report did not show) — 16px/500/24px line-height,
+   height 26px -> 34px, matching the light-theme numbers the report gave; and
+   on the untinted standalone ListBox (with-sections, tzuchi) confirmed the
+   header stays --muted (rgb(130,130,130)) at the new 16px/500 size, so the
+   colour split between tinted and untinted hosts still holds. No
+   corrections needed.
+   Pass 5 (2026-09-20): SUPERSEDES the 32px value below. The 32px was
+   tc-dropdown's POPOVER inset, and applying it to `.header` globally put a
+   section label 32px in above rows that, outside a popover, are now inset
+   20px (list-box-item.css / menu-item.css, pass 5) — and in a
+   width-constrained bare ListBox it was the 64px of inset that made every row
+   wrap. The global header therefore moves to the same 20px field inset, so it
+   stays flush with the rows it introduces wherever it is rendered. The four
+   tinted popovers keep 32px: dropdown.css already re-insets `.header` at
+   (0,3,0), and select.css / autocomplete.css now do the same at (0,4,0) so
+   they also out-rank list-box.css's own `.list-box .header` rule. The
+   ComboBox popover deliberately does NOT — its rows follow the typed query at
+   20px (combo-box.css, pass 5 item 2). Nothing else in this file changed.
+   Pass 5 reviewed (2026-09-20): diffed against the live theme file — only the
+   one padding value differs. Rule scoped, no colour, no !important, no
+   physical property, comment markers balanced. Probed live: bare
+   `components-collections-listbox--with-sections` header now 20px both
+   themes; `components-pickers-select--with-sections` and
+   `components-pickers-autocomplete--with-sections` headers stay 32px
+   (re-asserted at 0,4,0); `components-pickers-combobox--with-sections` header
+   sits at 20px, flush with the typed query. No corrections needed.
    ========================================================================== */
 
 [data-theme^="tzuchi"] .header {
-  /* Flush with the 32px option-row text inset (R146). Size, weight and colour
-     stay HeroUI's; R8 keeps the 12px caption step on purpose. */
-  padding-inline: var(--tc-space-32, 32px);
+  /* PASS 5 — flush with the option-row text inset, which outside a tinted
+     popover is the 20px field inset (list-box-item.css / menu-item.css).
+     R146's 32px lives on inside the Select, Autocomplete and Dropdown
+     popovers, where those files re-assert it at higher specificity. */
+  padding-inline: var(--tc-space-20, 20px);
+
+  /* PASS 4 — the 12px step does not exist in this theme (§1: "every 12px
+     (text-xs) role moves to 16px"), so R8's exemption cannot survive contact
+     with the scale. What made R8 worth keeping was the header not competing
+     with the 16px/700 rows it introduces; at 16px that job passes to weight and
+     line box: 500 against the rows' 700, and the 1.5 control line box rather
+     than the 1.6 prose one — exactly the pairing §1.1 R13 gives a tab label
+     (500 / 1.5). 500 is also the weight HeroUI already had (header.css:6,
+     font-medium), so the header's voice is unchanged, only its size.
+     Block padding stays HeroUI's pt-1.5 pb-1, so the header box grows
+     26px -> 34px. Colour is deliberately absent: see the note above. */
+  font-size: var(--tc-font-size-16, 16px);
+  font-weight: var(--tc-font-weight-medium, 500);
+  line-height: var(--tc-line-height-normal, 1.5);
 }

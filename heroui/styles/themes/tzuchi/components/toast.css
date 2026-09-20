@@ -95,6 +95,44 @@
  * assertions' selectors exist and resolve to the stated values. No colour literal, no --tc-color-*
  * token, no !important, no physical left/right, all nine rules scoped to [data-theme^="tzuchi"], no
  * comment prematurely closed.
+ *
+ * Pass 5 (2026-09-20): the CONTENT ↔ ACTION gap becomes 16px; indicator ↔ content stays 8px.
+ * WHICH GAP IS IT — `.toast` is one flex row (base toast.css:57, `flex flex-row … gap-1.5`) whose
+ * children are the indicator, `.toast__content` (`grow`, base:186-188) and, on a wide viewport,
+ * `.toast__action`; `.toast__close-button` is absolutely positioned (base:230-232) and out of flow.
+ * So BOTH gaps are the one flex `gap` this file already sets to --tc-space-8 — there is no separate
+ * margin. Base `.toast__action` declares only `mt-2 sm:mt-0` (base:264-266), a BLOCK margin.
+ * WHY IT NEEDED RAISING — at the theme's 16px/700 title the content column fills almost its whole
+ * width, so "You have been invited to join a team" ended 12px from the "Dismiss" chip and the two
+ * read as touching (upstream's 14px title left 74px of slack; measured in reports/qa-overlays.md).
+ * The gap is the only thing that can separate them, because `.toast__content` is `grow` and its box
+ * always reaches the action.
+ * HOW — an inline start margin on the action that tops the shared 8px gap up to --tc-space-16,
+ * written as the subtraction so the intent (16px total) is legible. Both tokens are
+ * mode-independent lengths in packages/tokens/dist/tokens.css with fallbacks.
+ * WHY THE CHILD COMBINATOR — below 768px, toast.tsx:866-872 renders the action INSIDE
+ * `.toast__content` instead (a column child under the description), where an inline margin would
+ * just indent the button. `.toast > .toast__action` matches only the wide-viewport sibling, so the
+ * narrow layout keeps HeroUI's `mt-2` and its flush left edge exactly as before — verified at 420px.
+ * Cascade: (0,3,0) against the base's (0,1,0); `margin-block` is never touched, so `mt-2 sm:mt-0`
+ * (utilities layer) keeps deciding the vertical offset in both layouts.
+ *
+ * Pass 5 reviewed (2026-09-20): diffed against the live
+ * styles/themes/tzuchi/components/toast.css — only the new
+ * `.toast > .toast__action` margin rule and this header differ; typography,
+ * title-description gap and tone-variant rules are byte-identical. Confirmed
+ * in toast.tsx that the action button is a direct `.toast` child only in the
+ * non-mobile layout (isMobile false, ≥768px), so the child combinator is
+ * exactly right and the narrow layout (verified pixel-identical at 420px in
+ * both themes) is unaffected. Verified live with the browser tool that the
+ * content-to-action gap is visibly wider than the indicator-to-content gap
+ * in both themes. NOTE (not a defect, not fixed): at the toast's fixed
+ * 460px width, the extra 8px can push an already-tight single-line title
+ * ("You have been invited to join a team") into wrapping one line earlier
+ * than before — an inherent trade-off of widening a gap in a fixed-width
+ * flex row, not a broken state or variant, and the brief's decision is
+ * implemented exactly as stated. Comment safety, colour-token and scope
+ * scans clean. No changes made — the fix matches the brief exactly.
  */
 
 /* ── Shell ───────────────────────────────────────────────────────────────── */
@@ -114,6 +152,15 @@
    * but that token belongs to the alert's flat callout box).
    */
   gap: var(--tc-space-8, 8px);
+}
+
+/* Pass 5 — content ↔ action is 16px, indicator ↔ content stays 8px. The shell's flex `gap` above
+   serves both, so the extra 8px rides on the action as an inline-start margin. The child
+   combinator keeps it off the narrow-viewport layout, where toast.tsx moves the action inside
+   `.toast__content` and an inline margin would only indent it. Block margins untouched, so the
+   base's `mt-2 sm:mt-0` still owns the vertical offset. */
+[data-theme^="tzuchi"] .toast > .toast__action {
+  margin-inline-start: calc(var(--tc-space-16, 16px) - var(--tc-space-8, 8px));
 }
 
 /* ── Typography ──────────────────────────────────────────────────────────── */

@@ -128,6 +128,123 @@
    variant is hidden. All comments open and close cleanly, no premature
    comment closure. Every assertion's storyId, selector and computed value
    re-checked against the real base markup and confirmed; none dropped.
+
+   PASS 4 (2026-09-20) — weekday header cell 12px -> 16px / 1.6.
+   This SUPERSEDES the "WEEKDAY HEADER `.range-calendar__header-cell` keeps its
+   12px" bullet above (written there as "`.range-calendar__header-cell`
+   keeps 12px (§1.3 row 1, §1 R8)").  The completeness sweep ruled (the integrator's call, delegated by the owner) that
+   Tzu Chi has no type step below 16px anywhere, so §1's mechanical rule —
+   "every 12px (`text-xs`) role moves to 16px" — applies here too; §1.3's
+   exception list never covered this cell (it names `.header`,
+   `.badge__label`, `.breadcrumbs__separator`, `.close-button svg` and the
+   toast spinner, not the calendar weekday row), so the earlier reading of
+   §1.3 row 1 / R8 was an extension of R8's `.header`, not R8 itself.
+   Line-height moves with the size, onto the 1.6 the day numerals already
+   carry (R21 -> R16), instead of being left in Tailwind's `text-xs` 16px
+   line box: the header cell grows 24px -> 33.6px tall and the grid below it
+   is untouched.  WEIGHT stays HeroUI's 500 (N5 — do not restate): keeping it
+   under the 700 of a subtitle is what still makes the weekday row read as
+   subordinate to the numerals it introduces, which was R8's actual concern.
+   COLOUR stays --muted: this row sits on the calendar surface, not on a
+   fill, so the new "no muted text on a fill" rule does not reach it, and its
+   contrast against the surface is a token-level matter (out of scope).
+   FIT, measured in the browser at 16px against a real 36px column
+   (`.range-calendar` is 252px wide, / 7), with React Aria's own
+   weekdayStyle="short" labels (range-calendar.tsx, same default) for every locale the
+   Storybook i18n addon offers: zh-TW / zh-CN "週日" = 32.0px — two CJK
+   glyphs are 2em in any CJK font, so that one is font-independent — en-US /
+   en-GB "Wed" = 34.3px, de-DE "Mo" = 24.1px, ja-JP "日" = 16.0px, hi-IN
+   "मंगल" = 30.0px, all on one line, and the same in the RangeCalendar's own
+   stories (`--default`, `--default-value`, `--weeks-in-month`) and in the
+   DateRangePicker popover.
+   NINE locales set a label WIDER than the 36px column and are REPORTED, not
+   worked around (the brief: name the locale rather than shrink the type, and
+   the 36px column is HeroUI's own): pt-PT (66.5px), lv-LV (62.2) and ar-AE
+   (53.7) already overset at 12px (50.4 / 48.1 / 40.7), so they are the base
+   file's problem, not this rule's; pl-PL (46.2), pt-BR (38.3), ro-RO (38.3),
+   da-DK (37.4), nb-NO (37.4) and fr-FR / fr-CA (36.4) newly cross it, by
+   0.4-10.2px; he-IL's "יום א׳" wraps to two lines.  Nothing clips — the cell
+   sets no overflow — the label simply centres wider than its column.  See
+   reports/fills-and-scale.md.
+
+   Pass 4 reviewed (2026-09-20): no changes to the CSS. Diffed this file
+   against the live styles/themes/tzuchi/components/range-calendar.css and
+   confirmed only the briefed `.range-calendar__header-cell { font-size /
+   line-height }` rule and its comment are new — nothing else moved or
+   reformatted, and the value matches calendar.css's `.calendar__header-cell`
+   exactly, so Calendar and RangeCalendar keep one weekday row as intended.
+   Re-probed the live weekday cell with this file injected: 16px / 25.6px
+   line-height, weight still 500, colour still rgb(130,130,130) light /
+   rgb(179,179,179) dark (--muted, unchanged) — a clean (0,2,0) win over the
+   base's (0,1,0). Opened the provided evidence screenshot
+   (after-rangecal-dark.png) and confirmed the weekday row and the day grid
+   below it read as one component with calendar.css's own screenshots.
+   Re-checked the band/cap radius rules, band-vs-cap colour separation, today/
+   hover/outside-month/unavailable/disabled and the four specificity ties
+   (e/g/k/m): all unchanged, none of them touch the header cell this rule
+   adds. Comment safety, colour-literal, !important, physical-property and
+   scope scans: clean.
+
+   PASS 5 (2026-09-20) — two changes.
+
+   A. TODAY RING (paired with the identical rule in calendar.css, so the two
+      calendars mark today the same way).  The band and the today marker are
+      BOTH --accent-soft, and since item 2 above squared both to 4px they are
+      also the same shape: a today inside the range vanished completely and a
+      today beside it read as a selected day.  The fill is left exactly as
+      HeroUI has it; the separation comes back as a 1px --accent ring inset
+      inside the day's own 4px corner, on `.range-calendar__cell-button` (the
+      day layer), never on the outer cell — putting it on the cell would draw
+      a box around a band segment.
+      MECHANISM — outline, not box-shadow: `status-focused` (utilities/index
+      .css:1-6) is a Tailwind `ring`, i.e. box-shadow, so a box-shadow marker
+      and the focus ring would evict one another; the base declares only
+      `outline-none` here, so outline is free.  The negative offset keeps the
+      ring inside the corner, clear of the 2px focus ring outside it.
+      SELECTED: a range CAP fills with --accent, so the ring flips to
+      --accent-foreground there and today is still marked when it is an
+      endpoint.  Mid-band today keeps the --accent ring, because its own fill
+      is still the soft tint.
+      SPECIFICITY: `[data-theme^="tzuchi"] .range-calendar__cell[data-today=
+      "true"] .range-calendar__cell-button` is (0,4,0) — a tie with the base's
+      `.range-calendar__cell:focus-visible:not([data-focused])
+      .range-calendar__cell-button` (0,4,0) that this file wins on import
+      order, and a win over the `[data-focus-visible="true"]` form (0,3,0);
+      the cap flip is (0,5,0).  Verified in the browser in both themes: today
+      at rest, today inside the band, today as a range end, today focused,
+      today hovered, today in a disabled calendar.
+
+   B. SELECTED-WEIGHT GUARD.  The 700 on `[data-selected="true"]` used to
+      reach a range endpoint that falls on an ADJACENT month's day, where the
+      base deliberately withholds the --accent cap fill
+      (styles/components/range-calendar.css:250-258, its own
+      `:not([data-outside-month="true"])`), so the endpoint showed as a lone
+      bold number with no fill beside two normal-weight neighbours.  The rule
+      now carries the base's own guard and therefore only bolds where the fill
+      lands; an outside-month endpoint falls back to this file's 400, the
+      weight its outside-month neighbours already have.
+      `data-outside-month` is rendered on the outer `.range-calendar__cell`
+      (react-aria's CalendarCell), not on the `.range-calendar__cell-button`
+      span (range-calendar.tsx:437-447 sets only disabled/hovered/pressed/
+      selected there), so the guard sits on the cell, exactly as the base
+      writes it.  The rule is lifted out of the nested block for that reason;
+      at (0,5,0) it still beats this file's own (0,3,0) day-layer 400 and has
+      no competitor in the base, which declares no font-weight on a selected
+      cell-button at all.
+
+   Pass 5 reviewed (2026-09-20): no changes. Diffed against the live
+   styles/themes/tzuchi/components/range-calendar.css — only the briefed
+   today-ring rules (A) and the guarded selected-weight rule (B) are new; the
+   nested `&[data-selected="true"]` block was correctly lifted out, and the
+   surrounding cell-button base rule (font-size/weight/line-height) still
+   closes cleanly. Verified in the browser: today inside a 15→22 band is now
+   distinguishable by its --accent ring (tzuchi); today as a range cap flips
+   the ring to --accent-foreground on the --accent fill, in both themes; an
+   outside-month range end (simulated the guard's effect, since css:
+   injection cannot remove the pre-Pass-5 unguarded rule still in the build)
+   drops to 400 with no fill, matching its outside-month neighbours, while an
+   in-month cap stays 700. Comment safety, colour-literal, !important,
+   physical-property and scope scans: clean.
    ========================================================================== */
 
 [data-theme^="tzuchi"] .range-calendar__heading {
@@ -135,6 +252,14 @@
   font-size: var(--tc-font-size-16, 16px);
   font-weight: var(--tc-font-weight-bold, 700);
   line-height: var(--tc-line-height-normal, 1.5);
+}
+
+/* Pass 4 — R21/§1: no Tzu Chi type step below 16px.  Same rule, same values
+   as calendar.css gives `.calendar__header-cell`, so the two components keep
+   one weekday row.  Base is (0,1,0), this is (0,2,0). */
+[data-theme^="tzuchi"] .range-calendar__header-cell {
+  font-size: var(--tc-font-size-16, 16px);
+  line-height: var(--tc-line-height-relaxed, 1.6);
 }
 
 /* Band layer, at rest (visible on selected outside-month cells, which keep the
@@ -150,10 +275,33 @@
   font-size: var(--tc-font-size-16, 16px);
   font-weight: var(--tc-font-weight-regular, 400);
   line-height: var(--tc-line-height-relaxed, 1.6);
+}
 
-  &[data-selected="true"] {
-    font-weight: var(--tc-font-weight-bold, 700);
-  }
+/* Pass 5 (B) — range CAPS bold (R16 / R81), but only where the base actually
+   paints the cap fill: it withholds it from an outside-month day, and weight
+   without fill is just a louder number.  Guard copied from the base's own
+   rule; `data-outside-month` lives on the cell, not on the button. */
+[data-theme^="tzuchi"]
+  .range-calendar__cell:not([data-outside-month="true"])
+  .range-calendar__cell-button[data-selected="true"] {
+  font-weight: var(--tc-font-weight-bold, 700);
+}
+
+/* Pass 5 (A) — TODAY: the --accent-soft fill stays HeroUI's; the ring is what
+   keeps today apart from the band, which is the same tint on the same 4px
+   shape.  Inset by its own width so it hugs the corner and leaves the focus
+   ring (a box-shadow, 2px at 2px offset) its own space outside. */
+[data-theme^="tzuchi"] .range-calendar__cell[data-today="true"] .range-calendar__cell-button {
+  outline: 1px solid var(--accent);
+  outline-offset: -1px;
+}
+
+/* Pass 5 (A) — today AS A RANGE CAP: the fill under the ring is --accent, so
+   the ring takes that fill's own foreground and today is still marked. */
+[data-theme^="tzuchi"]
+  .range-calendar__cell[data-today="true"]
+  .range-calendar__cell-button[data-selected="true"] {
+  outline-color: var(--accent-foreground);
 }
 
 /* Band START corners — mirrors base rules d, h and j so the 8px week-wrap end

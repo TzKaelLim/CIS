@@ -81,6 +81,89 @@
    in both dark blocks. Grepped clean for colour literals, --tc-color-,
    !important, physical left/right; comment delimiters balanced. No
    corrections needed.
+
+   Pass 5 (2026-09-20): the description now fades with its field when that
+   field or group is disabled.
+
+   THE BUG. HeroUI dims the label through `[data-disabled="true"] .label`
+   (base label.css:20-22) and the control through each component's own
+   `status-disabled`, but nothing ever reaches a description that sits at
+   FIELD or GROUP level. Probed in tzuchi light on
+   `components-forms-textfield--disabled`: `.label` 0.38, `.description` 1;
+   on `components-forms-radiogroup--disabled`:
+   `.radio-group > [data-slot="description"]` 1 while every `.radio` around it
+   is 0.38. Upstream has the same missing rule but hides it — 0.5 opacity
+   against a near-black label, and a 12px hint. Here the helper is 16px and
+   --disabled-opacity is 0.38 (variables.css:23), so the hint became the
+   loudest text in a control nobody can use and the hierarchy read upside down.
+
+   THE RULE. `opacity: var(--disabled-opacity)` — the same number
+   `status-disabled` uses (utilities/index.css:61-65), so label, control and
+   helper land on one level. Only the opacity: `cursor` and `pointer-events`
+   are left to the hosts that already set them, and no colour is touched.
+
+   THE TWO HOOKS, and why the selector is shaped this way.
+     · `[data-disabled="true"] > .description` — the real hook. The disabled
+       flag sits on the FIELD or GROUP root (`.textfield`, `.radio-group`,
+       `.checkbox-group`, `.number-field`, …), exactly the element label.css
+       already keys off, and the description is its direct child (probe-
+       confirmed on textfield / radio-group / checkbox-group / number-field).
+       `fieldset:disabled` rides along in the same `:is()`: HeroUI's Fieldset
+       mirrors native `disabled` to `data-disabled` itself
+       (react/src/components/fieldset/fieldset.tsx:48-59), so this only adds
+       cover for a hand-written `<fieldset disabled>`.
+     · `.label--disabled ~ .description` — for a hand-composed field with no
+       root at all. `components-forms-inputotp--disabled` is exactly that: a
+       plain `<div>` holding `<Label isDisabled>` + `<Description>` +
+       `<InputOTP isDisabled>`, where the only `[data-disabled]` in the whole
+       story is the OTP slot. Without this branch that helper stays at full
+       strength with no selector able to reach it. `.label--disabled` is only
+       emitted when a consumer disables a Label explicitly — grepped: one
+       occurrence in the entire story set, that one — so it cannot collide
+       with a component-driven disabled state.
+
+   NO DOUBLE-DIMMING. Opacity multiplies through the tree, so a description
+   inside a host HeroUI already dims must not be dimmed again. The `:not()`
+   lists every such host: `.checkbox` (base checkbox.css:25-31), `.radio`
+   (radio.css:34-42) and `.switch` (switch.css:16-26) each put
+   `status-disabled` on the item AND on its description, and `.list-box-item`
+   (list-box-item.css:68) / `.menu-item` (menu-item.css:94) / `.tag`
+   (tag.css:32-33) dim the whole row. Verified after the change: the group
+   description moved 1 -> 0.38 while `.checkbox[data-disabled] > .description`
+   and `.radio[data-disabled] > .description` stayed at exactly 0.38, and
+   `.list-box-item[data-disabled] .description` stayed at 1 under its already
+   dimmed row.
+
+   CASCADE. (0,4,1): the theme attribute, `:is()` (whose most specific
+   argument, `fieldset:disabled`, is one type + one pseudo-class), the `:not()`
+   (one class) and `.description`. Nothing in the base or in this theme
+   declares `opacity` on a description, so the margin is not needed — the rule
+   only has to sit under the theme attribute. No colour, no !important, no
+   physical property. `--disabled-opacity` is a HeroUI theme variable and
+   flips with neither mode, so light and dark fade identically.
+
+   Pass 5 verified by injection in tzuchi and tzuchi-dark on
+   textfield--disabled, radiogroup--disabled, checkboxgroup--disabled,
+   numberfield--disabled and inputotp--disabled (all now 0.38), against
+   checkbox--disabled, checkboxgroup--disabled and listbox--with-disabled-items
+   (unchanged) and textfield--with-description (still 1).
+
+   Pass 5 reviewed (2026-09-20): diffed against the live theme file — only the
+   two new rules were added; the R6 rule above is untouched. Confirmed
+   Fieldset (react/src/components/fieldset/fieldset.tsx:48-59) sets both the
+   native `disabled` attribute and `data-disabled="true"` on the same
+   `<fieldset>`, so `fieldset:disabled` is reachable and only ever adds cover
+   for a hand-written native fieldset, never double-fires against the
+   `[data-disabled="true"]` branch on the same element. Re-verified live by
+   css: injection in tzuchi and tzuchi-dark: textfield--disabled,
+   radiogroup--disabled (`.radio-group > .description`), checkboxgroup--
+   disabled (`.checkbox-group > .description`), numberfield--disabled and
+   inputotp--disabled all read opacity 0.38; checkbox--with-description (not
+   disabled) and textfield--with-description both stay at opacity 1;
+   listbox--with-disabled-items' `.list-box-item[data-disabled] .description`
+   stays at opacity 1 (the row's own dimming is untouched, not doubled) in both
+   light and dark. No premature comment close, no colour, no --tc-color-*, no
+   !important, no physical property. No corrections needed.
    ========================================================================== */
 
 [data-theme^="tzuchi"] .description {
@@ -88,4 +171,28 @@
      Longhands, so --font-sans and the base's --muted are left alone. */
   font-size: var(--tc-font-size-16, 16px);
   line-height: var(--tc-line-height-relaxed, 1.6);
+}
+
+/* Pass 5 — a disabled field's helper fades with its label and its control.
+   First branch: the disabled flag on the field or group ROOT, the same hook
+   base label.css:20-22 uses, with the description as its direct child. The
+   `:not()` excludes every host that already applies `status-disabled` to its
+   own description (checkbox / radio / switch) or to the whole row
+   (list-box-item / menu-item / tag), because opacity multiplies through the
+   tree. Second branch: a hand-composed field that has no root to key off —
+   `components-forms-inputotp--disabled` disables its Label explicitly and
+   leaves the helper with no other hook. */
+[data-theme^="tzuchi"] {
+  :is([data-disabled="true"], fieldset:disabled):not(
+      .checkbox,
+      .radio,
+      .switch,
+      .list-box-item,
+      .menu-item,
+      .tag
+    )
+    > .description,
+  .label--disabled ~ .description {
+    opacity: var(--disabled-opacity);
+  }
 }

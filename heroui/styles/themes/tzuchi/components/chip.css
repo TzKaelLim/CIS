@@ -44,6 +44,27 @@
  * citing the "Default" story (color=accent, variant=secondary) as proof of an exact colour match,
  * when that combination actually resolves to `--default` background + `--accent-soft-foreground`
  * text (see paragraph above), not tc-chip's accent-soft tonal fill. No CSS rule was changed.
+ *
+ * Pass 5 (2026-09-20): `.chip__label { white-space: nowrap }` — a status pill must never wrap.
+ * At the theme's type sizes a two-word label ("On Leave") no longer fits a 120px table column, so
+ * it broke after the first word and the pill ballooned into a ~57px two-line lozenge with huge
+ * pill ends, roughly doubling those table rows' height (reproduced on
+ * `components-data-display-table--column-resizing`). The label is a single inline box with no
+ * white-space declaration of its own anywhere in the chain, so one declaration on the existing
+ * `.chip__label` rule fixes every size, colour and variant at once. The chip keeps `w-fit`, so a
+ * long label now widens the pill instead of stacking it; nothing is clipped or hidden, and a chip
+ * that is genuinely too wide for its column overflows visibly rather than silently changing the
+ * row rhythm. Cascade unchanged: this rule is (0,2,0) against the base's (0,1,0)
+ * (styles/components/chip.css:13-15), which declares padding only.
+ *
+ * Pass 5 reviewed (2026-09-20): diffed against the live
+ * styles/themes/tzuchi/components/chip.css — only the `white-space: nowrap`
+ * declaration and the header note differ; the rest of the file is
+ * byte-identical, nothing reordered or reformatted. Confirmed with the
+ * browser tool in both themes on chip--sizes, chip--variants and a narrow
+ * table column: labels stay single-line, no size/variant/status loses a
+ * declaration. Scoping, colour-token and comment-safety scans clean. No
+ * changes made — the fix matches the brief exactly.
  * ------------------------------------------------------------------------------------------------ */
 
 /* Base = tc-chip. Also wins over .chip--sm/--md/--lg (0,2,0 vs 0,1,0), so each size that must
@@ -59,9 +80,11 @@
   line-height: var(--tc-line-height-normal, 1.5);
 }
 
-/* tc-chip spaces its slots with gap alone; the chip's padding is the real text inset. */
+/* tc-chip spaces its slots with gap alone; the chip's padding is the real text inset.
+   Pass 5: a status pill never wraps — see the header note. */
 [data-theme^="tzuchi"] .chip__label {
   padding-inline: 0;
+  white-space: nowrap;
 }
 
 [data-theme^="tzuchi"] .chip--sm {

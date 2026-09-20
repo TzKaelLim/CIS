@@ -173,6 +173,92 @@
    would stop 12px short of the panel edge). The only thing added by this
    review is this "Reviewed" line, which the draft omitted; no corrections
    were otherwise required.
+   Pass 4 (2026-09-20): the option-row focus ring is now drawn INSIDE the row
+   (--tw-ring-inset, 0 offset) — the popover's overflow was clipping the
+   outside ring's left and right segments, leaving two horizontal lines; and
+   the texts that sit ON the tinted panel take the panel's own
+   --accent-soft-foreground instead of --muted. That includes
+   `[data-slot="empty-state"]`, which the header above left alone on the
+   grounds that the empty-state unit owned it: it does own the TYPE, but its
+   colour here is a property of THIS panel (autocomplete.css:230-233 pins it to
+   `text-overlay-foreground/60`, only reachable from this scope), so the
+   spec gap that comment recorded is closed here. Nothing else changed.
+   Pass 4 reviewed: verified against the live file — only the two briefed
+   changes differ (section 4's ring declarations and new section 6); nothing
+   else moved, reordered or reformatted. Specificity re-derived: the ring rule
+   is (0,4,0) over base's (0,3,0); section 6 is (0,3,0), beating both base
+   `.empty-state` (0,1,0) and this file's own `.autocomplete__popover
+   [data-slot="empty-state"]` (0,2,0). Comment safety scanned (marker counts
+   match). Independently re-verified live in the browser, states the fixer's
+   own screenshots did not show: LIGHT theme ring (user-selection story,
+   key:Tab key:ArrowDown x2) — probed box-shadow `rgb(79,123,190) 0 0 0 2px
+   inset`, one layer, full ring visible on screen around a middle row, and
+   held up on the VIRTUALIZED rows (multiple-select story) without bleeding
+   into a neighbouring row's box. Also probed `.autocomplete__popover
+   [data-slot="description"]` there: rgb(130,130,130) -> rgb(27,45,88), the
+   same fix as Dropdown's descriptions, on a story the report did not cite.
+   .autocomplete--secondary, the clear button and invalid states untouched.
+   No corrections needed.
+   Pass 4, field-focus unit (2026-09-20): new section 7 gives the TRIGGER the
+   Tzu Chi field focus — a 3px --accent-soft-hover halo in place of the 2px
+   --focus ring at 2px offset, and a 3px --danger halo when the Autocomplete is
+   invalid — after the integrator settled (the owner delegated the call) §11 I1 / §12 Q2. Only the ring LAYER
+   variables are touched, never `box-shadow` (R74). Nothing outside section 7
+   changed; the popover and the option rows are as the option-rows unit left
+   them.
+   Pass 4 reviewed: diffed against css-reviewed/autocomplete.css (the
+   option-rows unit's output) — only section 7 is new; sections 1-6 are
+   byte-identical. Specificity re-derived: identical shape to select.css's
+   section 7, (0,4,0) / (0,3,0) for the pale halo and (0,5,0) for the invalid
+   variant. Injection-verified live: the keyboard-focused trigger carries the
+   3px halo in the dark theme, and submitting the Required story with nothing
+   selected moved native-invalid focus onto the trigger and showed the 3px
+   danger halo with the offset band collapsed to 0 — a state the fixer had not
+   verified. No corrections needed.
+   Pass 5, option-lists unit (2026-09-20): seven changes. The four the Select
+   makes (§1's field floor, §2's one-line value and clear button, §4's
+   re-asserted section header, §6's indicator and §8's separator) are made here
+   for the same reasons and in the same words — the two triggers and the two
+   panels are siblings and must not drift apart — plus two this component has
+   alone:
+     • MULTI-SELECT TAGS (§9). With a TagGroup in the value slot, the tags ran
+       straight through the 60px affix reserve: the chevron ended up squeezed
+       between two tag rows and the clear ✕ was pushed onto the trigger's
+       border. `.autocomplete__value` is `flex-1`, whose automatic minimum size
+       is its min-content width, so the value box simply refused to shrink to
+       the content box and overflowed it. It is now allowed to shrink, the tag
+       list is held inside it, and a tag longer than the column wraps inside
+       its own pill instead of escaping the field.
+     • THE POPOVER'S SEARCH FIELD (§10). The header above argued it should be
+       left alone; the QA pass overruled that on sight — a `--default` grey box
+       was the one element on the tinted panel that had not moved onto the
+       brand ramp, and in light it is LIGHTER than the panel it sits on. It now
+       takes the field surface, so it reads as a field sitting on the panel.
+       The 1px --field-border edge and the --field-border-focus it takes on
+       focus were already right and are untouched.
+   Pass 5 reviewed (2026-09-20): diffed against the live theme file — only the
+   briefed additions differ; nothing pre-existing lost or reformatted. One
+   placement issue found and fixed: sections 8-9 (indicator/separator, search
+   field) had been inserted between section 6 and section 7 (Trigger FOCUS,
+   pass 4), so the file read 1,2,3,4,5,6,8,9,7 — cosmetic only, since the
+   cascade here is specificity-driven, but confusing. Relocated sections 8-9 to
+   after section 7 and kept their numbers, which now follow 7 in order; no
+   selector, value, or specificity changed by the move. Every rule scoped,
+   every colour a HeroUI theme variable or a color-mix of one, no !important,
+   no physical property, comment markers balanced. Confirmed the tag-group
+   fix targets the right elements: `tag-group.tsx` sets `data-slot="tag-group"`
+   / `data-slot="tag-group-list"`, and `[data-slot="tag-group-list"] > *`
+   resolved live to the actual `.tag` pill (probed background-color and
+   border-radius on it, not an unstyled wrapper). Injection-verified live, both
+   themes, 1/2/5 tags (`--with-clear-button`, `--email-recipients`,
+   `--multiple-select`): tags wrap inside the trigger's content box, the
+   chevron and clear button keep their own column, no overlap. Also verified
+   `--default` and `--disabled` (min-block-size 43.5938px, value ellipsizes),
+   `--with-clear-button` (16px glyph, `currentColor`), `--virtualization`
+   (popover SearchField takes --field-background in both themes, border-focus
+   colour intact), `--with-sections` (indicator + separator). No variant,
+   size, or state broken. No corrections needed beyond the placement fix
+   above.
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
@@ -194,6 +280,20 @@
   font-weight: var(--tc-font-weight-bold, 700);
 
   color: var(--field-placeholder);
+
+  /* PASS 5 — the shared Tzu Chi field floor, written exactly as
+     search-field.css:121-125 and select.css §1 write it: a 16px/1.6 line box +
+     2 x 8px block padding + 2 x 1px border = 43.59px. The trigger's own content
+     box is 42px, because a control label takes the 1.5 line box and a field's
+     text takes the 1.6 prose one, so an Autocomplete beside an Input in one
+     form missed it by 1.6px. Flooring the shell keeps the 16px/1.5 label (R1)
+     and moves only the box. HeroUI's `min-h-9` never bound. (0,2,0) over the
+     base's (0,1,0); `min-block-size` and the base's `min-height` cascade
+     together, so specificity decides. */
+  min-block-size: calc(
+    var(--tc-font-size-16, 16px) * var(--tc-line-height-relaxed, 1.6) + 2 *
+      var(--tc-space-8, 8px) + 2 * var(--field-border-width, 1px)
+  );
 }
 
 /* R56 — in tc the chevron is an in-flow flex item at the content edge, so the
@@ -242,6 +342,56 @@
 [data-theme^="tzuchi"] .autocomplete__value {
   font-size: var(--tc-font-size-16, 16px);
   line-height: var(--tc-line-height-normal, 1.5);
+
+  /* PASS 5 — `.autocomplete__value` is `flex-1`, and a flex item's automatic
+     minimum size is its min-content width, so the value box could not shrink
+     to the trigger's content box: with a TagGroup inside it, it grew to the
+     widest tag and overflowed straight through the 60px affix reserve, putting
+     the tags under the chevron and shoving the clear button onto the border.
+     Letting it shrink is the whole fix for the layout; it is stated here, on
+     the value itself, because it is true whatever the value renders. */
+  min-inline-size: 0;
+}
+
+/* PASS 5 — the TEXT value (the single-select case) stays on ONE line and
+   ellipsizes, exactly as select.css does for `.select__value`: HeroUI's
+   `wrap-break-word` is right for its own 214px column at 14px/400, not for this
+   theme's 162px at 16px/700, where a long value wrapped and grew the trigger
+   beside its single-line neighbours.
+   `:not(:has([data-slot="tag-group"]))` is what keeps the rule off the
+   multi-select case: a TagGroup is a wrapping flex list and must be allowed to
+   wrap — its containment is handled below, not by nowrap. Specificity: `:not()`
+   takes its most specific argument, so this is (0,3,0) — above the (0,2,0) rule
+   just above, which is why `min-inline-size` is declared there and not here. */
+[data-theme^="tzuchi"] .autocomplete__value:not(:has([data-slot="tag-group"])) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* PASS 5 — hold the tag list inside the value box. The list is
+   `flex flex-wrap` (tag-group.css:7), so once its container can no longer be
+   pushed wider it wraps on its own; `min-inline-size: 0` on both boxes removes
+   the automatic minimum that was propagating the widest tag's width outward,
+   and `max-inline-size: 100%` stops a single long tag from re-widening them.
+   `overflow-wrap: anywhere` on the tag itself is the last resort for a tag
+   whose text has no soft wrap opportunity at all — an e-mail address — which
+   would otherwise still overflow: it wraps inside its own pill instead of
+   escaping the field. It is the same declaration list-box-item.css gives a
+   row's description, for the same reason.
+   SCOPE: every rule here is inside `.autocomplete__trigger`, so the TagGroup
+   component itself, and every TagGroup rendered anywhere else, is untouched.
+   CASCADE: nothing in the base or the theme sets these three properties on
+   these elements, so (0,3,0) / (0,4,0) is ample. */
+[data-theme^="tzuchi"] .autocomplete__trigger [data-slot="tag-group"],
+[data-theme^="tzuchi"] .autocomplete__trigger [data-slot="tag-group-list"] {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+
+[data-theme^="tzuchi"] .autocomplete__trigger [data-slot="tag-group-list"] > * {
+  max-inline-size: 100%;
+  overflow-wrap: anywhere;
 }
 
 [data-theme^="tzuchi"] .autocomplete__indicator {
@@ -262,6 +412,32 @@
     width: var(--tc-size-icon-sm, 20px);
     height: var(--tc-size-icon-sm, 20px);
   }
+}
+
+/* PASS 5 — the clear button, which the header above records as "left as HeroUI
+   ships it", the twin of select.css's pass-5 rule and identical to it. Left
+   alone it measured 12 x 14px in --muted grey beside a 20px brand-navy chevron:
+   two affordances in one field at two sizes and two colours. The 12 x 14 is not
+   a typo — the base gives the button `size-5` (20px) with `p-1` (4px), so the
+   14px `size-3.5` icon is a flex item in a 12px content box and is squeezed on
+   the inline axis only; the padding therefore has to go for the glyph to be
+   square at any size. At 0 the 16px glyph sits centred in the 20px box with 2px
+   of slack, and the button keeps its `bg-default-hover` circle, its pressed
+   scale and its `[data-empty]` fade.
+   COLOUR is `inherit`, the same answer §2 gives the chevron, so both affixes
+   track the trigger together (--field-placeholder empty, --accent with a value
+   or open, dimmed when disabled).
+   CASCADE: (0,2,0) for the colour over the base's (0,1,0); (0,3,0) for the
+   glyph over `.autocomplete__clear-button [data-slot=…]` (0,2,0). */
+[data-theme^="tzuchi"] .autocomplete__clear-button {
+  color: inherit;
+  padding-block: 0;
+  padding-inline: 0;
+}
+
+[data-theme^="tzuchi"] .autocomplete__clear-button [data-slot="autocomplete-clear-button-icon"] {
+  inline-size: var(--tc-space-16, 16px);
+  block-size: var(--tc-space-16, 16px);
 }
 
 /* --------------------------------------------------------------------------
@@ -324,8 +500,20 @@
     padding-inline: 0;
   }
 
-  /* R57/R93 — same tie, same fix. */
+  /* R57/R93 — same tie, same fix.
+     PASS 5 — and this is now the only place a row in THIS panel gets 32px:
+     list-box-item.css carries the 20px field inset globally, because a bare
+     ListBox is width-constrained by its consumer. This panel is not: it is
+     `w-(--trigger-width)`, and that trigger is itself inset 32px. */
   & [data-slot="list-box-item"] {
+    padding-inline: var(--tc-space-32, 32px);
+  }
+
+  /* PASS 5 — the same move for the section header: list-box.css's
+     `.list-box .header` (0,3,0) now carries 20px, and it reaches in here
+     because this popover's list element carries the shared `.list-box` class.
+     (0,4,0), one step above it. */
+  & [data-slot="list-box"] .header {
     padding-inline: var(--tc-space-32, 32px);
   }
 
@@ -370,10 +558,186 @@
   background-color: var(--accent-soft-hover);
 }
 
-/* R71 — `focus-ring` paints its 2px offset gap in --background, which reads as
-   a grey halo on the tinted panel. Width, offset and ring colour already come
-   from the theme (D3); only the offset colour moves onto the panel. */
+/* PASS 4 — CLIPPED RING. These rows are edge to edge (radius 0, the full
+   panel width), and `focus-ring` (utilities/index.css:2-6) paints BOTH its 2px
+   ring and its 2px offset OUTSIDE the padding box, where the popover's own
+   overflow clips the left and right segments: a keyboard user saw two
+   horizontal lines above and below the row, not a ring.
+   Tailwind composes the ring from three custom properties —
+     --tw-ring-offset-shadow: var(--tw-ring-inset,) 0 0 0 OFFSETW OFFSETC
+     --tw-ring-shadow:        var(--tw-ring-inset,) 0 0 0 calc(2px + OFFSETW) RINGC
+   — so giving --tw-ring-inset a value flips both layers inward, and a 0 offset
+   width leaves exactly one 2px band of --focus hugging the row edge on all four
+   sides. That is HeroUI's own answer wherever a ring may not escape its box
+   (`focus-field-ring`, utilities/index.css:8-12, "ring sits directly against
+   the element"). Colour (--focus) and width (2px) are unchanged; only the
+   direction is, and the fill that marks tc's keyboard cursor
+   (tc-dropdown.styles.ts:96-98, `.option.active`) is untouched above.
+   This SUPERSEDES R71 in this file: with no offset left there is no offset
+   colour to move onto the panel, so --tw-ring-offset-color is dropped. */
 [data-theme^="tzuchi"] .autocomplete__popover [data-slot="list-box-item"]:focus-visible,
 [data-theme^="tzuchi"] .autocomplete__popover [data-slot="list-box-item"][data-focus-visible="true"] {
-  --tw-ring-offset-color: var(--accent-soft);
+  --tw-ring-inset: inset;
+  --tw-ring-offset-width: 0px;
+}
+
+/* --------------------------------------------------------------------------
+   6. Text that sits ON the tinted panel — PASS 4
+   -------------------------------------------------------------------------- */
+
+/* NEW DESIGN-LANGUAGE RULE (pass 4; the integrator's call, delegated by the owner): text that sits on a FILL
+   never uses --muted; it takes that fill's own foreground. Tzu Chi's own
+   components are built that way — tc-dropdown's option text on brand-surface is
+   brand-primary (tc-dropdown.styles.ts:82-93), tc-search-bar's category label
+   on surface-subtle is text-default — and the completeness sweep measured
+   --muted on this --accent-soft panel at 3.31:1 (2.86:1 on a hovered row's
+   --accent-soft-hover fill; 3.42:1 dark), under the 4.5:1 floor.
+   --accent-soft-foreground, the panel's own foreground, gives 11.58:1 resting /
+   9.98:1 hovered in light and 7.42:1 resting in dark.
+   HIERARCHY IS CARRIED BY WEIGHT, not by colour: the row label keeps 700, the
+   section header 500 and the description 400, so a header still reads as a
+   header and a description still reads as secondary.
+   SCOPED TO THE POPOVER ON PURPOSE. A `.header`, `.description` or empty state
+   on an untinted surface — the standalone ListBox or Menu — sits on a surface,
+   not on a fill, so it keeps --muted; header.css and description.css stay
+   colour-free.
+   CASCADE: (0,3,0), over base `.header` / `.description` / `.empty-state`
+   (0,1,0), over `[data-theme^="tzuchi"] .header` (0,2,0) and over the popover's
+   own `[data-slot="empty-state"]` rule where one exists (0,2,0). The danger
+   row's label colour lives on a different element and is untouched. */
+[data-theme^="tzuchi"] .autocomplete__popover .header,
+[data-theme^="tzuchi"] .autocomplete__popover [data-slot="description"],
+[data-theme^="tzuchi"] .autocomplete__popover [data-slot="empty-state"] {
+  color: var(--accent-soft-foreground);
+}
+
+/* --------------------------------------------------------------------------
+   7. Trigger FOCUS — the Tzu Chi field halo — PASS 4
+   -------------------------------------------------------------------------- */
+
+/* Identical to select.css section 7, because the two triggers are identical
+   upstream (autocomplete.css:39-44 is a copy of select.css:51-56).
+   The owner has settled DESIGN-LANGUAGE §11 I1 / §12 Q2: the Tzu Chi field
+   focus is a focused border PLUS a soft 3px halo in color.brand.surface-hover
+   (tc-input.styles.ts:42-44), and the 2px --focus ring every field kept under
+   D21 was mechanical, not a design decision. --accent-soft-hover is exactly
+   color.brand.surface-hover in both modes (blue-200 light, blue-700 dark).
+
+   MECHANISM. The trigger uses `status-focused` = `focus-ring`, whose
+   --tw-ring-offset-width is --ring-offset-width (2px here) — an opaque
+   --background band between the border and the ring. The halo sits directly
+   against the edge, so that band is collapsed to 0, the same value
+   `focus-field-ring` (utilities/index.css:8-12) already uses on every text
+   field; at width 0 the offset layer draws `0 0 0 0`, exactly the border box,
+   and is invisible. The halo replaces only --tw-ring-shadow: the base composes
+   `box-shadow` from var(--tw-inset-shadow), var(--tw-inset-ring-shadow),
+   var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow), so
+   that single swap leaves `shadow-field` and the inset layers intact — R74's
+   concern, answered by the mechanism rather than ignored.
+
+   The focused BORDER is not restated: base autocomplete.css:43 already sets
+   --field-border-focus, the accessible 3:1 indicator (WCAG 1.4.11); the halo
+   is emphasis on top of it.
+
+   SPECIFICITY. Base autocomplete.css:40-44 is
+   `.autocomplete__trigger:focus-visible:not([data-focused])` (0,3,0) and
+   `.autocomplete__trigger[data-focus-visible="true"]` (0,2,0); mirroring both
+   under the theme attribute gives (0,4,0) and (0,3,0). Section 1's open-state
+   rule sets only background-color and border-color and does not compete. */
+[data-theme^="tzuchi"] .autocomplete__trigger:focus-visible:not([data-focused]),
+[data-theme^="tzuchi"] .autocomplete__trigger[data-focus-visible="true"] {
+  --tw-ring-offset-width: 0px;
+  --tw-ring-shadow: 0 0 0 3px var(--accent-soft-hover);
+}
+
+/* tc-input.styles.ts:71-73 — a focused INVALID field swaps the pale halo for a
+   solid danger one. Base's `status-invalid-field` focused branch compiles to
+   `.autocomplete[data-invalid="true"] .autocomplete__trigger:focus-visible`
+   etc. = (0,4,0); `:is()` takes its most specific argument on both sides, so
+   this is (0,5,0) and clears both that rule and the pale halo above. */
+[data-theme^="tzuchi"]
+  .autocomplete:is([data-invalid="true"], [aria-invalid="true"])
+  .autocomplete__trigger:is(:focus-visible, [data-focus-visible="true"]) {
+  --tw-ring-offset-width: 0px;
+  --tw-ring-shadow: 0 0 0 3px var(--danger);
+}
+
+/* --------------------------------------------------------------------------
+   8. Selection indicator + section separator on the tinted panel — PASS 5
+   -------------------------------------------------------------------------- */
+
+/* Reviewed-pass placement note: sections 8-9 were written by pass 5 right
+   after section 6 (before section 7's Trigger FOCUS, which pass 4 had already
+   appended). Moved here, after section 7, purely so the file reads 1-9 in
+   order; no selector, value or specificity changed. */
+
+/* PASS 5 — the same rule for the one mark on this panel that is not text: the
+   checkmark HeroUI parks in the row's gutter (`.list-box-item__indicator`,
+   list-box-item.css:76-77, `text-default-foreground`, a 10px glyph in a 16px
+   box). Section 5 gives hover, the keyboard cursor and selection the same
+   brand fill, so that mark is what separates them, and it was the last thing on
+   the panel still drawn from the neutral ramp. The danger variant's own
+   indicator colour (0,2,0) is excluded, as §5's label rule excludes the danger
+   label. CASCADE: (0,5,0). */
+[data-theme^="tzuchi"]
+  .autocomplete__popover
+  [data-slot="list-box-item"]:not(.list-box-item--danger)
+  .list-box-item__indicator {
+  color: var(--accent-soft-foreground);
+}
+
+/* HeroUI narrows a separator inside a list box to `ms-[3%] w-[94%]`
+   (list-box.css:22-24). That reads as "inset to match the rows" only while the
+   rows are HeroUI's own inset pills; here they run edge to edge, so the rule
+   lined up with neither them nor the 32px text column.
+   COLOUR: `--separator` is a neutral grey, the only neutral left on a fully
+   blue-tinted panel; the panel's own foreground at 20% keeps the line in the
+   panel's colour family in both modes, at a hairline weight.
+   CASCADE: (0,4,0) over the base's
+   `.list-box [data-slot="separator"][data-orientation="horizontal"]` (0,3,0)
+   and over `.separator` / `.separator--default` (0,1,0). Logical properties
+   only. */
+[data-theme^="tzuchi"] .autocomplete__popover [data-slot="list-box"] [data-slot="separator"] {
+  margin-inline: 0;
+  inline-size: 100%;
+  background-color: color-mix(in oklab, var(--accent-soft-foreground) 20%, transparent);
+}
+
+/* --------------------------------------------------------------------------
+   9. The SearchField inside the popover — PASS 5
+   -------------------------------------------------------------------------- */
+
+/* The header above argued this field should be left alone, on the grounds that
+   its 1px --field-border draws the box in both modes and search-field.css owns
+   the selector. The QA pass overruled the first half on sight: the group is
+   `--default` (gray-100 / gray-900) on an `--accent-soft` panel (blue-100 /
+   blue-900), which in LIGHT makes it a warm grey rectangle LIGHTER than the
+   panel it sits on, and in dark a mid-grey box on navy. Every other element on
+   this panel has been moved onto the brand ramp; this one had not, so it read
+   as an un-themed remnant rather than as a field.
+   WHAT CHANGES: the surface only. `--field-background` is what every other Tzu
+   Chi field stands on (white / gray-950), so against the tinted panel it reads
+   as a field sitting ON the panel, which is what it is. The 1px --field-border
+   edge, the --field-border-focus it takes on focus and the 3px halo are
+   already correct and are NOT restated here — that is still search-field.css's
+   property, and restating the border at this specificity would out-rank its
+   own hover and focus rules.
+   MECHANISM: `.search-field--secondary` (the variant the stories use) does not
+   hard-code its fill; it reads three custom properties it declares at (0,2,0)
+   — `--search-field-group-bg` and its hover / focus companions. Re-declaring
+   those three at (0,3,0) re-points the variant's OWN rules, at whatever
+   specificity they are written, instead of fighting them one by one; the
+   `background-color` line covers the `primary` variant, which reads `bg-field`
+   directly and therefore already resolves to the same colour. The hover and
+   focus values are the field background too, which is exactly what upstream's
+   primary field does (`--field-hover` is a 2% tint, below the noticing
+   threshold — see gap-audit/input.md:50).
+   CASCADE: (0,3,0) over `.search-field--secondary .search-field__group`
+   (0,2,0) and the base `.search-field__group` (0,1,0). */
+[data-theme^="tzuchi"] .autocomplete__popover .search-field__group {
+  --search-field-group-bg: var(--field-background);
+  --search-field-group-bg-hover: var(--field-background);
+  --search-field-group-bg-focus: var(--field-background);
+
+  background-color: var(--field-background);
 }

@@ -291,7 +291,50 @@
  * packages/tokens/dist/tokens.css (--tc-size-control-md=48px, -lg=64px,
  * --tc-size-icon-sm=20px/-md=32px/-lg=40px, --tc-space-8=8px,
  * --tc-button-radius=--tc-radius-md=8px); all eight kept as-is.
+ *
+ * Pass 5 (2026-09-20): a PENDING button is no longer dimmed like a disabled
+ * one. react-aria sets aria-disabled="true" on an isPending Button
+ * (react-aria-components Button.mjs:95) alongside data-pending="true" (:100),
+ * and HeroUI's base reacts to aria-disabled with status-disabled
+ * (styles/components/button.css:36-38) — opacity: var(--disabled-opacity).
+ * Under this theme that is 0.38 (../variables.css:23, --tc-opacity-disabled)
+ * against upstream's 0.5, and tzuchi-dark's primary pair is inverted (light
+ * blue fill, navy label), so a loading button landed at roughly 2.3:1 with the
+ * spinner ring lost inside the fill: it read as broken, not as working.
+ * status-pending itself only sets pointer-events: none
+ * (styles/utilities/index.css:67-69).
+ * The rule added below restores opacity: 1 and NOTHING else — cursor,
+ * pointer-events, colours and the spinner stay exactly as HeroUI has them.
+ * It is scoped away from a button that is genuinely disabled: react-aria
+ * renders data-disabled only from props.isDisabled (Button.mjs:96), and a
+ * pending-but-enabled button was probed in the running Storybook to match
+ * neither :disabled nor [data-disabled="true"] (only [aria-disabled="true"]),
+ * so the :not() list excludes the isDisabled + isPending combination and
+ * leaves it dimmed. Specificity (0,4,0) — :not() takes the specificity of its
+ * most specific argument, one attribute selector — against the base's
+ * .button[aria-disabled="true"] (0,2,0), so it does not depend on import
+ * order. Verified in tzuchi and tzuchi-dark on --with-spinner (static
+ * isPending) and --with-loading-state (clicked), and that --default with
+ * isDisabled still dims every variant to 0.38. ToggleButton, CloseButton and
+ * Link carry different class names and are untouched.
+ *
+ * Pass 5 reviewed (2026-09-20): diffed against the pre-Pass-5 file — only the one rule plus
+ * this header paragraph differ. Read react-aria-components' private Button.mjs myself: an
+ * isPending button carries aria-disabled="true" and data-pending="true" and carries
+ * data-disabled only from isDisabled — confirming the fixer's report exactly, including that
+ * isDisabled + isPending together still sets data-disabled="true" and so is excluded by the
+ * `:not()` list and stays dimmed. Re-verified opacity: 1 on --with-spinner in tzuchi (light,
+ * untested by the fixer's report, which only shot dark) — probed 1 — and that cursor/
+ * pointer-events are not in this rule. No changes needed.
  * ------------------------------------------------------------------------ */
+
+/* ---------------------------------------------------------------------------
+ * Pending — working, not broken
+ * ------------------------------------------------------------------------ */
+
+[data-theme^="tzuchi"] .button[data-pending="true"]:not(:disabled, [data-disabled="true"]) {
+  opacity: 1;
+}
 
 /* ---------------------------------------------------------------------------
  * Icon-only — shape and size scale

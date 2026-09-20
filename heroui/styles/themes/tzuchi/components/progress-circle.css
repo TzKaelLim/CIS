@@ -88,7 +88,53 @@
  * size, colour variant, determinate/indeterminate state or disabled
  * treatment is touched, hidden or flattened. No "*" immediately followed by
  * "/" outside a comment's own close.
+ *
+ * PASS 5 (2026-09-20) — the track takes --border, matching the Spinner's ring.
+ * This SUPERSEDES the first bullet of DELIBERATELY LEFT ALONE above.
+ * R123 kept ProgressCircle's track on HeroUI's --default so it would match the
+ * themed ProgressBar and Meter. In practice --default (gray-100) sits on the
+ * gray-50 page: measured against the light page background the ring is
+ * invisible, and at `sm` the component reads as a bare floating arc with no
+ * ring at all — while the themed Spinner, two stories away, draws a clearly
+ * visible --border ring (spinner.css:61, taken from tc-spinner's own
+ * color.border.default). The family's two CIRCULAR indicators therefore looked
+ * like two different design systems. They are now one: --border in both.
+ * Mechanism: the base exposes the track as a custom property,
+ * `--progress-circle-track-stroke`, declared on `.progress-circle`
+ * (styles/components/progress-circle.css:11) and read by
+ * `.progress-circle .progress-circle__track-circle { stroke: … }` (:19-21), so
+ * re-declaring the property is enough — the `stroke` rule and every colour
+ * variant (which set --progress-circle-stroke, the FILL, not the track) are
+ * untouched. Measured after: gray-300 on gray-50 in light, gray-750 on gray-900
+ * in dark, both plainly visible; all five colour variants keep their own fill.
+ * SIZES ARE DELIBERATELY NOT TOUCHED, per the brief — 20 / 28 / 36px stay as
+ * HeroUI ships them, so `size="md"` is still 28px here against the Spinner's
+ * 32px. That divergence is reported, not fixed.
+ * Cascade: the base's declaration is on `.progress-circle` (0,1,0); the rule
+ * below is (0,2,0) and wins on specificity alone.
+ *
+ * Pass 5 reviewed (2026-09-20): diffed against the live
+ * styles/themes/tzuchi/components/progress-circle.css — only the new
+ * `--progress-circle-track-stroke: var(--border)` rule and this header
+ * differ; the fill-circle transition and spin-rate rules are untouched.
+ * Confirmed the mechanism against the base file (the custom property really
+ * is what `.progress-circle__track-circle`'s `stroke` reads). Verified live
+ * with the browser tool in both themes on progresscircle--sizes and
+ * --colors: the track is now a visible grey ring instead of blending into
+ * the page, and all five colour variants keep their own fill untouched.
+ * Sizes confirmed unchanged. Scoping, colour-token and comment-safety scans
+ * clean. No changes made — the fix matches the brief exactly.
  */
+
+/* Pass 5 — one ring weight for the theme's two circular indicators. --border is
+   the value spinner.css gives its own track, so a ProgressCircle and a Spinner
+   now read as the same object at rest. The base declares this custom property
+   on `.progress-circle` (0,1,0); this is (0,2,0). Only the TRACK moves — the
+   five colour variants set --progress-circle-stroke, the fill, and are
+   untouched. */
+[data-theme^="tzuchi"] .progress-circle {
+  --progress-circle-track-stroke: var(--border);
+}
 
 /* 1. R132 — the value travels at motion.duration.base with the standard
    easing, exactly as the themed ProgressBar and Meter fills do. */
