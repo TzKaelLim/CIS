@@ -408,18 +408,29 @@
     line-height: var(--tc-line-height-relaxed, 1.6);
   }
 
-  .input-group__prefix {
-    /* R53 — 20px to the shell edge, 8px to the value. HeroUI's `px-3` puts 12px
-       on both sides; because the input is `ps-0` beside a prefix, the slot owns
-       both insets here, so both are set: tc `.control`'s padding (20px) and its
-       gap (8px). The 1px divider sits inside the 8px, as tc's slots sit inside
-       its gap. */
-    padding-inline: var(--tc-space-20, 20px) var(--tc-space-8, 8px);
+  .input-group__prefix,
+  .input-group__suffix {
+    /* Pass 6 (2026-09-20, reported by the owner: "input group icon 有偏移").
+       Pass 3 wrote R53 here — 20px to the shell edge, 8px to the value — copied
+       from tc-input's `.control` (padding 20px, gap 8px). But tc-input draws NO
+       divider beside its prefix, so there the asymmetry is invisible. HeroUI
+       draws one (the affix's border-inline-*, visible under this theme because
+       --field-border is), which turns the affix into a BOX — and a 16px icon in
+       a 20px | 8px box sits 6px off its centre. HeroUI's own padding is
+       symmetric (`px-3`, 12px | 12px); pass 3 is what broke it.
+       Symmetric again, on the Tzu Chi 16px step: content is centred in its cell
+       whatever it is (icon, "$", "USD", "https://"). */
+    padding-inline: var(--tc-space-16, 16px);
   }
 
-  .input-group__suffix {
-    /* Mirror of the prefix, so the value box is symmetrical. */
-    padding-inline: var(--tc-space-8, 8px) var(--tc-space-20, 20px);
+  /* An affix that holds a BUTTON (copy, password toggle) carries the button's own
+     ring of space around its glyph — 36px box, 16px glyph — so the cell adds only
+     4px. HeroUI's stories also put `pe-0` on such a suffix (a utility, which
+     out-ranks this layer on purpose: the consumer's call); with 4px the glyph stays
+     within 2px of centre either way. */
+  .input-group__prefix:has(> .button),
+  .input-group__suffix:has(> .button) {
+    padding-inline: var(--tc-space-4, 4px);
   }
 }
 
