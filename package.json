@@ -8,13 +8,16 @@
     "pnpm": ">=9"
   },
   "scripts": {
-    "build": "turbo run build",
+    "build": "turbo run build --filter='!./heroui/*'",
     "typecheck": "tsc -b",
-    "test": "turbo run test",
+    "test": "turbo run test --filter='!./heroui/*'",
     "lint": "eslint . && prettier --check .",
     "format": "prettier --write .",
-    "verify:pkg": "turbo run verify:pkg",
-    "changeset": "changeset"
+    "verify:pkg": "turbo run verify:pkg --filter='!./heroui/*'",
+    "changeset": "changeset",
+    "heroui:theme": "node heroui/styles/themes/tzuchi/generate.mjs",
+    "heroui:storybook": "pnpm --filter @heroui/storybook exec storybook dev --host 127.0.0.1 --port 6007 --no-open",
+    "heroui:storybook:build": "pnpm --filter @heroui/storybook build"
   },
   "devDependencies": {
     "typescript": "^5.7.0",

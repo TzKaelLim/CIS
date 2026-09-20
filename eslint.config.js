@@ -12,6 +12,8 @@ export default [
       '**/*.astro',
       '**/custom-elements.json',
       '**/coverage/**',
+      // Vendored HeroUI source keeps upstream's own lint/format config.
+      'heroui/**',
     ],
   },
   js.configs.recommended,

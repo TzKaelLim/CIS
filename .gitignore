@@ -5,3 +5,9 @@ storybook-static/
 *.log
 .turbo/
 .pnpm-store/
+# vendored HeroUI tooling
+.rollup.cache/
+coverage/
+*.tsbuildinfo
+**/__screenshots__/
+**/.vitest-attachments/

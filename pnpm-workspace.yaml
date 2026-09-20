@@ -1,3 +1,12 @@
 packages:
   - 'packages/*'
   - 'apps/*'
+  # Vendored HeroUI v3 source (see heroui/NOTICE.md). Kept in its own directory,
+  # in upstream's relative layout, because packages/react is already taken.
+  - 'heroui/*'
+
+# Mirrors upstream's allow-list for the vendored packages' native dependencies.
+onlyBuiltDependencies:
+  - '@swc/core'
+  - esbuild
+  - unrs-resolver
