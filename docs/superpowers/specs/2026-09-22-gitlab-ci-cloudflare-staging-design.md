@@ -1,6 +1,7 @@
 # GitLab CI → Cloudflare Pages staging（HeroUI Storybook）
 
-日期：2026-09-22　狀態：已核准，實作中
+日期：2026-09-22　狀態：已上線（pipeline #10444 首次部署、#10450 驗證 cache 命中）
+staging：https://staging.tzuchi-uikit.pages.dev
 
 ## 目標
 
@@ -65,7 +66,12 @@ Cloudflare Pages 專案 `tzuchi-uikit` 的 **Preview 環境**，alias 固定為 
 5. `pnpm run heroui:storybook:build` → artifact `heroui/storybook/storybook-static/`（約 18 MB、
    316 檔，保留 1 天；Pages 上限 20,000 檔、單檔 25 MiB）。`@heroui/react` / `@heroui/styles` 的
    `exports` 指向 `src/`，不需要先 build。
-6. timeout 先給 40 分鐘（第一次沒有任何 cache），量到實際時間後收緊。
+6. timeout 15 分鐘。實測（runner `gitlab-runner`）：冷啟動無 cache 131 秒、cache 命中 80 秒
+   （`pnpm install` 5 秒、Vite 31 秒）；deploy 約 50 秒，其中 wrangler 只上傳有變的檔案。
+7. `GIT_CLEAN_FLAGS: -ffdxq -e .pnpm-store/ -e .npm/ -e .corepack/`：runner 在每個 job 開頭
+   `git clean` 上一個 job 留下的未追蹤檔，預設逐行印出——第一次 deploy job 的 log 就是這樣被
+   `.pnpm-store/` 的 67,602 個檔案撐爆 4 MiB 上限、wrangler 輸出全被截掉。安靜刪除，並保留三個
+   純快取目錄。
 
 ### deploy job（`.deploy` 模板，兩個 job 只差 alias / 環境）
 

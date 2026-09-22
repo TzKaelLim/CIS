@@ -58,8 +58,8 @@ workflow:
 build:
   stage: build
   interruptible: true
-  # 第一次跑沒有任何 cache，要冷裝整個 workspace 再 build Storybook；量到實際時間後再收緊
-  timeout: 40 minutes
+  # 實測：冷啟動（無 cache）131 秒、cache 命中 80 秒；15 分鐘是冷啟動的 7 倍
+  timeout: 15 minutes
   variables:
     # pnpm 10 讀 npm_config_*；升到 pnpm 11 要改成 pnpm_config_store_dir，否則 store 會靜靜跑回
     # 預設路徑、cache 形同虛設。只放在這個 job：deploy job 的 npx 不認得它，會印警告。
