@@ -32,6 +32,9 @@
      belongs in select.css, NOT here. `.dropdown__trigger` is left untouched:
      in every stock story the trigger is a plain <Button>, and `.dropdown__trigger`
      is only a bare inline-block wrapper for custom triggers.
+     Pass 7 (2026-09-22): when a consumer ALSO puts `.button` on that wrapper
+     (--with-sections does), button.css restores the button's inline-flex —
+     the fix lives there, this file still does not touch `.dropdown__trigger`.
        tc `.listbox`               ↔ .dropdown__popover / [data-slot="dropdown-menu"]
        tc `.option`                ↔ .menu-item (variant "default")
        tc `.option:hover/.active`  ↔ [data-hovered] / [data-focused]

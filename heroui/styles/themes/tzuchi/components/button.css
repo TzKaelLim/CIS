@@ -413,3 +413,35 @@
   width: var(--tzuchi-icon-button-icon-size);
   height: var(--tzuchi-icon-button-icon-size);
 }
+
+/* ---------------------------------------------------------------------------
+ * Pass 7 (2026-09-22) — a Trigger wrapper styled as a button keeps flex
+ * ------------------------------------------------------------------------ */
+
+/*
+ * Reported by the owner on review: Dropdown --with-sections, the icon-only
+ * trigger's icon sat against the left edge of the circle (32px icon at
+ * x = -2px in a 48px box). The same story is off by 12px in upstream's own
+ * dark theme, so this is inherited, not introduced by the theme — the bigger
+ * tc-icon-button circle only makes it obvious.
+ * `Dropdown.Trigger` is react-aria's unstyled Button wearing
+ * `.dropdown__trigger`, which dropdown.css sets to `inline-block` for custom
+ * triggers. When a consumer ALSO gives it `.button` (the story does), that
+ * inline-block lands after `.button`'s inline-flex in the cascade, the
+ * button's centring is lost and its block-level svg falls to the start.
+ * Six wrapper classes make the same choice (alert-dialog, drawer, dropdown,
+ * modal, popover, tooltip). Whenever one of them is combined with `.button`
+ * the element IS a button and takes the button's layout. (0,3,0) over the
+ * wrappers' (0,1,0); scoped, so upstream's themes keep their own behaviour.
+ */
+[data-theme^="tzuchi"]
+  .button:is(
+    .alert-dialog__trigger,
+    .drawer__trigger,
+    .dropdown__trigger,
+    .modal__trigger,
+    .popover__trigger,
+    .tooltip__trigger
+  ) {
+  display: inline-flex;
+}

@@ -166,6 +166,13 @@ colour there, darker than the card) and the Slider track (`--border`; light uses
 - The "Color System" story prints each swatch's value once, during render, and
   never re-reads it: after a theme switch the swatches repaint but the printed
   values stay from the previous theme. Same for upstream's own light ↔ dark.
+- `Dropdown.Trigger` (likewise the AlertDialog / Drawer / Modal / Popover / Tooltip
+  wrappers) is react-aria's unstyled Button wearing an `inline-block` wrapper
+  class. `dropdown --with-sections` styles it with `.button` classes, and the
+  wrapper's `inline-block` beats `.button`'s `inline-flex`, so the icon sits at
+  the start of the box in upstream's own themes too. The Tzu Chi theme restores
+  `inline-flex` for that combination (`themes/tzuchi/components/button.css`);
+  upstream light / dark are left as shipped.
 
 ## Open items found by the theme audit (2026-09-19), not yet addressed
 
