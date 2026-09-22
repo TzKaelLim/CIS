@@ -40,6 +40,10 @@ variables:
   npm_config_store_dir: $CI_PROJECT_DIR/.pnpm-store
   npm_config_cache: $CI_PROJECT_DIR/.npm
   COREPACK_HOME: $CI_PROJECT_DIR/.corepack
+  # runner 在每個 job 開頭會 git clean 掉上一個 job 留下的未追蹤檔，而且預設逐行印出：光是
+  # .pnpm-store/ 的幾萬個檔案就把第一次 deploy job 的 log 撐爆 4 MiB 上限，wrangler 的輸出全被截掉。
+  # 安靜刪除，並保留三個純快取目錄（content-addressable，留著只會讓下一個 job 更快）。
+  GIT_CLEAN_FLAGS: -ffdxq -e .pnpm-store/ -e .npm/ -e .corepack/
   # corepack 在非 TTY 本來就不會問，明確關掉下載確認以防萬一
   COREPACK_ENABLE_DOWNLOAD_PROMPT: '0'
   # Cloudflare Pages 專案名稱（要與 Cloudflare 上的專案一致）
