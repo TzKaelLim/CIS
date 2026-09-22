@@ -35,9 +35,7 @@ default:
     - docker
 
 variables:
-  # 放在 $CI_PROJECT_DIR 下才能被 cache 帶走。pnpm 10 讀 npm_config_*；升到 pnpm 11 要改成
-  # pnpm_config_store_dir，否則 store 會靜靜跑回預設路徑、cache 形同虛設。
-  npm_config_store_dir: $CI_PROJECT_DIR/.pnpm-store
+  # 放在 $CI_PROJECT_DIR 下才能被 cache 帶走（pnpm 的 store 設定在 build job 裡，npm 看到它會警告）
   npm_config_cache: $CI_PROJECT_DIR/.npm
   COREPACK_HOME: $CI_PROJECT_DIR/.corepack
   # runner 在每個 job 開頭會 git clean 掉上一個 job 留下的未追蹤檔，而且預設逐行印出：光是
@@ -62,6 +60,10 @@ build:
   interruptible: true
   # 第一次跑沒有任何 cache，要冷裝整個 workspace 再 build Storybook；量到實際時間後再收緊
   timeout: 40 minutes
+  variables:
+    # pnpm 10 讀 npm_config_*；升到 pnpm 11 要改成 pnpm_config_store_dir，否則 store 會靜靜跑回
+    # 預設路徑、cache 形同虛設。只放在這個 job：deploy job 的 npx 不認得它，會印警告。
+    npm_config_store_dir: $CI_PROJECT_DIR/.pnpm-store
   cache:
     # 固定 key：pnpm store 是 content-addressable，舊 store 照樣可用、缺的才下載。
     # 若改成以 pnpm-lock.yaml 當 key，每次動 lockfile 都會回到空 store（GitLab 的 fallback_keys
