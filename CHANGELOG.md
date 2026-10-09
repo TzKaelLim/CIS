@@ -12,6 +12,7 @@ tceditor is a fork of [Puck](https://github.com/puckeditor/puck) v0.23.0 (git ta
 * remove the upstream recipes, `create-puck-app`, `field-contentful`, `plugin-emotion-cache`, the GitHub workflows and the npm release tooling
 * remove the Plausible analytics from the demo
 * upgrade the tiptap packages to 3.31.4 (GHSA-j95f-988m-3j2f, GHSA-cp6q-959q-f8rh, GHSA-c8x8-7fp4-3x9w)
+* stop loading the Inter font from rsms.me in the default stylesheet and in the demo; the editor uses Inter only when the host app provides it and otherwise falls back to the system font stack
 
 ## [0.23.0](/compare/v0.22.4...v0.23.0) (2026-08-07)
 
