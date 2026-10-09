@@ -20,9 +20,12 @@ describe("walkTree merging", () => {
 
     const data: Data = { root: { props: {} }, content: [], zones };
 
-    const start = performance.now();
+    // CPU time, not wall-clock time: on a busy machine the jest worker can be
+    // descheduled for hundreds of ms, which a wall-clock threshold would count.
+    const cpuStart = process.cpuUsage();
     const result = walkTree(data, config, (content) => content);
-    const elapsed = performance.now() - start;
+    const cpu = process.cpuUsage(cpuStart);
+    const elapsed = (cpu.user + cpu.system) / 1000;
 
     expect(Object.keys(result.zones ?? {})).toHaveLength(10_000);
     expect(elapsed).toBeLessThan(200);

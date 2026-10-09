@@ -26,9 +26,12 @@ describe("mapFields merging", () => {
   it("maps 10,000 props in under 200 ms", () => {
     const item = { type: "Comp", props: makeProps(10_000) };
 
-    const start = performance.now();
+    // CPU time, not wall-clock time: on a busy machine the jest worker can be
+    // descheduled for hundreds of ms, which a wall-clock threshold would count.
+    const cpuStart = process.cpuUsage();
     const result = mapFields(item, {}, config);
-    const elapsed = performance.now() - start;
+    const cpu = process.cpuUsage(cpuStart);
+    const elapsed = (cpu.user + cpu.system) / 1000;
 
     expect(Object.keys(result.props)).toHaveLength(10_001);
     expect(result.props.key9999).toBe("value9999");

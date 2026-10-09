@@ -17,9 +17,12 @@ describe("getChanged", () => {
       props[`key${i}`] = `value${i}`;
     }
 
-    const start = performance.now();
+    // CPU time, not wall-clock time: on a busy machine the jest worker can be
+    // descheduled for hundreds of ms, which a wall-clock threshold would count.
+    const cpuStart = process.cpuUsage();
     const changed = getChanged({ props }, { props: { id: "comp-1" } });
-    const elapsed = performance.now() - start;
+    const cpu = process.cpuUsage(cpuStart);
+    const elapsed = (cpu.user + cpu.system) / 1000;
 
     expect(Object.keys(changed)).toHaveLength(10_001);
     expect(elapsed).toBeLessThan(200);
