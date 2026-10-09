@@ -5,6 +5,8 @@ dist/
 .next/
 build/
 
-# Design specs and implementation plans are working documents, not shipped docs
+# Local agent workspace (git-ignored; Prettier 2 does not read .gitignore)
 .superpowers/
+
+# Design specs and implementation plans are working documents, not shipped docs
 docs/superpowers/
