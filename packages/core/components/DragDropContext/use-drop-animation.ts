@@ -38,6 +38,7 @@ export const useDropAnimation = (
               targetZone: preview.zone,
               getExpectedOrder: () =>
                 getZoneContentIds(appStore.getState().state, preview.zone),
+              nonce: appStore.getState().nonce,
             }
           : undefined
       );

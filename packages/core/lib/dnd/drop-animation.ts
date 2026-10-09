@@ -11,6 +11,7 @@ import {
   waitForCommit,
 } from "./commit-animation";
 import { getComponentSelector } from "../dom-selectors";
+import { applyNonce } from "../use-inject-css";
 
 type DropAnimationContext = Parameters<DropAnimationFunction>[0];
 
@@ -18,6 +19,7 @@ type TargetDrop = {
   itemId?: string;
   targetZone: string;
   getExpectedOrder: () => string[];
+  nonce?: string;
 };
 
 const getFrameTransform = (element: Element, boundary: Element | null) => {
@@ -119,11 +121,13 @@ export const runTargetDropAnimation = ({
   itemId,
   targetZone,
   getExpectedOrder,
+  nonce,
 }: {
   feedbackElement: HTMLElement;
   itemId?: string;
   targetZone: string;
   getExpectedOrder: () => string[];
+  nonce?: string;
 }) => {
   const overlayDoc = feedbackElement.ownerDocument;
   const targetDoc = getFrame() ?? overlayDoc;
@@ -157,6 +161,7 @@ export const runTargetDropAnimation = ({
   });
 
   const hideStyle = targetDoc.createElement("style");
+  applyNonce(hideStyle, nonce);
   hideStyle.textContent = `
     ${
       itemId

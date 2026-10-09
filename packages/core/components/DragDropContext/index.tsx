@@ -12,7 +12,12 @@ import {
   useRef,
   useState,
 } from "react";
-import { AutoScroller, defaultPreset, DragDropManager } from "@dnd-kit/dom";
+import {
+  AutoScroller,
+  defaultPreset,
+  DragDropManager,
+  StyleInjector,
+} from "@dnd-kit/dom";
 import { DragDropEventHandlers } from "@dnd-kit/abstract";
 import { DropZoneProvider } from "../DropZone";
 import type { Draggable, Droppable } from "@dnd-kit/dom";
@@ -125,6 +130,7 @@ const DragDropContextClient = ({
 }: DragDropContextProps) => {
   const dispatch = useAppStore((s) => s.dispatch);
   const instanceId = useAppStore((s) => s.instanceId);
+  const nonce = useAppStore((s) => s.nonce);
   const appStore = useAppStoreApi();
 
   const debouncedParamsRef = useRef<DeepestParams | null>(null);
@@ -253,6 +259,9 @@ const DragDropContextClient = ({
     ...(disableAutoScroll
       ? defaultPreset.plugins.filter((plugin) => plugin !== AutoScroller)
       : defaultPreset.plugins),
+    // dnd-kit always registers its StyleInjector. Listing it again with
+    // options only sets the CSP nonce on that instance.
+    ...(nonce ? [StyleInjector.configure({ nonce })] : []),
     createNestedDroppablePlugin(
       {
         onChange: (params, manager) => {

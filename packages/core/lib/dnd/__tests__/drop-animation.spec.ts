@@ -89,4 +89,33 @@ describe("runTargetDropAnimation", () => {
       { duration: 250, easing: "ease", fill: "forwards" }
     );
   });
+
+  const getHideStyleNonces = (nonce?: string) => {
+    const zone = document.createElement("div");
+    const feedback = document.createElement("div");
+
+    zone.setAttribute("data-puck-dropzone", "root:slot");
+    document.body.append(zone, feedback);
+    document.head.innerHTML = "";
+    feedback.getBoundingClientRect = () => rect(300);
+
+    runTargetDropAnimation({
+      feedbackElement: feedback,
+      targetZone: "root:slot",
+      getExpectedOrder: () => [],
+      nonce,
+    });
+
+    return Array.from(document.head.querySelectorAll("style")).map((el) =>
+      el.getAttribute("nonce")
+    );
+  };
+
+  it("sets the nonce on the style that hides the dropped item", () => {
+    expect(getHideStyleNonces("abc")).toEqual(["abc"]);
+  });
+
+  it("does not add a nonce to the hide style without a nonce", () => {
+    expect(getHideStyleNonces()).toEqual([null]);
+  });
 });
