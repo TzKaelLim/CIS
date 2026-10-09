@@ -13,7 +13,7 @@ import {
 import { resolveAndReplaceData } from "../../data/resolve-and-replace-data";
 
 import { EditorFallback } from "../../../components/RichTextEditor/components/EditorFallback";
-import { RichTextRenderFallback } from "../../../components/RichTextEditor/components/RenderFallback";
+import { RichTextContent } from "../../../components/RichTextEditor/components/RichTextContent";
 import { FieldTransforms } from "../../../types/API/FieldTransforms";
 import { useAppStoreApi } from "../../../store";
 
@@ -27,12 +27,6 @@ import { getSelectorForId } from "../../get-selector-for-id";
 const Editor = lazy(() =>
   import("../../../components/RichTextEditor/components/Editor").then((m) => ({
     default: m.Editor,
-  }))
-);
-
-const RichTextRender = lazy(() =>
-  import("../../../components/RichTextEditor/components/Render").then((m) => ({
-    default: m.RichTextRender,
   }))
 );
 
@@ -112,12 +106,7 @@ const InlineEditorWrapper = memo(
       [field, componentId]
     );
 
-    if (!field.contentEditable)
-      return (
-        <Suspense fallback={<RichTextRenderFallback content={value} />}>
-          <RichTextRender content={value} field={field} />
-        </Suspense>
-      );
+    if (!field.contentEditable) return <RichTextContent content={value} />;
 
     const editorProps = {
       content: value,
@@ -149,7 +138,7 @@ export const getRichTextTransform = (): FieldTransforms => ({
   richtext: ({ value, componentId, field, propPath, isReadOnly }) => {
     const { contentEditable = true, tiptap } = field;
     if (contentEditable === false || isReadOnly) {
-      return <RichTextRender content={value} field={field} />;
+      return <RichTextContent content={value} />;
     }
 
     const id = `${componentId}_${field.type}_${propPath}`;

@@ -1,23 +1,7 @@
-import { lazy, Suspense, useMemo } from "react";
-import {
-  BaseField,
-  Fields,
-  RichtextField,
-  WithPuckProps,
-} from "../../../types";
-import { RichTextRenderFallback } from "../components/RenderFallback";
+import { useMemo } from "react";
+import { BaseField, Fields, WithPuckProps } from "../../../types";
+import { RichTextContent } from "../components/RichTextContent";
 import { mapDeep } from "./mapDeep";
-
-const RichTextRender = lazy(() =>
-  import("../components/Render").then((m) => ({
-    default: m.RichTextRender,
-  }))
-);
-
-type RichtextPath = {
-  path: string[];
-  field: RichtextField;
-};
 
 export function useRichtextProps(
   fields:
@@ -28,61 +12,53 @@ export function useRichtextProps(
     [x: string]: any;
   }>
 ) {
-  const findAllRichtextKeys = (
+  const findAllRichtextPaths = (
     fields:
       | Fields<any, {}>
       | Fields<any, { type: string } & BaseField>
       | undefined,
     path: string[] = []
-  ): RichtextPath[] => {
+  ): string[][] => {
     if (!fields) return [];
 
-    const result: RichtextPath[] = [];
+    const result: string[][] = [];
 
     for (const [key, field] of Object.entries(fields)) {
       const currentPath = [...path, key];
 
       if (field.type === "richtext") {
-        result.push({
-          path: currentPath,
-          field: field as RichtextField,
-        });
+        result.push(currentPath);
       }
 
       if (field.type === "array" && "arrayFields" in field) {
-        result.push(...findAllRichtextKeys(field.arrayFields, currentPath));
+        result.push(...findAllRichtextPaths(field.arrayFields, currentPath));
       }
 
       if (field.type === "object" && "objectFields" in field) {
-        result.push(...findAllRichtextKeys(field.objectFields, currentPath));
+        result.push(...findAllRichtextPaths(field.objectFields, currentPath));
       }
     }
 
     return result;
   };
 
-  const richtextKeys = useMemo(() => findAllRichtextKeys(fields), [fields]);
+  const richtextPaths = useMemo(() => findAllRichtextPaths(fields), [fields]);
 
   const richtextProps = useMemo(() => {
-    if (!richtextKeys?.length) return {};
+    if (!richtextPaths?.length) return {};
 
     let result = { ...props };
 
-    for (const { path, field } of richtextKeys) {
+    for (const path of richtextPaths) {
       result = mapDeep(result, path, (content) => (
-        <Suspense
-          // Deterministic key to avoid hydration mismatch. No array index needed
-          // because mapDeep places each Suspense in a separate array object, not as siblings.
-          key={path.join(".")}
-          fallback={<RichTextRenderFallback content={content} />}
-        >
-          <RichTextRender content={content} field={field} />
-        </Suspense>
+        // Deterministic key to avoid hydration mismatch. No array index needed
+        // because mapDeep places each element in a separate array object, not as siblings.
+        <RichTextContent key={path.join(".")} content={content} />
       ));
     }
 
     return result;
-  }, [richtextKeys, props, fields]);
+  }, [richtextPaths, props]);
 
   return richtextProps;
 }

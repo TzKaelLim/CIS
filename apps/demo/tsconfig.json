@@ -11,6 +11,9 @@
       "@/plugin-heading-analyzer": ["../../packages/plugin-heading-analyzer"],
       "@/plugin-heading-analyzer/*": [
         "../../packages/plugin-heading-analyzer/*"
+      ],
+      "@tiptap/static-renderer/json/react": [
+        "../../packages/core/node_modules/@tiptap/static-renderer/dist/json/react/index"
       ]
     }
   },

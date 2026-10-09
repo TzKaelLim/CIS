@@ -90,6 +90,17 @@ const dispatchReplace = (
   });
 };
 
+const richText = (text: string) => ({
+  type: "doc",
+  content: [
+    {
+      type: "paragraph",
+      attrs: { textAlign: null },
+      content: [{ type: "text", text }],
+    },
+  ],
+});
+
 describe("Puck - richtext programmatic updates", () => {
   afterEach(() => {
     cleanup();
@@ -112,7 +123,7 @@ describe("Puck - richtext programmatic updates", () => {
       content: [
         {
           type: "RichTextBlock",
-          props: { id: "block-1", body: "<p>Hello world</p>" },
+          props: { id: "block-1", body: richText("Hello world") },
         },
       ],
     };
@@ -129,7 +140,7 @@ describe("Puck - richtext programmatic updates", () => {
     act(() => {
       dispatchReplace(appStore, "block-1", {
         type: "RichTextBlock",
-        props: { id: "block-1", body: "<p>Updated content</p>" },
+        props: { id: "block-1", body: richText("Updated content") },
       });
     });
     await flush();
@@ -157,7 +168,7 @@ describe("Puck - richtext programmatic updates", () => {
       content: [
         {
           type: "RichTextBlock",
-          props: { id: "block-1", body: "<p>Hello world</p>" },
+          props: { id: "block-1", body: richText("Hello world") },
         },
       ],
     };
@@ -174,7 +185,7 @@ describe("Puck - richtext programmatic updates", () => {
     act(() => {
       dispatchReplace(appStore, "block-1", {
         type: "RichTextBlock",
-        props: { id: "block-1", body: "<p>Updated content</p>" },
+        props: { id: "block-1", body: richText("Updated content") },
       });
     });
     await flush();
@@ -215,7 +226,7 @@ describe("Puck - richtext programmatic updates", () => {
     act(() => {
       dispatchReplace(appStore, "block-1", {
         type: "Block",
-        props: { id: "block-1", body: "<p>No longer empty</p>" },
+        props: { id: "block-1", body: richText("No longer empty") },
       });
     });
     await flush();
@@ -225,7 +236,7 @@ describe("Puck - richtext programmatic updates", () => {
     });
   });
 
-  it("updates richtext when value is set to plain text (no HTML tags)", async () => {
+  it("updates richtext when value is set to a plain string", async () => {
     const config: Config = {
       components: {
         Block: {
@@ -242,7 +253,7 @@ describe("Puck - richtext programmatic updates", () => {
       content: [
         {
           type: "Block",
-          props: { id: "block-1", body: "<p>HTML content</p>" },
+          props: { id: "block-1", body: richText("JSON content") },
         },
       ],
     };
@@ -251,7 +262,7 @@ describe("Puck - richtext programmatic updates", () => {
     await flush();
 
     await waitFor(() => {
-      expect(screen.getByText("HTML content")).toBeInTheDocument();
+      expect(screen.getByText("JSON content")).toBeInTheDocument();
     });
 
     const { appStore } = getInternal();
@@ -267,5 +278,32 @@ describe("Puck - richtext programmatic updates", () => {
     await waitFor(() => {
       expect(screen.getByText("Plain text value")).toBeInTheDocument();
     });
+  });
+
+  it("shows a legacy HTML string as plain text instead of parsing it", async () => {
+    const payload = '<p>Hello</p><img src=x onerror="alert(1)">';
+    const config: Config = {
+      components: {
+        Block: {
+          fields: {
+            body: { type: "richtext", contentEditable: false },
+          },
+          render: ({ body }) => <div data-testid="output">{body}</div>,
+        },
+      },
+    };
+
+    const data: Data = {
+      root: { props: {} },
+      content: [{ type: "Block", props: { id: "block-1", body: payload } }],
+    };
+
+    render(<Puck config={config} data={data} iframe={{ enabled: false }} />);
+    await flush();
+
+    const output = await screen.findByTestId("output");
+
+    expect(output.querySelector("img")).toBeNull();
+    expect(output.textContent).toBe(payload);
   });
 });

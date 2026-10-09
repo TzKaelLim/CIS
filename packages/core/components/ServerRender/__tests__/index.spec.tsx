@@ -2,6 +2,11 @@ import { renderToString } from "react-dom/server.node";
 import { Config, Data } from "../../../types";
 import { Render } from "../index";
 
+const richText = (...content: object[]) => ({
+  type: "doc",
+  content: [{ type: "paragraph", attrs: { textAlign: null }, content }],
+});
+
 describe("ServerRender", () => {
   it("renders richtext content in dropzones as HTML in RSC mode", () => {
     const config: Config = {
@@ -30,7 +35,7 @@ describe("ServerRender", () => {
             type: "RichText",
             props: {
               id: "richtext-1",
-              content: "<p>Hello world</p>",
+              content: richText({ type: "text", text: "Hello world" }),
             },
           },
         ],
@@ -39,8 +44,9 @@ describe("ServerRender", () => {
 
     const html = renderToString(<Render config={config} data={data} />);
 
-    expect(html).toContain("<p>Hello world</p>");
-    expect(html).not.toContain("&lt;p&gt;Hello world&lt;/p&gt;");
+    expect(html).toContain(
+      '<div class="RichTextEditor"><div class="rich-text"><p>Hello world</p></div></div>'
+    );
   });
 
   it("renders richtext and slot content when server config keeps render fields", () => {
@@ -79,7 +85,10 @@ describe("ServerRender", () => {
           type: "Hero",
           props: {
             id: "hero-1",
-            description: "<p>Hello <strong>world</strong></p>",
+            description: richText(
+              { type: "text", text: "Hello " },
+              { type: "text", text: "world", marks: [{ type: "bold" }] }
+            ),
             image: {
               content: [
                 {
@@ -100,6 +109,38 @@ describe("ServerRender", () => {
 
     expect(html).toContain("<p>Hello <strong>world</strong></p>");
     expect(html).toContain("<h2>Nested heading</h2>");
-    expect(html).not.toContain("&lt;p&gt;Hello");
+  });
+
+  it("renders a legacy HTML string as escaped text", () => {
+    const config: Config = {
+      components: {
+        RichText: {
+          fields: {
+            content: { type: "richtext" },
+          },
+          render: ({ content }) => <div>{content}</div>,
+        },
+      },
+    };
+
+    const data: Data = {
+      root: { props: {} },
+      content: [
+        {
+          type: "RichText",
+          props: {
+            id: "richtext-1",
+            content: '<p>Hello</p><img src=x onerror="alert(1)">',
+          },
+        },
+      ],
+    };
+
+    const html = renderToString(<Render config={config} data={data} />);
+
+    expect(html).toContain(
+      "<p>&lt;p&gt;Hello&lt;/p&gt;&lt;img src=x onerror=&quot;alert(1)&quot;&gt;</p>"
+    );
+    expect(html).not.toContain("<img");
   });
 });
