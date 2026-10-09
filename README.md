@@ -34,14 +34,14 @@ Puck is also [licensed under MIT](https://github.com/puckeditor/puck?tab=MIT-1-o
 Install the package:
 
 ```sh
-npm i @puckeditor/core --save # or npx create-puck-app my-app
+pnpm add @tzuchi/tceditor --workspace # not published to a registry; use it from this monorepo
 ```
 
 Render the editor:
 
 ```jsx
 // Editor.jsx
-import { Puck } from "@puckeditor/core";
+import { Puck } from "@tzuchi/tceditor";
 
 // Create Puck component config
 const config = {
@@ -75,7 +75,7 @@ Render the page:
 
 ```jsx
 // Page.jsx
-import { Render } from "@puckeditor/core";
+import { Render } from "@tzuchi/tceditor";
 
 export function Page() {
   return <Render config={config} data={data} />;

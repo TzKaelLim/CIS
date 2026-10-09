@@ -20,9 +20,9 @@
     "puppeteer": "^24.8.2",
     "turbo": "^2.5.8"
   },
-  "name": "puck-repo",
+  "name": "tceditor-repo",
   "packageManager": "pnpm@10.26.1",
-  "version": "0.23.0",
+  "version": "0.1.0",
   "engines": {
     "node": ">=24.0.0"
   }

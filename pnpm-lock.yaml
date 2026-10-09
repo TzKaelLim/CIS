@@ -51,9 +51,6 @@ importers:
         specifier: ^19.2.1
         version: 19.2.6(react@19.2.6)
     devDependencies:
-      '@puckeditor/core':
-        specifier: workspace:*
-        version: link:../../packages/core
       '@types/node':
         specifier: ^17.0.12
         version: 17.0.45
@@ -63,6 +60,9 @@ importers:
       '@types/react-dom':
         specifier: ^19.2.3
         version: 19.2.3(@types/react@19.2.14)
+      '@tzuchi/tceditor':
+        specifier: workspace:*
+        version: link:../../packages/core
       eslint-config-custom:
         specifier: workspace:*
         version: link:../../packages/eslint-config-custom
@@ -290,9 +290,6 @@ importers:
         specifier: ^0.8.0
         version: 0.8.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
     devDependencies:
-      '@puckeditor/core':
-        specifier: workspace:*
-        version: link:../core
       '@types/minimatch':
         specifier: 3.0.5
         version: 3.0.5
@@ -302,6 +299,9 @@ importers:
       '@types/react-dom':
         specifier: ^19.0.2
         version: 19.2.3(@types/react@19.2.14)
+      '@tzuchi/tceditor':
+        specifier: workspace:*
+        version: link:../core
       eslint:
         specifier: ^9.0.0
         version: 9.39.4

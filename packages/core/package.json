@@ -1,13 +1,10 @@
 {
-  "name": "@puckeditor/core",
-  "version": "0.23.0",
-  "description": "The open-source visual editor for React",
-  "author": "Chris Villa <chris@puckeditor.com>",
-  "repository": "puckeditor/puck",
-  "bugs": "https://github.com/puckeditor/puck/issues",
-  "homepage": "https://puckeditor.com",
+  "name": "@tzuchi/tceditor",
+  "version": "0.1.0",
+  "description": "Visual page editor for React, forked from Puck v0.23.0",
+  "author": "Tzu Chi",
   "keywords": [
-    "puck",
+    "tceditor",
     "visual",
     "editor",
     "react",
@@ -24,7 +21,7 @@
     "typescript",
     "WYSIWYG"
   ],
-  "private": false,
+  "private": true,
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {

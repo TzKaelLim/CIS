@@ -6,14 +6,16 @@ Visualise your heading outline structure and identify missing heading levels. Re
 
 ## Quick start
 
+This package is not published to a registry. Add it to an app in this monorepo as a workspace dependency:
+
 ```sh
-npm i @puckeditor/plugin-heading-analyzer
+pnpm add @tzuchi/tceditor-plugin-heading-analyzer --workspace
 ```
 
 ```jsx
-import { Puck } from "@puckeditor/core";
-import headingAnalyzer from "@puckeditor/plugin-heading-analyzer";
-import "@puckeditor/plugin-heading-analyzer/dist/index.css";
+import { Puck } from "@tzuchi/tceditor";
+import headingAnalyzer from "@tzuchi/tceditor-plugin-heading-analyzer";
+import "@tzuchi/tceditor-plugin-heading-analyzer/dist/index.css";
 
 ...
 
@@ -31,4 +33,4 @@ export function Page() {
 
 ## License
 
-MIT © [The Puck Contributors](https://github.com/puckeditor/puck/graphs/contributors)
+MIT © [The Puck Contributors](https://github.com/puckeditor/puck/graphs/contributors). See `LICENSE` and `NOTICE`.

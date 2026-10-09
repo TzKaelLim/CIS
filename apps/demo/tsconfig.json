@@ -7,7 +7,7 @@
       "@/core-dist": ["../../packages/core/dist"],
       "@/core": ["../../packages/core/index.ts"],
       "@/core/*": ["../../packages/core/*"],
-      "@puckeditor/core": ["../../packages/core/index.ts"],
+      "@tzuchi/tceditor": ["../../packages/core/index.ts"],
       "@/plugin-heading-analyzer": ["../../packages/plugin-heading-analyzer"],
       "@/plugin-heading-analyzer/*": [
         "../../packages/plugin-heading-analyzer/*"

@@ -1,11 +1,9 @@
 {
-  "name": "@puckeditor/plugin-heading-analyzer",
-  "version": "0.23.0",
-  "author": "Chris Villa <chris@puckeditor.com>",
-  "repository": "puckeditor/puck",
-  "bugs": "https://github.com/puckeditor/puck/issues",
-  "homepage": "https://puckeditor.com",
-  "private": false,
+  "name": "@tzuchi/tceditor-plugin-heading-analyzer",
+  "version": "0.1.0",
+  "description": "tceditor plugin that shows the heading outline and flags missing heading levels",
+  "author": "Tzu Chi",
+  "private": true,
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -25,7 +23,7 @@
     "dist"
   ],
   "devDependencies": {
-    "@puckeditor/core": "workspace:*",
+    "@tzuchi/tceditor": "workspace:*",
     "@types/minimatch": "3.0.5",
     "@types/react": "^19.0.1",
     "@types/react-dom": "^19.0.2",

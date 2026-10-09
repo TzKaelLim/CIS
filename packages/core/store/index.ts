@@ -362,7 +362,7 @@ export type AppStoreApi = ReturnType<typeof createAppStore>;
 export const appStoreContext = createContext<AppStoreApi | null>(null);
 
 // Fallback store used only when a component reads the store outside of a <Puck> provider (e.g. <Render> for SSR).
-// Created lazily instead of at module scope so that importing @puckeditor/core has no side effects that might
+// Created lazily instead of at module scope so that importing @tzuchi/tceditor has no side effects that might
 // be unsupported in edge runtimes
 let defaultAppStore: AppStoreApi | null = null;
 
