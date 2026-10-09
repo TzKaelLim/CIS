@@ -5,15 +5,18 @@ export const getChanged = (
   newItem: Omit<Partial<ComponentData<any>>, "type"> | undefined,
   oldItem: Omit<Partial<ComponentData<any>>, "type"> | null | undefined
 ) => {
-  return newItem
-    ? Object.keys(newItem.props || {}).reduce((acc, item) => {
-        const newItemProps = newItem?.props || {};
-        const oldItemProps = oldItem?.props || {};
+  if (!newItem) {
+    return {};
+  }
 
-        return {
-          ...acc,
-          [item]: !deepEqual(oldItemProps[item], newItemProps[item]),
-        };
-      }, {})
-    : {};
+  const newItemProps = newItem.props || {};
+  const oldItemProps = oldItem?.props || {};
+
+  // One pass, and "__proto__" stays an own key (see flatten in map-fields.ts)
+  return Object.fromEntries(
+    Object.keys(newItemProps).map((item): [string, boolean] => [
+      item,
+      !deepEqual(oldItemProps[item], newItemProps[item]),
+    ])
+  );
 };
