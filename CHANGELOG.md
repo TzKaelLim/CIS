@@ -20,6 +20,7 @@ tceditor is a fork of [Puck](https://github.com/puckeditor/puck) v0.23.0 (git ta
 * **breaking:** the richtext editor stores Tiptap JSON (`editor.getJSON()`) instead of HTML, shows a legacy HTML string as plain text, and renders its loading placeholder with the shared renderer instead of `dangerouslySetInnerHTML`; a richtext field's `options` and `tiptap.extensions` no longer affect rendering, so node and mark types added by `tiptap.extensions` are shown as plain text on published pages and removed when the editor reopens the content (with a warning in development), content that `options` turns off opens in the editor as plain text instead of an empty editor, and the editor only creates links that `isSafeHref` allows
 * add the `@tzuchi/tceditor/richtext-migrate` entry (`richTextHtmlToJson`, `migrateRichTextInData`) to convert legacy HTML richtext to JSON on the server, and `pnpm check:bundle` (part of `pnpm verify`), which fails when the main or RSC entry can reach `@tiptap/html` or `happy-dom`
 * the `RichText` type is now `RichTextDoc | string | ReactNode`, and the demo stores its richtext as JSON
+* build the results of `mapFields`, `walkTree` and `getChanged` in one pass; re-spreading the accumulator for every key took about 8 seconds for 10,000 props or zones, and a `__proto__` key in the data is now kept as an own key instead of replacing the prototype of the result
 
 ## [0.23.0](/compare/v0.22.4...v0.23.0) (2026-08-07)
 
