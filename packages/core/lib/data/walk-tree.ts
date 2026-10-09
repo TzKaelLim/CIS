@@ -59,12 +59,12 @@ export function walkTree<
         parentId: "root",
         propName: "default-zone",
       }) ?? mappedContent,
-    zones: Object.keys(zones).reduce(
-      (acc, zoneCompound) => ({
-        ...acc,
-        [zoneCompound]: zones[zoneCompound].map(walkItem),
-      }),
-      {}
+    // One pass, and "__proto__" stays an own key (see flatten in map-fields.ts)
+    zones: Object.fromEntries(
+      Object.keys(zones).map((zoneCompound) => [
+        zoneCompound,
+        zones[zoneCompound].map(walkItem),
+      ])
     ),
   } as T;
 }
