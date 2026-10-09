@@ -4,7 +4,9 @@ import { getSlotField } from "../../../lib/data/get-slot-field";
 import { LayerNode, LayerZone } from "../types";
 
 const getZonesByParent = (zones: ZoneIndex): Record<string, string[]> => {
-  const result: Record<string, string[]> = {};
+  // Null prototype: a parent id such as "constructor" must not find
+  // Object.prototype members (see createIndex in walk-app-state.ts)
+  const result: Record<string, string[]> = Object.create(null);
 
   Object.keys(zones).forEach((zone) => {
     const [parentId] = zone.split(":");

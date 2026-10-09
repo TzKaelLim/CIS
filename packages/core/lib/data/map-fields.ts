@@ -7,6 +7,7 @@ import {
   RootData,
 } from "../../types";
 import { defaultSlots } from "./default-slots";
+import { lookupComponentConfig } from "../lookup-component-config";
 
 export type MapFnParams<ThisField = Field> = {
   value: any;
@@ -76,7 +77,7 @@ export const walkField = ({
 
     const mappedContent = recurseSlots
       ? content.map((el) => {
-          if (!config.components[el.type]) {
+          if (!lookupComponentConfig(config, el.type)) {
             throw new Error(`Could not find component config for ${el.type}`);
           }
 
@@ -251,7 +252,7 @@ export function mapFields(
   const itemType = "type" in item ? item.type : "root";
 
   const componentConfig =
-    itemType === "root" ? config.root : config.components?.[itemType];
+    itemType === "root" ? config.root : lookupComponentConfig(config, itemType);
 
   const newProps = walkObject({
     value: shouldDefaultSlots

@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { flattenData } from "../../lib/data/flatten-data";
+import { lookupComponentConfig } from "../../lib/lookup-component-config";
 import { ComponentData, Config, Permissions, UserGenerics } from "../../types";
 import { getChanged } from "../../lib/get-changed";
 import { AppStore, useAppStoreApi } from "../";
@@ -66,7 +67,9 @@ export const createPermissionsSlice = (
       const parentData = parentNode?.data ?? null;
 
       const componentConfig =
-        item.type === "root" ? config.root : config.components[item.type];
+        item.type === "root"
+          ? config.root
+          : lookupComponentConfig(config, item.type);
 
       if (!componentConfig) {
         return;
@@ -175,7 +178,7 @@ export const createPermissionsSlice = (
       const { globalPermissions, resolvedPermissions } = permissions;
 
       if (item) {
-        const componentConfig = config.components[item.type];
+        const componentConfig = lookupComponentConfig(config, item.type);
 
         const initialPermissions = {
           ...globalPermissions,
@@ -190,7 +193,7 @@ export const createPermissionsSlice = (
             : initialPermissions
         ) as Permissions;
       } else if (type) {
-        const componentConfig = config.components[type];
+        const componentConfig = lookupComponentConfig(config, type);
 
         return {
           ...globalPermissions,

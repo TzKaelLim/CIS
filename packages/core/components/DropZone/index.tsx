@@ -163,7 +163,7 @@ const DropZoneChild = ({
   }, [appStore, componentId, zoneCompound, nodeType, nodeProps]);
 
   const componentConfig = useAppStore((s) =>
-    item?.type ? s.config.components[item.type] : null
+    lookupComponentConfig(s.config, item?.type)
   );
 
   const puckProps: PuckContext = useMemo(

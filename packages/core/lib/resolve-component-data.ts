@@ -10,6 +10,7 @@ import {
 import { mapFields } from "./data/map-fields";
 import { toComponent } from "./data/to-component";
 import { getChanged } from "./get-changed";
+import { lookupComponentConfig } from "./lookup-component-config";
 import { deepEqual } from "fast-equals";
 
 export type ResolveDataCache = {
@@ -33,7 +34,7 @@ export const resolveComponentData = async <
 ) => {
   const configForItem =
     "type" in item && item.type !== "root"
-      ? config.components[item.type]
+      ? lookupComponentConfig(config, item.type)
       : config.root;
 
   const resolvedItem: T = {

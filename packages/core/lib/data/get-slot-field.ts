@@ -2,6 +2,7 @@ import { Config } from "../../types";
 import { NodeIndex } from "../../types/Internal";
 import { rootAreaId } from "../root-droppable-id";
 import { getFieldByPath } from "./get-field-by-path";
+import { lookupComponentConfig } from "../lookup-component-config";
 
 /**
  * Gets the field definition backing a slot zone compound, using the
@@ -22,7 +23,7 @@ export const getSlotField = (
 
   const configForComponent =
     componentType && componentType !== rootAreaId
-      ? config.components[componentType]
+      ? lookupComponentConfig(config, componentType)
       : config.root;
 
   const slotField = getFieldByPath(slotId, configForComponent?.fields);

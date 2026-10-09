@@ -5,6 +5,7 @@ import { useMemo, useRef } from "react";
 import { mapFields, Mappers } from "../data/map-fields";
 import { FieldTransforms } from "../../types/API/FieldTransforms";
 import { buildMappers } from "./build-mappers";
+import { lookupComponentConfig } from "../lookup-component-config";
 
 export function useFieldTransformsTracked<
   T extends ComponentData,
@@ -27,7 +28,9 @@ export function useFieldTransformsTracked<
 
   const transformedProps = useMemo(() => {
     const componentConfig =
-      item.type === "root" ? config.root : config.components?.[item.type];
+      item.type === "root"
+        ? config.root
+        : lookupComponentConfig(config, item.type);
 
     const componentFields = componentConfig?.fields ?? {};
 

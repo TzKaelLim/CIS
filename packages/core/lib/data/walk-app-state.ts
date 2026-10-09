@@ -18,6 +18,17 @@ import { flattenNode } from "./flatten-node";
 import { toComponent } from "./to-component";
 
 /**
+ * Indexes are keyed by component ids and zone compounds from user data. A
+ * null-prototype object keeps ids such as "__proto__" or "constructor" as
+ * own keys, and a missing id never resolves to an Object.prototype member.
+ * Object.assign is safe here because a null-prototype target has no
+ * __proto__ setter. Spreading into {} is not: compiled for ES2015, as
+ * ts-jest does for this package, it becomes Object.assign onto {}.
+ */
+const createIndex = <T extends object>(...sources: T[]): T =>
+  Object.assign(Object.create(null), ...sources);
+
+/**
  * Walk the Puck state, generate indexes and make modifications to nodes.
  *
  * @param state The initial state
@@ -41,8 +52,8 @@ export function walkAppState<UserData extends Data = Data>(
   ) => ComponentData | null = (item) => item
 ): PrivateAppState<UserData> {
   let newZones: Record<string, Content> = {};
-  const newZoneIndex: ZoneIndex = {};
-  const newNodeIndex: NodeIndex = {};
+  const newZoneIndex: ZoneIndex = createIndex();
+  const newNodeIndex: NodeIndex = createIndex();
 
   const processContent = (
     path: string[],
@@ -216,8 +227,8 @@ export function walkAppState<UserData extends Data = Data>(
       },
     } as UserData,
     indexes: {
-      nodes: { ...state.indexes.nodes, ...newNodeIndex },
-      zones: { ...state.indexes.zones, ...newZoneIndex },
+      nodes: createIndex(state.indexes.nodes, newNodeIndex),
+      zones: createIndex(state.indexes.zones, newZoneIndex),
     },
   };
 }

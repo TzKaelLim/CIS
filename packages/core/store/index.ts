@@ -19,6 +19,7 @@ import {
 } from "../types";
 import { createReducer, PuckAction } from "../reducer";
 import { getItem } from "../lib/data/get-item";
+import { lookupComponentConfig } from "../lib/lookup-component-config";
 import { defaultViewports } from "../components/ViewportControls/default-viewports";
 import { Viewports } from "../types";
 import { create, useStore } from "zustand";
@@ -148,9 +149,9 @@ export const createAppStore = (initialAppStore?: Partial<AppStore>) =>
         const rootFields = config.root?.fields || defaultPageFields;
 
         return type && type !== "root"
-          ? config.components[type]
+          ? lookupComponentConfig(config, type)
           : selectedItem
-          ? config.components[selectedItem.type]
+          ? lookupComponentConfig(config, selectedItem.type)
           : ({ ...config.root, fields: rootFields } as ComponentConfig);
       },
       selectedItem: initialAppStore?.state?.ui.itemSelector

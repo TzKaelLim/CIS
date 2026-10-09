@@ -7,6 +7,7 @@ import { walkAppState } from "../../lib/data/walk-app-state";
 import { getIdsForParent } from "../../lib/data/get-ids-for-parent";
 import { AppStore } from "../../store";
 import { populateIds } from "../../lib/data/populate-ids";
+import { lookupComponentConfig } from "../../lib/lookup-component-config";
 
 export function insertAction<UserData extends Data>(
   state: PrivateAppState<UserData>,
@@ -18,8 +19,8 @@ export function insertAction<UserData extends Data>(
     {
       type: action.componentType,
       props: {
-        ...(appStore.config.components[action.componentType].defaultProps ||
-          {}),
+        ...(lookupComponentConfig(appStore.config, action.componentType)
+          ?.defaultProps || {}),
         id,
       },
     },
