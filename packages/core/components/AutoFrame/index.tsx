@@ -9,6 +9,7 @@ import {
 import hash from "object-hash";
 import { createPortal } from "react-dom";
 import {
+  applyNonce,
   isPuckStyleElement,
   useInjectIframeCss,
 } from "../../lib/use-inject-css";
@@ -80,17 +81,19 @@ const defer = (fn: () => void) => setTimeout(fn, 0);
 const CopyHostStyles = ({
   children,
   debug = false,
+  nonce,
   onStylesLoaded = () => null,
   syncHostStyles = true,
 }: {
   children: ReactNode;
   debug?: boolean;
+  nonce?: string;
   onStylesLoaded?: () => void;
   syncHostStyles?: boolean;
 }) => {
   const { document: doc, window: win } = useFrame();
 
-  useInjectIframeCss(doc);
+  useInjectIframeCss(doc, nonce);
 
   useEffect(() => {
     if (!win || !doc) {
@@ -162,6 +165,12 @@ const CopyHostStyles = ({
       }
 
       mirror.setAttribute(mirroredStyleAttribute, "true");
+
+      // Only carry the nonce over from host styles that already have it, so a
+      // style the host CSP blocked is not allowed inside the iframe.
+      if (el.nonce === nonce) {
+        applyNonce(mirror, nonce);
+      }
 
       return mirror;
     };
@@ -368,7 +377,7 @@ const CopyHostStyles = ({
       observer.disconnect();
       removeAllMirrors();
     };
-  }, [syncHostStyles]);
+  }, [syncHostStyles, nonce]);
 
   return <>{children}</>;
 };
@@ -381,6 +390,7 @@ export type AutoFrameProps = {
   onReady?: () => void;
   onNotReady?: () => void;
   frameRef: RefObject<HTMLIFrameElement | null>;
+  nonce?: string;
   syncHostStyles?: boolean;
 };
 
@@ -401,6 +411,7 @@ function AutoFrame({
   onReady = () => {},
   onNotReady = () => {},
   frameRef,
+  nonce,
   syncHostStyles = true,
   ...props
 }: AutoFrameProps) {
@@ -454,6 +465,7 @@ function AutoFrame({
         {loaded && mountTarget && (
           <CopyHostStyles
             debug={debug}
+            nonce={nonce}
             onStylesLoaded={() => setStylesLoaded(true)}
             syncHostStyles={syncHostStyles}
           >
