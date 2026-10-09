@@ -129,6 +129,7 @@
     "@tiptap/html": "3.31.4",
     "@tiptap/pm": "3.31.4",
     "@tiptap/react": "3.31.4",
+    "@tiptap/static-renderer": "3.31.4",
     "classnames": "^2.5.1",
     "fast-equals": "5.2.2",
     "flat": "^5.0.2",
