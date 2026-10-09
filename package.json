@@ -7,8 +7,9 @@
     "format:check": "prettier --check \"**/*.{ts,tsx,mjs,md,mdx,css}\"",
     "format": "prettier --write \"**/*.{ts,tsx,mjs,md,mdx,css}\"",
     "smoke": "node scripts/e2e/smoke.mjs",
-    "test": "turbo run test",
-    "typecheck": "pnpm --filter ./packages/core typecheck"
+    "test": "turbo run test && node --test scripts/audit-gate-lib.test.mjs",
+    "typecheck": "pnpm --filter ./packages/core typecheck",
+    "audit:gate": "node scripts/audit-gate.mjs"
   },
   "devDependencies": {
     "asciichart": "^1.5.25",
