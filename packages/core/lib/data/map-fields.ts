@@ -50,8 +50,11 @@ type WalkObjectOpts = {
 const isPromise = <T = unknown>(v: any): v is Promise<T> =>
   !!v && typeof v.then === "function";
 
+// Object.fromEntries builds the result in one pass (spreading the accumulator
+// on every step was O(n²)) and defines "__proto__" as an own property instead
+// of calling the prototype setter.
 const flatten = (values: Record<string, any>[]) =>
-  values.reduce((acc, item) => ({ ...acc, ...item }), {});
+  Object.fromEntries(values.flatMap((item) => Object.entries(item)));
 
 const containsPromise = (arr: any[]) => arr.some(isPromise);
 
