@@ -15,6 +15,7 @@ tceditor is a fork of [Puck](https://github.com/puckeditor/puck) v0.23.0 (git ta
 * stop loading the Inter font from rsms.me in the default stylesheet and in the demo; the editor uses Inter only when the host app provides it and otherwise falls back to the system font stack
 * export a single stylesheet, `@tzuchi/tceditor/tceditor.css`; the `puck.css`, `no-external.css` and `dist/index.css` exports and the `no-external` entry point are removed
 * remove the unused `deep-diff`, `@types/deep-diff`, `react-hotkeys-hook` and `@dnd-kit/helpers` dependencies, and declare `classnames`, which core imports but did not list
+* port three fixes from upstream Puck: hotkeys no longer fire from a modifier key left stuck after switching windows ([6a396a5](https://github.com/puckeditor/puck/commit/6a396a5dfd8e7a0c26f1a00f49a8d69a4b493e63)), browser translation no longer crashes the editor ([90665df](https://github.com/puckeditor/puck/commit/90665dfbe201398fe9fbe54cfac31e3d08391b90)), and inline text fields no longer shift the layout on hover ([9e917a3](https://github.com/puckeditor/puck/commit/9e917a398afa982b18101566303134830b25e7ab))
 
 ## [0.23.0](/compare/v0.22.4...v0.23.0) (2026-08-07)
 
