@@ -1,0 +1,29 @@
+# apps/docs stays in the repo as reference material only; it is not part of
+# the workspace, the install or the build.
+packages:
+  - "apps/demo"
+  - "packages/*"
+
+shamefullyHoist: true
+autoInstallPeers: true
+
+# Supply-chain mitigation: pnpm 10 only runs dependency lifecycle scripts for
+# packages listed in onlyBuiltDependencies. Keep this list minimal.
+onlyBuiltDependencies:
+  - esbuild # installs/verifies the platform binary used by tsup (core/plugin builds)
+  - puppeteer # downloads Chromium for the e2e smoke test (pnpm smoke)
+
+# Install scripts we deliberately skip. Each one only builds from source when
+# the prebuilt optional binary is missing. Listing them here silences pnpm's
+# "Ignored build scripts" warning.
+ignoredBuiltDependencies:
+  - "@parcel/watcher" # via sass (next, typescript-plugin-css-modules)
+  - sharp # via next; the demo does not use next/image
+  - unrs-resolver # via eslint-config-next's import resolver
+
+# pnpm ignores package.json `resolutions`; v0.23.0's yarn resolutions that still
+# apply to the dependency graph are carried over here.
+overrides:
+  # GHSA-48c2-rrv3-qjmp. Also keeps postcss-load-config on yaml@2.9.0, the
+  # version yarn resolved for v0.23.0.
+  yaml: ">=2.8.3"

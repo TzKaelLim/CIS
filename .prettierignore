@@ -1,3 +1,10 @@
 CHANGELOG.md
 
-/.nx/workspace-data
+# Generated build output (not source; Prettier does not read .gitignore)
+dist/
+.next/
+build/
+
+# Design specs and implementation plans are working documents, not shipped docs
+.superpowers/
+docs/superpowers/
