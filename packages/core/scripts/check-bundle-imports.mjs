@@ -3,9 +3,9 @@
 // (server-side conversion of legacy HTML), and must never ship to public pages.
 //
 // Usage: node packages/core/scripts/check-bundle-imports.mjs (after pnpm build)
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, realpathSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { fileURLToPath } from "node:url";
 
 export const ENTRIES = ["index.mjs", "rsc.mjs", "index.js", "rsc.js"];
 export const FORBIDDEN = ["happy-dom", "@tiptap/html"];
@@ -55,8 +55,12 @@ export function findForbidden(
   return problems;
 }
 
+// Node runs the real path of a symlinked script, so compare real paths;
+// otherwise running it through a symlink would skip the check and exit 0
 const isMain =
-  process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
+  process.argv[1] !== undefined &&
+  realpathSync(process.argv[1]) ===
+    realpathSync(fileURLToPath(import.meta.url));
 
 if (isMain) {
   const distDir = resolve(dirname(fileURLToPath(import.meta.url)), "../dist");

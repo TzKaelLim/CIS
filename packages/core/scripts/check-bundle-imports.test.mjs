@@ -1,8 +1,17 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import {
+  copyFileSync,
+  mkdirSync,
+  mkdtempSync,
+  rmSync,
+  symlinkSync,
+  writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { after, test } from "node:test";
+import { fileURLToPath } from "node:url";
 
 import { collectFiles, findForbidden } from "./check-bundle-imports.mjs";
 
@@ -50,4 +59,35 @@ test("findForbidden reports reachable files that mention a forbidden package", (
 
 test("findForbidden ignores files no entry reaches", () => {
   assert.deepEqual(findForbidden(dist, ["rsc.mjs", "rsc.js"]), []);
+});
+
+test("the CLI fails when run through a symlinked path", (t) => {
+  const root = mkdtempSync(join(tmpdir(), "check-bundle-imports-cli-"));
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+
+  // root/pkg/scripts/check-bundle-imports.mjs checks root/pkg/dist, and
+  // root/link points to root/pkg
+  const pkg = join(root, "pkg");
+  mkdirSync(join(pkg, "scripts"), { recursive: true });
+  mkdirSync(join(pkg, "dist"));
+  copyFileSync(
+    fileURLToPath(new URL("./check-bundle-imports.mjs", import.meta.url)),
+    join(pkg, "scripts", "check-bundle-imports.mjs")
+  );
+  writeFileSync(join(pkg, "dist", "index.mjs"), 'import "happy-dom";\n');
+  writeFileSync(join(pkg, "dist", "rsc.mjs"), "export {};\n");
+  writeFileSync(join(pkg, "dist", "index.js"), "module.exports = {};\n");
+  writeFileSync(join(pkg, "dist", "rsc.js"), "module.exports = {};\n");
+
+  const link = join(root, "link");
+  symlinkSync(pkg, link, "dir");
+
+  const { status, stderr } = spawnSync(
+    process.execPath,
+    [join(link, "scripts", "check-bundle-imports.mjs")],
+    { encoding: "utf8" }
+  );
+
+  assert.equal(status, 1);
+  assert.match(stderr, /check:bundle FAILED/);
 });
