@@ -9,6 +9,7 @@ import type {
 } from "../types";
 import { walkAppState } from "./data/walk-app-state";
 import { walkTree } from "./data/walk-tree";
+import { lookupComponentConfig } from "./lookup-component-config";
 
 type MigrationOptions<UserConfig extends Config> = {
   migrateDynamicZonesForComponent?: {
@@ -54,7 +55,9 @@ const migrations: Migration[] = [
 
     console.log("Migrating DropZones to slots...");
 
-    const updatedItems: Record<string, ComponentData> = {};
+    // Keyed by component id. Null prototype, so an id such as "__proto__" is
+    // an own key and other ids never find Object.prototype members.
+    const updatedItems: Record<string, ComponentData> = Object.create(null);
     const appState = { ...defaultAppState, data };
     const { indexes } = walkAppState(appState, config);
 
@@ -68,7 +71,9 @@ const migrations: Migration[] = [
         const componentType = nodeData.type;
 
         const configForComponent =
-          id === "root" ? config.root : config.components[componentType];
+          id === "root"
+            ? config.root
+            : lookupComponentConfig(config, componentType);
 
         if (configForComponent?.fields?.[slotName]?.type === "slot") {
           // Migrate this to slot
@@ -109,10 +114,11 @@ const migrations: Migration[] = [
 
     // Migrate zones created by dynamic arrays
     if (migrationOptions?.migrateDynamicZonesForComponent) {
+      // Keyed by component id, so null prototype as for updatedItems
       const unmigratedZonesGrouped: Record<
         string,
         Record<string, Content>
-      > = {};
+      > = Object.create(null);
 
       Object.keys(updated.data.zones ?? {}).forEach((zoneCompound) => {
         const [componentId, propName] = zoneCompound.split(":");
@@ -138,8 +144,15 @@ const migrations: Migration[] = [
               return child;
             }
 
+            // Own keys only: a type such as "constructor" must not call an
+            // Object.prototype member
+            const migrateFns =
+              migrationOptions?.migrateDynamicZonesForComponent;
             const migrateFn =
-              migrationOptions?.migrateDynamicZonesForComponent?.[child.type];
+              migrateFns &&
+              Object.prototype.hasOwnProperty.call(migrateFns, child.type)
+                ? migrateFns[child.type]
+                : undefined;
 
             if (!migrateFn) {
               return child;

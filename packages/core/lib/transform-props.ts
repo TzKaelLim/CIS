@@ -28,12 +28,21 @@ export function transformProps<
   config: Config = { components: {} }
 ): Data {
   const mapItem = (item: any) => {
-    if (propTransforms[item.type]) {
+    // Own keys only: a type such as "__proto__" or "toString" must not call an
+    // Object.prototype member
+    const transform = Object.prototype.hasOwnProperty.call(
+      propTransforms,
+      item.type
+    )
+      ? propTransforms[item.type]
+      : undefined;
+
+    if (transform) {
       return {
         ...item,
         props: {
           id: item.props.id,
-          ...propTransforms[item.type]!(item.props as any),
+          ...transform(item.props as any),
         },
       };
     }
