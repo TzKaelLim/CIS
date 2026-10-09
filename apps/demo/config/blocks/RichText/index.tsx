@@ -1,10 +1,10 @@
-import React from "react";
-import { ComponentConfig } from "@/core/types";
+import React, { ReactNode } from "react";
+import { ComponentConfig, RichText as RichTextValue } from "@/core/types";
 import { WithLayout, withLayout } from "../../components/Layout";
 import { Section } from "../../components/Section";
 
 export type RichTextProps = WithLayout<{
-  richtext?: string;
+  richtext?: RichTextValue;
 }>;
 
 const RichTextInner: ComponentConfig<RichTextProps> = {
@@ -14,10 +14,25 @@ const RichTextInner: ComponentConfig<RichTextProps> = {
     },
   },
   render: ({ richtext }) => {
-    return <Section>{richtext}</Section>;
+    // Puck passes richtext fields to render as rendered elements
+    return <Section>{richtext as ReactNode}</Section>;
   },
   defaultProps: {
-    richtext: "<h2>Heading</h2><p>Body</p>",
+    richtext: {
+      type: "doc",
+      content: [
+        {
+          type: "heading",
+          attrs: { textAlign: null, level: 2 },
+          content: [{ type: "text", text: "Heading" }],
+        },
+        {
+          type: "paragraph",
+          attrs: { textAlign: null },
+          content: [{ type: "text", text: "Body" }],
+        },
+      ],
+    },
   },
 };
 

@@ -2,7 +2,7 @@
 import React from "react";
 import { ComponentConfig } from "@/core/types";
 import { quotes } from "./quotes";
-import { AutoField, FieldLabel, RichTextMenu } from "@/core";
+import { AutoField, FieldLabel, RichTextMenu, textToRichText } from "@/core";
 import { Link2, Quote } from "lucide-react";
 import HeroComponent, { HeroProps } from "./Hero";
 import { heroRenderFields } from "./render-fields";
@@ -176,7 +176,7 @@ export const Hero: ComponentConfig<{
   defaultProps: {
     title: "Hero",
     align: "left",
-    description: "<p>Description</p>",
+    description: textToRichText("Description"),
     buttons: [{ label: "Learn more", href: "#" }],
     padding: "64px",
   },
@@ -204,7 +204,7 @@ export const Hero: ComponentConfig<{
     return {
       props: {
         title: quotes[props.quote.index].author,
-        description: `<p>${quotes[props.quote.index].content}</p>`,
+        description: textToRichText(quotes[props.quote.index].content),
       },
       readOnly: { title: true, description: true },
     };

@@ -8,8 +8,21 @@ export const initialData: Record<string, UserData> = {
         type: "Hero",
         props: {
           title: "This page was built with Puck",
-          description:
-            "<p>Puck is the self-hosted visual editor for React. Bring your own components and make site changes instantly, without a deploy.</p>",
+          description: {
+            type: "doc",
+            content: [
+              {
+                type: "paragraph",
+                attrs: { textAlign: null },
+                content: [
+                  {
+                    type: "text",
+                    text: "Puck is the self-hosted visual editor for React. Bring your own components and make site changes instantly, without a deploy.",
+                  },
+                ],
+              },
+            ],
+          },
           buttons: [
             {
               label: "Visit GitHub",

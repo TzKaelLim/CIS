@@ -7,6 +7,7 @@ import { ComponentDataOptionalId, Content, Data } from "./../Data";
 import { Overrides } from "./Overrides";
 import { FieldTransforms } from "./FieldTransforms";
 import { Config, DefaultComponents } from "../Config";
+import type { RichTextDoc } from "../../lib/richtext/types";
 
 export type Permissions = {
   drag: boolean;
@@ -91,7 +92,11 @@ export type WithSlotProps<
   SlotType extends Content<Components> = Content<Components>
 > = WithDeepSlots<Target, SlotType>;
 
-export type RichText = string | ReactNode;
+/**
+ * A richtext prop: Tiptap JSON (or a legacy string) in data, a ReactNode in
+ * `render`.
+ */
+export type RichText = RichTextDoc | string | ReactNode;
 
 export * from "./DropZone";
 export * from "./Viewports";
