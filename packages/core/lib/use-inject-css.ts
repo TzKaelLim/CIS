@@ -19,6 +19,7 @@ type InjectStyleSheetOptions = {
   cssText: string;
   document?: Document;
   id: PuckStyleId;
+  nonce?: string;
   prepend?: boolean;
 };
 
@@ -88,16 +89,30 @@ const attachStyleElement = (
   }
 };
 
+/**
+ * Sets a CSP nonce on an element before it is attached. Setting the content
+ * attribute also updates the element's internal nonce, which is what the
+ * browser checks against the Content Security Policy. Without a nonce the
+ * element is left unchanged.
+ */
+export const applyNonce = (el: Element, nonce?: string) => {
+  if (nonce) {
+    el.setAttribute("nonce", nonce);
+  }
+};
+
 const createStyleElement = (
   target: Document,
   id: PuckStyleId,
   cssText: string,
-  prepend = false
+  prepend = false,
+  nonce?: string
 ) => {
   const el = target.createElement("style");
 
   el.setAttribute(PUCK_STYLE_SOURCE_ATTRIBUTE, PUCK_STYLE_SOURCE_VALUE);
   el.setAttribute(PUCK_STYLE_ID_ATTRIBUTE, id);
+  applyNonce(el, nonce);
   el.textContent = cssText;
 
   attachStyleElement(target, el, prepend);
@@ -134,7 +149,8 @@ export const useInjectStyleSheet = (
         targetDocument,
         options.id,
         options.cssText,
-        options.prepend
+        options.prepend,
+        options.nonce
       );
 
       registry.set(options.id, {
@@ -160,6 +176,7 @@ export const useInjectStyleSheet = (
   }, [
     options?.cssText,
     options?.id,
+    options?.nonce,
     options?.prepend,
     options?.document,
     targetDocument,
@@ -180,7 +197,7 @@ const hasStaticPuckCss = (): boolean => {
   return staticCssDetected;
 };
 
-export const useInjectUiCss = () => {
+export const useInjectUiCss = (nonce?: string) => {
   const skip = hasStaticPuckCss();
 
   useInjectStyleSheet(
@@ -189,6 +206,7 @@ export const useInjectUiCss = () => {
       : {
           cssText: defaultUiStyles,
           id: PUCK_STYLE_IDS.uiDefault,
+          nonce,
           prepend: true,
         }
   );
@@ -202,13 +220,17 @@ export const useInjectUiCss = () => {
   }, []);
 };
 
-export const useInjectIframeCss = (targetDocument?: Document) => {
+export const useInjectIframeCss = (
+  targetDocument?: Document,
+  nonce?: string
+) => {
   useInjectStyleSheet(
     targetDocument
       ? {
           cssText: iframeInteractionStyles,
           document: targetDocument,
           id: PUCK_STYLE_IDS.iframeInteractions,
+          nonce,
         }
       : null
   );
