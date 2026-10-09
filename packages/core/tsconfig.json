@@ -5,6 +5,7 @@
   "compilerOptions": {
     "types": ["node", "jest", "@testing-library/jest-dom"],
     "paths": {
+      "@tiptap/html/server": ["./node_modules/@tiptap/html/dist/server/index"],
       "@tiptap/static-renderer/json/react": [
         "./node_modules/@tiptap/static-renderer/dist/json/react/index"
       ]

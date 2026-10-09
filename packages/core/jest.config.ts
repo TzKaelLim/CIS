@@ -12,9 +12,10 @@ const config: Config = {
     "^.+\\.[tj]sx?$": ["ts-jest", { useESM: true }],
   },
 
-  // Re-enable transform *inside* selected node_modules
+  // Re-enable transform *inside* selected node_modules. happy-dom is ESM-only;
+  // the richtext-migrate tests load it through @tiptap/html/server.
   transformIgnorePatterns: [
-    "/node_modules/(?!(?:\\.pnpm|@preact/signals-core|@preact/signals-react|@dnd-kit)/)",
+    "/node_modules/(?!(?:\\.pnpm|@preact/signals-core|@preact/signals-react|@dnd-kit|happy-dom)/)",
   ],
 
   moduleNameMapper: {
