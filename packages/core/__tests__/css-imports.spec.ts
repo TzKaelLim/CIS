@@ -36,4 +36,16 @@ describe("package CSS", () => {
 
     expect(offenders).toEqual([]);
   });
+
+  it("exports a single stylesheet, ./tceditor.css", () => {
+    const { exports } = JSON.parse(
+      fs.readFileSync(path.join(packageRoot, "package.json"), "utf8")
+    );
+    const cssExports = Object.keys(exports).filter((key) =>
+      key.endsWith(".css")
+    );
+
+    expect(cssExports).toEqual(["./tceditor.css"]);
+    expect(exports["./tceditor.css"]).toBe("./dist/index.css");
+  });
 });
