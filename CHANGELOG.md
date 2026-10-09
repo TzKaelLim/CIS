@@ -21,6 +21,7 @@ tceditor is a fork of [Puck](https://github.com/puckeditor/puck) v0.23.0 (git ta
 * add the `@tzuchi/tceditor/richtext-migrate` entry (`richTextHtmlToJson`, `migrateRichTextInData`) to convert legacy HTML richtext to JSON on the server, and `pnpm check:bundle` (part of `pnpm verify`), which fails when the main or RSC entry can reach `@tiptap/html` or `happy-dom`
 * the `RichText` type is now `RichTextDoc | string | ReactNode`, and the demo stores its richtext as JSON
 * build the results of `mapFields`, `walkTree` and `getChanged` in one pass; re-spreading the accumulator for every key took about 8 seconds for 10,000 props or zones, and a `__proto__` key in the data is now kept as an own key instead of replacing the prototype of the result
+* look up component configs, `migrateDynamicZonesForComponent` callbacks and `transformProps` transforms by own key only, and keep the node and zone indexes free of `Object.prototype`, so component types or ids such as `constructor`, `__proto__` or `toString` no longer crash or corrupt data in `<Render>`, the editor, `resolveAllData`, `migrate` or `transformProps`; such types render like any other type without a configuration
 
 ## [0.23.0](/compare/v0.22.4...v0.23.0) (2026-08-07)
 
