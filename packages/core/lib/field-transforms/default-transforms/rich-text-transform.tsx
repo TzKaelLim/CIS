@@ -1,6 +1,6 @@
 "use client";
 
-import type { Editor as TipTapEditor, JSONContent } from "@tiptap/react";
+import type { Editor as TipTapEditor } from "@tiptap/react";
 import {
   useEffect,
   useRef,
@@ -18,6 +18,7 @@ import { FieldTransforms } from "../../../types/API/FieldTransforms";
 import { useAppStoreApi } from "../../../store";
 
 import { RichtextField, UiState } from "../../../types";
+import type { RichTextDoc } from "../../richtext/types";
 
 import { setDeep } from "../../data/set-deep";
 import { registerOverlayPortal } from "../../overlay-portal";
@@ -38,7 +39,7 @@ const InlineEditorWrapper = memo(
     field,
     id,
   }: {
-    value: string;
+    value: RichTextDoc | string;
     componentId: string;
     propPath: string;
     field: RichtextField;
@@ -74,7 +75,7 @@ const InlineEditorWrapper = memo(
     }, [portalRef.current]);
 
     const handleChange = useCallback(
-      async (content: string | JSONContent, ui?: Partial<UiState>) => {
+      async (content: RichTextDoc, ui?: Partial<UiState>) => {
         const appStore = appStoreApi.getState();
         const node = appStore.state.indexes.nodes[componentId];
 

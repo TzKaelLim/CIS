@@ -1,9 +1,13 @@
-/** Fallback component. Should not contain any tiptap imports (except for types) */
+/**
+ * Fallback component. Should not import the Tiptap editor (@tiptap/react,
+ * @tiptap/core) except for types; it renders with the shared static renderer.
+ */
 
 import { memo } from "react";
 import { EditorProps } from "../types";
 import { LoadedRichTextMenuInner } from "../../RichTextMenu/inner";
 import { EditorInner } from "./EditorInner";
+import { renderRichText } from "../../../lib/richtext/render";
 
 export const EditorFallback = memo((props: EditorProps) => {
   return (
@@ -19,11 +23,9 @@ export const EditorFallback = memo((props: EditorProps) => {
         />
       }
     >
-      <div
-        className="rich-text"
-        dangerouslySetInnerHTML={{ __html: props.content }}
-        contentEditable
-      />
+      {/* Same renderer as the published page, so nothing shifts when the
+          editor finishes loading */}
+      <div className="rich-text">{renderRichText(props.content)}</div>
     </EditorInner>
   );
 });

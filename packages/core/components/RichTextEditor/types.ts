@@ -1,7 +1,8 @@
-import type { Editor, EditorStateSnapshot, JSONContent } from "@tiptap/react";
+import type { Editor, EditorStateSnapshot } from "@tiptap/react";
 import { useSyncedEditor } from "./lib/use-synced-editor";
 import { defaultEditorState } from "./selector";
 import { RichtextField, UiState } from "../../types";
+import type { RichTextDoc } from "../../lib/richtext/types";
 
 export type RichTextSelector = (
   ctx: EditorStateSnapshot,
@@ -16,8 +17,9 @@ export type EditorState<Selector extends RichTextSelector = RichTextSelector> =
     Record<string, boolean | undefined>;
 
 export type EditorProps = {
-  onChange: (content: string | JSONContent, uiState?: Partial<UiState>) => void;
-  content: string;
+  onChange: (content: RichTextDoc, uiState?: Partial<UiState>) => void;
+  /** Tiptap JSON. A legacy HTML string is shown as plain text. */
+  content: RichTextDoc | string;
   readOnly?: boolean;
   inline?: boolean;
   field: RichtextField;

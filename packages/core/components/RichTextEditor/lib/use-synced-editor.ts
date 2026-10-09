@@ -1,9 +1,36 @@
-import { useEditor } from "@tiptap/react";
-import type { Extensions, JSONContent, Editor } from "@tiptap/react";
-import { useEffect, useRef } from "react";
+import { getSchema, useEditor } from "@tiptap/react";
+import type { Extensions, Editor } from "@tiptap/react";
+import type { Schema } from "@tiptap/pm/model";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useDebounce } from "use-debounce";
 import { UiState } from "../../../types";
 import { useAppStoreApi } from "../../../store";
+import { normalizeRichText } from "../../../lib/richtext/normalize";
+import type { RichTextDoc } from "../../../lib/richtext/types";
+import { findUnrenderableTypes, fitToSchema } from "./fit-to-schema";
+import { stableStringify } from "./stable-stringify";
+
+// Tiptap needs at least one block to place the cursor in
+const EMPTY_EDITOR_DOC: RichTextDoc = {
+  type: "doc",
+  content: [{ type: "paragraph", attrs: { textAlign: null } }],
+};
+
+/**
+ * The document the editor shows for a stored value. It goes through the same
+ * normalization as the renderer, so the editor and the rendered page agree,
+ * and legacy HTML strings appear as plain text. It is then fitted to the
+ * editor's schema, because Tiptap would show an empty document instead of
+ * content with a node or mark type the field turned off.
+ */
+const toEditorDoc = (content: unknown, schema: Schema): RichTextDoc => {
+  const doc = fitToSchema(normalizeRichText(content), schema);
+
+  return doc.content?.length ? doc : EMPTY_EDITOR_DOC;
+};
+
+// Types already reported, so each one is reported once
+const reportedTypes = new Set<string>();
 
 export function useSyncedEditor({
   content,
@@ -13,8 +40,8 @@ export function useSyncedEditor({
   onFocusChange,
   name,
 }: {
-  content: JSONContent | string;
-  onChange: (content: JSONContent | string, uiState?: Partial<UiState>) => void;
+  content: RichTextDoc | string;
+  onChange: (content: RichTextDoc, uiState?: Partial<UiState>) => void;
   extensions: Extensions;
   editable?: boolean;
   onFocusChange?: (editor: Editor | null) => void;
@@ -23,7 +50,7 @@ export function useSyncedEditor({
   const [debouncedState, setDebouncedState] = useDebounce<{
     from: number;
     to: number;
-    html: string;
+    json: RichTextDoc;
   } | null>(null, 50, {
     leading: true,
     maxWait: 200,
@@ -33,6 +60,33 @@ export function useSyncedEditor({
   const lastSyncedRef = useRef("");
   const editTimer = useRef<NodeJS.Timeout>(null);
   const isPending = !!editTimer.current;
+
+  // useEditor creates the editor once and keeps its schema even when the
+  // extensions change later, so the schema is computed once as well
+  const [schema] = useState(() => getSchema(extensions));
+
+  const editorDoc = useMemo(
+    () => toEditorDoc(content, schema),
+    [content, schema]
+  );
+
+  useEffect(() => {
+    if (process.env.NODE_ENV === "production") return;
+
+    const types = findUnrenderableTypes(schema).filter(
+      (type) => !reportedTypes.has(type)
+    );
+
+    if (types.length === 0) return;
+
+    types.forEach((type) => reportedTypes.add(type));
+
+    console.warn(
+      `tceditor: the richtext types ${types.join(
+        ", "
+      )} come from tiptap.extensions and are not supported by the shared renderer. Published pages show only their text, and the editor removes them when it loads saved content.`
+    );
+  }, [schema]);
 
   const resetTimer = (clearOn: string) => {
     if (editTimer.current) {
@@ -50,7 +104,7 @@ export function useSyncedEditor({
 
   const editor = useEditor({
     extensions,
-    content,
+    content: editorDoc,
     editable,
     immediatelyRender: false,
     parseOptions: { preserveWhitespace: "full" },
@@ -62,14 +116,15 @@ export function useSyncedEditor({
         return;
       }
 
-      const html = editor.getHTML();
+      const json = editor.getJSON() as RichTextDoc;
+      const serialized = stableStringify(json);
 
       const { from, to } = editor.state.selection;
 
-      setDebouncedState({ from, to, html });
-      resetTimer(html);
+      setDebouncedState({ from, to, json });
+      resetTimer(serialized);
 
-      lastSyncedRef.current = html;
+      lastSyncedRef.current = serialized;
     },
   });
 
@@ -91,7 +146,7 @@ export function useSyncedEditor({
     if (debouncedState) {
       const { ui } = appStoreApi.getState().state;
 
-      onChange(debouncedState.html, {
+      onChange(debouncedState.json, {
         field: {
           ...ui.field,
           metadata: { from: debouncedState.from, to: debouncedState.to },
@@ -113,14 +168,21 @@ export function useSyncedEditor({
       return;
     }
 
-    // Compare current doc vs incoming doc; if same, skip
-    const current = editor.getHTML();
+    // Skip when the editor already shows this content: either it produced the
+    // stored JSON itself, or it shows the stored value in normalized form.
+    // Compared with sorted keys, so key order does not matter.
+    const current = stableStringify(editor.getJSON());
 
-    if (current === content) return;
+    if (
+      current === stableStringify(content) ||
+      current === stableStringify(editorDoc)
+    ) {
+      return;
+    }
 
     syncingRef.current = true;
 
-    editor.commands.setContent(content, { emitUpdate: false });
+    editor.commands.setContent(editorDoc, { emitUpdate: false });
 
     const { ui } = appStoreApi.getState().state;
 
@@ -132,7 +194,7 @@ export function useSyncedEditor({
     }
 
     syncingRef.current = false;
-  }, [content, editor, appStoreApi]);
+  }, [content, editorDoc, editor, appStoreApi]);
 
   return editor;
 }

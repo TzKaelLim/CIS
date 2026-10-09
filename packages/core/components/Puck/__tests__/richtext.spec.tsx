@@ -58,6 +58,7 @@ jest.spyOn(console, "error").mockImplementation((...args: unknown[]) => {
 
 jest.spyOn(console, "warn").mockImplementation(() => {});
 
+import type { Editor as TiptapEditor } from "@tiptap/core";
 import { Puck } from "../index";
 import { AppStoreApi } from "../../../store";
 
@@ -305,5 +306,93 @@ describe("Puck - richtext programmatic updates", () => {
 
     expect(output.querySelector("img")).toBeNull();
     expect(output.textContent).toBe(payload);
+  });
+});
+
+describe("Puck - inline richtext editor", () => {
+  afterEach(() => {
+    cleanup();
+  });
+
+  const config: Config = {
+    components: {
+      Block: {
+        fields: {
+          body: { type: "richtext", contentEditable: true },
+        },
+        render: ({ body }) => <div data-testid="output">{body}</div>,
+      },
+    },
+  };
+
+  const renderPuck = async (body: unknown) => {
+    const data: Data = {
+      root: { props: {} },
+      content: [{ type: "Block", props: { id: "block-1", body } }],
+    };
+
+    render(<Puck config={config} data={data} iframe={{ enabled: false }} />);
+    await flush();
+
+    const output = await screen.findByTestId("output");
+
+    await waitFor(() => {
+      expect(output.querySelector(".ProseMirror")).not.toBeNull();
+    });
+
+    return output.querySelector(".ProseMirror") as HTMLElement & {
+      editor: TiptapEditor;
+    };
+  };
+
+  it("loads JSON into the editor and follows programmatic updates", async () => {
+    const editorDom = await renderPuck(richText("Hello world"));
+
+    expect(editorDom.textContent).toBe("Hello world");
+
+    act(() => {
+      dispatchReplace(getInternal().appStore, "block-1", {
+        type: "Block",
+        props: { id: "block-1", body: richText("Updated content") },
+      });
+    });
+    await flush();
+
+    await waitFor(() => {
+      expect(editorDom.textContent).toBe("Updated content");
+    });
+  });
+
+  it("stores edits as JSON", async () => {
+    const editorDom = await renderPuck(richText("Hello"));
+    const { appStore } = getInternal();
+
+    act(() => {
+      // The editor only reports changes while its field has focus
+      appStore.getState().setUi({
+        field: { ...appStore.getState().state.ui.field, focus: "body::inline" },
+      });
+    });
+
+    act(() => {
+      editorDom.editor.commands.insertContentAt(
+        editorDom.editor.state.doc.content.size - 1,
+        " world"
+      );
+    });
+
+    await waitFor(() => {
+      expect(
+        appStore.getState().state.indexes.nodes["block-1"].data.props.body
+      ).toEqual(richText("Hello world"));
+    });
+  });
+
+  it("shows a legacy HTML string as plain text", async () => {
+    const payload = '<p>Hello</p><img src=x onerror="alert(1)">';
+    const editorDom = await renderPuck(payload);
+
+    expect(editorDom.querySelector("img")).toBeNull();
+    expect(editorDom.textContent).toBe(payload);
   });
 });

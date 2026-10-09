@@ -38,6 +38,7 @@ import { Text } from "@tiptap/extension-text";
 import TextAlign, { TextAlignOptions } from "@tiptap/extension-text-align";
 import type { UnderlineOptions } from "@tiptap/extension-underline";
 import { Underline } from "@tiptap/extension-underline";
+import { isSafeHref } from "../../lib/richtext/is-safe-href";
 
 export interface PuckRichTextOptions {
   /**
@@ -225,7 +226,20 @@ export const PuckRichText = Extension.create<PuckRichTextOptions>({
     }
 
     if (options.link !== false) {
-      extensions.push(Link.configure(options?.link));
+      const linkOptions = options.link ?? {};
+
+      extensions.push(
+        Link.configure({
+          ...linkOptions,
+          // Published pages only keep links that pass isSafeHref, so the
+          // editor must not create any other link (typed, pasted or parsed)
+          isAllowedUri: (url, context) =>
+            isSafeHref(url) &&
+            (linkOptions.isAllowedUri
+              ? linkOptions.isAllowedUri(url, context)
+              : context.defaultValidate(url)),
+        })
+      );
     }
 
     if (options.paragraph !== false) {
