@@ -81,9 +81,6 @@ importers:
       '@dnd-kit/geometry':
         specifier: 0.4.0
         version: 0.4.0
-      '@dnd-kit/helpers':
-        specifier: 0.4.0
-        version: 0.4.0
       '@dnd-kit/react':
         specifier: 0.4.0
         version: 0.4.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
@@ -156,9 +153,9 @@ importers:
       '@tiptap/react':
         specifier: 3.31.4
         version: 3.31.4(@floating-ui/dom@1.7.6)(@tiptap/core@3.31.4(@tiptap/pm@3.31.4))(@tiptap/pm@3.31.4)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
-      deep-diff:
-        specifier: ^1.0.2
-        version: 1.0.2
+      classnames:
+        specifier: ^2.5.1
+        version: 2.5.1
       fast-equals:
         specifier: 5.2.2
         version: 5.2.2
@@ -174,9 +171,6 @@ importers:
       react:
         specifier: ^18.0.0 || ^19.0.0
         version: 19.2.6
-      react-hotkeys-hook:
-        specifier: ^4.6.1
-        version: 4.6.2(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       use-debounce:
         specifier: ^9.0.4
         version: 9.0.4(react@19.2.6)
@@ -196,9 +190,6 @@ importers:
       '@testing-library/react':
         specifier: ^16.1.0
         version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
-      '@types/deep-diff':
-        specifier: ^1.0.3
-        version: 1.0.5
       '@types/flat':
         specifier: ^5.0.5
         version: 5.0.5
@@ -568,9 +559,6 @@ packages:
 
   '@dnd-kit/geometry@0.4.0':
     resolution: {integrity: sha512-d1n+CU54V/qF/g792bmJK2oR4f5jOL7Pls2IfC+j9f5UBECpjsYbcPZ/krom/z8LgieqvMh1qrUkdcBjJJ7vpg==}
-
-  '@dnd-kit/helpers@0.4.0':
-    resolution: {integrity: sha512-9YOKevD6zOwKVvV4k3fQL//NF+UaN92sfqPpJhT0/7Jq5PLtfD+CTpzmFAjTt5o1qQpFj3xqjWnQl25ooW62wQ==}
 
   '@dnd-kit/react@0.4.0':
     resolution: {integrity: sha512-J2/N4CpQf98zJBZhMljDNsc+QR4VtUKU9BRO1+Di4OGaB1qafMC4qZ11xKXOkjw+d7h82FRSXmXCo0c8+VWaWg==}
@@ -1983,9 +1971,6 @@ packages:
   '@types/babel__traverse@7.28.0':
     resolution: {integrity: sha512-8PvcXf70gTDZBgt9ptxJ8elBeBjcLOAcOtoO/mPJjtji1+CdGbHgm77om1GrsPxsiE+uXIpNSK64UYaIwQXd4Q==}
 
-  '@types/deep-diff@1.0.5':
-    resolution: {integrity: sha512-PQyNSy1YMZU1hgZA5tTYfHPpUAo9Dorn1PZho2/budQLfqLu3JIP37JAavnwYpR1S2yFZTXa3hxaE4ifGW5jaA==}
-
   '@types/estree@1.0.8':
     resolution: {integrity: sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==}
 
@@ -2666,10 +2651,6 @@ packages:
     peerDependenciesMeta:
       babel-plugin-macros:
         optional: true
-
-  deep-diff@1.0.2:
-    resolution: {integrity: sha512-aWS3UIVH+NPGCD1kki+DCU9Dua032iSsO43LqQpcs4R3+dVv7tX0qBGjiVHJHjplsoUM2XRO/KB92glqc68awg==}
-    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
 
   deep-is@0.1.4:
     resolution: {integrity: sha512-oIPzksmTg4/MriiaYGO+okXDT7ztn/w3Eptv/+gSIdMdKsJo0u4CfYNFJPy+4SKMuCqGw2wxnA+URMg3t8a/bQ==}
@@ -4233,12 +4214,6 @@ packages:
       react: ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
       react-dom: ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
 
-  react-hotkeys-hook@4.6.2:
-    resolution: {integrity: sha512-FmP+ZriY3EG59Ug/lxNfrObCnW9xQShgk7Nb83+CkpfkcCpfS95ydv+E9JuXA5cp8KtskU7LGlIARpkc92X22Q==}
-    peerDependencies:
-      react: '>=16.8.1'
-      react-dom: '>=16.8.1'
-
   react-is@16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
 
@@ -5259,11 +5234,6 @@ snapshots:
   '@dnd-kit/geometry@0.4.0':
     dependencies:
       '@dnd-kit/state': 0.4.0
-      tslib: 2.8.1
-
-  '@dnd-kit/helpers@0.4.0':
-    dependencies:
-      '@dnd-kit/abstract': 0.4.0
       tslib: 2.8.1
 
   '@dnd-kit/react@0.4.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
@@ -6506,8 +6476,6 @@ snapshots:
     dependencies:
       '@babel/types': 7.29.7
 
-  '@types/deep-diff@1.0.5': {}
-
   '@types/estree@1.0.8': {}
 
   '@types/estree@1.0.9': {}
@@ -7189,8 +7157,6 @@ snapshots:
   decimal.js@10.6.0: {}
 
   dedent@1.7.2: {}
-
-  deep-diff@1.0.2: {}
 
   deep-is@0.1.4: {}
 
@@ -9210,11 +9176,6 @@ snapshots:
       scheduler: 0.27.0
 
   react-from-json@0.8.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6):
-    dependencies:
-      react: 19.2.6
-      react-dom: 19.2.6(react@19.2.6)
-
-  react-hotkeys-hook@4.6.2(react-dom@19.2.6(react@19.2.6))(react@19.2.6):
     dependencies:
       react: 19.2.6
       react-dom: 19.2.6(react@19.2.6)
