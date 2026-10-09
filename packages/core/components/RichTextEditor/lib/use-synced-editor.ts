@@ -107,6 +107,7 @@ export function useSyncedEditor({
     content: editorDoc,
     editable,
     immediatelyRender: false,
+    injectNonce: appStoreApi.getState().nonce,
     parseOptions: { preserveWhitespace: "full" },
     onUpdate: ({ editor }) => {
       const isFocused = appStoreApi.getState().state.ui.field.focus === name;
