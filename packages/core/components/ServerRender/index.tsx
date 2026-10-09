@@ -5,6 +5,7 @@ import {
   rootZone,
 } from "../../lib/root-droppable-id";
 import { setupZone } from "../../lib/data/setup-zone";
+import { lookupComponentConfig } from "../../lib/lookup-component-config";
 import { Config, Data, Metadata, UserGenerics } from "../../types";
 import { useSlots } from "../../lib/use-slots";
 import { SlotRenderPure } from "../SlotRender/server";
@@ -32,7 +33,7 @@ function DropZoneRenderItem({
   config,
   metadata,
 }: DropZoneRenderItemProps) {
-  const Component = config.components[item.type];
+  const Component = lookupComponentConfig(config, item.type);
 
   const props = {
     ...item.props,

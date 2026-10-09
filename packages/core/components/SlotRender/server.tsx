@@ -1,4 +1,5 @@
 import { forwardRef } from "react";
+import { lookupComponentConfig } from "../../lib/lookup-component-config";
 import { DropZoneProps } from "../DropZone/types";
 import {
   ComponentData,
@@ -29,7 +30,8 @@ const Item = ({
   item: ComponentData;
   metadata: Metadata;
 }) => {
-  const Component = config.components[item.type];
+  // SlotRender only renders an Item once its type has a config
+  const Component = lookupComponentConfig(config, item.type)!;
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const props = useSlots(config, item, (slotProps) => (
@@ -65,7 +67,7 @@ export const SlotRender = forwardRef<HTMLDivElement, SlotRenderProps>(
     return (
       <El className={className} style={style} ref={ref}>
         {content.map((item) => {
-          if (!config.components[item.type]) {
+          if (!lookupComponentConfig(config, item.type)) {
             return null;
           }
 

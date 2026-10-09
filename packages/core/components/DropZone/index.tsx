@@ -11,6 +11,7 @@ import {
 } from "react";
 import { DraggableComponent } from "../DraggableComponent";
 import { setupZone } from "../../lib/data/setup-zone";
+import { lookupComponentConfig } from "../../lib/lookup-component-config";
 import { rootAreaId, rootDroppableId } from "../../lib/root-droppable-id";
 import { getClassNameFactory } from "../../lib";
 import styles from "./styles.module.css";
@@ -562,7 +563,8 @@ const DropZoneRenderItem = ({
   item: ComponentData;
   metadata: Metadata;
 }) => {
-  const Component = config.components[item.type];
+  // DropZoneRender only renders this item once its type has a config
+  const Component = lookupComponentConfig(config, item.type)!;
 
   const props = useSlots(config, item, (slotProps) => (
     <SlotRenderPure {...slotProps} config={config} metadata={metadata} />
@@ -628,7 +630,7 @@ const DropZoneRender = forwardRef<HTMLDivElement, DropZoneProps>(
     return (
       <El className={className} style={style} ref={ref}>
         {content.map((item) => {
-          const Component = config.components[item.type];
+          const Component = lookupComponentConfig(config, item.type);
           if (Component) {
             return (
               <DropZoneRenderItem
