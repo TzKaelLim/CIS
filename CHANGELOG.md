@@ -16,6 +16,7 @@ tceditor is a fork of [Puck](https://github.com/puckeditor/puck) v0.23.0 (git ta
 * export a single stylesheet, `@tzuchi/tceditor/tceditor.css`; the `puck.css`, `no-external.css` and `dist/index.css` exports and the `no-external` entry point are removed
 * remove the unused `deep-diff`, `@types/deep-diff`, `react-hotkeys-hook` and `@dnd-kit/helpers` dependencies, and declare `classnames`, which core imports but did not list
 * port three fixes from upstream Puck: hotkeys no longer fire from a modifier key left stuck after switching windows ([6a396a5](https://github.com/puckeditor/puck/commit/6a396a5dfd8e7a0c26f1a00f49a8d69a4b493e63)), browser translation no longer crashes the editor ([90665df](https://github.com/puckeditor/puck/commit/90665dfbe201398fe9fbe54cfac31e3d08391b90)), and inline text fields no longer shift the layout on hover ([9e917a3](https://github.com/puckeditor/puck/commit/9e917a398afa982b18101566303134830b25e7ab))
+* render richtext everywhere it is displayed with one shared renderer built on `@tiptap/static-renderer`, exported as `renderRichText` and `RichTextContent` together with `normalizeRichText`, `isSafeHref` and `textToRichText`; a legacy HTML string is shown as plain text and never parsed, content nested deeper than 100 levels is reduced to text, and the lazy `@tiptap/html` renderer with its `dangerouslySetInnerHTML` fallback is removed
 
 ## [0.23.0](/compare/v0.22.4...v0.23.0) (2026-08-07)
 

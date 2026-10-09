@@ -17,6 +17,8 @@ export * from "../components/IconButton";
 export { Puck } from "../components/Puck";
 export * from "../components/Render";
 export { RichTextMenu } from "../components/RichTextMenu/inner";
+export { RichTextContent } from "../components/RichTextEditor/components/RichTextContent";
+export * from "../lib/richtext";
 
 export * from "../lib/migrate";
 export * from "../lib/transform-props";
