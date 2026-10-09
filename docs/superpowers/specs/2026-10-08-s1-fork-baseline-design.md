@@ -1,7 +1,8 @@
 # S1：Fork 基線與開發基礎設施（設計規格）
 
 - 日期：2026-10-08
-- 狀態：草案，待審閱
+- 狀態：已核准（2026-10-09 依實作計畫的驗證結果修訂，見 §12）
+- 實作計畫：`docs/superpowers/plans/2026-10-09-s1-fork-baseline.md`
 - 上層文件：`2026-10-08-tzuchi-puck-roadmap.md`
 - 依據：`puck-audit/REPORT.md`（§1 資安、§5 相容性），以及其中引用的子報告
 
@@ -57,7 +58,8 @@
 | `packages/plugin-emotion-cache` | HeroUI 採用 Tailwind，不需要 Emotion |
 | `.github/`（workflows、dependabot、範本） | 上游的 GitHub 與 npm 發佈流程。CI 待遠端確定後重建 |
 | `lerna.json`、`scripts/publish.sh`、release 相關 scripts | 上游的 npm 發佈流程 |
-| demo 的第三方分析 | 不送資料給第三方 |
+| demo 的第三方分析（Plausible）與外部字型（rsms.me） | 不送資料給第三方 |
+| `CODE_OF_CONDUCT.md` | 上游社群守則，唯一的通報管道是 Puck 的 Discord；tceditor 是內部專案 |
 
 ### 3.3 保留
 
@@ -75,14 +77,17 @@
 
 `v0.23.0` 使用 `yarn@1.22.19`，有 `yarn.lock` 與 `resolutions`。
 
-1. 以 `pnpm import` 由 `yarn.lock` 產生 `pnpm-lock.yaml`，**保留 0.23.0 原本解析到的版本**，不順便升級。
+1. 以 `pnpm import` 由 `yarn.lock` 產生 `pnpm-lock.yaml`，**保留 0.23.0 原本解析到的版本**，不順便升級。唯一例外是第 5 項的 tiptap。
 2. 新增 `pnpm-workspace.yaml`。`packages` 不含 recipes 與 docs。
-3. `allowBuilds` 只放必要項目，參考上游 main 的清單。
+3. 以 pnpm 10 語法的 `onlyBuiltDependencies`（`esbuild`、`puppeteer`）與 `ignoredBuiltDependencies`（`@parcel/watcher`、`sharp`、`unrs-resolver`）控制 lifecycle script，只放必要項目。上游 main 的 `allowBuilds` 是 pnpm 11 語法。
 4. 把 `resolutions` 改寫為 `overrides`。
-5. 執行 `pnpm audit --prod`，針對 runtime 依賴的漏洞加入最少量的 `overrides`。每一項都註明 GHSA 編號。
+5. 漏洞把關改用 `pnpm audit:gate`（`scripts/audit-gate.mjs`）：只有「隨 `packages/core`、`packages/plugin-heading-analyzer` 出貨的套件版本」有 advisory 時才失敗，其餘（demo、開發工具）只列出不阻擋。原因是 v0.23.0 的依賴圖約有 70 筆 advisory，多數在 demo 與開發工具，raw `pnpm audit --prod` 無法以少量 overrides 清零。
+   - core 的 runtime 依賴有 GHSA-j95f-988m-3j2f、GHSA-cp6q-959q-f8rh、GHSA-c8x8-7fp4-3x9w，因此 tiptap 整組由 3.23.4 升到 **3.31.4**，並寫成精確版本（tiptap 各套件以精確版本互相宣告 peer，無法只用 override 拉高 `@tiptap/core`）。
+   - 仍需要的 `overrides` 每一項都註明 GHSA 編號。
 6. 根目錄的 `packageManager` 設為目前使用的 pnpm 版本，`engines.node` 設為 `>=24`（只影響開發環境）。`packages/core` 給使用端的 `engines` 維持 `>=20`。
 7. 刪除 `yarn.lock` 與 `.yarnrc`。
-8. 新增根目錄 script **`pnpm verify`**，依序執行 test、tsc、lint、format:check、build、`pnpm audit --prod`。
+8. 新增根目錄 script **`pnpm verify`**，依序執行 test、typecheck、lint、format:check、build、check:bundle（F1 的轉換入口加入後）、audit:gate。
+9. demo 的 `dev`／`start` 只綁 `127.0.0.1`。
 
 ## 5. 移植上游的 bug 修正
 
@@ -110,7 +115,7 @@
 **作法**：消除「兩條路徑」本身。
 1. **儲存格式改為 tiptap JSON**（ProseMirror document）。
    - 編輯器的 `onUpdate` 改用 `editor.getJSON()`。
-   - richtext 欄位的值型別改為 `JSONContent`。
+   - richtext 欄位的值型別改為 `RichTextDoc`（仍接受舊的字串值）。
 2. **所有顯示處都用同一個靜態渲染器**，直接把 JSON 轉成 React 元素。
    - 涵蓋公開頁（RSC、SSR、CSR）、編輯器畫布在 tiptap 載入前、欄位預覽。
    - 優先採用官方的 `@tiptap/static-renderer`（`./json/react`，3.31.4，以 node 與 mark 的 mapping 渲染 JSON，不需要 editor 也不需要 DOM）。
@@ -125,11 +130,15 @@
 4. **屬性在 mapping 層驗證**：
    - `link.href` 只允許 `http`、`https`、`mailto`、`tel` 與相對路徑，不合格就不輸出連結。
    - `textAlign` 只允許 `left`、`center`、`right`、`justify`。
+   - link 的 `class` 一律清除，`rel` 去掉 `opener`（防止 reverse tabnabbing）。
    - 不認得的 node 或 mark 一律不輸出（只保留其中的文字）。
+   - 編輯器建立連結時也套用同一個 `isSafeHref` 規則；tiptap 預設允許的 `ftp:`、`sms:`、`callto:` 等協定不再能建立連結。
+   - 渲染器依完整的預設 schema 渲染，不依欄位的 `options` 過濾；`options` 只影響編輯器。
+   - `tiptap.extensions` 新增的 node 與 mark 不會被渲染，重新開啟編輯器時也會被移除（開發模式會警告）。需要新型別時，在 mapping 加上對應的渲染與驗證。
 5. **相容舊的 HTML 字串**：
-   - 渲染時若遇到字串，一律當作純文字段落輸出，由 React escape，渲染期不解析 HTML。
-   - 另外提供一次性轉換工具 `scripts/richtext-html-to-json`，在伺服器端以 tiptap 的 `generateJSON` 轉換既有資料，只在轉換時使用 happy-dom。
-6. **渲染器與 mapping 以獨立模組對外匯出**，S2 的 schema、S3 的寫入驗證、S4 的 MCP 都會重用。
+   - 渲染時若遇到字串，一律當作純文字段落輸出，由 React escape，渲染期不解析 HTML。編輯器也把舊字串當純文字載入，與公開頁一致；因此上線前要先執行轉換工具。
+   - 轉換工具是套件入口 `@tzuchi/tceditor/richtext-migrate`（`richTextHtmlToJson`、`migrateRichTextInData`），在伺服器端以 tiptap 的 `generateJSON` 轉換既有資料，只有這個入口使用 happy-dom。
+6. **渲染器以獨立模組對外匯出**（`renderRichText`、`normalizeRichText`、`isSafeHref`、`textToRichText`、`RichTextContent` 與型別），S2 的 schema、S3 的寫入驗證、S4 的 MCP 都會重用。mapping 物件本身是否公開，留待 S2 決定。
    - 寫入端只需要驗證 JSON 結構（node 與 mark 型別、屬性、深度上限），不必淨化 HTML。
 
 **實作前的 spike（第一步）**：確認以下三點。
@@ -151,7 +160,7 @@
 **代價與限制**：
 - 儲存格式改變。PoC 既有的 HTML 內容要用轉換工具轉一次。
 - 日後新增 tiptap extension（例如圖片或表格）時，要同時在 mapping 加上對應的渲染與屬性驗證。這是刻意設計的明確擴充點。
-- `happy-dom` 降為只有轉換工具使用的 devDependency，`@tiptap/html` 也只在轉換工具中使用。路線圖 S6 的「happy-dom → static-renderer」因此提前在 S1 完成。
+- `happy-dom` 與 `@tiptap/html` 留在 `dependencies`，但只被轉換入口使用；`pnpm check:bundle` 保證主入口與 RSC 入口的打包結果不引用它們。路線圖 S6 的「happy-dom → static-renderer」因此提前在 S1 完成。
 
 ### F2. JSON 深度與大小上限（取代原本的 try/catch 方案）
 
@@ -160,19 +169,20 @@
 
 ### F3. `mapFields`／`walkTree` 的 O(n²) 合併（sec-data-02）
 
-- reduce 搭配 spread 的寫法改為直接寫入累加物件（`Object.assign` 或賦值）。
+- reduce 搭配 spread 的寫法改用 `Object.fromEntries`。不用 `Object.assign` 或 `acc[k] = v`，因為遇到 `__proto__` key 會呼叫 setter 而改到原型。
 - 對外行為不變。
 
 ### F4. 原型成員名稱造成崩潰（sec-data-05）
 
-- 元件型別查找改用自有屬性檢查（例如 `Object.hasOwn(config.components, type)`），涵蓋 Render、ServerRender、`group-zones-by-component`、`migrate`。
+- 元件型別查找改用自有屬性檢查：helper `lookupComponentConfig`（`lib/lookup-component-config.ts`），以 `Object.prototype.hasOwnProperty.call` 實作（core 的 TypeScript lib 不含 `Object.hasOwn`）。涵蓋 Render、ServerRender、SlotRender、DropZone、store、permissions、insert、`group-zones-by-component`、`migrate`、`transformProps`、`build-layer-tree` 等讀取點。
 - 找不到的型別沿用既有的 "No configuration for {type}" 行為。
 - `walkAppState` 建立的 `nodes` 與 `zones` 索引改用 `Object.create(null)`，避免 id 是 `__proto__` 時汙染原型。
 
 ### F5. CSP nonce 支援（sec-supply-11）
 
 - `<Puck>` 新增選用的 `nonce` prop。
-- `use-inject-css` 在主文件與 iframe 注入的 `<style>` 都帶上這個 nonce。
+- `use-inject-css` 在主文件與 iframe 注入的 `<style>` 都帶上這個 nonce；其他執行期注入點（dnd-kit 的 `StyleInjector`、放下動畫的 `<style>`、tiptap 的 `injectNonce`）也一併帶上。
+- 鏡像進 iframe 的樣式，只在原樣式本來就帶同一個 nonce 時才設定。
 - 沒有傳入時，行為與現在相同。
 
 ### F6. 預設 CSS 不再載入外部字型
@@ -199,14 +209,16 @@
 
   | 服務 | host port |
   |---|---|
-  | API gateway（含 Studio） | 127.0.0.1:8200、8201（對應方式比照 tciam 的 8100、8101） |
+  | API gateway（API 與 Studio 共用，Studio 以 basic auth 保護） | 127.0.0.1:8200（官方 Envoy 只有一個 listener，不使用 8201） |
   | Postgres（Supavisor session 模式） | 127.0.0.1:5434 |
   | Postgres（transaction pooler） | 127.0.0.1:6545 |
 
   啟動前以 `lsof` 再確認一次這些 port 沒有被佔用。
 - **祕密**：JWT secret、anon key、service key、Postgres 密碼以官方工具產生，寫在 `.env`。`.env` 列入 gitignore，repo 只提交 `.env.example`。
 - **開發設定**：S1 不含寄信服務，Auth 設為 email 自動確認。S3 再決定是否串接 tciam SSO。
-- **腳本**：`infra/supabase/up.sh`、`down.sh`、`reset.sh`。`reset.sh` 只清除 `tceditor` 自己的 volume。
+- **腳本**：`infra/supabase/setup-env.sh`、`up.sh`、`down.sh`、`reset.sh`（共用函式在 `lib.sh`）。`reset.sh` 只清除 `tceditor` 自己的 container、volume 與資料目錄。
+- **URL**：`API_EXTERNAL_URL` 為 `http://127.0.0.1:8200/auth/v1`；`SUPABASE_PUBLIC_URL` 與 `SITE_URL` 為 `http://127.0.0.1:8200`。
+- **授權**：vendored 的官方檔案為 Apache-2.0，`infra/supabase/LICENSE` 附全文。
 
 ## 8. 文件
 
@@ -217,7 +229,9 @@
     - 禁止新增 `dangerouslySetInnerHTML`。
     - richtext 只以 JSON 儲存，並由共用渲染器輸出。
     - 新增 tiptap extension 時，必須同時加上渲染 mapping 與屬性驗證。
+    - 元件型別查找使用 `lookupComponentConfig`；執行期注入的 `<style>` 要帶 nonce。
 - `README.md` 改寫為 fork 的說明：來源、差異、如何驗證、如何啟動 Supabase。
+- `CONTRIBUTING.md`、`apps/demo/README.md` 改寫，移除上游專屬內容。
 
 ## 9. 測試計畫
 
@@ -236,16 +250,16 @@
      - tiptap `getHTML()` 的輸出。
    - 正規化後兩者必須相同。
    - 確認編輯器畫布在 tiptap 載入前、載入後的 DOM 相同，沒有閃動。
-5. **轉換工具**：HTML 經過 `scripts/richtext-html-to-json` 轉成 JSON 之後再渲染，結果應與原本正常路徑的輸出相同。
+5. **轉換工具**：HTML 經過 `@tzuchi/tceditor/richtext-migrate` 轉成 JSON 之後再渲染，結果應與原本正常路徑的輸出相同。
 6. F2：深度 5,000 的 JSON 不會拋錯，也不會 stack overflow；超過上限的部分只輸出文字。
 7. **SSR 不需要 happy-dom**：在沒有安裝 happy-dom 的情況下，`renderToString(<Render>)` 能正常輸出 richtext。
 8. F3：10,000 個 key 的 props 經過 `mapFields`，在本機上低於 200 ms。
 9. F4：`type` 或 id 為 `constructor`、`__proto__` 的資料不會讓 Render 或編輯器崩潰，也不會汙染 `Object.prototype`。
 10. F5：傳入 `nonce` 時，注入的 `<style>` 都帶有該值。
-11. `pnpm verify` 全部通過；`apps/demo` 能在本機啟動，可以手動拖放與編輯 richtext。
+11. `pnpm verify` 全部通過；`apps/demo` 能在本機啟動，可以拖放與編輯 richtext（以 puppeteer 自動驗證，並保留人工步驟）。
 12. Supabase：
    - `tceditor` 的所有 container 都是 healthy。
-   - 以 anon key 呼叫 `http://127.0.0.1:8200/rest/v1/` 回應正常。
+   - `http://127.0.0.1:8200/rest/v1/`：不帶 key 回 401；anon key 讀根路徑回 403（官方 RBAC 只讓 service_role 讀 OpenAPI 根路徑）；service_role 讀根路徑回 200；anon 讀暫時建立的資料表回 200。
    - Studio 可以開啟。
    - 同一時間 tciam stack 的狀態不變（`docker compose ls` 顯示 running(17)）。
 
@@ -270,3 +284,21 @@
 | `@tiptap/static-renderer` 的 API 或體積不符需求 | spike 先行；不符時改用自建的 JSON → React 渲染器（約 150 行、零依賴） |
 | 共用渲染器與 tiptap `getHTML()` 的輸出有差異 | 第 4 項一致性測試把關 |
 | 舊 HTML 資料在轉換前被當作純文字顯示 | 上線前先執行轉換工具；PoC 資料量小 |
+
+## 12. 修訂紀錄
+
+**2026-10-09**：實作計畫在暫存 worktree 實測後，使用者核准以下 10 項與原規格不同的做法，本文件已就地修訂：
+
+1. `verify` 以 `audit:gate` 取代 raw `pnpm audit --prod`（§4 第 5、8 項）。
+2. tiptap 整組升到 3.31.4（§4 第 1、5 項）。
+3. demo 的 `dev`／`start` 只綁 `127.0.0.1`（§4 第 9 項）。
+4. 編輯器也把舊 HTML 字串當純文字（F1 第 5 點）。
+5. 渲染器不依欄位 `options` 過濾（F1 第 4 點）。
+6. `tiptap.extensions` 新增的型別不渲染、重新開啟編輯器時會被移除（F1 第 4 點）。
+7. 連結協定收緊為 `isSafeHref`（F1 第 4 點）。
+8. Supabase gateway 只綁 8200（§7）。
+9. anon key 讀 `/rest/v1/` 根路徑回 403（§9 第 12 項）。
+10. 刪除 `CODE_OF_CONDUCT.md`（§3.2）。
+
+其餘實作細節的差異（例如 F3 改用 `Object.fromEntries`、F4 以 `hasOwnProperty.call` 實作、F5 涵蓋的額外注入點、轉換入口的位置），也已同步寫入上文；完整清單見實作計畫開頭的「與規格的差異」。
+
