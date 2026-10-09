@@ -1,0 +1,65 @@
+# tceditor: compose override for the local Supabase dev stack (S1 spec §7).
+#
+# Layered on the vendored upstream docker-compose.yml (ref in .supabase-version):
+#   1. Compose project name "tceditor"; every service gets a tceditor-* container
+#      name, so nothing collides with the other Supabase stacks on this machine
+#      (tciam-*, tcdata-*, and the upstream default supabase-* names).
+#   2. Host ports bind to 127.0.0.1 only: API gateway (Envoy, also serves Studio)
+#      8200, Postgres through Supavisor (session mode) 5434, transaction pooler 6545.
+#   3. docker-compose.logs.yml (Logflare, Vector) is deliberately not used.
+#
+# Enabled by COMPOSE_FILE=docker-compose.yml:docker-compose.tceditor.yml in .env.
+# Operate the stack with infra/supabase/up.sh, down.sh and reset.sh.
+# Merge rule: compose merges environment/volumes key by key; `ports` needs
+# `!override` (Compose >= 2.24.4) to replace the base list instead of extending it.
+
+name: tceditor
+
+services:
+  studio:
+    container_name: tceditor-studio
+
+  api-gw:
+    container_name: tceditor-api-gw
+    ports: !override
+      - 127.0.0.1:${API_GW_HTTP_PORT:-8200}:8000/tcp
+
+  auth:
+    container_name: tceditor-auth
+
+  rest:
+    container_name: tceditor-rest
+
+  realtime:
+    container_name: tceditor-realtime
+    # Upstream names this container realtime-dev.supabase-realtime because Envoy
+    # (volumes/api/envoy/cds.yaml) connects to that host name and Realtime derives
+    # the tenant id from it. Keep the name reachable as a network alias; aliases
+    # only resolve inside tceditor_default, so they cannot clash with other stacks.
+    networks:
+      default:
+        aliases:
+          - realtime-dev.supabase-realtime
+
+  storage:
+    container_name: tceditor-storage
+
+  imgproxy:
+    container_name: tceditor-imgproxy
+
+  meta:
+    container_name: tceditor-meta
+
+  functions:
+    container_name: tceditor-functions
+
+  db:
+    container_name: tceditor-db
+
+  supavisor:
+    container_name: tceditor-supavisor
+    # POSTGRES_PORT stays 5432: the containers use it internally, so the host
+    # port for session mode gets its own variable (POSTGRES_HOST_PORT).
+    ports: !override
+      - 127.0.0.1:${POSTGRES_HOST_PORT:-5434}:5432
+      - 127.0.0.1:${POOLER_PROXY_PORT_TRANSACTION:-6545}:6543
