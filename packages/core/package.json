@@ -58,10 +58,10 @@
   "typesVersions": {
     "*": {
       "rsc": [
-        "./dist/rsc.js"
+        "./dist/rsc.d.ts"
       ],
       "richtext-migrate": [
-        "./dist/richtext-migrate.js"
+        "./dist/richtext-migrate.d.ts"
       ]
     }
   },
