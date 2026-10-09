@@ -88,6 +88,7 @@ export const Preview = ({ id = "puck-preview" }: { id?: string }) => {
   const iframe = useAppStore((s) => s.iframe);
   const overrides = useAppStore((s) => s.overrides);
   const metadata = useAppStore((s) => s.metadata);
+  const nonce = useAppStore((s) => s.nonce);
   const renderData = useAppStore((s) =>
     s.state.ui.previewMode === "edit" ? null : s.state.data
   );
@@ -133,6 +134,7 @@ export const Preview = ({ id = "puck-preview" }: { id?: string }) => {
           className={getClassName("frame")}
           data-rfd-iframe
           syncHostStyles={iframe.syncHostStyles}
+          nonce={nonce}
           onReady={() => {
             setStatus("READY");
           }}

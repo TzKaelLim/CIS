@@ -90,6 +90,14 @@ type PuckProps<
   metadata?: Metadata;
   dictionary?: Dictionary;
   height?: CSSProperties["height"];
+  /**
+   * CSP nonce set on the `<style>` elements the editor injects (its own
+   * styles, the preview iframe's styles, the drag-and-drop styles and the
+   * rich text editor's base styles), so it can run under a nonce-based
+   * `style-src` policy. Host styles mirrored into the preview iframe get it
+   * only if they already carry the same nonce.
+   */
+  nonce?: string;
   _experimentalFullScreenCanvas?: boolean;
   _experimentalVirtualization?: boolean;
 };
@@ -129,6 +137,7 @@ function PuckProvider<
     dictionary,
     onAction,
     fieldTransforms,
+    nonce,
     _experimentalFullScreenCanvas,
     _experimentalVirtualization,
   } = usePropsContext();
@@ -272,6 +281,7 @@ function PuckProvider<
         dictionary: dictionary || {},
         dnd,
         fieldTransforms: loadedFieldTransforms,
+        nonce,
       };
     },
     [
@@ -289,6 +299,7 @@ function PuckProvider<
       dictionary,
       dnd,
       loadedFieldTransforms,
+      nonce,
     ]
   );
 

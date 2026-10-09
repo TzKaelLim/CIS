@@ -1,4 +1,4 @@
-import { act, cleanup, render, screen } from "@testing-library/react";
+import { act, cleanup, render, screen, waitFor } from "@testing-library/react";
 import { Config, Plugin } from "../../../types";
 import "@testing-library/jest-dom";
 import {
@@ -324,6 +324,79 @@ describe("Puck", () => {
     expect(interactionStyle).not.toBeNull();
     expect(interactionStyle?.getAttribute(PUCK_STYLE_SOURCE_ATTRIBUTE)).toBe(
       PUCK_STYLE_SOURCE_VALUE
+    );
+  });
+
+  it("sets the nonce prop on the styles it injects into the document", async () => {
+    render(
+      <Puck config={config} data={{}} iframe={{ enabled: false }} nonce="abc" />
+    );
+
+    await flush();
+
+    const { appStore } = getInternal();
+
+    expect(appStore.getState().nonce).toBe("abc");
+
+    const injected = Array.from(
+      document.head.querySelectorAll(
+        `style[${PUCK_STYLE_SOURCE_ATTRIBUTE}="${PUCK_STYLE_SOURCE_VALUE}"]`
+      )
+    );
+
+    expect(injected).toHaveLength(1);
+    expect(injected.map((el) => el.getAttribute("nonce"))).toEqual(["abc"]);
+  });
+
+  it("does not add a nonce to injected styles without the nonce prop", async () => {
+    render(<Puck config={config} data={{}} iframe={{ enabled: false }} />);
+
+    await flush();
+
+    const injected = document.head.querySelectorAll(
+      `style[${PUCK_STYLE_SOURCE_ATTRIBUTE}="${PUCK_STYLE_SOURCE_VALUE}"]`
+    );
+
+    expect(injected).toHaveLength(1);
+    expect(document.head.querySelectorAll("[nonce]")).toHaveLength(0);
+  });
+
+  it("passes the nonce prop to the preview iframe", async () => {
+    const hostStyle = document.createElement("style");
+    hostStyle.setAttribute("data-test-style", "");
+    hostStyle.setAttribute("nonce", "abc");
+    hostStyle.textContent = ".host { color: red; }";
+    document.head.append(hostStyle);
+
+    render(<Puck config={config} data={{}} nonce="abc" />);
+
+    const frame = document.querySelector<HTMLIFrameElement>("#preview-frame");
+    const frameDoc = frame!.contentDocument!;
+
+    // jsdom ignores srcDoc, so create the mount node AutoFrame looks for
+    // before the frame's load event fires.
+    const root = frameDoc.createElement("div");
+    root.id = "frame-root";
+    frameDoc.body.append(root);
+
+    await waitFor(() =>
+      expect(getInternal().appStore.getState().status).toBe("READY")
+    );
+
+    expect(
+      frameDoc.head.querySelector(
+        `[${PUCK_STYLE_ID_ATTRIBUTE}="${PUCK_STYLE_IDS.iframeInteractions}"]`
+      )
+    ).not.toBeNull();
+    expect(
+      frameDoc.head.querySelector('[data-puck-style-mirror="true"]')
+        ?.textContent
+    ).toBe(".host { color: red; }");
+
+    const frameStyles = Array.from(frameDoc.head.querySelectorAll("style"));
+
+    expect(frameStyles.map((el) => el.getAttribute("nonce"))).toEqual(
+      frameStyles.map(() => "abc")
     );
   });
 

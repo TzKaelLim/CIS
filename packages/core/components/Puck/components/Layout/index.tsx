@@ -88,7 +88,9 @@ export const Layout = ({ children }: { children?: ReactNode }) => {
     [_iframe]
   );
 
-  useInjectUiCss();
+  const nonce = useAppStore((s) => s.nonce);
+
+  useInjectUiCss(nonce);
 
   const dispatch = useAppStore((s) => s.dispatch);
   const leftSideBarVisible = useAppStore((s) => s.state.ui.leftSideBarVisible);

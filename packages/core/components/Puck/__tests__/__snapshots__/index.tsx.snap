@@ -185,6 +185,7 @@ exports[`Puck should generate the correct state on mount 1`] = `
     "syncNodes": [Function],
     "unregisterNode": [Function],
   },
+  "nonce": undefined,
   "onAction": undefined,
   "overrides": {},
   "pendingLoadTimeouts": {},

@@ -93,6 +93,7 @@ export type AppStore<
   metadata: Metadata;
   dictionary: Dictionary;
   dnd?: DndConfig;
+  nonce?: string;
   fields: FieldsSlice;
   history: HistorySlice;
   nodes: NodesSlice;
