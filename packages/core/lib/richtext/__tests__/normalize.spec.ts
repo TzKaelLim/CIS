@@ -406,12 +406,9 @@ describe("normalizeRichText", () => {
       );
     });
 
-    it("defaults to RICHTEXT_MAX_DEPTH (100)", () => {
-      expect(RICHTEXT_MAX_DEPTH).toBe(100);
-
-      let node: RichTextNode | undefined = normalizeRichText(
-        deepBlockquotes(5000)
-      );
+    // Follows the chain of blockquotes that deepBlockquotes() builds.
+    const unwrapBlockquotes = (value: RichTextNode) => {
+      let node: RichTextNode | undefined = value;
       let blockquotes = 0;
 
       while (node?.content?.[0]?.type === "blockquote") {
@@ -419,8 +416,35 @@ describe("normalizeRichText", () => {
         node = node.content[0];
       }
 
-      expect(blockquotes).toBe(RICHTEXT_MAX_DEPTH);
-      expect(node?.content).toEqual([p(t("deep"))]);
+      return { blockquotes, innermost: node?.content };
+    };
+
+    it("defaults to RICHTEXT_MAX_DEPTH (100)", () => {
+      expect(RICHTEXT_MAX_DEPTH).toBe(100);
+
+      expect(
+        unwrapBlockquotes(normalizeRichText(deepBlockquotes(5000)))
+      ).toEqual({ blockquotes: RICHTEXT_MAX_DEPTH, innermost: [p(t("deep"))] });
+    });
+
+    it.each([NaN, Infinity, -1, 1e6])(
+      "never goes deeper than RICHTEXT_MAX_DEPTH when maxDepth is %p",
+      (maxDepth) => {
+        const normalize = () =>
+          normalizeRichText(deepBlockquotes(5000), { maxDepth });
+
+        expect(normalize).not.toThrow();
+        expect(unwrapBlockquotes(normalize())).toEqual({
+          blockquotes: RICHTEXT_MAX_DEPTH,
+          innermost: [p(t("deep"))],
+        });
+      }
+    );
+
+    it("does not overflow the stack on 100,000 levels when maxDepth is Infinity", () => {
+      expect(() =>
+        normalizeRichText(deepBlockquotes(100_000), { maxDepth: Infinity })
+      ).not.toThrow();
     });
 
     it("extracts the text of a very deep subtree without recursion", () => {

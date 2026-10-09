@@ -181,6 +181,14 @@ type Walk = {
   ancestors: Set<unknown>;
 };
 
+// normalizeNode recurses once per level, so the limit is what keeps it from
+// overflowing the stack. A caller can only lower it: anything that is not a
+// non-negative integer falls back to the default, and larger values are capped.
+const toMaxDepth = (value: unknown): number =>
+  typeof value === "number" && Number.isInteger(value) && value >= 0
+    ? Math.min(value, RICHTEXT_MAX_DEPTH)
+    : RICHTEXT_MAX_DEPTH;
+
 function normalizeChildren(
   value: unknown,
   context: Context,
@@ -336,6 +344,9 @@ function normalizeKnownNode(
  * - Attributes are checked one by one; invalid values fall back to defaults,
  *   and links with an unsafe href are removed.
  * - Nodes nested deeper than `maxDepth` are reduced to their text.
+ *   `maxDepth` defaults to RICHTEXT_MAX_DEPTH and can only be lowered: a
+ *   value that is not a non-negative integer is ignored, and a larger one is
+ *   capped at RICHTEXT_MAX_DEPTH.
  *
  * Valid editor output (editor.getJSON()) is returned unchanged.
  */
@@ -349,7 +360,7 @@ export function normalizeRichText(
 
   const isDoc = value.type === "doc";
   const walk: Walk = {
-    maxDepth: options.maxDepth ?? RICHTEXT_MAX_DEPTH,
+    maxDepth: toMaxDepth(options.maxDepth),
     ancestors: new Set(isDoc ? [value] : []),
   };
   const content = isDoc ? value.content : [value];
