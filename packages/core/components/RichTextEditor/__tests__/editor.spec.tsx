@@ -16,6 +16,14 @@ const p = (...content: RichTextNode[]): RichTextNode => ({
 const t = (text: string, marks?: RichTextNode["marks"]): RichTextNode =>
   marks ? { type: "text", marks, text } : { type: "text", text };
 
+/** The href of every link mark in a document, in document order. */
+const linkHrefs = (node: RichTextNode): unknown[] => [
+  ...(node.marks ?? [])
+    .filter((mark) => mark.type === "link")
+    .map((mark) => mark.attrs?.href),
+  ...(node.content ?? []).flatMap(linkHrefs),
+];
+
 /** Renders the editor and waits for Tiptap to load. */
 const renderEditor = async (
   content: EditorProps["content"],
@@ -174,5 +182,77 @@ describe("Editor", () => {
     expect(editor.isActive("link")).toBe(false);
     expect(editor.commands.setLink({ href: "https://example.com" })).toBe(true);
     expect(editor.isActive("link")).toBe(true);
+  });
+
+  it("only links pasted URLs that published pages keep", async () => {
+    const { editor } = await renderEditor(doc(p(t("word"))));
+
+    // Pastes a URL over a selected word, which linkOnPaste turns into a link
+    const pasteOverWord = (url: string) => {
+      editor.commands.setContent(doc(p(t("word"))));
+      editor.commands.setTextSelection({ from: 1, to: 5 });
+      // jsdom has no ClipboardEvent, which pasteText would create
+      editor.view.pasteText(url, new Event("paste") as ClipboardEvent);
+
+      return {
+        text: editor.getText(),
+        links: linkHrefs(editor.getJSON() as RichTextNode),
+      };
+    };
+
+    // Any other URL is pasted as plain text, like text that is not a URL
+    for (const url of [
+      "ftp://example.com",
+      "ftps://example.com",
+      "file:///etc/passwd",
+    ]) {
+      expect(pasteOverWord(url)).toEqual({ text: url, links: [] });
+    }
+
+    expect(pasteOverWord("https://example.com")).toEqual({
+      text: "word",
+      links: ["https://example.com"],
+    });
+    expect(pasteOverWord("example.com")).toEqual({
+      text: "word",
+      links: ["http://example.com"],
+    });
+  });
+
+  it("removes links with an href published pages drop, however they are added", async () => {
+    // With this default protocol, linkOnPaste builds "ftp://example.com" from
+    // "example.com", which no option that sees only the pasted text can catch
+    const { editor } = await renderEditor(doc(p(t("word"))), {
+      type: "richtext",
+      options: { link: { defaultProtocol: "ftp" } },
+    });
+    const links = () => linkHrefs(editor.getJSON() as RichTextNode);
+
+    editor.commands.setTextSelection({ from: 1, to: 5 });
+    editor.view.pasteText("example.com", new Event("paste") as ClipboardEvent);
+
+    expect(links()).toEqual([]);
+
+    // Commands other than setLink do not check the href
+    editor.commands.setTextSelection({ from: 1, to: 5 });
+    editor.commands.setMark("link", { href: "ftp://example.com" });
+
+    expect(links()).toEqual([]);
+
+    editor.commands.insertContentAt(editor.state.doc.content.size - 1, [
+      {
+        type: "text",
+        text: " script",
+        marks: [{ type: "link", attrs: { href: "javascript:alert(1)" } }],
+      },
+      {
+        type: "text",
+        text: " safe",
+        marks: [{ type: "link", attrs: { href: "https://example.com" } }],
+      },
+    ]);
+
+    expect(editor.getText()).toBe("word script safe");
+    expect(links()).toEqual(["https://example.com"]);
   });
 });

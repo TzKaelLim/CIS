@@ -38,7 +38,50 @@ import { Text } from "@tiptap/extension-text";
 import TextAlign, { TextAlignOptions } from "@tiptap/extension-text-align";
 import type { UnderlineOptions } from "@tiptap/extension-underline";
 import { Underline } from "@tiptap/extension-underline";
+import { Plugin, PluginKey } from "@tiptap/pm/state";
 import { isSafeHref } from "../../lib/richtext/is-safe-href";
+
+/**
+ * Link that also removes every link mark whose href fails isSafeHref after
+ * each change, because published pages drop those links. isAllowedUri and
+ * shouldAutoLink only see the URL as written, not the href that autolink,
+ * paste rules and linkOnPaste build from it with `defaultProtocol`, and
+ * commands such as setMark or insertContent never check the href at all.
+ */
+const SafeLink = Link.extend({
+  addProseMirrorPlugins() {
+    const linkType = this.type;
+
+    return [
+      ...(this.parent?.() ?? []),
+      new Plugin({
+        key: new PluginKey("puckSafeLink"),
+        appendTransaction: (transactions, _oldState, newState) => {
+          if (!transactions.some((transaction) => transaction.docChanged)) {
+            return null;
+          }
+
+          const { tr } = newState;
+
+          newState.doc.descendants((node, pos) => {
+            if (!node.isInline) return;
+
+            for (const mark of node.marks) {
+              if (mark.type === linkType && !isSafeHref(mark.attrs.href)) {
+                tr.removeMark(pos, pos + node.nodeSize, mark);
+              }
+            }
+          });
+
+          if (!tr.docChanged) return null;
+
+          // Keeps the autolink plugin from linking the same text again
+          return tr.setMeta("preventAutolink", true);
+        },
+      }),
+    ];
+  },
+});
 
 export interface PuckRichTextOptions {
   /**
@@ -229,7 +272,7 @@ export const PuckRichText = Extension.create<PuckRichTextOptions>({
       const linkOptions = options.link ?? {};
 
       extensions.push(
-        Link.configure({
+        SafeLink.configure({
           ...linkOptions,
           // Published pages only keep links that pass isSafeHref, so the
           // editor must not create any other link (typed, pasted or parsed)
@@ -238,6 +281,11 @@ export const PuckRichText = Extension.create<PuckRichTextOptions>({
             (linkOptions.isAllowedUri
               ? linkOptions.isAllowedUri(url, context)
               : context.defaultValidate(url)),
+          // linkOnPaste, which links the selected text when a URL is pasted
+          // over it, only consults shouldAutoLink and never isAllowedUri
+          shouldAutoLink: (url) =>
+            isSafeHref(url) &&
+            (linkOptions.shouldAutoLink ?? Link.options.shouldAutoLink)(url),
         })
       );
     }
