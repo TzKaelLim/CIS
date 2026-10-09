@@ -1,6 +1,17 @@
 # CHANGELOG
 
-<!--__CHANGELOG_ENTRY__-->
+## tceditor 0.1.0 (unreleased)
+
+tceditor is a fork of [Puck](https://github.com/puckeditor/puck) v0.23.0 (git tag `v0.23.0`, commit `b4204f09`), and its versions restart at 0.1.0. Everything from the `0.23.0` section down is Puck's upstream changelog, kept unchanged for reference.
+
+### Changes from Puck v0.23.0
+
+* rename the packages to `@tzuchi/tceditor` and `@tzuchi/tceditor-plugin-heading-analyzer` so they cannot be confused with Puck's npm packages, and mark both `private` because they are not published to a registry yet; public API names such as `<Puck>`, `usePuck` and `Config` are unchanged
+* add a `NOTICE` file and ship `LICENSE` and `NOTICE` in both packages
+* switch the monorepo from yarn 1 to pnpm and add `pnpm verify`
+* remove the upstream recipes, `create-puck-app`, `field-contentful`, `plugin-emotion-cache`, the GitHub workflows and the npm release tooling
+* remove the Plausible analytics from the demo
+* upgrade the tiptap packages to 3.31.4 (GHSA-j95f-988m-3j2f, GHSA-cp6q-959q-f8rh, GHSA-c8x8-7fp4-3x9w)
 
 ## [0.23.0](/compare/v0.22.4...v0.23.0) (2026-08-07)
 
