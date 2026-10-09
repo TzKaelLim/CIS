@@ -71,7 +71,9 @@
     "prepare": "pnpm build"
   },
   "files": [
-    "dist"
+    "dist",
+    "LICENSE",
+    "NOTICE"
   ],
   "devDependencies": {
     "@juggle/resize-observer": "^3.4.0",

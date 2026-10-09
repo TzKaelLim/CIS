@@ -1,0 +1,13 @@
+tceditor
+
+tceditor is a modified version of Puck, the open-source visual editor for
+React (https://github.com/puckeditor/puck). It was forked from Puck release
+v0.23.0 (git tag v0.23.0, commit b4204f09).
+
+Puck is distributed under the MIT License:
+
+    Copyright (c) The Puck Contributors.
+
+The full text of that license is in the LICENSE file that accompanies this
+notice. It covers the Puck source code and the changes made in tceditor,
+which are distributed under the same MIT License.

@@ -20,7 +20,9 @@
     "prepare": "pnpm build"
   },
   "files": [
-    "dist"
+    "dist",
+    "LICENSE",
+    "NOTICE"
   ],
   "devDependencies": {
     "@tzuchi/tceditor": "workspace:*",

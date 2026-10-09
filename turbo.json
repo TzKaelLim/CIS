@@ -9,6 +9,16 @@
     },
     "lint": {},
     "test": {},
+    "@tzuchi/tceditor#test": {
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/LICENSE",
+        "$TURBO_ROOT$/NOTICE",
+        "$TURBO_ROOT$/packages/plugin-heading-analyzer/package.json",
+        "$TURBO_ROOT$/packages/plugin-heading-analyzer/LICENSE",
+        "$TURBO_ROOT$/packages/plugin-heading-analyzer/NOTICE"
+      ]
+    },
     "dev": {
       "cache": false,
       "persistent": true
