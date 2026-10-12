@@ -28,19 +28,21 @@
 | # | 子專案 | 範圍 | 依賴 | 狀態 |
 |---|---|---|---|---|
 | S1 | Fork 基線與開發基礎設施 | 建立 fork 分支、改名為 tceditor、yarn 改 pnpm、移除不需要的套件、函式庫層資安修補（含 richtext 改為 JSON 與共用渲染器）、自架 Supabase 開發環境 | — | 規格見 `2026-10-08-s1-fork-baseline-design.md` |
-| S2 | 元件規格（唯一 schema） | 從 schema 產生 Puck fields、Storybook argTypes、JSON Schema 或 zod 驗證器、MCP 元件目錄 | S1 | 待 brainstorm |
+| S2 | 元件規格（唯一 schema） | 以 zod 為唯一來源，產生 Puck fields、Storybook stories、MCP 元件目錄與整頁驗證器；8 個示範區塊（uikit HeroUI 線）與示範站 | S1 | 規格見 `2026-10-12-s2-block-spec-design.md` |
 | S3 | Supabase 後端 | 驗證與授權、RLS、頁面與版本、草稿、審核狀態機、媒體庫、寫入 API（伺服器端以 schema 驗證） | S1、S2 | 待 brainstorm |
 | S4 | MCP server | 以 S3 的 API 與 S2 的 schema 為基礎；LLM 只能建立草稿，發佈必須經過人工 | S2、S3 | 待 brainstorm |
 | S5 | 編輯器效能 | 權限 slice 的全樹走訪、增量索引、history 改存 patch、虛擬化正式化。目標規模待定 | S1，可與 S3 並行 | 待 brainstorm |
 | S6 | 大型依賴替換 | `@dnd-kit` 0.4→0.5+、jest 改 vitest（`happy-dom` 的替換已提前在 S1 的 F1 完成） | S1，要先有 E2E 測試保護 | 待 brainstorm |
+| S7 | 編輯器視覺改版 | 只改編輯器的視覺：`--puck-*` CSS 變數對應慈濟 tokens、字型、必要時用 overrides 調整元件外觀；操作流程不變 | S2 | 待 brainstorm |
 
 ## 4. 各子專案待回答的問題（到該子專案時再問）
 
-- **S2**：schema 放在 tzuchi-uikit 還是 fork repo？React 層用 HeroUI 元件，還是用 `tc-*` Web Components 的 React wrapper？
+- **S2**：已回答（2026-10-10 至 10-12）。區塊與規格全部放在 tceditor；畫面用 tzuchi uikit 的 HeroUI 線。其餘決定見 S2 規格第 2 節。
 - **S3**：
   - 誰會使用編輯器：A 少數內部專職人員；B 多單位、多站台、需要審核；C 志工或外部投稿者。
   - 是否以 tciam 作為 SSO？
   - 審核需要幾個關卡？
 - **S4**：MCP 的使用端是誰（Claude Code、Claude Desktop、其他代理）？需要哪些工具？要不要預覽截圖？
 - **S5**：實際頁面規模的上限，以及效能目標（例如 5,000 個節點時開啟編輯器 < 2 s）。
-- **共通**：fork 的遠端與 CI 要放在哪裡（GitLab？）？版本如何發佈給 tzuchi-uikit 使用（workspace link 或私有 registry）？
+- **S7**：介面文字要不要同時改成中文（`dictionary`）？要不要打包 Noto Sans TC 字型？
+- **共通**：fork 的遠端與 CI 要放在哪裡（GitLab？）？uikit 套件的取用方式：S2 期間從本機 uikit repo 複製指定 commit 的快照（`vendor/uikit`），S3 部署前改用 GitLab Package Registry。
