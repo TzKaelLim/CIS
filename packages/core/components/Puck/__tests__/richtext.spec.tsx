@@ -152,7 +152,7 @@ describe("Puck - richtext programmatic updates", () => {
     expect(screen.queryByText("Hello world")).not.toBeInTheDocument();
   });
 
-  it("updates the preview when a contentEditable richtext field is changed via dispatch", async () => {
+  it("updates the preview when a richtext field without contentEditable is changed via dispatch", async () => {
     const config: Config = {
       components: {
         RichTextBlock: {
@@ -195,6 +195,10 @@ describe("Puck - richtext programmatic updates", () => {
       expect(screen.getByText("Updated content")).toBeInTheDocument();
     });
     expect(screen.queryByText("Hello world")).not.toBeInTheDocument();
+    // Without contentEditable the canvas shows static content, not an editor
+    expect(
+      screen.getByTestId("richtext-output").querySelector(".ProseMirror")
+    ).toBeNull();
   });
 
   it("updates richtext when value transitions from empty string to content", async () => {

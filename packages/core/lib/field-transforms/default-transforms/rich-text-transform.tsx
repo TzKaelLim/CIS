@@ -137,8 +137,9 @@ InlineEditorWrapper.displayName = "InlineEditorWrapper";
 
 export const getRichTextTransform = (): FieldTransforms => ({
   richtext: ({ value, componentId, field, propPath, isReadOnly }) => {
-    const { contentEditable = true, tiptap } = field;
-    if (contentEditable === false || isReadOnly) {
+    // Unset means false, as in the field docs and InlineEditorWrapper: only
+    // `contentEditable: true` puts an inline editor on the canvas
+    if (!field.contentEditable || isReadOnly) {
       return <RichTextContent content={value} />;
     }
 

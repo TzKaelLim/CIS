@@ -100,6 +100,8 @@ export function Page({ data }: { data: Data }) {
   const converted = migrateRichTextInData(data, config);
   ```
 
+  只由 `resolveFields` 加入的 richtext 欄位不在 `config` 的靜態 `fields` 裡，預設會略過。要轉換這些欄位，傳入第三個參數 `{ getFields }`：一個同步函式，對 root（`isRoot: true`）與每個元件（`isRoot: false`）各呼叫一次，回傳該項目的欄位；回傳 `undefined` 則沿用 `config` 的 `fields`。`getFields` 不能是非同步函式（回傳 Promise 會拋錯），也會收到 `config` 沒登記的類型，查設定時要用 own-key 檢查。
+
 ## 開發環境
 
 需求：
