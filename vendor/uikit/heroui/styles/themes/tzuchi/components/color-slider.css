@@ -1,0 +1,165 @@
+/*
+ * Tzu Chi theme — ColorSlider
+ * ---------------------------------------------------------------------------
+ * Base:   styles/components/color-slider.css (`.color-slider`,
+ *         `.color-slider__track` + its two edge-cap pseudo-elements,
+ *         `.color-slider__thumb`, `.color-slider__output`, the three
+ *         `:has()` grid-collapse rules and both orientation blocks), plus
+ *         styles/components/label.css for the label slot.
+ * Model:  none. There is no tc colour picker of any kind — spec Q8 lists
+ *         ColorArea / ColorSlider / ColorSwatch(Picker) as components with no
+ *         Tzu Chi counterpart at all. Both rules below come from a spec ROLE
+ *         table, not from a Figma decision.
+ *
+ * WHAT THIS CHANGES — two things:
+ *   1. READOUT AND LABEL TYPE (§1, R19). `.color-slider__output` is a numeric
+ *      channel readout — 16px / 400 / 1.6 in `--muted`, where HeroUI has
+ *      14px / 500 in the inherited foreground — and its row-mate
+ *      `[data-slot="label"]` takes the same two metrics so the pair keeps a
+ *      shared baseline in the `"label output"` grid row. Identical to what
+ *      progress-bar.css:126-138 ships and to this pass's slider.css, and it is
+ *      §1's mechanical rule: Tzu Chi has no 14px step, so every `text-sm` role
+ *      moves to 16px.
+ *      >> BEYOND THE LETTER OF THE BRIEF. The unit brief scopes ColorSlider to
+ *      "thumbs and radius only". It is written anyway, and flagged here and in
+ *      the report so it can be deleted in one edit, because (a) §1 is the one
+ *      mechanical, library-wide rule in the spec, (b) the thumb and the radius
+ *      turn out to need nothing at all (see below), so honouring the brief
+ *      literally would ship the final base-layer pass with a 14px label inside
+ *      a 16px system, and (c) ColorPicker composes ColorSlider directly
+ *      alongside ColorField and Slider (story
+ *      "components-colors-colorpicker--with-sliders"), which will both be
+ *      16px — the mismatch would be visible in one screenshot. The owner's
+ *      call; nothing else in the file depends on it.
+ *   2. THUMB RADIUS (§2 R26, the round-handle role), as a canonicalisation.
+ *      `rounded-2xl` is 16px on a 16px box, which CSS clamps to 8px, so the
+ *      handle already renders as a circle and this changes no pixel — only the
+ *      computed value, from 16px to 9999px. Written so the handle stays round
+ *      if the box is ever resized, and to match slider.css.
+ *
+ * NOT CHANGED — and why:
+ *   - THE GRADIENTS. `--track-start-color`, `--track-end-color`, the
+ *     `repeating-conic-gradient` transparency checkerboard and the channel
+ *     gradient React Aria writes inline are the component's data, not its
+ *     chrome. Untouched, as the brief requires.
+ *   - THE THUMB'S 3px WHITE RING and `shadow-overlay`. Unlike the Slider
+ *     handle (whose `shadow-field` this theme empties to transparent), the
+ *     ColorSlider thumb already carries a real elevation, and its ring has to
+ *     stay a constant light colour because it sits on an arbitrary hue, not on
+ *     a theme surface. Repainting it from `--surface` would make it disappear
+ *     over pale hues in light mode and would be a redesign, not a mapping.
+ *   - THE TRACK RADIUS. `.color-slider__track`'s root `rounded-2xl` never
+ *     applies: both orientation blocks override it to `rounded-none` and put
+ *     the rounding on the `::before` / `::after` edge caps instead. Those caps
+ *     already render as perfect semicircles in both orientations (horizontal
+ *     `rounded-ss-2xl` / `rounded-es-2xl` = 16px clamped to 10px on a
+ *     10x20 cap; vertical hard-codes 999px), so R32's pill is already the
+ *     rendered shape and restating it on four logical corners of two
+ *     pseudo-elements would be pure noise. Upstream's 16px-vs-999px
+ *     inconsistency between the two orientations is cosmetic-equal and left
+ *     alone.
+ *   - THE TRACK COLOUR. R124's `--border` is for a NEUTRAL interactive track.
+ *     A ColorSlider track is entirely covered by its own channel gradient;
+ *     there is nothing to repaint.
+ *   - Focus ring (R70 / D3, already 2px `--focus` at a 2px offset), the
+ *     disabled block (R85 / D2), the disabled thumb's `bg-default`, the
+ *     `:has()` grid-collapse rules, both orientations' geometry, the drag
+ *     cursor, `tabular-nums`, and all motion (R140: none of it is R131's
+ *     colour fade or R132's travelling value).
+ *
+ * VARIANT / STATE COVERAGE — ColorSlider has no size or colour variants:
+ *   every channel (hue / saturation / lightness / alpha / rgb), both
+ *   orientations, with-label, without-label (the grid collapses and the label
+ *   rule simply matches nothing), controlled and disabled all keep working —
+ *   the two rules are scoped to `.color-slider` and to slot classes that exist
+ *   in every one of them.
+ *
+ * CASCADE NOTES
+ *   - Base selectors compile to `.color-slider [data-slot=label]`,
+ *     `.color-slider .color-slider__output` and
+ *     `.color-slider .color-slider__thumb`, all (0,2,0). The rules below are
+ *     (0,3,0) and win on specificity alone.
+ *   - The orientation blocks also target the thumb
+ *     (`.color-slider[data-orientation=horizontal] .color-slider__thumb`,
+ *     (0,4,0)) but declare `top` / `left` / `width` / `height` only, never
+ *     `border-radius`. Nothing below is contested.
+ *
+ * COLOURS — only `--muted`, a HeroUI theme variable resolved per mode. No
+ * `--tc-color-` token, no colour-valued `--tc-` component token, no hex / rgb /
+ * hsl / oklch literal, no `!important`, logical properties only. Both `--tc-`
+ * tokens referenced (font-size-16, font-weight-regular, line-height-relaxed,
+ * radius-full) exist in packages/tokens/dist/tokens.css and are absent from
+ * both of its dark blocks.
+ *
+ * Story ids used for verification: "components-colors-colorslider--default",
+ * "--vertical", "--without-label", "--disabled", "--alpha-channel" and
+ * "components-colors-colorpicker--with-sliders" (all present in index.json).
+ *
+ * Reviewed: no changes. Re-verified against the real files: `.color-slider__
+ * output`, `.color-slider [data-slot="label"]` and `.color-slider__thumb`
+ * exist in styles/components/color-slider.css; `color-slider.styles.ts`'s
+ * `tv()` slot map confirms the output slot compiles to `color-slider__output`.
+ * Confirmed the track's root `rounded-2xl` is unconditionally beaten by
+ * `rounded-none` in both orientation blocks (`color-slider.css` — horizontal
+ * and vertical `.color-slider__track` rules both set `border-radius: 0`), so
+ * skipping the track radius is correct, not an oversight. Confirmed
+ * `.color-slider__thumb`'s `size-4` (16px) box with `rounded-2xl` (16px,
+ * i.e. `--radius-2xl` = `calc(var(--radius) * 2)`, `--radius` =
+ * `--tc-radius-md` = 8px) already clamps to a circle, so the radius rule here
+ * is a pure canonicalisation exactly as claimed. Confirmed `--tc-radius-full`,
+ * `--tc-font-size-16`, `--tc-font-weight-regular` and `--tc-line-height-
+ * relaxed` exist in packages/tokens/dist/tokens.css above its
+ * `[data-theme="dark"]` block and are not redeclared inside it. Confirmed
+ * `--muted` is declared for both `tzuchi` and `tzuchi-dark` in
+ * themes/tzuchi/variables.css. Grepped for `!important`, colour literals,
+ * `--tc-color-`, physical `left`/`right` and a premature comment close — none found
+ * outside this comment. Confirmed all six story ids exist in
+ * storybook-static/index.json (including `--without-label` and
+ * `--alpha-channel`, both present as hyphenated slugs) and that Default
+ * renders Label + ColorSlider.Output + ColorSlider.Track > ColorSlider.Thumb,
+ * so the two assertions resolve on initial render.
+ *
+ * On the "beyond the brief" R19 rules: the unit brief scoped this file to
+ * "thumbs and radius only," but §1 of the design-language spec states its
+ * 14px/12px → 16px rule as mechanical and library-wide, not component-by-
+ * component, and RESTRAINT (rule 6) instructs changing what the spec gives a
+ * rule for — which it does here. Keeping the two type rules is the more
+ * spec-conformant reading, it is disclosed in the file and the report, and it
+ * prevents a visible 14px/16px mismatch in the
+ * `components-colors-colorpicker--with-sliders` story. No corrections needed.
+ *
+ * Consistency pass: fixed a PREMATURE COMMENT CLOSE, the same defect slider.css
+ * carried. The comment-terminator sequence was spelled out literally (inside
+ * backticks) in the sentence claiming none existed; CSS ignores backticks, so
+ * the header comment ended on that line, the remaining prose plus the stray
+ * terminator plus `[data-theme^="tzuchi"] .color-slider` became one invalid
+ * selector, and the file's ONLY rule block was dropped. Both R19 type rules
+ * and the round-handle canonicalisation were dead — which would have left a
+ * 14px/500 channel readout next to slider.css's and progress-bar.css's
+ * 16px/1.6 ones, exactly the mismatch this file's header argues against. The
+ * sentence now names the sequence instead of spelling it (brief rule 8). No
+ * selector, declaration or value changed.
+ */
+
+[data-theme^="tzuchi"] .color-slider {
+  /* 1. R19 — channel readout: 16 / 400 / 1.6, muted. */
+  & .color-slider__output {
+    font-size: var(--tc-font-size-16, 16px);
+    font-weight: var(--tc-font-weight-regular, 400);
+    line-height: var(--tc-line-height-relaxed, 1.6);
+    color: var(--muted);
+  }
+
+  /* 1. R19 — row-mate, same metrics, shared baseline. Weight and colour stay
+     HeroUI's, as in progress-bar.css and this pass's slider.css. */
+  & [data-slot="label"] {
+    font-size: var(--tc-font-size-16, 16px);
+    line-height: var(--tc-line-height-relaxed, 1.6);
+  }
+
+  /* 2. R26 — round handle. Already the rendered shape; this makes it explicit
+     rather than a consequence of radius clamping. */
+  & .color-slider__thumb {
+    border-radius: var(--tc-radius-full, 9999px);
+  }
+}

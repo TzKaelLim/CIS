@@ -1,0 +1,28 @@
+{
+  "list-panel": {
+    "header-bg": {
+      "$type": "color",
+      "$value": "{color.brand.primary}"
+    },
+    "header-fg": {
+      "$type": "color",
+      "$value": "{color.text.on-brand}"
+    },
+    "bg": {
+      "$type": "color",
+      "$value": "{color.surface.default}"
+    },
+    "radius": {
+      "$type": "dimension",
+      "$value": "{radius.lg}"
+    },
+    "divider": {
+      "$type": "color",
+      "$value": "{color.border.default}"
+    },
+    "border": {
+      "$type": "color",
+      "$value": "{color.border.default}"
+    }
+  }
+}

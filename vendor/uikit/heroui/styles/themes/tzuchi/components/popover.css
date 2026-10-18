@@ -1,0 +1,90 @@
+/*
+ * Popover — Tzu Chi theme overrides
+ * =================================
+ * Scoped to [data-theme^="tzuchi"]; loaded into @layer components AFTER
+ * heroui/styles/components/popover.css, so upstream's own light / dark themes are untouched.
+ * HeroUI's markup, slots, class names, placements, arrow and every state keep working —
+ * only the shell radius and the type scale change.
+ *
+ * SCOPE — this file owns ONLY the generic CONTENT popover: .popover, .popover__dialog,
+ * .popover__heading, .popover__trigger. Select / Dropdown / ComboBox / Autocomplete render
+ * their own shells (`select__popover`, `dropdown__popover`, `combo-box__popover`,
+ * `autocomplete__popover` — their slot maps in styles/src/components/<name>/<name>.styles.ts
+ * never include the `popover` base class), so nothing here can reach an option-list panel.
+ * Those are §6(a) and belong to other files.
+ *
+ * WHAT THIS CHANGES
+ *   shell radius   min(32px, --radius-3xl) = 24px   ->  16px  (--tc-card-radius)   [§6(b) R98 / R30]
+ *   body type      text-sm = 14px / 20px            ->  16px / 1.6 (typography.body)
+ *                                                                                 [§6(b) R101 -> R5]
+ *   heading type   inherits 14px, font-medium (500) ->  16px / 700 / 1.5           [§6(b) R101 -> R11]
+ *
+ * WHY the surface shape and not the option-panel shape: §6(b) is an explicit DECISION — the two
+ * nearest Tzu Chi shells (tc-card.styles.ts:8 and tc-modal.styles.ts:21) both land on
+ * --tc-radius-lg (16px) on a plain surface. The dropdown's 8px corner is earned by its rows
+ * running edge-to-edge; a content popover pads its content, so that argument does not apply.
+ * (Recorded as open question Q7 — the competing reading is "every floating panel is 8px".)
+ *
+ * KEPT AS HEROUI'S, deliberately
+ *   · background --overlay and the --overlay-shadow elevation (R99, R100) — no tint: the
+ *     --accent-soft wash is tc-dropdown's LISTBOX signature, and body copy was never
+ *     contrast-checked against it.
+ *   · the arrow, which follows that untinted fill (base `fill: var(--overlay)`) and its
+ *     per-placement rotation.
+ *   · .popover__dialog's 16px padding (R102 — p-4 already IS the card / alert / accordion-panel
+ *     inset) and its outline-none.
+ *   · enter / exit animation, the placement slide-ins, transform-origin and anchor positioning.
+ *     §6(d) R116 keeps HeroUI's motion for the tooltip, the nearest anchored overlay; §8 R140
+ *     forbids new choreography; the base's `transition-[opacity,transform]` is a positional list
+ *     (R138) that must not be half-restated. R133's 200ms enter retune was applied to the Modal
+ *     only — see the report's "spec gaps".
+ *   · .popover__trigger entirely: its 150ms transitions carry no themed colour change, its focus
+ *     ring is already 2px / 2px / --focus theme-wide (D3) and its disabled state is
+ *     --disabled-opacity 0.38 (D2).
+ *   · text colour: the base sets none, so it inherits --foreground, which is byte-identical to
+ *     --overlay-foreground under both tzuchi and tzuchi-dark. Nothing to restate (N5 / D1).
+ *
+ * CASCADE — base .popover / .popover__heading are (0,1,0); both rules below are (0,2,0) and win
+ * on specificity alone, independent of import order. Neither selector is touched by any other
+ * Tzu Chi override file.
+ *
+ * COLOUR — this file declares no colour at all, so N2 cannot be violated: every value is a
+ * mode-independent dimension token with a fallback (N3).
+ *
+ * Reviewed: no changes. Verified against the live sources — popover.styles.ts confirms `.popover`
+ * is the generic-popover slot only (select/dropdown/combo-box/autocomplete map their own
+ * `*__popover` classes and never emit `popover`); popover.css:4-99 confirms the base specificities
+ * and the kept declarations (arrow fill, dialog padding, trigger, motion); tokens.css confirms
+ * --tc-card-radius, --tc-font-size-16, --tc-line-height-relaxed/-normal and --tc-font-weight-bold
+ * exist and are not redefined in either dark block; grep over themes/tzuchi/components/ confirms no
+ * sibling file touches .popover or .popover__heading; the Default story (popover.stories.tsx:54-65)
+ * renders a clickable trigger + Popover.Heading, so both assertions' selectors exist and resolve to
+ * the stated computed values. No colour literal, no !important, no physical left/right, both rules
+ * scoped to [data-theme^="tzuchi"], no comment prematurely closed.
+ */
+
+/* Shell — the Card / Modal surface radius (§6(b) R98). */
+[data-theme^="tzuchi"] .popover {
+  border-radius: var(--tc-card-radius, var(--radius-2xl));
+
+  /*
+   * Body type for everything the dialog holds. Tzu Chi has no 14px step (§1), and a popover's
+   * content is read as prose, so it takes the `body` voice: 16px / 400 / 1.6 (§1.2, R5).
+   * Longhands rather than the `font` shorthand so the inherited --font-sans is not clobbered;
+   * the weight is left to inherit (400), exactly as the base leaves it.
+   */
+  font-size: var(--tc-font-size-16, 16px);
+  line-height: var(--tc-line-height-relaxed, 1.6);
+}
+
+/*
+ * Heading — an overlay title is a control voice, not prose: 16px / 700 / 1.5 (R11, §1.2).
+ * The base only sets `font-medium` and lets the size inherit, so the size and line-height are
+ * stated here too: this is the role declaration, and it keeps the heading at a 24px line box
+ * instead of inheriting the 1.6 prose leading from the shell rule above.
+ */
+[data-theme^="tzuchi"] .popover__heading {
+  font-size: var(--tc-font-size-16, 16px);
+  font-weight: var(--tc-font-weight-bold, 700);
+  line-height: var(--tc-line-height-normal, 1.5);
+}

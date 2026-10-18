@@ -1,0 +1,226 @@
+/*
+ * Toast — Tzu Chi theme overrides
+ * ===============================
+ * Scoped to [data-theme^="tzuchi"]; loaded into @layer components AFTER
+ * heroui/styles/components/toast.css, so upstream's own light / dark themes are untouched.
+ * Every HeroUI variant (default · accent · success · warning · danger), every placement
+ * (top / bottom × start / centre / end), every state (entering, exiting, expanded, frontmost,
+ * hidden, swapped) and the whole stacking model keep working.
+ *
+ * WHICH FAMILY IT FOLLOWS — §6(d)'s explicit DECISION: Toast follows the CARD / MODAL SURFACE,
+ * not the tooltip inversion. A toast is a persistent, dismissible, multi-line message with an
+ * action and a close button, i.e. structurally tc-alert / tc-card, not a 240px hint bubble;
+ * HeroUI already treats it that way (base paints `bg-surface … shadow-overlay` and uses the
+ * card / modal radius expression). There is no `tc-toast` — this is derived, see Q6.
+ *
+ * WHAT THIS CHANGES
+ *   shell radius   min(32px, --radius-3xl) = 24px  ->  16px (--tc-card-radius)    [R117 / R27]
+ *   shell gap      gap-1.5 = 6px                   ->  8px (--tc-space-8)         [§9 R147]
+ *   title          text-sm leading-5 font-medium
+ *                  = 14px / 20px / 500             ->  16px / 700 / 1.5           [R119 -> R1/R11]
+ *   description    text-sm text-muted
+ *                  = 14px / 20px in --muted        ->  16px / 1.6 in --foreground  [R119 -> R5]
+ *   title/desc gap none                            ->  4px (--tc-space-4)         [§9 R148]
+ *   indicator tone the -soft-foreground mix        ->  the raw tone, via one local
+ *                  (and, for `accent`, no tone
+ *                   at all — upstream sets an
+ *                   indicator colour for success /
+ *                   warning / danger only)             channel on the root         [R120 / R87 / R121]
+ *
+ * TONE CHANNEL — R87's two-channel pattern collapses to ONE channel here, because R118 keeps the
+ * neutral --surface fill (a toast has no tone wash and no tc-alert stripe to paint). So only
+ * `--toast-accent` exists; it defaults to the exact colour upstream already gives the indicator
+ * (--overlay-foreground) so `default` is untouched, and the four toned variants flip it. Same
+ * local-custom-property shape as alert.css's --alert-accent / --alert-surface; it is NOT a new
+ * --tzuchi-* theme variable and needs no generate.mjs change.
+ *
+ * KEPT AS HEROUI'S, deliberately
+ *   · background (bg-surface) and elevation (shadow-overlay) — R118; the shadow rule in §6 says
+ *     a floating overlay uses --overlay-shadow, which is exactly what the base applies, and dark
+ *     mode's fall-through to the 1px inset hairline is intentional ("do not fix it per
+ *     component").
+ *   · THE INDICATOR'S SIZE. R120 asks for a 20px leading icon, but R122 / §1.3 pin the toast
+ *     indicator to 16px and forbid breaking spinner.css:106-113, which restates
+ *     `.toast__indicator .spinner { 1rem }` precisely so the theme's 20/32/40 spinner scale
+ *     cannot grow it. The default icon and the loading spinner alternate in the SAME slot (a
+ *     promise toast swaps one for the other), so growing only the icon would make that swap jump
+ *     4px. 16px on both is the conservative, self-consistent reading — flagged in the report.
+ *     The indicator's own p-1 padding is left alone for the same reason.
+ *   · THE PER-STATUS TITLE COLOURS (--accent/--success/--warning/--danger-soft-foreground).
+ *     R119 re-types the title but gives it no colour, and unlike tc-alert — which carries the
+ *     tone in a 4px stripe AND a soft wash, and could therefore neutralise its words — a toast
+ *     has neither, so the title is the tone's second carrier. Left as upstream's; flagged.
+ *   · the close button in full (D8: `.close-button` is shared with drawer / popover /
+ *     alert-dialog; §1.3 keeps its 16px glyph), its reveal-on-hover and its bg-default chip.
+ *   · the action button (it is a `Button`, already themed by button.css) and its mt-2 sm:mt-0.
+ *   · px-4 / py-3 padding: §6(d) prescribes none for the toast and the values are already on the
+ *     Tzu Chi 4px rhythm (16 / 12 = --tc-space-16 / --tc-space-12).
+ *   · EVERY piece of motion and choreography: the enter / exit / collapse transitions and their
+ *     --toast-ease, the 350 / 250 / 200 / 150ms tokens, the stacking offsets and scale factors,
+ *     the `data-expanded` hit-area ::after, the swipe model, the indicator swap keyframes, and
+ *     both motion-reduce guards. §8 R140 forbids new choreography, R136 forbids touching
+ *     `transition-property` / `animation-name`, and the base's `transition` shorthand is a
+ *     positional list (R138) that must not be half-restated.
+ *   · .toast-region entirely (placement, width, z-index and its focus ring — D3 / D32).
+ *
+ * COLOURS come only from HeroUI theme variables (--overlay-foreground, --foreground, --accent,
+ * --success, --warning, --danger), so tzuchi-dark resolves to dark values. No --tc-color-* token,
+ * no colour-valued component token, no hex / rgb / hsl / oklch literal. --foreground and
+ * --overlay-foreground resolve to the same primitive (gray-900 light / gray-100 dark) in this
+ * theme, so the description matches the default title exactly while following R119's wording.
+ *
+ * CASCADE — base `.toast`, `.toast__title`, `.toast__description`, `.toast__indicator` are all
+ * (0,1,0); every rule below is (0,2,0) (the adjacency rule is (0,3,0)) and wins on specificity.
+ * The one tie is `.toast__indicator` against the base's per-status
+ * `.toast--success .toast__indicator` (also (0,2,0)) — resolved by source order, since the
+ * theme's components/index.css is imported after @heroui/styles inside the same `components`
+ * layer; identical to the tie alert.css already documents. The title rule declares no colour, so
+ * it does not compete with `.toast--<status> .toast__title` at all. Nothing here collides with
+ * spinner.css's `.toast__indicator .spinner` guard, which is a size rule on a deeper selector.
+ *
+ * Reviewed: no changes. Verified against the live sources — toast.styles.ts confirms every class
+ * used here (.toast, .toast__title, .toast__description, .toast__indicator, .toast--accent/
+ * -success/-warning/-danger) is actually emitted; toast.tsx's getDefaultChildren (react/src/
+ * components/toast/toast.tsx:840-866) confirms title and description render as adjacent siblings
+ * inside .toast__content, so `.toast__title + .toast__description` matches; toast.css:43-295
+ * confirms every kept-as-HeroUI's declaration and the (0,1,0)/(0,2,0) specificities, including the
+ * .toast--success/-warning/-danger .toast__indicator tie, which the theme's later import in the same
+ * "components" layer resolves in this file's favour (confirmed against styles/index.css:1-14 and
+ * themes/tzuchi/index.css); spinner.css:106-113 confirms the 16px indicator-spinner guard this file
+ * does not disturb; tokens.css confirms every --tc-* used is mode-independent with no dark-block
+ * redefinition; variables.css confirms --overlay-foreground/--accent/--success/--warning/--danger
+ * exist for both tzuchi and tzuchi-dark. R120's 20px icon is correctly withheld per R122's explicit
+ * "do not break the 16px guard" — the conservative, restraint-correct reading, not a gap in this
+ * file. The Default story (toast.stories.tsx:141-160) fires a title+description toast, so both
+ * assertions' selectors exist and resolve to the stated values. No colour literal, no --tc-color-*
+ * token, no !important, no physical left/right, all nine rules scoped to [data-theme^="tzuchi"], no
+ * comment prematurely closed.
+ *
+ * Pass 5 (2026-09-20): the CONTENT ↔ ACTION gap becomes 16px; indicator ↔ content stays 8px.
+ * WHICH GAP IS IT — `.toast` is one flex row (base toast.css:57, `flex flex-row … gap-1.5`) whose
+ * children are the indicator, `.toast__content` (`grow`, base:186-188) and, on a wide viewport,
+ * `.toast__action`; `.toast__close-button` is absolutely positioned (base:230-232) and out of flow.
+ * So BOTH gaps are the one flex `gap` this file already sets to --tc-space-8 — there is no separate
+ * margin. Base `.toast__action` declares only `mt-2 sm:mt-0` (base:264-266), a BLOCK margin.
+ * WHY IT NEEDED RAISING — at the theme's 16px/700 title the content column fills almost its whole
+ * width, so "You have been invited to join a team" ended 12px from the "Dismiss" chip and the two
+ * read as touching (upstream's 14px title left 74px of slack; measured in reports/qa-overlays.md).
+ * The gap is the only thing that can separate them, because `.toast__content` is `grow` and its box
+ * always reaches the action.
+ * HOW — an inline start margin on the action that tops the shared 8px gap up to --tc-space-16,
+ * written as the subtraction so the intent (16px total) is legible. Both tokens are
+ * mode-independent lengths in packages/tokens/dist/tokens.css with fallbacks.
+ * WHY THE CHILD COMBINATOR — below 768px, toast.tsx:866-872 renders the action INSIDE
+ * `.toast__content` instead (a column child under the description), where an inline margin would
+ * just indent the button. `.toast > .toast__action` matches only the wide-viewport sibling, so the
+ * narrow layout keeps HeroUI's `mt-2` and its flush left edge exactly as before — verified at 420px.
+ * Cascade: (0,3,0) against the base's (0,1,0); `margin-block` is never touched, so `mt-2 sm:mt-0`
+ * (utilities layer) keeps deciding the vertical offset in both layouts.
+ *
+ * Pass 5 reviewed (2026-09-20): diffed against the live
+ * styles/themes/tzuchi/components/toast.css — only the new
+ * `.toast > .toast__action` margin rule and this header differ; typography,
+ * title-description gap and tone-variant rules are byte-identical. Confirmed
+ * in toast.tsx that the action button is a direct `.toast` child only in the
+ * non-mobile layout (isMobile false, ≥768px), so the child combinator is
+ * exactly right and the narrow layout (verified pixel-identical at 420px in
+ * both themes) is unaffected. Verified live with the browser tool that the
+ * content-to-action gap is visibly wider than the indicator-to-content gap
+ * in both themes. NOTE (not a defect, not fixed): at the toast's fixed
+ * 460px width, the extra 8px can push an already-tight single-line title
+ * ("You have been invited to join a team") into wrapping one line earlier
+ * than before — an inherent trade-off of widening a gap in a fixed-width
+ * flex row, not a broken state or variant, and the brief's decision is
+ * implemented exactly as stated. Comment safety, colour-token and scope
+ * scans clean. No changes made — the fix matches the brief exactly.
+ */
+
+/* ── Shell ───────────────────────────────────────────────────────────────── */
+[data-theme^="tzuchi"] .toast {
+  /*
+   * Tone channel (R87 / R121). Default = the colour upstream's own `.toast__indicator` rule
+   * paints, so `default` toasts are pixel-identical to before.
+   */
+  --toast-accent: var(--overlay-foreground);
+
+  /* Card / surface corner (R117 / R27) — 24px under this theme's --radius-3xl. */
+  border-radius: var(--tc-card-radius, var(--radius-2xl));
+
+  /*
+   * Indicator ↔ content ↔ action gap. 6px is off the Tzu Chi 4px rhythm entirely; R147's
+   * icon ↔ label step is the closest role the spec names (tc-alert's is --tc-alert-gap, 12px,
+   * but that token belongs to the alert's flat callout box).
+   */
+  gap: var(--tc-space-8, 8px);
+}
+
+/* Pass 5 — content ↔ action is 16px, indicator ↔ content stays 8px. The shell's flex `gap` above
+   serves both, so the extra 8px rides on the action as an inline-start margin. The child
+   combinator keeps it off the narrow-viewport layout, where toast.tsx moves the action inside
+   `.toast__content` and an inline margin would only indent it. Block margins untouched, so the
+   base's `mt-2 sm:mt-0` still owns the vertical offset. */
+[data-theme^="tzuchi"] .toast > .toast__action {
+  margin-inline-start: calc(var(--tc-space-16, 16px) - var(--tc-space-8, 8px));
+}
+
+/* ── Typography ──────────────────────────────────────────────────────────── */
+
+/* The title IS the message: the control voice, 16 / 700 / 1.5 (§1.2, R1 / R11 via R119).
+   No colour is declared, so upstream's default and per-status title colours survive. */
+[data-theme^="tzuchi"] .toast__title {
+  font-size: var(--tc-font-size-16, 16px);
+  font-weight: var(--tc-font-weight-bold, 700);
+  line-height: var(--tc-line-height-normal, 1.5);
+}
+
+/* The description is prose: the body voice, 16 / 400 / 1.6, and off --muted (R119 -> R5 —
+   the same move card.css, modal.css and alert.css make for body copy). */
+[data-theme^="tzuchi"] .toast__description {
+  font-size: var(--tc-font-size-16, 16px);
+  line-height: var(--tc-line-height-relaxed, 1.6);
+  color: var(--foreground);
+}
+
+/*
+ * Title ↔ description pair: 4px, the callout value (R148; tc-alert's `.content` gap, applied by
+ * alert.css). Expressed as an adjacency margin rather than a gap on `.toast__content` so the
+ * mobile layout — which moves the action button inside the content column — keeps HeroUI's own
+ * mt-2 spacing untouched. Same shape as modal.css's region rhythm.
+ */
+[data-theme^="tzuchi"] .toast__title + .toast__description {
+  margin-block-start: var(--tc-space-4, 4px);
+}
+
+/* ── Tone variants ───────────────────────────────────────────────────────── */
+/*
+ * `default` intentionally has no block: it inherits --toast-accent: var(--overlay-foreground)
+ * from the shell rule and keeps HeroUI's neutral indicator.
+ */
+
+[data-theme^="tzuchi"] .toast--accent {
+  --toast-accent: var(--accent);
+}
+
+[data-theme^="tzuchi"] .toast--success {
+  --toast-accent: var(--success);
+}
+
+[data-theme^="tzuchi"] .toast--warning {
+  --toast-accent: var(--warning);
+}
+
+[data-theme^="tzuchi"] .toast--danger {
+  --toast-accent: var(--danger);
+}
+
+/*
+ * The indicator carries the tone in the raw colour, not in the softened *-soft-foreground mix
+ * (R120 / R87 — the same call alert.css makes for `.alert__indicator`). This also gives the
+ * `accent` variant an indicator colour, which upstream only ever set for success / warning /
+ * danger. Size is untouched: see the header note on R122 / spinner.css. A loading toast's
+ * Spinner is `color="current"`, so it follows this colour and its --spinner-track keeps deriving
+ * from currentColor (spinner.css `.spinner--current`).
+ */
+[data-theme^="tzuchi"] .toast__indicator {
+  color: var(--toast-accent);
+}

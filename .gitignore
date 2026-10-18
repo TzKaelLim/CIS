@@ -40,3 +40,7 @@ yarn-error.log*
 .idea
 
 dist
+
+# The built design tokens are part of the vendored uikit snapshot
+# (pnpm sync:uikit builds them), so re-include them after the dist rule above
+!vendor/uikit/packages/tokens/dist/

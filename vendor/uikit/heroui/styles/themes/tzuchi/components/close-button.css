@@ -1,0 +1,91 @@
+/* ------------------------------------------------------------------------------------------------
+ * Tzu Chi theme — CloseButton
+ * ------------------------------------------------------------------------------------------------
+ * Destination: heroui/styles/themes/tzuchi/components/close-button.css, imported into the
+ * `components` layer after HeroUI's own styles/components/close-button.css. Import it BEFORE
+ * ./tag.css and ./modal.css in ../index.css, so those two files' host-scoped rules stay last; it
+ * makes no difference to the computed result (see "Interaction with the shipped overrides" below),
+ * but it keeps the per-host overrides reading as the more specific layer.
+ *
+ * ONE DECLARATION, AND IT IS SHAPE ONLY.
+ *
+ *   .close-button  border-radius  rounded-xl  ->  var(--tc-radius-full, 9999px)   (R26 / R24)
+ *
+ * R26 names the "remove button" role and lists `rounded-xl` among the utilities it replaces; its
+ * cited evidence is tag.css:146, where the shipped Tag override already gives exactly this
+ * declaration to `.tag__remove-button` — which IS a CloseButton (the composed class list on that
+ * element is "close-button close-button--default tag__remove-button", recorded in
+ * tag.css:51-53). R24 says the same thing from the other direction: a close affordance is an
+ * icon-only button, and an icon-only button is a full circle in this system.
+ *
+ * THIS IS A NO-OP TODAY, ON PURPOSE. Under `--radius: 8px` the base's `rounded-xl` resolves to
+ * `--radius-xl` = calc(8px x 1.5) = 12px, which on the base's own 24px square box is already
+ * exactly half the side — a circle — and at the 20px boxes its hosts use (SearchField's clear
+ * button, Toast's close button, Tag's remove button) CSS radius clamping produces a circle too.
+ * So the rendered shape does not move; what moves is the REASON for it. The circle currently
+ * depends on `--radius` happening to be 8px and the box happening to be 24px, and would silently
+ * become a squircle the moment either changed. This rule states the intent instead, which is what
+ * R26 asks for, and is why the file is worth one line.
+ *
+ * INTERACTION WITH THE SHIPPED OVERRIDES — neither is duplicated or contradicted:
+ *   · ./tag.css:143-147 sets `.tag__remove-button` to 20px / padding 0 / 9999px. Same value for
+ *     radius, different selector (0,2,0 either way); whichever lands last, the result is 9999px.
+ *     Size and padding are that file's and are not touched here.
+ *   · ./tag.css:153-161 and ./modal.css:110-118 make the button transparent at rest inside their
+ *     host, via a host slot class compounded with `.close-button--default` and a `:not(:hover,
+ *     [data-hovered="true"], :active, [data-pressed="true"])` guard. This file declares no
+ *     background, no colour and no state, so both of those keep working untouched.
+ *   · search-field.tsx's clear button is itself a `<CloseButton data-slot="search-field-clear-
+ *     button">` (confirmed in react/src/components/search-field/search-field.tsx), so it also
+ *     carries `.close-button` and inherits this rule; D22 leaves its 20px size and 12px glyph
+ *     untouched, only the radius intent is now stated instead of accidental.
+ *
+ * KEPT AS HEROUI'S — deliberately, because D8 says restyling the shared CloseButton regresses
+ * every host (Modal, Drawer, AlertDialog, Toast, Alert, Card, SearchField, Tag) and the spec
+ * settles each of these elsewhere:
+ *   · 24px box and 16px glyph — section 1.3 keeps the 16px svg explicitly ("tc's 20px glyph on a
+ *     32px box = 0.63; HeroUI's 16px on 24px = 0.67 — proportionally equivalent"), and the hosts
+ *     that want a different size already set it themselves (SearchField 20px/12px per D22, Toast
+ *     20px/14px, Tag 20px with a filling glyph).
+ *   · `bg-default` / `text-muted` at rest, `bg-default-hover` on hover — R88 item 1: a HeroUI-only
+ *     neutral affordance with no Tzu Chi counterpart keeps `--default`, and R109's transparent-at-
+ *     rest treatment is scoped per host, not applied globally.
+ *   · `p-1` (4px), the -mx-0.5 / my-0.5 optical margins, the `scale(0.93)` press, the 250/150/100ms
+ *     transition stack, `status-focused` / `status-disabled` / `status-pending`, and the
+ *     `touch-target` behaviour of its hosts.
+ *   · the `--default` variant is HeroUI's only one; nothing is hidden or flattened.
+ *
+ * Nothing colour-valued, no shadow token, no --tc-color-* token and no new --tzuchi-* theme
+ * variable is referenced. --tc-radius-full is a mode-independent dimension token (9999px in both
+ * the :root and the [data-theme="dark"] blocks of packages/tokens/dist/tokens.css, i.e. it is
+ * declared only once).
+ *
+ * CASCADE — `[data-theme^="tzuchi"] .close-button` is (0,2,0) against the base's (0,1,0)
+ * `.close-button` in the same layer, earlier — and (0,2,0) beats (0,1,0) on specificity alone, so
+ * this also holds regardless of import order. Host rules that reach the same element through a
+ * slot class (`.search-field__clear-button`, `.toast__close-button`, `.modal__close-trigger`,
+ * `.tag__remove-button`) are all (0,1,0)–(0,2,0) upstream and none of them sets `border-radius`
+ * except `.tag__remove-button` (which agrees on the same 9999px value), so nothing upstream is
+ * overridden except the base utility this rule is meant to replace.
+ *
+ * Reviewed: no changes. Verified against the live files: `.close-button` exists in
+ * heroui/styles/components/close-button.css and is emitted by close-button.styles.ts's
+ * closeButtonVariants (base "close-button", default variant "close-button--default"); the rule is
+ * scoped under [data-theme^="tzuchi"]. Colour rule: grepped clean for --tc-color-*, any
+ * colour-valued component token, hex/rgb/hsl/oklch literal, !important and physical left/right —
+ * only --tc-radius-full is used, confirmed a mode-independent dimension token in
+ * packages/tokens/dist/tokens.css (no [data-theme="dark"] or prefers-color-scheme:dark override).
+ * No variant, size or state is hidden or flattened (CloseButton has one variant). Comment safety:
+ * comment-open and comment-close markers balance (2 and 2), no premature closer. Confirmed
+ * search-field.tsx's clear button
+ * really is a CloseButton instance, so D22's 20px/12px sizing and this rule coexist as claimed, not
+ * merely asserted. Assertion re-verified against storybook-static/index.json
+ * (components-buttons-closebutton--default exists; the Default story renders a single bare
+ * <CloseButton variant="default">, so `.close-button` matches it directly with reveal: none); kept
+ * as-is.
+ * ------------------------------------------------------------------------------------------------ */
+
+[data-theme^="tzuchi"] .close-button {
+  /* R26 / R24 — a close affordance is a round icon-only button, as tag.css:146 already states. */
+  border-radius: var(--tc-radius-full, 9999px);
+}

@@ -1,0 +1,99 @@
+/* ==========================================================================
+   ColorPicker — Tzu Chi theme overrides
+   Destination: styles/themes/tzuchi/components/color-picker.css
+   (layer: components, imported after ../../../components/color-picker.css).
+
+   ColorPicker has no Tzu Chi counterpart (spec §12 Q8). It is a chromeless
+   trigger (swatch + label, no fill, no padding, no border) opening a CONTENT
+   popover — spec §6(b), the Card/Modal surface, not the option-list panel.
+
+   Reviewed: no changes. Confirmed `[data-slot="label"]` really renders inside
+   `.color-picker__trigger` (the Default/Controlled stories nest a `<Label>`
+   there, which emits `data-slot="label"` per label.tsx), that
+   `.color-picker__popover` carries no other class the React layer could
+   attach (styles.ts's `popover` slot is exactly "color-picker__popover"), and
+   that `--radius` = --tc-radius-md = 8px makes the base popover radius
+   min(32px, 20px) = 20px, so the 16px override is a real change. All four
+   `--tc-` tokens exist in tokens.css and are mode-independent
+   (`--tc-font-size-16`, `--tc-font-weight-bold`, `--tc-line-height-normal`,
+   `--tc-card-radius` → `--tc-radius-lg` = 16px). Specificity hand-checked
+   against the base file and label.css — all three rules win outright, none
+   is a tie. No colour, no `!important`, no physical properties, no premature
+   comment close.
+
+   WHAT THIS CHANGES
+   1. Trigger type: text-sm (14px/20px) -> 16px / 700 / 1.5.
+      Spec §1 R1 — "control label: the text a button/trigger/tab/row IS" —
+      and §1's mechanical rule that Tzu Chi has no 14px step. Same three
+      longhands select.css:120-122 gives the Select trigger, set as longhands
+      so the theme's --font-sans stack is not re-declared.
+   2. The label inside the trigger is lifted to match.
+      `.label` re-asserts `text-sm font-medium` on its own (label.css:4), so
+      the weight and size have to be reached the way spec R4 does it in
+      dropdown.css:115-121 and list-box-item.css — size and line-height
+      `inherit`, weight restated. Reaching `[data-slot="label"]` inside
+      `.color-picker__trigger` is exactly how HeroUI's own base file for this
+      component does it (color-picker.css:29-31), so ownership rule 7 holds.
+      Its colour is untouched: --foreground is already right off a tinted
+      panel, and spec R94's colour lift applies only inside one.
+   3. Popover radius: min(32px, --radius * 2.5) = 20px -> 16px.
+      Spec §6(b) R98 / §2 R30 — a content popover follows the surface radius
+      (--tc-card-radius = --tc-radius-lg), not the option panel's 8px, because
+      it pads its content instead of running rows edge to edge.
+
+   KEPT — deliberately left exactly as HeroUI ships it
+   - Popover background and elevation: `bg-overlay` + var(--overlay-shadow)
+     (color-picker.css:52-53) are already spec R99 / R100 verbatim. The
+     --accent-soft tint is tc-dropdown's LISTBOX signature and §6(b) rules it
+     out here; do not tint a content popover.
+   - Popover padding (px-2 pt-2 pb-3) and the gap-3 between sections. Spec
+     R102 says to leave HeroUI's padding where it has some, and all four
+     values already sit on the Tzu Chi 4px rhythm.
+   - min-w-62, overflow/overscroll behaviour, origin-(--trigger-anchor-point)
+     and the enter/exit animations. Spec R140 — no choreography; and every
+     shipped popover override (select, dropdown, tooltip) leaves the entering
+     animation to HeroUI. Only modal.css retunes one, for reasons local to the
+     Modal.
+   - Trigger radius: `rounded-sm` already resolves to 4px = spec R34, the
+     focus-shape radius for an element whose corner is only ever visible as
+     the ring's shape. Nothing to restate (spec N5).
+   - Trigger gap-3 (12px) between the preview swatch and the label. Spec R147
+     prices an ICON against a label at 8px; the lg ColorSwatch here is a 36px
+     preview, not an icon, and 12px is already --tc-space-12. Recorded as a
+     spec gap rather than guessed at.
+   - Trigger focus ring (spec R70/D3), disabled (spec R85/D2), cursor, and the
+     dead `background-color` transition (the trigger never paints one).
+   - Everything inside the popover — ColorArea, ColorSlider, ColorField,
+     Select, their labels and outputs. They are other components' classes and
+     belong to their own override files (ownership rule 7).
+
+   CASCADE (hand-derived against color-picker.css and label.css)
+   - trigger type: mine is (0,2,0) against the base's `.color-picker__trigger`
+     at (0,1,0); `text-sm` sets font-size AND line-height, both replaced here.
+   - trigger label: mine is (0,3,0), above `.label` (0,1,0) and above
+     label.css's state rules (0,2,0) — which set colour and opacity only, so
+     nothing of theirs is displaced.
+   - popover radius: mine is (0,2,0) against (0,1,0). `.color-picker__popover`
+     is the popover's ONLY class (the React layer composes no `.popover`
+     base), so nothing else competes.
+   ========================================================================== */
+
+/* -- Trigger type (spec §1 R1 / R4) ---------------------------------------- */
+
+[data-theme^="tzuchi"] .color-picker__trigger {
+  font-size: var(--tc-font-size-16, 16px);
+  font-weight: var(--tc-font-weight-bold, 700);
+  line-height: var(--tc-line-height-normal, 1.5);
+}
+
+[data-theme^="tzuchi"] .color-picker__trigger [data-slot="label"] {
+  font-size: inherit;
+  line-height: inherit;
+  font-weight: var(--tc-font-weight-bold, 700);
+}
+
+/* -- Content popover shell (spec §6(b) R98 / §2 R30) ----------------------- */
+
+[data-theme^="tzuchi"] .color-picker__popover {
+  border-radius: var(--tc-card-radius, var(--radius-2xl));
+}

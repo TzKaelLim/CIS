@@ -1,0 +1,21 @@
+{
+  "tooltip": {
+    "bg": {
+      "$type": "color",
+      "$value": "{color.text.default}",
+      "$description": "Bubble background. Intentionally references the text colour so the tooltip inverts against the surface per theme."
+    },
+    "fg": {
+      "$type": "color",
+      "$value": "{color.surface.default}",
+      "$description": "Bubble text colour (inverted surface)."
+    },
+    "radius": { "$type": "dimension", "$value": "{radius.sm}" },
+    "padding-block": { "$type": "dimension", "$value": "4px" },
+    "padding-inline": { "$type": "dimension", "$value": "{space.8}" },
+    "font-size": { "$type": "dimension", "$value": "{font.size.16}" },
+    "max-width": { "$type": "dimension", "$value": "240px" },
+    "shadow": { "$type": "shadow", "$value": "{elevation.2}" },
+    "z": { "$type": "number", "$value": "{z.popover}" }
+  }
+}

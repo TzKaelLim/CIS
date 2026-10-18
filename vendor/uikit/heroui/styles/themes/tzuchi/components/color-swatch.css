@@ -1,0 +1,54 @@
+/* ==========================================================================
+   ColorSwatch — Tzu Chi theme overrides
+   Destination: styles/themes/tzuchi/components/color-swatch.css
+   (layer: components, imported after ../../../components/color-swatch.css).
+
+   ColorSwatch has no Tzu Chi counterpart (spec §12 Q8), so the only change is
+   the one the design language actually gives a rule for: radius by role.
+
+   Reviewed: no changes. Verified against the live base CSS, tokens.css and
+   the Shapes story — `.color-swatch--square` exists (color-swatch.css:19),
+   is scoped, uses only `--tc-radius-sm` (mode-independent, 4px in
+   tokens.css:49), matches spec R25/R33, and at (0,2,0) beats the base rule's
+   (0,1,0) with nothing else in the cascade to out-rank. No colour, no
+   `!important`, no physical properties, no premature comment close, nothing
+   else broken or hidden.
+
+   WHAT THIS CHANGES
+   1. shape="square"  6px -> 4px.
+      HeroUI's `rounded-md` (color-swatch.css:20) resolves to
+      calc(var(--radius) * 0.75) = 6px under this theme, and 6px is not a step
+      on the Tzu Chi radius ladder (0 · 4px · 8px · 16px · 9999px). The two
+      nearest roles for a small square selectable cell both land on 4px:
+      spec R25 (checkbox control, --tc-checkbox-radius = --tc-radius-sm) and
+      spec R33 (pagination cell, --radius-sm). One rule covers every size,
+      because the base file has no per-size square radius — the same way the
+      pagination cell keeps 4px from 32px to 48px.
+
+   KEPT — deliberately left exactly as HeroUI ships it
+   - shape="circle" at every size. Under --radius: 8px the base radii
+     (xs rounded-lg 8px on a 16px box, sm rounded-xl 12px on 24px,
+     md rounded-2xl 16px on 32px, lg/xl rounded-3xl 24px on 36px/40px) all
+     reach or exceed half the box, so the swatch is already a true circle.
+     Spec R26's pill answer with nothing left to restate.
+   - The size scale (xs 16 / sm 24 / md 32 / lg 36 / xl 40px). The spec gives
+     no rule for swatch sizes, and md / xl already sit on --tc-size-icon-md
+     and --tc-size-icon-lg.
+   - The `inset 0 0 0 1px` visibility hairline and the checkerboard
+     transparency pattern (color-swatch.css:6-11). They are part of how the
+     swatch renders its own colour, which this pass must not touch, and §4
+     gives no border rule for a colour sample.
+   - The swatch fill itself (--color-swatch-current), which React sets inline.
+
+   CASCADE
+   `.color-swatch--square` is (0,1,0) in the base file; the rule below is
+   (0,2,0) and sits later in the same `components` layer, so it wins outright.
+   Per-story utilities (e.g. the Default story's `h-5 w-5`) live in the
+   `utilities` layer and are untouched.
+   ========================================================================== */
+
+/* -- Radius by role (spec §2 R25/R33) -------------------------------------- */
+
+[data-theme^="tzuchi"] .color-swatch--square {
+  border-radius: var(--tc-radius-sm, 4px);
+}

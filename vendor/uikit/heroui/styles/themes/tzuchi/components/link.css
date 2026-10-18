@@ -1,0 +1,79 @@
+/* ------------------------------------------------------------------------------------------------
+ * Tzu Chi theme override — Link   (tc-link  ↔  HeroUI `.link`)
+ * ------------------------------------------------------------------------------------------------
+ * Destination: heroui/styles/themes/tzuchi/components/link.css
+ * Layer: `components`, imported AFTER heroui/styles/components/link.css.
+ * Every rule is scoped by [data-theme^="tzuchi"], so upstream's own light/dark
+ * themes are provably untouched.
+ *
+ * VARIANT MAPPING
+ *   tc-link (default)        ↔  .link                        — the only shape HeroUI has
+ *   tc-link variant="subtle" ↔  (no HeroUI counterpart)      — not ported, see report
+ *   tc-link [disabled]       ↔  .link[aria-disabled="true"]  — HeroUI also renders a
+ *                                                                <span> when isDisabled (react-aria
+ *                                                                Link swaps element type, not just
+ *                                                                the attribute); kept as upstream's
+ *                                                                opacity treatment either way.
+ *   (no tc equivalent)       ↔  .link__icon                  — left as upstream
+ *
+ * WHAT THIS CHANGES  (everything else is upstream's, on purpose)
+ *   1. font-weight    500 → 700        tc links are bold inside body copy
+ *   2. border-radius  12px → 4px       only visible on the ring-based focus indicator
+ *   3. underline-offset 4px → 0.15em   tc scales the offset with the inherited font-size
+ *   4. resting colour --link → --accent-hover   (brand.primary → brand.primary-hover)
+ *   5. hover/pressed underline colour  --muted/50 → currentColor
+ *
+ * WHY `:not(.button)` — HeroUI lets a Link borrow the Button's classes (the "Default"
+ * story does exactly that: `class="link button button--tertiary …"`). Those links must
+ * keep the Button atom's shape, weight and colour, and this selector outranks the
+ * `.button` rules, so it must exclude them.
+ * ---------------------------------------------------------------------------------------------- */
+
+[data-theme^="tzuchi"] .link:not(.button) {
+  /* tc `--tc-link-fg` = {color.brand.primary-hover}. The generated theme maps that
+     same primitive onto --accent-hover (light #30559f = blue-700, dark #c2d4f2 =
+     blue-250), so this is the Tzu Chi value in both modes. HeroUI's own --link is
+     {color.brand.primary}, one step darker in light mode. */
+  color: var(--accent-hover);
+
+  font-weight: var(--tc-font-weight-bold, 700);
+  border-radius: var(--tc-radius-sm, 4px);
+  text-underline-offset: 0.15em;
+
+  /* tc `--tc-link-fg-hover` = {color.border.focus}, which the theme maps onto --focus
+     (light #4f7bbe = blue-500, dark #a9c2ea = blue-300). The underline picks up the
+     link's own colour instead of upstream's dimmed --muted. */
+  @media (hover: hover) {
+    &:hover,
+    &[data-hovered="true"] {
+      color: var(--focus);
+      text-decoration-color: currentColor;
+    }
+  }
+
+  &:active,
+  &[data-pressed="true"] {
+    text-decoration-color: currentColor;
+  }
+}
+
+/* Reviewed: verified every selector/class/data-attribute against
+   heroui/react/src/components/link/link.tsx, .../link.styles.ts, node_modules'
+   react-aria-components private/Link.js (confirms .link, .button, button--tertiary,
+   data-hovered, data-pressed all really exist/are emitted) and
+   heroui/styles/components/link.css (base declarations + specificity of every rule
+   this file must beat). Confirmed --accent-hover and --focus are the exact HeroUI
+   theme variables the generator maps 1:1 from --tc-color-brand-primary-hover and
+   --tc-color-border-focus (themes/tzuchi/generate.mjs), i.e. the same primitives
+   --tc-link-fg / --tc-link-fg-hover resolve to, in both light and dark. Confirmed
+   --tc-radius-sm (4px) and --tc-font-weight-bold (700) are mode-independent tokens
+   in tokens.dist/tokens.css. No --tc-color-*, no component colour token, no hex/rgb
+   literal in any declaration. Every rule scoped under [data-theme^="tzuchi"]
+   (including the nested @media/:hover/:active blocks, via `&`). Specificity of every
+   override clause exceeds the corresponding base clause it must beat, in every state
+   (rest, hover, pressed) — no !important needed. No variant/size/state hidden;
+   disabled and focus-visible are untouched and inherit correctly. Only change made
+   in this review: corrected the header/variant-mapping comment's claim about the
+   disabled link's DOM mechanism (HeroUI's react-aria Link also renders a <span>, not
+   an <a aria-disabled>, when isDisabled — verified in node_modules'
+   react-aria-components private/Link.js) — comment-only, no rule changed. */

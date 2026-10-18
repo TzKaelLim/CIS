@@ -1,0 +1,68 @@
+/* ------------------------------------------------------------------------------------------------
+ * Avatar — Tzu Chi theme overrides
+ * ------------------------------------------------------------------------------------------------
+ * Base            : heroui/styles/components/avatar.css
+ * Tzu Chi source  : NONE. DESIGN-LANGUAGE.md §12 Q8 lists Avatar / AvatarGroup among the components
+ *                   with no Figma record at all, so every value below is derived from a numbered
+ *                   spec rule and cited inline. Nothing here is invented without being labelled.
+ *
+ * WHAT THIS CHANGES — exactly one declaration block, the fallback's type:
+ *
+ *   font-size    12px (sm) · 14px (md) · 16px (lg)   ->  16px at every size   §1 R1 + §1 preamble
+ *   font-weight  500                                 ->  700                  §1 R1 · §1.2
+ *   line-height  1.3333 (sm) · 1.4286 (md) · 1.5     ->  1.5                  §1 R1
+ *
+ * WHY THAT VOICE. The initials — or the Iconify glyph, which is sized in `em` and therefore rides
+ * along — are the text the avatar IS, not prose about it. §1.2's table sends "the text a control
+ * is" to the `subtitle` voice: 700 16px/1.5. The 12px and 14px steps have to move because Tzu Chi's
+ * scale has neither (§1 preamble; §0 token list runs 16 · 20 · 24 · 26 · 34 · 46).
+ *
+ * WHY ONE SIZE FOR THREE BOXES. §3.2 is the precedent: "Type does not change with size — 16/700/1.5
+ * at every step" (button.css:83-85, R42-R44 change only padding). Tzu Chi has no step below 16px to
+ * give `sm`, and the step above is 20px (title), which §1 reserves for tab / chip roles — so the
+ * three-step 12/14/16 ramp collapses onto the one value the scale does have. A 16/700 pair of
+ * initials measures ~23px across, inside a 32px `sm` circle (~29px of clear width once the
+ * AvatarGroup clip nudge is applied), so nothing clips.
+ *
+ * CASCADE. The extra `.avatar` in the selector is not decoration: the base file nests the per-size
+ * type inside the size modifier, emitting `.avatar--sm .avatar__fallback` and
+ * `.avatar--lg .avatar__fallback` at (0,2,0). A plain `[data-theme^="tzuchi"] .avatar__fallback`
+ * would only TIE those (N7 allows a tie, resolved by the theme importing later in the same
+ * `components` layer); (0,3,0) wins outright, and the fallback is always a child of the root —
+ * including the AvatarGroup count bubble, which renders a full Avatar (avatar-group.tsx:42-51).
+ *
+ * DELIBERATELY NOT CHANGED
+ *   - Box sizes 32 / 40 / 48px. No spec rule reaches them, and badge.css:6-13 already anchors the
+ *     Tzu Chi badge ramp (16 / 20 / 24px) to exactly these three numbers.
+ *   - Radius. HeroUI's `rounded-2xl` (16px) on 32px and `rounded-3xl` (24px) on 40/48px all exceed
+ *     half the box, so CSS scales them down to a true circle at every size already — the same
+ *     "already a pill, do not touch" reading badge.css:18-19 records (§10 D5).
+ *   - Every colour. `--default` on the root and the fallback is §5 R88 case ① (a HeroUI-only
+ *     neutral with no Tzu Chi counterpart); the accent / success / warning / danger fallbacks and
+ *     the `soft` variant already resolve through theme variables.
+ *   - No ring, no border. §4 R65-R70 give a border only to fields and a ring only to focus; an
+ *     Avatar has neither, and AvatarGroup's `--ring` seam already paints `var(--background)`.
+ *   - The image slot: absolute fill, aspect-square, and the 250ms opacity fade (motion the spec is
+ *     silent on — §8 R140 forbids adding choreography, not keeping HeroUI's).
+ *
+ * VARIANTS / SIZES / STATES — none hidden or flattened. sm / md / lg keep their boxes and radii;
+ * default / soft keep their fills; all five colours keep their foregrounds; Radix's image-loading
+ * states are untouched. Only the fallback's three type properties move, identically for all of them.
+ *
+ * Reviewed: no changes. Verified against heroui/styles/components/avatar.css and avatar-group.css,
+ * the React sources (avatar.tsx, avatar-group.tsx) and avatar.styles.ts's tv() slot map, the
+ * compiled storybook CSS (iframe-DpN8oW_m.css) for the exact base specificity/values claimed above,
+ * and packages/tokens/dist/tokens.css for every --tc-* token. Selector exists and is always
+ * satisfied (AvatarFallback only ever renders inside AvatarRoot's `.avatar`, including inside
+ * AvatarGroupCount). Scoping, colour rule (no --tc-color-* tokens, no literals, only
+ * mode-independent --tc-font-* and --tc-line-height-* tokens with fallbacks) and cascade
+ * (0,3,0 vs base's 0,1,0 / 0,2,0)
+ * all confirmed. No variant/size/state hidden.
+ * ------------------------------------------------------------------------------------------------ */
+
+/* §1 R1 (control label) via §1.2, size-independent per §3.2. */
+[data-theme^="tzuchi"] .avatar .avatar__fallback {
+  font-size: var(--tc-font-size-16, 16px);
+  font-weight: var(--tc-font-weight-bold, 700);
+  line-height: var(--tc-line-height-normal, 1.5);
+}

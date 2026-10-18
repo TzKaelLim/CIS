@@ -1,0 +1,44 @@
+{
+  "ebook-toolbar": {
+    "bg": {
+      "$type": "color",
+      "$value": "{color.surface.subtle}"
+    },
+    "fg": {
+      "$type": "color",
+      "$value": "{color.brand.primary}"
+    },
+    "border": {
+      "$type": "color",
+      "$value": "{color.border.default}"
+    },
+    "title-fg": {
+      "$type": "color",
+      "$value": "{color.brand.primary}"
+    },
+    "height": {
+      "$type": "dimension",
+      "$value": "{size.control.lg}"
+    },
+    "radius": {
+      "$type": "dimension",
+      "$value": "{radius.full}"
+    },
+    "padding-inline": {
+      "$type": "dimension",
+      "$value": "{space.24}"
+    },
+    "tools-gap": {
+      "$type": "dimension",
+      "$value": "{space.4}"
+    },
+    "back-bg-hover": {
+      "$type": "color",
+      "$value": "{color.brand.surface}"
+    },
+    "focus-ring-color": {
+      "$type": "color",
+      "$value": "{color.border.focus}"
+    }
+  }
+}

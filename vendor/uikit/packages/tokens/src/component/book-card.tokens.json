@@ -1,0 +1,40 @@
+{
+  "book-card": {
+    "bg": {
+      "$type": "color",
+      "$value": "{color.surface.default}"
+    },
+    "radius": {
+      "$type": "dimension",
+      "$value": "{radius.lg}"
+    },
+    "elevation": {
+      "$type": "shadow",
+      "$value": "{elevation.1}"
+    },
+    "elevation-hover": {
+      "$type": "shadow",
+      "$value": "{elevation.3}"
+    },
+    "title-fg": {
+      "$type": "color",
+      "$value": "{color.brand.primary}"
+    },
+    "title-fg-hover": {
+      "$type": "color",
+      "$value": "{color.brand.primary-hover}"
+    },
+    "subtitle-fg": {
+      "$type": "color",
+      "$value": "{color.text.muted}"
+    },
+    "padding": {
+      "$type": "dimension",
+      "$value": "{space.16}"
+    },
+    "focus-ring-color": {
+      "$type": "color",
+      "$value": "{color.border.focus}"
+    }
+  }
+}

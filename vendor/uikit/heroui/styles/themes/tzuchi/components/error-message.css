@@ -1,0 +1,62 @@
+/* ==========================================================================
+   ErrorMessage — Tzu Chi theme override
+   Destination: styles/themes/tzuchi/components/error-message.css
+   (layer: components, imported after ../../../components/error-message.css).
+
+   ErrorMessage is the static validation line a host renders itself (Slider,
+   TagGroup, ColorSlider …), as opposed to FieldError, which React Aria shows
+   and hides. Base error-message.css:3 is
+   `h-auto text-xs wrap-break-word text-danger` — 12px / 400 / 16px.
+
+   WHAT THIS CHANGES — type only, two declarations.
+
+     · font-size    12px  ->  16px    (§1 R7)
+     · line-height  16px  ->  25.6px  (1.6, the prose voice)
+
+   EVIDENCE. R7 "Error text (.field-error, .error-message, text-xs)": same
+   metrics as R6, keep `text-danger`. Tzu Chi's error line is
+   tc-input.styles.ts:91-93 / tc-textarea.styles.ts:98-100 — `.helper.error`
+   is the helper rule with nothing but the colour changed, so error text and
+   helper text share one set of metrics by construction. §1 forbids a 12px
+   step and §1.3 does not exempt this element.
+
+   Colour is NOT restated — `text-danger` already resolves to --danger, the
+   theme's feedback.error (N5 / D1 / R86).
+
+   LEFT EXACTLY AS HEROUI HAS IT
+     · MOTION. error-message.css:9-12 is
+       `transition: opacity 150ms var(--ease-out), height 350ms var(--ease-smooth)`
+       followed by `motion-reduce:transition-none`. §8 has no rule for a
+       validation-line reveal, R140 forbids new choreography, and R136 warns
+       that touching `transition-property` (which the shorthand rewrites)
+       would out-specify HeroUI's reduced-motion guard and force this file to
+       restate BOTH guards for no design gain. Untouched.
+     · `h-auto`, `wrap-break-word` and the box model.
+     · `.tag-group [data-slot="error-message"] { p-1 }` (tag-group.css:12-14)
+       — padding only, and D29 leaves TagGroup's own spacing alone.
+
+   CASCADE
+   (0,2,0) — attribute + class — against a base of (0,1,0). No other base or
+   theme file declares a font-size or line-height that reaches
+   `.error-message`, so nothing ties.
+
+   Reviewed: no changes. Verified against the live files, not just the
+   report — base error-message.css:3-12 confirmed byte-for-byte, including
+   the transition + motion-reduce guard. Confirmed tag-group.css:10-15 covers
+   `[slot="errorMessage"]` / `[data-slot="error-message"]` with `p-1` only.
+   Confirmed no other base or theme file (checkbox/radio/switch/select/etc.)
+   declares a font-size or line-height reaching `.error-message` — it is a
+   standalone host-rendered element, not routed through checkbox/radio/switch
+   the way FieldError is, so the checkbox.css:11-14-style ties that apply to
+   description.css and field-error.css do not apply here. Confirmed
+   `--tc-font-size-16` / `--tc-line-height-relaxed` are mode-independent in
+   tokens.css. Grepped clean for colour literals, --tc-color-, !important,
+   physical left/right; comment delimiters balanced. No corrections needed.
+   ========================================================================== */
+
+[data-theme^="tzuchi"] .error-message {
+  /* R7 — error text carries the same metrics as helper text (R6); only the
+     colour differs, and the theme already supplies it. */
+  font-size: var(--tc-font-size-16, 16px);
+  line-height: var(--tc-line-height-relaxed, 1.6);
+}

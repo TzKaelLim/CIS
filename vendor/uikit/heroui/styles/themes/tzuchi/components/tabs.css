@@ -1,0 +1,304 @@
+/*
+ * Tabs — Tzu Chi shape over HeroUI's structure.
+ * Scope: [data-theme^="tzuchi"] only; upstream's own themes are untouched.
+ *
+ * VARIANT MAPPING
+ *   tc-tabs[variant="web"]     ↔ HeroUI `secondary` (underline + bottom divider).
+ *                                Tabs hug in tc, stretch in HeroUI — see below.
+ *   tc-tabs[variant="mobile"]  ↔ HeroUI `secondary` too: HeroUI's tabs are
+ *                                `w-full`, i.e. already the equal-width layout
+ *                                tc-tabs gets from `flex: 1 1 0`. Kept as is.
+ *   HeroUI `primary` (segmented pill) has no tc counterpart. It keeps its shape
+ *                                and gets the same tokens: tc type ramp, tc
+ *                                density, the 8px tc corner (like .button), the
+ *                                tc hover fill and the tc inset focus ring.
+ *
+ * WHAT THIS CHANGES
+ *   1. Type: 14px/500 → the tc tab ramp (--tc-typography-tab-sm = 500 20px/1.5);
+ *      the selected tab goes bold (700), as in tc-tab.styles.ts.
+ *   2. Density: HeroUI's fixed 32px tab becomes auto height + 12px block padding
+ *      (tc padding: 12px 16px — the 16px inline padding already matched px-4).
+ *   3. Hover: HeroUI fades the tab to 70%; tc fills it with the brand surface
+ *      (--accent-soft) and keeps the label at full opacity.
+ *   4. Focus: HeroUI's outer 2px ring (+2px offset) becomes tc's INSET 2px
+ *      outline — it also stops the ring being clipped by the tab scroller.
+ *   5. `primary` corners: 24px pill / 20px container → 8px / 12px concentric.
+ *   6. `secondary`: 4px gap between tabs, selected label in --accent (tc
+ *      brand.primary; HeroUI used plain --foreground), and the underline is
+ *      inset 8px per side with fully rounded ends (tc's ::after indicator).
+ *
+ * UNCHANGED ON PURPOSE: divider/underline colours (--border / --accent already
+ * resolve to tc border.default / brand.primary), disabled (0.38 + not-allowed
+ * already identical), 150ms transitions, separators, scroll chevrons, panels.
+ *
+ * Reviewed: no changes. Verified against styles/components/tabs.css,
+ * react/src/components/tabs/{tabs.tsx,tabs.stories.tsx},
+ * styles/src/components/tabs/tabs.styles.ts (class names + variant wiring),
+ * styles/themes/tzuchi/variables.css, packages/tokens/dist/tokens.css, and
+ * node_modules' react-aria-components SharedElementTransition source (confirms
+ * the indicator's width/height/translate are set inline during the 250ms FLIP
+ * move, which is why the indicator is inset via padding + background-clip
+ * instead of width/inset-inline). Every selector exists in the base file or is
+ * emitted by tabs.tsx/tabs.styles.ts; every rule is scoped by
+ * [data-theme^="tzuchi"]; only HeroUI theme variables and mode-independent
+ * --tc-space-* /--tc-radius-* /--tc-typography-* /--tc-font-weight-* /
+ * --tc-focus-ring-* tokens are referenced (no --tc-color-*, no component
+ * colour tokens, no hex/rgb literals); each override selector carries strictly
+ * higher specificity than the base declaration it must beat, in the same
+ * "components" layer, so it wins in every state (hover incl. both :hover and
+ * [data-hovered], focus-visible incl. both native and [data-focus-visible],
+ * disabled-excluded hover, primary vs. secondary, horizontal vs. vertical);
+ * no variant, size, or state is hidden or broken. All six assertions were
+ * re-derived independently (font shorthand → font-size 20px; padding-block →
+ * padding-block-start 12px; block-size:auto + 1.5 line-height + 24px padding →
+ * height 54px; --tc-radius-md → 8px tab radius; bold selected weight 700;
+ * concentric list-container radius calc(8px + 4px) → 12px) against the
+ * `components-navigation-tabs--default` story (confirmed in index.json; its
+ * DefaultTemplate renders the default `primary` variant with no per-consumer
+ * utility classes, so nothing in the later "utilities" layer competes here).
+ *
+ * PASS 4 (2026-09-20) — unselected segmented ("primary") tab labels off
+ * --muted onto --default-foreground.
+ * NEW DESIGN-LANGUAGE RULE (the integrator's call, delegated by the owner): text that sits on a FILL never
+ * uses --muted; it uses that fill's own foreground.  In the primary variant
+ * the tab strip IS a fill — `.tabs__list-container` is `bg-default` (base
+ * tabs.css:16-19) — and `.tabs__tab`'s `text-muted` (base:124) measured
+ * 3.43:1 on it in light (6.03:1 dark).  The unselected label therefore takes
+ * --default-foreground: 11.29:1 in both modes.
+ * SCOPE: primary only.  The rule is written the way this file already scopes
+ * its other primary-variant rules, plus the child combinator the base itself
+ * uses (base:177-183) so a Tabs nested inside a panel keeps its own colours:
+ * `.tabs:not(.tabs--secondary) > :is(.tabs__list-container, .tabs__list)`.
+ * The secondary/underline variant — the one that IS tc-tabs — is untouched:
+ * its container is `bg-transparent` (base:249-250), its tabs sit on the page,
+ * and tc-tab.styles.ts:13 puts them at color.text.muted at rest with
+ * color.brand.primary when selected, which is exactly what this file already
+ * produces.  `:not([data-selected="true"])` keeps the selected tab on
+ * --segment-foreground.
+ * STILL READS AS SELECTED (checked in the browser, both themes): the pill
+ * itself does the work — `.tabs__indicator` paints --segment (white light /
+ * gray-800 dark) over the --default track and carries --surface-shadow (base
+ * :227-229) — plus this file's 700 weight on the selected tab against the
+ * unselected 500.  In tzuchi-dark --default-foreground and --segment-foreground
+ * both resolve to gray-100, so after this change the dark segmented control
+ * separates selected from unselected by pill + shadow + weight only, no longer
+ * also by label colour; light keeps a small colour difference as well
+ * (gray-900 #333333 vs --eclipse).  Mapping --segment / --segment-foreground
+ * for this theme is still the open item the gap report names, and would give
+ * the dark pill its colour channel back.
+ * Specificity: base `.tabs__tab` colour is (0,1,0); this rule is (0,6,0).
+ * Nothing else in the base file sets `color` on an unselected tab, and the
+ * selected (:141-142), disabled (:151-156), hover (:158-164) and focus
+ * (:166-170) rules are all left alone.
+ *
+ * extraThemeVars stays empty: --accent, --accent-soft and --focus already
+ * resolve, in both tzuchi and tzuchi-dark, to the exact hex values tc-tab's
+ * own tokens specify (--tc-color-brand-primary / -surface / -border-focus all
+ * alias the same --tc-color-blue-* primitives as HeroUI's --accent/-soft/
+ * --focus in the generated theme), so no invented variable is needed.
+ *
+ * Pass 4 reviewed (2026-09-20): no changes to the CSS. Diffed this file
+ * against the live styles/themes/tzuchi/components/tabs.css and confirmed
+ * only the briefed `.tabs:not(.tabs--secondary) > :is(.tabs__list-container,
+ * .tabs__list) .tabs__tab:not([data-selected="true"]) { color:
+ * var(--default-foreground) }` rule is new — nothing else moved or
+ * reformatted. Confirmed --default and --default-foreground are mapped
+ * theme variables in both `[data-theme="tzuchi"]` and `[data-theme="tzuchi-
+ * dark"]` (variables.css), and that `.tabs__list-container` really is
+ * `bg-default` in the primary variant (base:16-19) with no tc override
+ * touching that fill. Re-probed the live tab with this rule injected:
+ * unselected colour is rgb(51,51,51) in tzuchi / rgb(242,242,242) in
+ * tzuchi-dark — a clean (0,6,0) win over the base's `text-muted` (0,1,0) —
+ * and confirmed the selected tab is untouched (still --segment-foreground,
+ * unaffected by the `:not([data-selected="true"])` guard). Re-probed the
+ * secondary/underline variant with the same file injected: its unselected
+ * tab colour is still rgb(130,130,130) (--muted), confirming the child-
+ * combinator scoping keeps this rule out of tc-tabs' own component. Screened
+ * both themes' segmented control by eye: the selected pill (shadow + fill +
+ * 700 weight) still reads as selected in light and in dark, including the
+ * dark case the header comment already calls out where unselected and
+ * selected now share one colour. Checked the disabled tab in both themes:
+ * still visibly dimmed by `--disabled-opacity` on top of the new colour, no
+ * regression. Comment safety, colour-literal, !important, physical-property
+ * and scope scans: clean.
+ *
+ * PASS 5 (2026-09-20) — the hover fill is split per variant, and the
+ * underline variant's tab gets tc's own corner.  This SUPERSEDES item 3 of
+ * "WHAT THIS CHANGES" ("tc fills it with the brand surface") as a statement
+ * about BOTH variants; it is now true of the secondary variant only.
+ *
+ *   a) SEGMENTED (HeroUI `primary`): hover is neutral, --default-hover.
+ *      The brand tint was louder than the SELECTED state it sits under: the
+ *      selected tab is a neutral `--segment` pill (deliberately unmapped,
+ *      DESIGN-LANGUAGE R130 / D31), and in tzuchi-dark --accent-soft is a
+ *      saturated navy, so the hovered tab became the strongest mark in the
+ *      strip and read as the current tab.  --default-hover is the hover step
+ *      of the fill the strip itself is painted with (`.tabs__list-container`
+ *      is `bg-default`, base:16-19), so hover now sits one step above the
+ *      track and below the pill.  It is also NOT tc's own control: HeroUI's
+ *      segmented pill has no tc counterpart (see VARIANT MAPPING), so nothing
+ *      here is being taken away from tc-tabs.
+ *      RESIDUAL, reported not worked around: in tzuchi-dark --default-hover
+ *      and --segment are the same gray-800, so the hovered tab and the
+ *      selected pill share a fill and are told apart by the pill's shadow and
+ *      the 700 weight alone.  That is the --segment mapping gap §12 Q4
+ *      already tracks — the neutral ramp offers exactly one step above the
+ *      track — not something this file can fix without inventing a colour.
+ *      Light is unaffected: gray-200 hover under a white pill.
+ *   b) SECONDARY (underline) = tc-tabs: the fill STAYS.  tc-tab.styles.ts
+ *      :24-26 really does paint `--tc-tabs-tab-bg-hover` = brand.surface =
+ *      --accent-soft across the whole host box on hover, so the tint is
+ *      faithful and is kept.  What was not faithful was the SHAPE: the base
+ *      makes this tab `rounded-none` (base:258-259) and this file's radius
+ *      rule is scoped `.tabs:not(.tabs--secondary)`, so the tint landed as a
+ *      hard square block running edge to edge into the rail.  tc gives this
+ *      same box a 4px corner (tc-tab.styles.ts:53, its focus shape; §2 R34),
+ *      so the tab takes that corner and the tint reads as a control.  The
+ *      corner is on the TAB, not on the hover rule, so the inset focus ring
+ *      this file already draws picks it up too — which is exactly the pairing
+ *      tc-tab makes.  Full height into the rail is tc's own geometry (its
+ *      divider is the tabs container's border-block-end, below the tab) and
+ *      is deliberately kept.
+ *      The label stays --muted on the tint, as tc-tab leaves it.
+ *
+ * SPECIFICITY: the neutral hover keeps the existing (0,4,0) selectors, so it
+ * simply replaces the value they already set; the secondary hover adds
+ * `.tabs--secondary > .tabs__list-container` for (0,6,0) and wins over it in
+ * that variant only; the secondary radius is (0,4,0) against the base's
+ * `rounded-none` at (0,3,0).  Consumer utility classes are unaffected — they
+ * live in the later `utilities` layer.  No variant, size or state is hidden:
+ * disabled still never fills, selected still never fills, the indicator, the
+ * separators, the scroll chevrons and the panels are untouched.
+ *
+ * PASS 5 REVIEWED (2026-09-20): no changes. Diffed against the live
+ * styles/themes/tzuchi/components/tabs.css — only the briefed hover-value
+ * split, the secondary hover rule and the secondary radius rule are new.
+ * Re-probed in the browser: segmented hover is --default-hover in both
+ * themes and both orientations (horizontal, vertical, with-separator);
+ * secondary/underline hover keeps --accent-soft and now paints on a 4px
+ * corner instead of a hard square, and the inset keyboard focus-visible ring
+ * (verified via real Tab, not synthetic hover) follows the same corner;
+ * disabled tabs still never fill on hover. Residual, not in scope: in
+ * tzuchi-dark the segmented hover and the selected --segment pill still
+ * share one gray-800 fill (the --segment mapping gap §12 Q4 already
+ * tracks) — hover no longer outranks selection, which was the defect, but
+ * the two are told apart only by weight and shadow. Comment safety,
+ * colour-literal, !important, physical-property and scope scans: clean.
+ */
+
+/* ── Tab: tc type ramp + tc density (both variants) ─────────────────────── */
+[data-theme^="tzuchi"] .tabs__tab {
+  /* tc-tab: no fixed height — padding + line-height define it (→ 54px) */
+  block-size: auto;
+  padding-block: var(--tc-space-12, 12px);
+  /* icon ↔ label gap (tc-tab.styles.ts :host gap) */
+  gap: var(--tc-space-8, 8px);
+  /* 500 20px/1.5 Noto Sans TC — the family already equals --font-sans */
+  font: var(--tc-typography-tab-sm, 500 20px / 1.5 var(--font-sans));
+}
+
+[data-theme^="tzuchi"] .tabs__tab[data-selected="true"] {
+  font-weight: var(--tc-font-weight-bold, 700);
+}
+
+/* Hover: the tab fills instead of fading to 70%.  Pass 5 — WHICH fill depends
+   on the variant (see PASS 5 in the header): neutral in the segmented strip,
+   where the brand tint outranked the neutral --segment pill; tc's own brand
+   surface in the underline variant, which IS tc-tabs. */
+@media (hover: hover) {
+  [data-theme^="tzuchi"]
+    .tabs__tab:not([data-selected="true"]):not([data-disabled="true"]):hover,
+  [data-theme^="tzuchi"]
+    .tabs__tab[data-hovered="true"]:not([data-selected="true"]):not([data-disabled="true"]) {
+    opacity: 1;
+    background-color: var(--default-hover);
+  }
+
+  /* tc-tab.styles.ts:24-26 — the underline tab really does fill with
+     brand.surface on hover, so the tint is kept here. */
+  [data-theme^="tzuchi"]
+    .tabs--secondary
+    > .tabs__list-container
+    .tabs__tab:not([data-selected="true"]):not([data-disabled="true"]):hover,
+  [data-theme^="tzuchi"]
+    .tabs--secondary
+    > .tabs__list-container
+    .tabs__tab[data-hovered="true"]:not([data-selected="true"]):not([data-disabled="true"]) {
+    background-color: var(--accent-soft);
+  }
+}
+
+/* Focus: tc draws the ring inside the tab (outline-offset is negative), so it
+   survives the ScrollShadow's overflow clipping. `box-shadow: none` drops
+   HeroUI's ring, which the tab uses for nothing else. */
+[data-theme^="tzuchi"] .tabs__tab:focus-visible:not([data-focused]),
+[data-theme^="tzuchi"] .tabs__tab[data-focus-visible="true"] {
+  outline: var(--tc-focus-ring-width, 2px) solid var(--focus);
+  outline-offset: calc(-1 * var(--tc-focus-ring-offset, 2px));
+  box-shadow: none;
+}
+
+/* Pass 4 — the segmented strip is a fill (--default), so an unselected label
+   is that fill's own foreground, never --muted.  Child combinator (as in the
+   base's own align-start/end rules) so a nested Tabs inside a panel is not
+   reached; the secondary/underline variant keeps --muted, which is tc-tab's
+   own resting colour. */
+[data-theme^="tzuchi"]
+  .tabs:not(.tabs--secondary)
+  > :is(.tabs__list-container, .tabs__list)
+  .tabs__tab:not([data-selected="true"]) {
+  color: var(--default-foreground);
+}
+
+/* ── primary (segmented): the 8px Tzu Chi corner, as on .button ──────────── */
+[data-theme^="tzuchi"] .tabs:not(.tabs--secondary) > .tabs__list-container {
+  /* concentric with the tab: 8px + the list's 4px inset */
+  border-radius: calc(var(--tc-radius-md, 8px) + var(--tc-space-4, 4px));
+}
+
+[data-theme^="tzuchi"] .tabs:not(.tabs--secondary) .tabs__tab,
+[data-theme^="tzuchi"] .tabs:not(.tabs--secondary) .tabs__indicator {
+  border-radius: var(--tc-radius-md, var(--radius));
+}
+
+/* ── secondary (underline) = tc-tabs web/mobile ──────────────────────────── */
+
+/* Pass 5 — tc-tab.styles.ts:53 gives this box a 4px corner (§2 R34); the base
+   makes it `rounded-none` (base:258-259), which is what turned the hover tint
+   into a hard square block.  On the tab itself, so the inset focus ring above
+   takes the same corner — the pairing tc-tab makes. */
+[data-theme^="tzuchi"] .tabs--secondary > .tabs__list-container .tabs__tab {
+  border-radius: var(--tc-radius-sm, 4px);
+}
+
+/* tc-tabs[variant="web"] gap */
+[data-theme^="tzuchi"] .tabs--secondary .tabs__list[data-orientation="horizontal"] {
+  column-gap: var(--tc-space-4, 4px);
+}
+
+/* tc selected label is brand.primary, not plain foreground */
+[data-theme^="tzuchi"] .tabs--secondary > .tabs__list-container .tabs__tab[data-selected="true"] {
+  color: var(--accent);
+}
+
+/* tc's underline is inset 8px per side with fully rounded ends. The indicator's
+   box is sized by React Aria, so inset it with padding + a content-box clip
+   rather than with width/inset-inline, which an inline width would override. */
+[data-theme^="tzuchi"] .tabs--secondary > .tabs__list-container .tabs__indicator {
+  border-radius: var(--tc-radius-full, 9999px);
+  background-clip: content-box;
+}
+
+[data-theme^="tzuchi"]
+  .tabs--secondary[data-orientation="horizontal"]
+  > .tabs__list-container
+  .tabs__indicator {
+  padding-inline: var(--tc-space-8, 8px);
+}
+
+[data-theme^="tzuchi"]
+  .tabs--secondary[data-orientation="vertical"]
+  > .tabs__list-container
+  .tabs__indicator {
+  padding-block: var(--tc-space-8, 8px);
+}

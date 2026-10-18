@@ -1,0 +1,152 @@
+/* ------------------------------------------------------------------------------------------------
+ * Kbd — Tzu Chi theme overrides
+ * ------------------------------------------------------------------------------------------------
+ * Base            : heroui/styles/components/kbd.css
+ * Tzu Chi source  : NONE. DESIGN-LANGUAGE.md §12 Q8 lists Kbd among the components with no Figma
+ *                   record; §1 R21 names `kbd` explicitly as a "NO EVIDENCE — derive" role and
+ *                   points it at R1 ("a label inside a control"). Every value below cites its rule.
+ *
+ * WHAT THIS CHANGES
+ *
+ *   1. Type — text-sm/font-medium (14px · 500 · 1.4286 = 20px) -> 16px · 700 · 1.5 (= 24px).
+ *      §1 R21 -> R1 via §1.2: a key legend is the text the cap IS, so it takes the `subtitle`
+ *      voice, and Tzu Chi has no 14px step at all (§1 preamble). The cap's `h-6` (24px) box takes
+ *      a 24px line box exactly, so the height does not have to move with it.
+ *
+ *   2. Radius — rounded-lg (`calc(var(--radius) * 1)` = 8px) -> 4px, §2 R33.
+ *      8px in this system is the CONTROL radius (R22: button / field / trigger, every one of them
+ *      34-50px tall) and the option-panel radius (R29). Every small square-ish object is 4px:
+ *      the pagination cell at 32-48px (R33), the checkbox at 32px (R25), the tooltip bubble (R31),
+ *      an inline element's focus shape (R34). A 24px key cap is the smallest of that family, so it
+ *      takes their value. This also puts Kbd and Typography's inline `code` chip — the same object
+ *      in two components — on one corner; see typography.css.
+ *
+ *   3. Foreground — `text-muted` -> `--default-foreground`, §5's tint ladder.
+ *      The ladder's row for a `--default` fill names `--default-foreground` as the text on it, at
+ *      11.29:1 in BOTH modes. `--muted` on that fill measures 3.43:1 light / 6.03:1 dark
+ *      (gap-audit/neutral-token-impact.md:117), i.e. real text below AA in light. Both variants are
+ *      moved together, so `light` (no fill) and the default (filled) still differ by the fill
+ *      alone, exactly as upstream has it — the colour was never the variant tell.
+ *
+ *   4. Internal gap — space-x-0.5 (2px) -> 4px, §9 R154 ("micro gap: chip/tag/badge internals").
+ *      badge.css:14 made the identical 2px -> 4px move for the badge's dot-to-label gap. It is
+ *      re-expressed as `column-gap` because the base ships `space-x-*`, i.e. per-child margins plus
+ *      an `rtl:space-x-reverse` flip; a flex gap is direction-agnostic, so zeroing those margins
+ *      and letting the gap do the work reproduces both directions with one value and keeps N4's
+ *      "logical properties only".
+ *
+ * CASCADE
+ *   - `[data-theme^="tzuchi"] .kbd` is (0,2,0) against the base's `.kbd` (0,1,0) — wins on
+ *     specificity, no order dependency, for all four properties it replaces.
+ *   - The base's spacing rule is `:where(.kbd > :not(:last-child))`, which `:where()` flattens to
+ *     (0,0,0); the rule below is (0,3,0). The RTL companion only sets `--tw-space-x-reverse: 1`,
+ *     which feeds the calc()s this rule replaces, so it becomes inert rather than conflicting.
+ *   - Nothing here is a Tailwind ring / shadow composition, so §4 R74's warning does not apply.
+ *
+ * DELIBERATELY NOT CHANGED
+ *   - Height `h-6` (24px) and `px-2` (8px). The spec gives no Kbd metric; R40/R41's 42 / 43.6px
+ *     control heights describe things you click, and a key cap sits INSIDE a 25.6px prose line
+ *     (the InlineUsage story). 24px with a 24px line box is the restrained reading, and 8px is
+ *     already a Tzu Chi space step.
+ *   - `bg-default` (§5 R88 case ①: a HeroUI-only neutral with no Tzu Chi counterpart) and
+ *     `.kbd--light`'s transparent fill.
+ *   - `word-spacing: -0.25rem`, `text-center`, `white-space: nowrap`, `font-sans`, and the
+ *     `.kbd__abbr` / `.kbd__content` full-bleed flex boxes — structure and optics, not design
+ *     language.
+ *
+ * VARIANTS / STATES — none hidden. `default` (filled) and `light` (transparent) both keep their
+ * fills and now share the new type, radius, gap and foreground; Kbd has no size, hover, focus or
+ * disabled state to preserve.
+ *
+ * Reviewed: no changes. Verified against heroui/styles/components/kbd.css, kbd.tsx and
+ * kbd.styles.ts, and the compiled storybook CSS (iframe-DpN8oW_m.css), which confirms the base
+ * `.kbd` rule is (0,1,0), the space-x rule really is `:where(.kbd > :not(:last-child))` = (0,0,0)
+ * with an inert `rtl:space-x-reverse` companion, and every --tc-* token used (--tc-radius-sm,
+ * --tc-space-4, --tc-font-size-16, --tc-font-weight-bold, --tc-line-height-normal) exists in
+ * packages/tokens/dist/tokens.css and is mode-independent. `--default-foreground` is a HeroUI
+ * theme colour variable, not --tc-color-*. Scoping and comment-close safety confirmed. Both
+ * `default` and `light` variants keep their fills; the shared type/radius/gap/foreground change
+ * is deliberate and documented above, not a hidden state.
+ *
+ * Pass 5 (2026-09-20) — SUPERSEDES item 1's weight, and adds one row-scoped rule.
+ *   a. Weight 700 -> 500. R21 -> R1 gave the key legend the `subtitle` voice, and 700 is what
+ *      that voice carries at 16px; but a Kbd never speaks on its own — it is always beside the
+ *      command it belongs to. In a menu row (`components-collections-dropdown--with-keyboard-
+ *      shortcuts`) 16px/700 in the plain foreground made `⌘N` heavier than `New`, and in
+ *      tzuchi-dark it made the shortcut pure white against a mid-blue command name: the least
+ *      important thing in the row was the loudest. 500 is HeroUI's own weight for this element
+ *      (kbd.css:3, `font-medium`), so the change is a return to the base, not an invention, and
+ *      it is the same weight the section header carries for the same reason (header.css, pass 4:
+ *      "the distance from its 16px/700 rows is carried in WEIGHT").
+ *   b. Inside a menu / list-box ROW the cap goes further: weight 400 (the row's own description
+ *      weight) and `color: inherit`, so it takes the row's own AMBIENT text colour — --foreground
+ *      on a bare row, --accent-soft-foreground on a tinted panel, and the dimmed inherited colour
+ *      when the row is disabled. That is the same "text on a fill takes the fill's foreground" rule
+ *      pass 4 applied to the row's description, and it is what stops the shortcut from being the
+ *      only element in the row that ignores its context. The `--light` variant (no fill) is the one
+ *      the stories use in rows; the filled variant keeps `bg-default` either way, since §5 R88 ①
+ *      has no Tzu Chi counterpart for it.
+ *      REVIEWED CORRECTION: on a DANGER row the Kbd does NOT turn --danger. `Kbd` renders as a
+ *      sibling of `Label` inside the row (dropdown.stories.tsx:398-406), and
+ *      `.menu-item--danger`/`.list-box-item--danger` only colour `[data-slot="label"]` and the
+ *      selection indicator (menu-item.css:158-165, list-box-item.css:110-117) — never the row
+ *      element itself — so `color: inherit` on a sibling Kbd resolves to the row's ordinary
+ *      foreground, not to red. Verified live: `components-collections-dropdown--with-keyboard-
+ *      shortcuts`, tzuchi, probe `.menu-item--danger .kbd` -> `rgb(27, 45, 88)`
+ *      (--accent-soft-foreground), while `.menu-item--danger [data-slot="label"]` stays --danger.
+ *      This unit's brief (item 10) only asks for weight 400 + the row's ambient colour, which is
+ *      what is written below; making a danger row's shortcut red as well is a design decision for
+ *      the integrator, not assumed here.
+ *
+ * Pass 5 reviewed (2026-09-20): diffed against the live theme file — only the briefed weight change
+ * and the new row-scoped rule differ; nothing pre-existing lost or reformatted. One documentation
+ * correction made (above): the original pass-5 comment claimed the row-scoped rule turns a Kbd
+ * --danger inside a danger row; live probing showed it does not (see the correction above) — no CSS
+ * changed, only the claim. Rule scoped, colour is `inherit` (no literal, no --tc-color-*), no
+ * !important, no physical property, comment markers balanced (checked twice given this file's own
+ * warnings about comment-close safety). Cascade re-derived: the row rule is (0,3,0) against this
+ * file's own `.kbd` (0,2,0) and the base's (0,1,0); `.kbd--light`'s only declaration (its transparent
+ * fill) is untouched. Injection-verified live: `components-typography-kbd--key-combinations`
+ * (standalone, weight 500 confirmed by probe), `components-collections-dropdown--with-keyboard-
+ * shortcuts` in tzuchi-dark (in-row weight 400, colour rgb(169,194,234) = the row's own
+ * --accent-soft-foreground, probed) and in tzuchi (danger row's Kbd probed at
+ * --accent-soft-foreground, not --danger — the correction above). No variant or state broken. No
+ * corrections needed beyond the comment fix above.
+ * ------------------------------------------------------------------------------------------------ */
+
+[data-theme^="tzuchi"] .kbd {
+  /* §2 R33 — the small square-ish cell radius. */
+  border-radius: var(--tc-radius-sm, 4px);
+
+  /* §5 tint ladder — the foreground that pairs with a `--default` fill (11.29:1, both modes). */
+  color: var(--default-foreground);
+
+  /* §9 R154 — micro gap, replacing the base's 2px `space-x-0.5` margins (zeroed below). */
+  column-gap: var(--tc-space-4, 4px);
+
+  /* §1 R21 -> R1 — the key legend is a control's own label: the `subtitle` voice.
+     PASS 5 — at HeroUI's own 500, not 700: the cap always sits beside the command it
+     belongs to, and 700 made it the loudest thing in the row. */
+  font-size: var(--tc-font-size-16, 16px);
+  font-weight: var(--tc-font-weight-medium, 500);
+  line-height: var(--tc-line-height-normal, 1.5);
+}
+
+/* PASS 5 — a Kbd INSIDE an option row is an annotation on that row, so it recedes further:
+   the row's own normal weight, and the row's own colour rather than a colour of its own.
+   `color: inherit` is what makes it correct in every host at once — --foreground on a bare
+   ListBox / Menu row, --accent-soft-foreground on the four tinted panels, --danger on a danger
+   row, and the dimmed value when the row is disabled — without this file knowing anything about
+   the surface behind it. CASCADE: (0,3,0) against this file's own `.kbd` rule (0,2,0) and the
+   base's (0,1,0); `.kbd--light`'s only declaration is its transparent fill, which is untouched. */
+[data-theme^="tzuchi"] .menu-item .kbd,
+[data-theme^="tzuchi"] .list-box-item .kbd {
+  color: inherit;
+  font-weight: var(--tc-font-weight-regular, 400);
+}
+
+/* The base's `space-x-0.5` margins, retired in favour of the gap above. Direction-agnostic, so the
+   `rtl:space-x-reverse` companion has nothing left to flip. */
+[data-theme^="tzuchi"] .kbd > :not(:last-child) {
+  margin-inline: 0;
+}

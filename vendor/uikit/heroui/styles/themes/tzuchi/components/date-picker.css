@@ -1,0 +1,171 @@
+/* ==========================================================================
+   DatePicker — Tzu Chi shape and type overrides
+   --------------------------------------------------------------------------
+   Base:   heroui/styles/components/date-picker.css — `.date-picker`,
+           `.date-picker__trigger`, `.date-picker__trigger-indicator`,
+           `.date-picker__popover`, plus the two
+           `.date-picker__popover .calendar__nav-button-icon` rotation rules.
+   Model:  none. DatePicker has no tc-* counterpart, so every value below is
+           derived from DESIGN-LANGUAGE.md and from the two field-family
+           overrides that already shipped: search-field.css (affix icon) and
+           select.css (trigger type, popover shell).
+
+   Scoped to [data-theme^="tzuchi"], loaded into the same "components" layer as
+   heroui/styles/components/date-picker.css but after it, so upstream's own
+   light and dark themes are provably untouched.
+
+   WHAT THIS CHANGES — three declarations' worth, nothing else.
+
+     1. TRIGGER TYPE  `.date-picker__trigger`
+        `text-sm` (14px / 20px / inherited 400)  ->  16px / 700 / 1.5.
+        §1 R1: "the text a button/trigger/tab/row IS" is the subtitle voice,
+        and §1's mechanical rule is that every 14px role moves to 16px —
+        Tzu Chi has no 14px step. Identical treatment to the Select trigger
+        (select.css:120-122). React Aria renders this slot icon-only in every
+        stock story, so the declaration is only visible once a consumer puts a
+        label inside DatePicker.Trigger; it is written so that label lands on
+        the Tzu Chi control voice instead of a size the palette does not have.
+
+     2. INDICATOR SIZE  `.date-picker__trigger-indicator`
+        `size-4` (16px square)  ->  var(--tc-size-icon-sm) = 20px.
+        16px is not on the Tzu Chi icon scale at all (--tc-size-icon-sm/-md/-lg
+        = 20 / 32 / 40px), and §1.3 enumerates the only two 16px glyphs the
+        theme deliberately keeps — the shared `.close-button` svg and the toast
+        spinner. This is neither. Both field affixes the 26 already themed move
+        to the same 20px: the SearchField magnifier (R54, search-field.css:
+        179-180) and the Select chevron (select.css:192-195).
+
+     3. POPOVER RADIUS  `.date-picker__popover`
+        `min(32px, calc(var(--radius) * 2.5))` = 20px under this theme  ->
+        var(--tc-card-radius) = 16px. §6(b) R98/R30 — the DatePicker shell is a
+        CONTENT popover (it holds a calendar, not an option column), so it
+        follows the Card/Modal surface radius, not the 8px option-panel radius
+        that dropdown.css / select.css use.
+
+   KEPT DELIBERATELY
+     • Popover background (`bg-overlay`) and elevation (`--overlay-shadow`) —
+       §6(b) R99/R100 and the §6 shadow table. No tint: an --accent-soft panel
+       is tc-dropdown's LISTBOX signature and would make the calendar read as a
+       Select menu.
+     • Popover padding `p-3` (12px) — §6(b) R102 says leave HeroUI's padding
+       where the popover already has some.
+     • Popover enter/exit animation, durations, placement slide-ins, the
+       `origin-(--trigger-anchor-point)` transform origin, `overflow-y-auto`,
+       `overscroll-contain`, `scrollbar-none`, `w-fit`. R140 (no choreography)
+       and the precedent of the two themed popovers: dropdown.css and select.css
+       both leave popover motion exactly as HeroUI ships it.
+     • Trigger radius — `rounded-field` already resolves to --field-radius =
+       --tc-radius-md = 8px (R22); N5 / D1 forbid restating a theme variable.
+     • Trigger padding (`p-1`), `w-full`, `no-highlight`, `cursor-interactive`
+       and its 150ms box-shadow transition: the spec is silent, and the
+       resulting 28px box still clears the 24px WCAG 2.5.8 minimum.
+     • Trigger focus ring and disabled treatment — D2 / D3 / R70 / R85: 2px
+       --focus at a 2px offset and --disabled-opacity 0.38 are theme-wide.
+     • Indicator COLOUR (`text-field-placeholder`). The Tzu Chi precedent for a
+       disclosure affordance inside a field is the Select chevron, which
+       select.css:180 points at `inherit` — resolving to --field-placeholder at
+       rest. The SearchField magnifier's --accent comes from a tc token
+       (--tc-search-bar-icon-fg) that the DatePicker has no counterpart for, so
+       painting this glyph brand blue would be an invention. Listed as a gap.
+     • `.date-picker` root `gap-1` = 4px — already R141/R142's label-to-control
+       and control-to-description rhythm.
+     • The DateField shell the trigger sits in (`.date-input-group`, its
+       `__suffix` 12px inset, its height, border and type) belongs to the
+       date-input-group unit, which applies R49-R54. Nothing here reaches it.
+     • The calendar inside the popover, including the two nav-button-icon
+       rotation rules, belongs to the calendar unit.
+
+   CASCADE
+     Every base declaration touched here is written against a single class
+     (0,1,0); every selector below is (0,2,0), so all three win outright and
+     none of them depends on import order.
+     `inline-size` / `block-size` versus the base `size-4`'s `width` / `height`:
+     logical and physical properties that map to the same used value are
+     resolved against each other by the normal cascade, so the more specific
+     logical declaration wins. search-field.css:179-180 already ships exactly
+     this pair against exactly this base utility.
+     Focus-ring clearance: `.date-input-group` is `overflow-hidden`, so the
+     trigger's 2px ring at a 2px offset needs 4px of room inside the shell.
+     With the 20px glyph the trigger is 28px tall, which clears inside the
+     43.6px field shell R41/R49 gives every field-family component (6.8px each
+     side). It is exactly 3px — 1px short — against HeroUI's un-themed `h-9`
+     36px shell, so this file assumes the date-input-group override lands.
+     Recorded in the report.
+
+   VARIANTS / SIZES / STATES — DatePicker ships none of its own: no size scale,
+   no colour variants. The four states on the base (`:focus-visible`,
+   `[data-focus-visible]`, `:disabled` / `[data-disabled]` / `[aria-disabled]`
+   on the trigger; `[data-entering]` / `[data-exiting]` / `[data-placement]` on
+   the popover) are all untouched and keep working.
+
+   Reviewed: no changes. Verified against the live sources — every selector
+   (.date-picker__trigger, __trigger-indicator, __popover) exists in
+   heroui/styles/components/date-picker.css and date-picker.styles.ts
+   (which has no `variants` key, confirming no size/colour axis is hidden);
+   every rule sits inside the single [data-theme^="tzuchi"] block; grepped
+   clean for --tc-color-*, hex/rgb/hsl/oklch literals, !important and
+   physical left/right; --tc-font-size-16, --tc-font-weight-bold,
+   --tc-line-height-normal, --tc-size-icon-sm and --tc-card-radius all exist
+   in packages/tokens/dist/tokens.css and are absent from both its
+   [data-theme="dark"] and prefers-color-scheme dark blocks, so all are
+   mode-independent; --tc-card-radius resolves to --tc-radius-lg = 16px,
+   matching R98/R30. Confirmed no other of the 26 shipped override files
+   mentions date-picker, date-range-picker or date-input-group, so there is
+   no ownership collision. Confirmed via storybook/styles/globals.css and
+   themes/tzuchi/index.css that this file's [data-theme^="tzuchi"] block
+   lands in the same "components" layer as HeroUI's base date-picker.css but
+   after it, so the (0,2,0) vs (0,1,0) specificity table above is not
+   load-order-dependent. Confirmed .date-input-group is h-9 (36px),
+   overflow-hidden and text-sm in the live base CSS, matching the
+   cross-unit-dependency note. No comment closes early (no interior
+   comment-terminator sequence).
+   Both story ids referenced by the assertions exist in
+   storybook-static/index.json, and Default's render tree (DateField.Group >
+   DateField.Suffix > DatePicker.Trigger > DatePicker.TriggerIndicator,
+   {open} DatePicker.Popover > Calendar) matches every asserted selector.
+   No corrections were needed.
+
+   Consistency pass: fixed a PREMATURE COMMENT CLOSE. The line above that
+   claimed "no comment closes early" spelled the comment-terminator sequence
+   out literally inside backticks, which CSS does not recognise — so the header
+   comment ended there, and the five prose lines that followed (one of which
+   contains a brace pair, "{open}") plus the real terminator plus
+   `[data-theme^="tzuchi"] {` were parsed as two garbage rules. The whole
+   single-block body of this file was dropped. That left DatePicker as the only
+   content popover still on HeroUI's 20px corner while date-range-picker.css,
+   color-picker.css and popover.css moved to 16px, and its trigger indicator
+   the only field affix still 16px beside the 20px chevrons in select.css,
+   combo-box.css, autocomplete.css and date-range-picker.css. The sentence now
+   names the sequence instead of spelling it (brief rule 8). No selector,
+   declaration or value changed.
+   ========================================================================== */
+
+[data-theme^="tzuchi"] {
+  /* ---------------------------------------------------------------- trigger -- */
+  .date-picker__trigger {
+    /* §1 R1 — control label: 16px / 700 / 1.5, the same three longhands
+       select.css:120-122 gives the Select trigger. Longhands only, so the
+       theme's --font-sans stack is not re-declared (N5). */
+    font-size: var(--tc-font-size-16, 16px);
+    font-weight: var(--tc-font-weight-bold, 700);
+    line-height: var(--tc-line-height-normal, 1.5);
+  }
+
+  /* -------------------------------------------------------------- indicator -- */
+  .date-picker__trigger-indicator {
+    /* §1.3 + R54 — the Tzu Chi small icon is 20px; 16px is not on the scale.
+       Scoped to the indicator element, not to `svg`, so a custom child icon
+       (the WithCustomIndicator story passes its own `size-4` Iconify glyph)
+       keeps whatever size it brings and simply centres in the 20px box. */
+    inline-size: var(--tc-size-icon-sm, 20px);
+    block-size: var(--tc-size-icon-sm, 20px);
+  }
+
+  /* ---------------------------------------------------------------- popover -- */
+  .date-picker__popover {
+    /* §6(b) R98/R30 — content popover, so the Card/Modal surface radius (16px),
+       not the option panel's 8px. Background, shadow, padding and motion stay
+       HeroUI's (R99/R100/R102). */
+    border-radius: var(--tc-card-radius, var(--radius-2xl));
+  }
+}

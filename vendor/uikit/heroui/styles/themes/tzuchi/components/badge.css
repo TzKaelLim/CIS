@@ -1,0 +1,81 @@
+/* ==========================================================================
+   Badge — Tzu Chi theme overrides
+   --------------------------------------------------------------------------
+   WHAT THIS CHANGES (everything else is left to HeroUI's base badge.css):
+
+   1. Density — HeroUI's badge box is min-h-7/min-w-7 (28px) at `md`, i.e. 70%
+      of the 40px `md` Avatar it hangs off. tc-badge's box is 20px
+      (--tc-badge-min-size). 20px is also exactly half a 40px avatar, which is
+      the ratio `sm` (16px badge / 32px avatar) already has — so `md` takes the
+      Tzu Chi token, `lg` is extrapolated to 24px (half of the 48px `lg`
+      avatar, a 16/20/24 scale on the 4px --tc-space-4 rhythm) and `sm` keeps
+      its 16px. `sm`/`lg` have to RESTATE their size here only because the
+      themed base rule below out-specifies HeroUI's own `.badge--sm/--lg`.
+   2. Gap — 4px (--tc-badge-gap) instead of HeroUI's gap-0.5 (2px).
+   3. Line height — one value for every size, 1.3 (--tc-line-height-tight),
+      instead of HeroUI's per-size 1.34 / 1.43.
+
+   DELIBERATELY NOT CHANGED: radius (HeroUI's rounded-3xl/2xl/xl already
+   resolve to a full pill at every size, which is tc-badge's `pill` shape),
+   font-size (12px at md = --tc-badge-font-size), font-weight (500 = medium in
+   both), font-family (inherited from the theme's --font-sans), the 1px
+   --badge-border cut-out ring, every colour (already themed), the placement
+   offsets, and the .badge__label padding (tc's 8px padding-inline would stop
+   a single-digit count from rendering as a circle — HeroUI's width comes from
+   min-inline-size instead). See the report for the full table.
+
+   VARIANT / TONE MAPPING (tc → HeroUI), colours untouched:
+     tc variant filled  → .badge--primary   (solid tone bg, on-tone fg)
+     tc variant soft    → .badge--soft      (tinted bg, tone fg)
+     tc variant outline → (no HeroUI slot; .badge--secondary is a neutral fill)
+     tc tone   neutral  → .badge--default
+     tc tone   brand    → .badge--accent
+     tc tone   error    → .badge--danger
+     tc tone   success  → .badge--success
+     tc tone   warning  → .badge--warning   (stays amber: the theme maps
+                                             --warning to --tc-color-amber-*;
+                                             tc-badge's blue warning was a
+                                             workaround for a palette gap that
+                                             the tokens have since closed)
+     tc tone   info     → (no HeroUI slot)
+
+   Reviewed: no changes. Verified all three selectors exist in
+   heroui/styles/components/badge.css and are emitted by badge.styles.ts
+   (tailwind-variants: size sm/md/lg → .badge--sm/--md/--lg); every rule is
+   scoped by [data-theme^="tzuchi"] with no nesting, so nothing leaks into
+   upstream's own themes; no hex/rgb/hsl/oklch literals and the only tokens
+   referenced (--tc-badge-min-size, --tc-badge-gap → --tc-space-4,
+   --tc-line-height-tight) are literal dimension/number values in tokens.css,
+   none resolving to a --tc-color-* or a shadow; specificity checked against
+   the base badge.css cascade (both land in layer "components", tzuchi's
+   loads after upstream's) — the themed `.badge` rule is (0,2,0) vs. base
+   `.badge`/`.badge--sm`/`.badge--lg` at (0,1,0), so it always wins and the
+   `sm`/`lg` restatements (also (0,2,0), later in source) correctly restore
+   only the one property HeroUI's own size rules would otherwise lose; no
+   variant, size, state or breakpoint is hidden or flattened. All four
+   assertions were re-derived from the real story args (the "Default"/"Sizes"
+   stories, not the component's own defaultVariants) and hold as written; no
+   assertions dropped, no extra theme variables needed.
+   ========================================================================== */
+
+/* Density + type. Size-independent: tc-badge has one line-height and one gap. */
+[data-theme^="tzuchi"] .badge {
+  min-block-size: var(--tc-badge-min-size, 20px);
+  min-inline-size: var(--tc-badge-min-size, 20px);
+  gap: var(--tc-badge-gap, var(--tc-space-4, 4px));
+  line-height: var(--tc-line-height-tight, 1.3);
+}
+
+/* Restated, not changed: HeroUI's own `.badge--sm` (16px) is out-specified by
+   the rule above, so its size has to be repeated at the same specificity. */
+[data-theme^="tzuchi"] .badge--sm {
+  min-block-size: 16px;
+  min-inline-size: 16px;
+}
+
+/* tc-badge has no `lg`; kept at half the 48px `lg` avatar, in step with the
+   20px `md` above (HeroUI's own value is 32px). */
+[data-theme^="tzuchi"] .badge--lg {
+  min-block-size: 24px;
+  min-inline-size: 24px;
+}

@@ -1,0 +1,9 @@
+{
+  "link": {
+    "fg": { "$type": "color", "$value": "{color.brand.primary-hover}" },
+    "fg-hover": { "$type": "color", "$value": "{color.border.focus}" },
+    "subtle-fg": { "$type": "color", "$value": "{color.text.default}" },
+    "disabled-fg": { "$type": "color", "$value": "{color.text.disabled}" },
+    "focus-ring-color": { "$type": "color", "$value": "{focus-ring.color}" }
+  }
+}

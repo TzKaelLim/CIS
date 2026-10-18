@@ -1,0 +1,11 @@
+{
+  "tabs": {
+    "indicator": { "$type": "color", "$value": "{color.brand.primary}" },
+    "tab-fg": { "$type": "color", "$value": "{color.text.muted}" },
+    "tab-fg-selected": { "$type": "color", "$value": "{color.brand.primary}" },
+    "tab-bg-hover": { "$type": "color", "$value": "{color.brand.surface}" },
+    "divider": { "$type": "color", "$value": "{color.border.default}" },
+    "focus-ring-color": { "$type": "color", "$value": "{focus-ring.color}" },
+    "disabled-opacity": { "$type": "number", "$value": "{opacity.disabled}" }
+  }
+}

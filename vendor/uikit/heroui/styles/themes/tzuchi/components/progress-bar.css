@@ -1,0 +1,154 @@
+/*
+ * Tzu Chi theme — ProgressBar
+ * ---------------------------------------------------------------------------
+ * Base:   styles/components/progress-bar.css  (`.progress-bar`,
+ *         `.progress-bar__track` / `__fill` / `__output`, the `--sm/--md/--lg`
+ *         sizes and the `--default/--accent/--success/--warning/--danger`
+ *         colours), plus styles/components/label.css for the label slot.
+ * Model:  CISwebsite/packages/components/src/progress/tc-progress.styles.ts
+ *         (`.track`, `.fill`, `.value`) and
+ *         CISwebsite/packages/tokens/src/component/progress.tokens.json.
+ *
+ * WHAT THIS CHANGES — four things, nothing else:
+ *   1. Shape       — track AND fill go from `rounded-sm` (calc(--radius * .5)
+ *                    = 4px here) to a PILL: tc's track is
+ *                    --tc-progress-radius = radius.full, and tc's fill takes
+ *                    `border-radius: inherit` from it. Set on the root scope
+ *                    so all three sizes follow, which also beats the per-size
+ *                    `rounded-xs` / `rounded-md` rules.
+ *   2. Readout     — `.progress-bar__output` is tc's `.value`: 16px / 400 /
+ *                    1.6 in the muted text colour, where HeroUI has 14px /
+ *                    500 in the inherited foreground colour.
+ *   3. Label       — no tc counterpart, but it shares the grid row with the
+ *                    readout, so it takes the same 16px / 1.6 metrics; at
+ *                    HeroUI's 14px / 20px the two would no longer share a
+ *                    baseline. Weight, colour, `w-fit` and label.css's
+ *                    required / invalid / disabled treatments are untouched.
+ *   4. Motion      — determinate fill: 300ms `--ease-out` becomes tc's
+ *                    motion.duration.base (200ms) + motion.easing.standard.
+ *                    Indeterminate: timing-function becomes `linear` — tc
+ *                    glides at constant speed, HeroUI eases in and out.
+ *
+ * KEPT ON PURPOSE (see the gap report for the full list)
+ *   · Track height — HeroUI `md` is `h-2` = 8px and --tc-progress-height is
+ *     8px. Identical, so nothing is restated. `sm` (4px) / `lg` (12px) have no
+ *     tc counterpart and keep HeroUI's heights.
+ *   · Row gap — `gap-1` = 4px, the same 4px tc puts above `.value`.
+ *   · TRACK FILL stays `bg-default`. tc paints the track with
+ *     color.surface.subtle, but this theme maps that exact token onto
+ *     --background — the page colour — in BOTH modes (light gray-50 #f8f8f8,
+ *     dark gray-980 #161618). A --background track would therefore be
+ *     invisible on a themed page. --default is itself a Tzu Chi token now
+ *     (#f2f2f2 light, #333333 dark): one ramp step from tc's intent in light,
+ *     and the only one of the two that stays readable in dark.
+ *   · Fill colour, disabled treatment, the grid layout and the indeterminate
+ *     keyframes — all already correct or structural. Nothing restated.
+ *
+ * VARIANT MAPPING — tc-progress has ONE look, no size and no colour variants:
+ *   tc track + fill (8px, pill, fill = color.brand.primary)
+ *        <->  `.progress-bar--md` + `.progress-bar--accent`, which are
+ *             progressBarVariants' defaultVariants, and this theme already
+ *             maps --accent onto brand.primary in both modes. Colour untouched.
+ *   tc `:host([indeterminate])` (40%-wide sliding bar)
+ *        <->  `.progress-bar:not([aria-valuenow])` (also 40% wide).
+ *   `--sm` / `--lg`                  <->  no tc equivalent. Heights kept;
+ *             they inherit the pill radius so the family reads as one.
+ *   `--default` / `--success` / `--warning` / `--danger`
+ *                                    <->  no tc equivalent. Untouched — they
+ *             already resolve through --default-foreground / --success /
+ *             --warning / --danger, which this theme maps per mode.
+ *   Disabled (`:disabled`, `[data-disabled]`, `[aria-disabled]`)
+ *                                    <->  no tc equivalent. Untouched;
+ *             --disabled-opacity is already tc's opacity.disabled (0.38).
+ *
+ * NOT TRANSFERABLE — tc puts the percentage BELOW the track and has no label
+ * slot at all; HeroUI's 2-row grid puts label and readout side by side ABOVE
+ * it (`grid-template-areas`). That is HeroUI's structure and stays. tc's
+ * keyframes (margin-inline-start -40% -> 100%) also differ from HeroUI's
+ * (translateX -100% -> 350%); the keyframes live in the base file and are not
+ * overridable from a theme, so only the easing is matched here.
+ *
+ * CASCADE NOTES (all verified against the compiled Storybook CSS)
+ *   · Base selectors are `.progress-bar .progress-bar__track|__fill|__output`
+ *     and `.progress-bar [data-slot=label]`, all (0,2,0); the per-size rules
+ *     `.progress-bar--sm .progress-bar__track` are (0,2,0) too. Every rule
+ *     below is (0,3,0) and wins on specificity alone.
+ *   · The indeterminate rule below is (0,4,0) against a base of (0,3,0).
+ *   · `motion-reduce:transition-none` compiles to `transition-property: none`
+ *     and `motion-reduce:animate-none` to the `animation: none` shorthand.
+ *     This file only ever sets transition-duration / -timing-function and
+ *     animation-timing-function, never transition-property or animation-name,
+ *     so both reduced-motion guards keep working untouched — no restatement
+ *     is needed here. (The reduced-motion rules tie this file's specificity in
+ *     two places and, being imported earlier, would lose on source order; that
+ *     tie is harmless precisely because the declared properties are disjoint.)
+ *
+ * COLOURS — only --muted is set, a HeroUI theme variable the generated theme
+ * resolves per mode (light gray-700, dark gray-400), which is exactly what
+ * color.text.muted resolves to in each mode. No --tc-color-token and no
+ * colour-valued --tc-progress-token is referenced.
+ *
+ * Reviewed: no changes. Verified against the live files: every selector
+ * (.progress-bar, __track/__fill/__output, [data-slot="label"],
+ * :not([aria-valuenow])) exists in progress-bar.css / is emitted by
+ * progress-bar.tsx + label.tsx; every rule is scoped [data-theme^="tzuchi"];
+ * every --tc- token used (progress-radius/-font-size, radius-full,
+ * font-size-16, line-height-relaxed, font-weight-regular, motion-duration-base,
+ * motion-easing-standard) is mode-independent in tokens.css (:root only, no
+ * [data-theme="dark"] override), and --muted is an allowed HeroUI theme
+ * variable — no semantic/colour --tc- token or literal colour anywhere;
+ * specificity (0,3,0)/(0,4,0) beats every base rule it targets (unconditional
+ * root scope beats size variants for radius; longhand transition-duration/
+ * -timing-function and animation-timing-function leave transition-property
+ * and animation-name/-iteration-count untouched, matching the file's own
+ * cascade notes); no overlap with pass-1 files (dropdown.css's
+ * [data-slot="label"] rule lives under .dropdown__popover, a disjoint
+ * ancestor); no "*" + "/" comment-closing bug. One harmless imprecision, not
+ * worth changing: under prefers-reduced-motion the base's motion-reduce:
+ * animate-none resets the full `animation` shorthand (incl. timing-function)
+ * inside the @media block, while this file's `animation-timing-function:
+ * linear` is unconditional and higher-specificity, so linear technically wins
+ * over the shorthand's implicit "ease" even in reduced motion — but since
+ * animation-name stays "none" either way, no animation runs and the
+ * visible behaviour is unaffected.
+ */
+
+[data-theme^="tzuchi"] .progress-bar {
+  /* 1. Pill at every size. tc-progress.styles.ts:14 — the track is
+     --tc-progress-radius (radius.full) and the fill inherits it. */
+  & .progress-bar__track,
+  & .progress-bar__fill {
+    border-radius: var(--tc-progress-radius, var(--tc-radius-full, 9999px));
+  }
+
+  /* 3. Same metrics as the readout so the two share a baseline in the grid
+     row. Weight and colour stay HeroUI's — tc has no label to contradict. */
+  & [data-slot="label"] {
+    font-size: var(--tc-font-size-16, 16px);
+    line-height: var(--tc-line-height-relaxed, 1.6);
+  }
+
+  /* 2. tc `.value` — 16px, body weight, color.text.muted. `tabular-nums` and
+     the grid area stay HeroUI's. */
+  & .progress-bar__output {
+    font-size: var(--tc-progress-font-size, var(--tc-font-size-16, 16px));
+    font-weight: var(--tc-font-weight-regular, 400);
+    line-height: var(--tc-line-height-relaxed, 1.6);
+    color: var(--muted);
+  }
+
+  /* 4a. tc: `transition: inline-size var(--tc-motion-duration-base)
+     var(--tc-motion-easing-standard)`. Longhands only, so HeroUI keeps
+     transition-property: width (it is `width` that the Fill sets inline). */
+  & .progress-bar__fill {
+    transition-duration: var(--tc-motion-duration-base, 200ms);
+    transition-timing-function: var(--tc-motion-easing-standard, cubic-bezier(0.2, 0, 0, 1));
+  }
+
+  /* 4b. tc's slide is linear. Duration is deliberately left at HeroUI's 1.5s:
+     its keyframes travel further (450% of the bar's width vs tc's 350%), so
+     1.5s already reproduces tc's 1.2s velocity to within 3%. */
+  &:not([aria-valuenow]) .progress-bar__fill {
+    animation-timing-function: linear;
+  }
+}

@@ -1,0 +1,137 @@
+/*
+ * Tzu Chi theme — Meter
+ * ---------------------------------------------------------------------------
+ * Base:   styles/components/meter.css — `.meter`, `.meter__track` /
+ *         `__fill` / `__output`, the `--sm` `--md` `--lg` sizes and the
+ *         `--default` `--accent` `--success` `--warning` `--danger` colours —
+ *         plus styles/components/label.css for the label slot.
+ * Model:  there is no tc-meter. Meter is a line-for-line twin of HeroUI's
+ *         ProgressBar (same grid and grid-areas, same `gap-1`, same `h-2` /
+ *         `rounded-sm` `bg-default` track, same `text-sm font-medium` label and
+ *         `text-sm font-medium tabular-nums` output, same
+ *         `width 300ms var(--ease-out)` fill transition, same five colour
+ *         variants, same `status-disabled` block). So this file is
+ *         themes/tzuchi/components/progress-bar.css with the class prefix
+ *         swapped and its rule 4b dropped — which is exactly what
+ *         gap-audit/progress-bar.md prescribes in its "Meter" section
+ *         ("the same override would apply verbatim … it must be its own
+ *         meter.css override file") and what DESIGN-LANGUAGE.md Q9 asks to
+ *         confirm before duplicating by hand. The shape's record is
+ *         CISwebsite/packages/components/src/progress/tc-progress.styles.ts +
+ *         packages/tokens/src/component/progress.tokens.json, which is why the
+ *         two --tc-progress- tokens are referenced verbatim here rather than
+ *         re-expressed: the design decision they carry is this component's too.
+ *
+ * WHAT THIS CHANGES — three things, nothing else:
+ *   1. Shape   — R32 (track role): track AND fill go from `rounded-sm` (4px
+ *      under this theme) to the pill --tc-progress-radius (radius.full).
+ *      Declared on the root scope so all three sizes follow, which is also what
+ *      beats the per-size `rounded-xs` (2px) and `rounded-md` (6px) rules.
+ *   2. Readout — R19, which names "meter output" explicitly: 16px / 400 / 1.6
+ *      in --muted, where HeroUI has 14px / 500 in the inherited foreground.
+ *      R19 also says to give the readout's row-mate the same metrics, so the
+ *      label moves to 16px / 1.6 as well; at 14px / 20px against 16px / 25.6px
+ *      the two stop sharing a baseline in the grid row. This is the §1 type
+ *      rule as well — Tzu Chi has no 14px step.
+ *   3. Motion  — R132 (a value travelling): the determinate fill moves at
+ *      motion.duration.base (200ms) with motion.easing.standard instead of
+ *      300ms --ease-out, matching the themed ProgressBar fill exactly.
+ *
+ * DELIBERATELY LEFT ALONE
+ *   · Track height — `md` is `h-2` = 8px and --tc-progress-height is 8px:
+ *     identical, so nothing is restated (R126 / D19). `sm` (4px) and `lg`
+ *     (12px) have no tc counterpart and keep HeroUI's heights; they inherit
+ *     the pill so the family still reads as one.
+ *   · Track fill stays `bg-default` — R123: the track is passive scenery and
+ *     the fill-vs-track ratio is 12.00:1 light / 6.97:1 dark. (tc paints it
+ *     color.surface.subtle, which this theme maps onto --background — the page
+ *     colour — in both modes, so that track would be invisible.)
+ *   · Fill colour --accent and all five colour variants (R75 / R88), the
+ *     two-row grid and its areas, `gap-1` = 4px (already the tc rhythm, R141),
+ *     `w-fit`, `tabular-nums`, the disabled block (R85 / D2) and label.css's
+ *     required / invalid treatments — all already correct or structural.
+ *   · Label weight (500) and colour: tc-progress has no label slot at all, so
+ *     there is nothing to contradict HeroUI's label-over-readout hierarchy.
+ *   · progress-bar.css's rule 4b (indeterminate easing) is dropped: Meter has
+ *     no indeterminate state — meter.css has no `:not([aria-valuenow])` block.
+ *
+ * VARIANT MAPPING — nothing is hidden or flattened. `--sm` / `--md` / `--lg`
+ * keep their own heights and gain the pill; `--default` / `--accent` /
+ * `--success` / `--warning` / `--danger` keep their fills untouched; disabled
+ * keeps `status-disabled` with the label forced back to opacity 1.
+ *
+ * CASCADE NOTES
+ *   · Base selectors are `.meter .meter__track|__fill|__output` and
+ *     `.meter [data-slot="label"]`, all (0,2,0); the per-size rules
+ *     `.meter--sm .meter__track` are (0,2,0) too, and label.css's `.label` is
+ *     (0,1,0). Every rule below is (0,3,0) and wins on specificity alone.
+ *   · Only transition-duration and transition-timing-function are set, never
+ *     transition-property (R136), so `motion-reduce:transition-none` — which
+ *     compiles to `transition-property: none` — keeps working untouched.
+ *
+ * COLOURS — only --muted is set: a HeroUI theme variable the generated theme
+ * resolves per mode (light gray-700, dark gray-400), which is what
+ * color.text.muted resolves to in each mode. No Tzu Chi semantic colour token,
+ * no colour-valued component token, no literal.
+ *
+ * Reviewed: no changes. Verified against the live files: every selector
+ * (.meter, __track/__fill/__output, [data-slot="label"]) exists in
+ * heroui/styles/components/meter.css and is emitted by meter.tsx + label.tsx
+ * (meter.styles.ts's slots are base/track/fill/output = meter/meter__track/
+ * meter__fill/meter__output); every rule is scoped [data-theme^="tzuchi"];
+ * every --tc- token referenced (progress-radius, progress-font-size,
+ * radius-full, font-size-16, line-height-relaxed, font-weight-regular,
+ * motion-duration-base, motion-easing-standard) resolves in
+ * packages/tokens/dist/tokens.css to a value set only in :root, never
+ * restated under [data-theme="dark"], and --muted is an allowed HeroUI theme
+ * variable — no semantic/colour --tc- token, no --tzuchi-* invented, no
+ * literal colour anywhere. Specificity (0,3,0) beats every base declaration
+ * it replaces — (0,2,0) on .meter .meter__track|__fill|__output and
+ * .meter [data-slot="label"], and (0,2,0) on the per-size
+ * .meter--sm/--lg .meter__track|__fill rules, confirmed by hand against
+ * meter.css. No existing tzuchi override file reaches into .meter's elements
+ * (checked [data-slot="label"] across all 26 files: dropdown.css, list-box-
+ * item.css, progress-bar.css and select.css each scope it under a disjoint
+ * ancestor), so nothing here duplicates or contradicts another file. Both
+ * Default-story assertions and the Sizes/Colors stories keep every colour
+ * variant, every size's own height and the disabled block untouched — only
+ * transition-duration/-timing-function are set on .meter__fill, never
+ * transition-property, so motion-reduce:transition-none (transition-property:
+ * none) keeps working. No "*" immediately followed by "/" outside a comment's
+ * own close.
+ */
+
+[data-theme^="tzuchi"] .meter {
+  /* 1. R32 — pill at every size. tc-progress.styles.ts:14: the track is
+     --tc-progress-radius (radius.full) and the fill takes `border-radius:
+     inherit` from it, so the leading edge rounds the same way. */
+  & .meter__track,
+  & .meter__fill {
+    border-radius: var(--tc-progress-radius, var(--tc-radius-full, 9999px));
+  }
+
+  /* 2b. R19's row-mate clause — the label shares the grid row with the readout,
+     so it takes the same metrics. Weight, colour, `w-fit` and label.css's
+     required / invalid / disabled treatments stay HeroUI's. */
+  & [data-slot="label"] {
+    font-size: var(--tc-font-size-16, 16px);
+    line-height: var(--tc-line-height-relaxed, 1.6);
+  }
+
+  /* 2a. R19 — numeric readout: 16px / 400 / 1.6 in the muted text colour.
+     `tabular-nums` and the grid area stay HeroUI's. */
+  & .meter__output {
+    font-size: var(--tc-progress-font-size, var(--tc-font-size-16, 16px));
+    font-weight: var(--tc-font-weight-regular, 400);
+    line-height: var(--tc-line-height-relaxed, 1.6);
+    color: var(--muted);
+  }
+
+  /* 3. R132 — the value travels at motion.duration.base with the standard
+     easing. Longhands only, so HeroUI keeps `transition-property: width`
+     (width is what Meter.Fill sets inline, meter.tsx:132-135). */
+  & .meter__fill {
+    transition-duration: var(--tc-motion-duration-base, 200ms);
+    transition-timing-function: var(--tc-motion-easing-standard, cubic-bezier(0.2, 0, 0, 1));
+  }
+}
