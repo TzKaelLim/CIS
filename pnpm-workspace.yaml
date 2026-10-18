@@ -20,6 +20,10 @@ ignoredBuiltDependencies:
   - "@parcel/watcher" # via sass (next, typescript-plugin-css-modules)
   - sharp # via next; the demo does not use next/image
   - unrs-resolver # via eslint-config-next's import resolver
+  # The two below only run patch-package (their own development patches); the
+  # tokens build of pnpm sync:uikit works without it.
+  - "@bundled-es-modules/glob" # via style-dictionary
+  - style-dictionary # root devDependency that builds the tokens in pnpm sync:uikit
 
 # pnpm ignores package.json `resolutions`; v0.23.0's yarn resolutions that still
 # apply to the dependency graph are carried over here.

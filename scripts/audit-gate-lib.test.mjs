@@ -97,6 +97,7 @@ test("the gate covers the published packages", () => {
   assert.deepEqual(GATED_IMPORTERS, [
     "packages/core",
     "packages/plugin-heading-analyzer",
+    "packages/blocks",
   ]);
   assert.deepEqual(BUNDLED_DEV_DEPENDENCIES, {
     "packages/core": ["css-box-model", "lucide-react"],

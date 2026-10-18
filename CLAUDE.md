@@ -12,6 +12,7 @@ tceditor is Tzu Chi's visual page editor for React. It is a hard fork of [Puck](
 - `apps/demo` — Next.js App Router playground used for development and the e2e smoke test.
 - `scripts/` — the supply-chain gate (`audit-gate.mjs`, `audit-gate-lib.mjs`) and the puppeteer smoke test (`e2e/`).
 - `infra/supabase/` — self-hosted Supabase for local development (see "Supabase dev stack").
+- `vendor/uikit` — snapshot of the Tzu Chi uikit's `@heroui/styles` (HeroUI, Apache-2.0, kept with `heroui/LICENSE` and `heroui/NOTICE.md`) and `@tzuchi/tokens` at a pinned commit. Only `pnpm sync:uikit -- --commit <sha>` writes it; `pnpm test` checks every file against `vendor/uikit/SOURCE.json`, so never edit it by hand.
 - `apps/docs` — Puck's upstream documentation site, kept only as reference. It is not part of the pnpm workspace, is never installed or built, and still uses the upstream package names.
 - `docs/superpowers/specs/` — the tceditor roadmap and the design specs of its sub-projects.
 
@@ -34,14 +35,15 @@ From the repo root:
 pnpm install        # also builds core and the plugin through their `prepare` scripts
 pnpm dev            # runs only apps/demo on http://localhost:3000 (bound to 127.0.0.1); editor at /edit or any /<path>/edit
 pnpm build          # turbo build of core, the plugin and the demo
-pnpm test           # core's jest suites, then the node:test suites of the audit gate and check:bundle
+pnpm test           # core's jest suites, then the node:test suites of the audit gate, check:bundle, the vendored uikit snapshot and the single-React check
 pnpm typecheck      # tsc over core's production sources (packages/core/tsconfig.typecheck.json)
 pnpm lint
 pnpm format:check   # prettier over ts, tsx, mjs, md, mdx and css files; use `pnpm format` to fix
 pnpm check:bundle   # after a build: fails if the main, RSC or rules entry can reach @tiptap/html or happy-dom, or the rules entry reaches React, Tiptap or node:*
-pnpm audit:gate     # pnpm audit; fails only on advisories in versions that ship with core or the plugin
+pnpm audit:gate     # pnpm audit; fails only on advisories in versions that ship with core, the plugin or packages/blocks
 pnpm verify         # test, typecheck, lint, format:check, build, check:bundle, audit:gate (in that order)
 pnpm smoke          # puppeteer drag-and-drop smoke test; needs the demo running on :3000
+pnpm sync:uikit     # rewrites vendor/uikit from a uikit commit: pnpm sync:uikit -- --commit <sha>
 ```
 
 There is no CI yet, so `pnpm verify` is the gate: work is not done until it passes. `audit:gate` needs network access.
@@ -155,4 +157,4 @@ infra/supabase/reset.sh       # delete tceditor's containers, volumes and data (
 - **TypeScript**: avoid `any`.
 - **Commits**: use Angular-style conventional commits in English (`feat:`, `fix:`, `docs:`, `build:`, …). Record every user-visible change as a line in `CHANGELOG.md`, in the `### Changes from Puck v0.23.0` list under `## tceditor 0.1.0 (unreleased)`; everything below that is Puck's history and stays unchanged. Stage files by path; don't commit untracked files you didn't create.
 - **Package files**: `packages/core` and `packages/plugin-heading-analyzer` ship copies of the root `LICENSE` and `NOTICE`, and `__tests__/package-files.spec.ts` requires them to stay byte-identical. A core test that reads files outside `packages/core` must list them in the `inputs` of `@tzuchi/tceditor#test` in `turbo.json`, or turbo replays stale cached results.
-- **Formatting and lint**: Prettier 2 with default settings. `CHANGELOG.md`, `docs/superpowers/` and `infra/supabase/docker/` are excluded (`.prettierignore`). ESLint uses `eslint-config-next`; don't add new warnings.
+- **Formatting and lint**: Prettier 2 with default settings. `CHANGELOG.md`, `docs/superpowers/`, `infra/supabase/docker/` and `vendor/` are excluded (`.prettierignore`). ESLint uses `eslint-config-next`; don't add new warnings.

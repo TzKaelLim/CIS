@@ -7,7 +7,8 @@
     "format:check": "prettier --check \"**/*.{ts,tsx,mjs,md,mdx,css}\"",
     "format": "prettier --write \"**/*.{ts,tsx,mjs,md,mdx,css}\"",
     "smoke": "node scripts/e2e/smoke.mjs",
-    "test": "turbo run test && node --test scripts/audit-gate-lib.test.mjs packages/core/scripts/check-bundle-imports.test.mjs",
+    "sync:uikit": "node scripts/uikit/sync-uikit.mjs",
+    "test": "turbo run test && node --test scripts/audit-gate-lib.test.mjs packages/core/scripts/check-bundle-imports.test.mjs scripts/uikit/uikit.test.mjs scripts/single-react.test.mjs",
     "typecheck": "pnpm --filter ./packages/core typecheck",
     "audit:gate": "node scripts/audit-gate.mjs",
     "check:bundle": "node packages/core/scripts/check-bundle-imports.mjs",
@@ -15,10 +16,12 @@
   },
   "devDependencies": {
     "asciichart": "^1.5.25",
+    "esbuild": "0.27.7",
     "eslint": "^9.0.0",
     "eslint-config-custom": "workspace:*",
     "prettier": "^2.5.1",
     "puppeteer": "^24.8.2",
+    "style-dictionary": "4.4.0",
     "turbo": "^2.5.8"
   },
   "name": "tceditor-repo",
