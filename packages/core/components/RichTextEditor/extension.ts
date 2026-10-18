@@ -199,10 +199,12 @@ export interface PuckRichTextOptions {
   underline: Partial<UnderlineOptions> | false;
 }
 
+const defaultTextAlignOptions: Partial<TextAlignOptions> = {
+  types: ["heading", "paragraph"],
+};
+
 export const defaultPuckRichTextOptions: Partial<PuckRichTextOptions> = {
-  textAlign: {
-    types: ["heading", "paragraph"],
-  },
+  textAlign: defaultTextAlignOptions,
 };
 
 export const PuckRichText = Extension.create<PuckRichTextOptions>({
@@ -210,9 +212,10 @@ export const PuckRichText = Extension.create<PuckRichTextOptions>({
   addExtensions() {
     const extensions = [];
 
+    // The field's options win over the defaults
     const options: Partial<PuckRichTextOptions> = {
-      ...this.options,
       ...defaultPuckRichTextOptions,
+      ...this.options,
     };
 
     if (options.bold !== false) {
@@ -303,7 +306,14 @@ export const PuckRichText = Extension.create<PuckRichTextOptions>({
     }
 
     if (options.textAlign !== false) {
-      extensions.push(TextAlign.configure(options.textAlign));
+      // TextAlign's own default types are [], so a field that only sets, for
+      // example, alignments keeps the default types
+      extensions.push(
+        TextAlign.configure({
+          ...defaultTextAlignOptions,
+          ...options.textAlign,
+        })
+      );
     }
 
     if (options.underline !== false) {

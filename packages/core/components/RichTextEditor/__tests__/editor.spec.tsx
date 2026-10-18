@@ -153,6 +153,49 @@ describe("Editor", () => {
     );
   });
 
+  it("aligns text with the keyboard shortcut by default", async () => {
+    const { editor } = await renderEditor(doc(p(t("x"))));
+
+    act(() => {
+      editor.commands.selectAll();
+      editor.commands.keyboardShortcut("Mod-Shift-j");
+    });
+
+    expect(editor.getJSON()).toEqual(
+      doc({
+        type: "paragraph",
+        attrs: { textAlign: "justify" },
+        content: [t("x")],
+      })
+    );
+  });
+
+  it("has no text alignment and no alignment shortcuts when textAlign is false", async () => {
+    const editorDom = await renderEditor(
+      doc({
+        type: "paragraph",
+        attrs: { textAlign: "right" },
+        content: [t("x")],
+      }),
+      { type: "richtext", options: { textAlign: false } }
+    );
+    const { editor } = editorDom;
+
+    act(() => {
+      editor.commands.selectAll();
+      editor.commands.keyboardShortcut("Mod-Shift-j");
+    });
+
+    // What the editor stores: paragraphs without attributes
+    expect(editor.getJSON()).toEqual(
+      doc({ type: "paragraph", content: [t("x")] })
+    );
+    expect(editorDom.querySelector("p")?.getAttribute("style")).toBeNull();
+    expect(warnings()).not.toContainEqual(
+      expect.stringContaining("Invalid content")
+    );
+  });
+
   it("warns about types from tiptap.extensions and shows only their text", async () => {
     const Highlight = Mark.create({
       name: "highlight",

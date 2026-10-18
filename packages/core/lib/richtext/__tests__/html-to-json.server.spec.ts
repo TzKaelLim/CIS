@@ -1,7 +1,7 @@
 /** @jest-environment node */
 import { generateHTML } from "@tiptap/html/server";
 import { PuckRichText } from "../../../components/RichTextEditor/extension";
-import { richTextHtmlToJson } from "../html-to-json";
+import { parseRichTextHtml, richTextHtmlToJson } from "../html-to-json";
 import { doc, typicalContent } from "../__helpers__/fixtures";
 
 const paragraph = (...content: object[]) => ({
@@ -57,5 +57,13 @@ describe("richTextHtmlToJson on the server (happy-dom)", () => {
     expect(richTextHtmlToJson("a & b")).toEqual(
       doc(paragraph({ type: "text", text: "a & b" }))
     );
+  });
+
+  it("drops the alignment of a field without text alignment", () => {
+    expect(
+      parseRichTextHtml('<p style="text-align: center">x</p>', [
+        PuckRichText.configure({ textAlign: false }),
+      ])
+    ).toEqual(doc(paragraph({ type: "text", text: "x" })));
   });
 });

@@ -27,6 +27,7 @@ tceditor is a fork of [Puck](https://github.com/puckeditor/puck) v0.23.0 (git ta
 * `normalizeRichText(value, options)` accepts `null` as `options` and uses the defaults instead of throwing a `TypeError`
 * when `normalizeRichText` reduces unknown or too deeply nested content to text, the texts of separate blocks are joined with a line break (`"a\nb"`) instead of running together (`"ab"`)
 * the richtext menu no longer crashes in a field with `paragraph: false` and `listItem: false`; checking whether the code block button applies threw, because a code block toggles back to a paragraph
+* a richtext field's `options.textAlign` now takes effect instead of being overridden by the default `{ types: ["heading", "paragraph"] }`, and `textAlign` options such as `alignments` keep the default `types` unless they set their own; with `textAlign: false` the editor has no text alignment, so the alignment shortcuts (Mod-Shift-L, E, R and J) stop working, stored alignment is removed the next time the content is edited (published pages show it until then), and `migrateRichTextInData` no longer keeps the alignment of legacy HTML in such a field
 
 ## [0.23.0](/compare/v0.22.4...v0.23.0) (2026-08-07)
 

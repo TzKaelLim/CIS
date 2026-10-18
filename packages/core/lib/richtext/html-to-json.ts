@@ -23,7 +23,9 @@ export function richTextHtmlToJson(html: string): RichTextDoc {
 /**
  * richTextHtmlToJson with the extensions of one richtext field, so markup the
  * field's editor cannot show (for example bold with `options: { bold: false }`)
- * is dropped the way v0.23.0 dropped it. Used by migrateRichTextInData.
+ * is dropped the way v0.23.0 dropped it. Alignment in a field with
+ * `textAlign: false` is dropped too (textAlign becomes null), although v0.23.0
+ * kept it because it ignored that option. Used by migrateRichTextInData.
  */
 export function parseRichTextHtml(
   html: string,

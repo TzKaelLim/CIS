@@ -251,6 +251,19 @@ describe("fitToSchema without text alignment", () => {
       )
     );
   });
+
+  it("keeps the alignment of headings when only headings can be aligned", () => {
+    const schema = schemaWith({ textAlign: { types: ["heading"] } });
+
+    // Unchecked: the editor ignores the textAlign of the paragraphs
+    expect(
+      fitToSchemaUnchecked(typicalContent.alignment, schema).content?.[4]
+    ).toEqual({
+      type: "heading",
+      attrs: { textAlign: "center", level: 2 },
+      content: [t("centered heading")],
+    });
+  });
 });
 
 describe("findUnrenderableTypes", () => {
