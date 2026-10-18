@@ -1,7 +1,7 @@
 # S2：元件規格（唯一 schema）與示範區塊（設計規格）
 
 - 日期：2026-10-12
-- 狀態：草案，待使用者審閱
+- 狀態：已核准（2026-10-12）；2026-10-18 更正第 12 節的 HeroUI 授權
 - 上層文件：`2026-10-08-tzuchi-puck-roadmap.md`
 - 依據：
   - S2 探索彙整與 7 項技術驗證（2026-10-09 至 10-10）。本文引用的實測數字都來自這些驗證，必要的結果已直接寫進本文。
@@ -614,7 +614,7 @@ uikit 的 `variant` 另有 `danger`、`danger-soft`、`ghost`、`tertiary`，初
 - `vendor/uikit/SOURCE.json` 記錄來源：repo、分支 `spike/heroui-v3`、完整 commit（目前是 `2b5a6781`）、每個檔案的 sha256。
 - `pnpm sync:uikit -- --dir ../puck-tzuchi-poc --commit <sha>`：
   - 用 `git archive` 取出指定 commit 的 `heroui/react`、`heroui/styles`、`packages/tokens`。這是唯讀操作，不修改 uikit repo。
-  - 去掉 stories、測試與建置腳本，保留授權檔（HeroUI 為 MIT）。
+  - 去掉 stories、測試與建置腳本，保留 `heroui/LICENSE` 與 `heroui/NOTICE.md`。HeroUI 原始碼的授權是 Apache-2.0（`LICENSE` 檔）；`@heroui/*` 的 `package.json` 雖然寫 MIT，但兩者以 `LICENSE` 檔為準。Apache-2.0 第 4 條要求保留授權檔與 NOTICE，並註明修改過的內容，所以 `SOURCE.json` 要列出去掉了哪些檔案。
   - 用 uikit 的 `build.mjs` 建出 tokens（`style-dictionary` 鎖在 uikit 使用的 4.4.0，只當作 root 的 devDependency）。
   - 重新產生 `uikit-options.json` 快照。
 - 快照 commit 進 repo，不得手改；測試會比對 `SOURCE.json` 的雜湊。Prettier、ESLint 和 Jest 都略過 `vendor/`。
