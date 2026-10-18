@@ -709,3 +709,34 @@ uikit 的 `variant` 另有 `danger`、`danger-soft`、`ghost`、`tertiary`，初
 5. `apps/storybook`：設定、隔離 HOME 的包裝腳本、逐一開啟 story 的檢查。
 6. `apps/showcase`：編輯器、發布 API、公開頁、「發布檢查」面板、範例頁與示範圖、產物掃描、冒煙測試。
 7. 文件：`CLAUDE.md`、`CHANGELOG.md`、各套件的 README。
+
+## 18. 實作前更正（2026-10-18）
+
+撰寫實作計畫前，依實際程式碼與實測（`.superpowers/plan-work/s2/facts/`，git 忽略）做了下列更正。本節與前文衝突時，以本節為準。
+
+| # | 位置 | 更正 | 原因 |
+|---|---|---|---|
+| 1 | §4.1、§6.2 #6 | 區塊 `type` 改為 `^[A-Z][A-Za-z0-9]{0,26}$`（最多 27 字元） | 編輯器產生的 id 是 `<type>-<uuid>`，長度是 type 加 37，而 id 上限是 64 |
+| 2 | §4.3 最後一行 | `GlobalMeta` 只檢查已宣告 key 的值型別；拼錯的 key 改由測試檢查（JSON Schema 只能出現允許的 meta key） | zod 的 `JSONSchemaMeta` 有 index signature，拼錯的 key 編譯時不會報錯 |
+| 3 | §4.2、§8.3、§8.8 | 必填的 `link()` 與 `image()` 用 `.prefault()`；物件與陣列的預設值一律寫成函式 | `.default()` 不驗證預設值，而且只做淺拷貝 |
+| 4 | §5.2 | `Fields<Props>` 會檢查欄位名稱與必填欄位是否存在，不檢查欄位型別 | tsc 實測 |
+| 5 | §5.3 | stories 改用 `@tzuchi/tceditor/rsc` 的 `Render` | client `Render` 會在根節點多包一層 `<div>`，RSC 版的輸出才和公開頁相同 |
+| 6 | §6.3 | override 寫成 `"zod@^4": "4.6.5"` | 不帶範圍會把 puppeteer 依賴（chromium-bidi）的 zod 3 也改成 zod 4，使它的錯誤處理壞掉 |
+| 7 | §6.4 | 只能用 `import * as z from "zod"`，由 ESLint 強制 | `import { z }` 會讓 esbuild 打包全部語系，Edge 單檔變成約 93 KB（gzip） |
+| 8 | §4.3 rule 7、§5.4、§6.2 #8 | 區塊 schema 不宣告 `id`。驗證器先取出 `props.id`、單獨檢查，再用區塊 schema 檢查其餘 props；catalog 以 `nodeIdPattern` 說明 id 規則 | 規則 7 把 `id` 列為保留字，strictObject 會把它當成未宣告欄位 |
+| 9 | §7.2 | CSS 順序改為 tokens → `@heroui/styles` → `@heroui/styles/themes/tzuchi/index.css`（不包 layer），不另外 import `tailwindcss` | `@heroui/styles` 本身就 import Tailwind，另外 import 會輸出兩份 preflight |
+| 10 | §8.2、§11.1、§11.2 | 修正 `extension.ts` 的 spread 順序，讓 `options.textAlign` 生效；類型過濾加入 `textAlign`；`richText()` 一律關閉對齊，驗證器清理時移除對齊屬性 | 原本的 spread 順序讓預設值蓋掉使用者設定，段落區塊無法關閉對齊，renderer 還會輸出 inline style |
+| 11 | §9 | 區塊 Storybook 的開發 port 改為 6010，`refs` 的 url 改為 `http://127.0.0.1:6010`；`viteFinal` 加入 `@vitejs/plugin-react` 與 `@tailwindcss/vite` | uikit 根目錄的 script 與 S1 的 port 慣例都用了 6007；Storybook 10 的 react-vite 不會自動處理 sibling 套件的 JSX |
+| 12 | §11.1 | rules 入口用另一份沒有 react `inject` 的 tsup 設定建置；`check:bundle` 比對 `node:` 時改比對 import／require 的寫法；`isComponentAllowed` 改用本地型別；另外匯出 `richTextFeaturesToOptions`、`RICHTEXT_FEATURES`、`isRichTextFeature`、`stableStringify` 與 `RichTextTypes` | 共用設定會把 React 注入每個入口；esbuild 的 CJS 產物固定帶一行含 `node:` 的註解；轉換器需要和編輯器相同的功能對應 |
+| 13 | §11.2 B-01 | 預設 textblock 改用 `@tiptap/core` 的 `defaultBlockAt(schema.topNodeType.contentMatch)`；改用 codeBlock 承接時只放純文字 | `contentMatch.defaultType` 實測得到 `blockquote`，`createAndFill()` 會 stack overflow |
+| 14 | §3.1、§12 | 只 vendor `heroui/styles` 與 `packages/tokens`（加上 `heroui/LICENSE`、`heroui/NOTICE.md`），不 vendor 也不連結 `heroui/react`；8 個區塊都只用 `@heroui/styles` 的 tv 函式畫出一般 HTML 元素 | 這 8 個區塊都不需要互動元件；不用 `@heroui/react` 就不必帶入 react-aria 等執行期依賴，公開頁也不送元件的 JS。之後需要互動元件時再加入 |
+| 15 | §12 | `vendor/uikit/packages/tokens/dist/` 以 `.gitignore` 的否定規則重新納入 | 根目錄的 `dist` 規則會把建好的 tokens 忽略掉 |
+| 16 | §13.1、§17 | 需要 build 產物的檢查（Edge 單檔、公開頁產物掃描、Storybook 逐一開 story）是 root script，排在 `verify` 的 `pnpm build` 之後；§5.5 #1「產生的檔案是否同步」改由 blocks 的 jest 測試檢查 | `verify` 先跑測試後 build |
+| 17 | §5.5 | uikit 選項快照用 esbuild 打包 vendor 的 `@heroui/styles` 原始碼，再讀每個 tv 函式的 `variants` | PoC 的 `tvRegistry` 不在 uikit 的指定 commit 中 |
+| 18 | §4.2、§8.5、§8.7 | `x-item-label` 是樣板字串：`{欄位名}` 代入項目的欄位值，`{n}` 代入從 1 起算的序號（TagList 用 `"{label}"`，Columns 用 `"第 {n} 欄"`） | 多欄要顯示「第 1 欄」，不是欄位值 |
+| 19 | §10.1 | 公開頁與編輯器用 route group `(public)`、`(editor)` 各自有根 layout；編輯器根 layout 的 `<html>` 不設 `data-theme` | host 的 `data-theme` 會蓋掉 `overrides.iframe` 在預覽 iframe 設的值 |
+| 20 | §10.2 | 同源檢查比對 `Origin` 與 `Host` 標頭 | `next start -H 127.0.0.1` 下 `req.url` 仍是 `localhost` |
+| 21 | §6.2 #7 | 巢狀層數：頂層區塊是第 1 層，放在第 n 層區塊放置區裡的區塊是第 n+1 層；第 33 層回報 `too_deep` | 原文沒有定義起算點 |
+| 22 | §13.1 | 示範站冒煙測試是獨立的 `scripts/e2e/showcase-smoke.mjs`，失敗時以非 0 結束；`pnpm smoke` 依序執行既有測試與它 | 既有的 `smoke()` 永遠不會失敗 |
+| 23 | §11.2 A-11 | `migrateRichTextInData(data, config, options?)`，`options.getFields?: (item, ctx: { isRoot }) => Fields \| undefined`，必須是同步函式 | `resolveFields` 可能是非同步，轉換工具是同步的 |
+| 24 | §4.2 | `richText()` 的底層是 `z.looseObject({ type: z.literal("doc") })`，字串值會被拒絕；舊 HTML 先用 `richtext-migrate` 轉換 | 與 JSON Schema 的 `type: "object"` 一致，雙層一致性測試才成立 |
