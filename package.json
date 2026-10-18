@@ -9,7 +9,7 @@
     "smoke": "node scripts/e2e/smoke.mjs",
     "sync:uikit": "node scripts/uikit/sync-uikit.mjs",
     "test": "turbo run test && node --test scripts/audit-gate-lib.test.mjs packages/core/scripts/check-bundle-imports.test.mjs scripts/uikit/uikit.test.mjs scripts/single-react.test.mjs",
-    "typecheck": "pnpm --filter ./packages/core typecheck",
+    "typecheck": "turbo run typecheck",
     "audit:gate": "node scripts/audit-gate.mjs",
     "check:bundle": "node packages/core/scripts/check-bundle-imports.mjs",
     "verify": "pnpm test && pnpm typecheck && pnpm lint && pnpm format:check && pnpm build && pnpm check:bundle && pnpm audit:gate"

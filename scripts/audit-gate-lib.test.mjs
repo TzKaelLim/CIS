@@ -98,6 +98,7 @@ test("the gate covers the published packages", () => {
     "packages/core",
     "packages/plugin-heading-analyzer",
     "packages/blocks",
+    "packages/spec",
   ]);
   assert.deepEqual(BUNDLED_DEV_DEPENDENCIES, {
     "packages/core": ["css-box-model", "lucide-react"],

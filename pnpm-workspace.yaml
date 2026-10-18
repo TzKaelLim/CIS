@@ -31,3 +31,8 @@ overrides:
   # GHSA-48c2-rrv3-qjmp. Also keeps postcss-load-config on yaml@2.9.0, the
   # version yarn resolved for v0.23.0.
   yaml: ">=2.8.3"
+  # One zod 4 for the whole graph: packages/spec pins 4.6.5, and copies of zod
+  # share their configuration through globalThis (patch releases have also
+  # removed APIs before). The range matters: a bare "zod" override would move
+  # puppeteer's chromium-bidi from zod 3 to zod 4 and break its error handling.
+  "zod@^4": "4.6.5"

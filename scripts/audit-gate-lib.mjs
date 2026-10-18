@@ -4,14 +4,16 @@ import { existsSync, readFileSync, realpathSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
 
 // Workspace projects whose dependencies ship: the packages that we publish,
-// and packages/blocks, whose views and styles are part of every public page.
-// A vulnerable package that ships with one of them fails the gate. Findings
-// anywhere else (apps/demo, build and lint tooling) are printed but do not
-// fail it.
+// packages/blocks, whose views and styles are part of every public page, and
+// packages/spec, whose helpers and validator ship with the blocks and the
+// edge validator. A vulnerable package that ships with one of them fails the
+// gate. Findings anywhere else (apps/demo, build and lint tooling) are
+// printed but do not fail it.
 export const GATED_IMPORTERS = [
   "packages/core",
   "packages/plugin-heading-analyzer",
   "packages/blocks",
+  "packages/spec",
 ];
 
 // devDependencies that the tsup build bundles into dist (tsup only leaves

@@ -1,0 +1,30 @@
+{
+  "name": "@tzuchi/tceditor-spec",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Block specs for tceditor: authoring helpers, converters and the page validator",
+  "license": "MIT",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts",
+    "./validator": "./src/validator/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint \"**/*.ts*\"",
+    "test": "jest",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@tzuchi/tceditor": "workspace:*",
+    "zod": "4.6.5"
+  },
+  "devDependencies": {
+    "@types/jest": "29.5.14",
+    "@types/node": "24.13.2",
+    "eslint": "9.39.4",
+    "eslint-config-custom": "workspace:*",
+    "jest": "29.7.0",
+    "ts-jest": "29.4.9",
+    "typescript": "5.9.3"
+  }
+}
