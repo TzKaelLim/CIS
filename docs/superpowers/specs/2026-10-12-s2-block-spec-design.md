@@ -740,3 +740,7 @@ uikit 的 `variant` 另有 `danger`、`danger-soft`、`ghost`、`tertiary`，初
 | 22 | §13.1 | 示範站冒煙測試是獨立的 `scripts/e2e/showcase-smoke.mjs`，失敗時以非 0 結束；`pnpm smoke` 依序執行既有測試與它 | 既有的 `smoke()` 永遠不會失敗 |
 | 23 | §11.2 A-11 | `migrateRichTextInData(data, config, options?)`，`options.getFields?: (item, ctx: { isRoot }) => Fields \| undefined`，必須是同步函式 | `resolveFields` 可能是非同步，轉換工具是同步的 |
 | 24 | §4.2 | `richText()` 的底層是 `z.looseObject({ type: z.literal("doc") })`，字串值會被拒絕；舊 HTML 先用 `richtext-migrate` 轉換 | 與 JSON Schema 的 `type: "object"` 一致，雙層一致性測試才成立 |
+| 25 | §13.1 雙層一致性 | 「Ajv 接受、zod 拒絕」的允許清單除了 x-lost-checks 對應的 `unsafe_href`、`alt_required`，另含整頁規則 `duplicate_id`、`not_allowed_here`、`too_deep`、`too_many_blocks`；外殼 schema 檢查的是驗證器的輸出，區塊 props 則同時檢查輸入與輸出 | 外殼 schema 依 §6.5 只檢查結構，id 重複、放置規則與層數上限都無法用它表達 |
+| 26 | §6.4 | `check:edge` 的「不得出現 `node:`」只比對引入 `node:` 模組的寫法，與 `check:bundle` 共用同一個 regex（`NODE_IMPORT`） | 驗證器走訪 JSON Schema 時用 `{ node }` 物件，壓縮後的產物會出現 `node:` 這個物件 key，比對子字串會誤判 |
+| 27 | §7.2 | `packages/blocks/styles.css` 只需要 `@source "./src"`，不需要指向 vendor | `@heroui/styles` 的 class 來自它自己的 CSS 檔，由 Tailwind 透過 `@import` 編譯；S2 沒有使用 `heroui/react` 的元件原始碼（第 14 項） |
+| 28 | §1、§3.3、§7.1 | §7.1 的 `createRenderConfig({ blocks, views, assets })` 改名為 `buildRenderConfig`，依規格的 JSON Schema 自動把 props 對應到畫面；`createRenderConfig({ assets })` 是它套用全部區塊規格與 `views` 表的版本。新增區塊要在區塊清單與 `views` 表各登記一行；少了畫面時 `tsc` 會失敗 | 區塊規格清單不能 import React（驗證器要用它），所以畫面要另外登記；用型別檢查保證兩份清單一致 |
