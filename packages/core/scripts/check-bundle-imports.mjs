@@ -1,14 +1,58 @@
-// Checks that the main and RSC entries of the built package cannot reach
-// happy-dom or @tiptap/html. Those two are only for the richtext-migrate entry
-// (server-side conversion of legacy HTML), and must never ship to public pages.
+// Checks what the entries of the built package can reach through relative
+// imports:
+// - the main, RSC and rules entries must not reach happy-dom or @tiptap/html.
+//   Those two are only for the richtext-migrate entry (server-side conversion
+//   of legacy HTML), and must never ship to public pages.
+// - the rules entry, including its type declarations, must also stay free of
+//   React, Tiptap and Node built-ins, so validators can bundle it for edge
+//   runtimes without React.
 //
 // Usage: node packages/core/scripts/check-bundle-imports.mjs (after pnpm build)
 import { existsSync, readFileSync, realpathSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-export const ENTRIES = ["index.mjs", "rsc.mjs", "index.js", "rsc.js"];
+export const ENTRIES = [
+  "index.mjs",
+  "rsc.mjs",
+  "index.js",
+  "rsc.js",
+  "rules.mjs",
+  "rules.js",
+];
 export const FORBIDDEN = ["happy-dom", "@tiptap/html"];
+
+export const RULES_ENTRIES = [
+  "rules.mjs",
+  "rules.js",
+  "rules.d.ts",
+  "rules.d.mts",
+];
+// esbuild ends every CommonJS file with the comment "// Annotate the CommonJS
+// export names for ESM import in node:", so "node:" only counts where a module
+// is imported or required
+export const NODE_IMPORT = {
+  name: "an import of node:*",
+  pattern:
+    /(?:\bfrom\s*|\bimport\s*\(\s*|\bimport\s+|\brequire\s*\(\s*)["']node:/,
+};
+export const RULES_FORBIDDEN = ["react", "react-dom", "@tiptap/", NODE_IMPORT];
+
+const CHECKS = [
+  {
+    entries: ENTRIES,
+    forbidden: FORBIDDEN,
+    reason: `${FORBIDDEN.join(
+      " and "
+    )} must only be used by the richtext-migrate entry.`,
+  },
+  {
+    entries: RULES_ENTRIES,
+    forbidden: RULES_FORBIDDEN,
+    reason:
+      "the rules entry must not import react, react-dom, @tiptap/* or node:* modules.",
+  },
+];
 
 // from "./x.mjs", import("./x.mjs"), import "./x.mjs", require("./x.js")
 const RELATIVE_IMPORT =
@@ -34,7 +78,10 @@ export function collectFiles(distDir, entry) {
   return [...seen].map((file) => relative(distDir, file));
 }
 
-/** Lists each reachable file that mentions a forbidden package. */
+/**
+ * Lists each reachable file that mentions a forbidden name. A forbidden entry
+ * is a substring, or `{ name, pattern }` to match a regular expression.
+ */
 export function findForbidden(
   distDir,
   entries = ENTRIES,
@@ -46,8 +93,19 @@ export function findForbidden(
     for (const file of collectFiles(distDir, entry).sort()) {
       const source = readFileSync(join(distDir, file), "utf8");
 
-      for (const name of forbidden) {
-        if (source.includes(name)) problems.push({ entry, file, name });
+      for (const item of forbidden) {
+        const found =
+          typeof item === "string"
+            ? source.includes(item)
+            : item.pattern.test(source);
+
+        if (found) {
+          problems.push({
+            entry,
+            file,
+            name: typeof item === "string" ? item : item.name,
+          });
+        }
       }
     }
   }
@@ -64,7 +122,10 @@ const isMain =
 
 if (isMain) {
   const distDir = resolve(dirname(fileURLToPath(import.meta.url)), "../dist");
-  const missing = ENTRIES.filter((entry) => !existsSync(join(distDir, entry)));
+  const allEntries = [...new Set([...ENTRIES, ...RULES_ENTRIES])];
+  const missing = allEntries.filter(
+    (entry) => !existsSync(join(distDir, entry))
+  );
 
   if (missing.length > 0) {
     console.error(
@@ -75,21 +136,24 @@ if (isMain) {
     process.exit(1);
   }
 
-  const problems = findForbidden(distDir);
+  let failed = false;
 
-  if (problems.length > 0) {
+  for (const { entries, forbidden, reason } of CHECKS) {
+    const problems = findForbidden(distDir, entries, forbidden);
+
     for (const { entry, file, name } of problems) {
       console.error(`${entry} reaches ${file}, which mentions ${name}`);
     }
 
-    console.error(
-      `check:bundle FAILED: ${FORBIDDEN.join(
-        " and "
-      )} must only be used by the richtext-migrate entry.`
-    );
-    process.exit(1);
+    if (problems.length > 0) {
+      console.error(`check:bundle FAILED: ${reason}`);
+      failed = true;
+    }
   }
 
+  if (failed) process.exit(1);
+
+  // Count what the message below describes: the files ENTRIES reach
   const fileCount = new Set(
     ENTRIES.flatMap((entry) => collectFiles(distDir, entry))
   ).size;
@@ -97,6 +161,8 @@ if (isMain) {
   console.log(
     `check:bundle passed: ${fileCount} files reachable from ${ENTRIES.join(
       ", "
-    )} do not mention ${FORBIDDEN.join(" or ")}.`
+    )} do not mention ${FORBIDDEN.join(
+      " or "
+    )}, and the rules entry does not import react, react-dom, @tiptap/* or node:* modules.`
   );
 }

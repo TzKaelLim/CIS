@@ -1,12 +1,19 @@
-import { SlotField } from "../../types";
+/** The allow and disallow lists of a slot or a DropZone. */
+export type ComponentAllowRules = {
+  allow?: readonly string[];
+  disallow?: readonly string[];
+};
 
 /**
  * Checks whether a component type may be placed in a zone with the given
  * allow/disallow lists. An unset componentType is always accepted.
+ *
+ * Imports nothing, so the React-free `@tzuchi/tceditor/rules` entry can
+ * export it.
  */
 export const isComponentAllowed = (
   componentType: string | null | undefined,
-  { allow, disallow }: Pick<SlotField, "allow" | "disallow">
+  { allow, disallow }: ComponentAllowRules
 ): boolean => {
   if (!componentType) {
     return true;

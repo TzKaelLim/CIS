@@ -119,16 +119,16 @@ pnpm verify
 
 `pnpm verify` 依序執行 test、typecheck、lint、format:check、build、check:bundle、audit:gate，全部通過才算完成。目前沒有 CI，提交前請在本機執行一次。`audit:gate` 需要連網。
 
-| 指令                | 作用                                                                                       |
-| ------------------- | ------------------------------------------------------------------------------------------ |
-| `pnpm test`         | core 的 jest 測試，以及 audit gate、check:bundle 的 `node:test` 測試                       |
-| `pnpm typecheck`    | 以 `packages/core/tsconfig.typecheck.json` 檢查 core 的型別（不含測試檔）                  |
-| `pnpm lint`         | ESLint                                                                                     |
-| `pnpm format:check` | Prettier 檢查；`pnpm format` 會直接修正                                                    |
-| `pnpm build`        | 建置 core、外掛與 demo                                                                     |
-| `pnpm check:bundle` | 確認主入口與 RSC 入口不會引用 `@tiptap/html`、`happy-dom`（需先 build）                    |
-| `pnpm audit:gate`   | 執行 `pnpm audit`，只有隨套件出貨的依賴有 advisory 時才失敗，其餘（demo 與開發工具）只列出 |
-| `pnpm smoke`        | puppeteer 拖放 smoke test，需先以 `pnpm dev` 在 3000 port 啟動 demo                        |
+| 指令                | 作用                                                                                                                             |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `pnpm test`         | core 的 jest 測試，以及 audit gate、check:bundle 的 `node:test` 測試                                                             |
+| `pnpm typecheck`    | 以 `packages/core/tsconfig.typecheck.json` 檢查 core 的型別（不含測試檔）                                                        |
+| `pnpm lint`         | ESLint                                                                                                                           |
+| `pnpm format:check` | Prettier 檢查；`pnpm format` 會直接修正                                                                                          |
+| `pnpm build`        | 建置 core、外掛與 demo                                                                                                           |
+| `pnpm check:bundle` | 確認主入口、RSC 入口與 rules 入口不會引用 `@tiptap/html`、`happy-dom`，且 rules 入口不碰 React、Tiptap 與 `node:*`（需先 build） |
+| `pnpm audit:gate`   | 執行 `pnpm audit`，只有隨套件出貨的依賴有 advisory 時才失敗，其餘（demo 與開發工具）只列出                                       |
+| `pnpm smoke`        | puppeteer 拖放 smoke test，需先以 `pnpm dev` 在 3000 port 啟動 demo                                                              |
 
 只跑一個測試檔或一個測試：
 

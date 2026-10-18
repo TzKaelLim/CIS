@@ -38,7 +38,7 @@ pnpm test           # core's jest suites, then the node:test suites of the audit
 pnpm typecheck      # tsc over core's production sources (packages/core/tsconfig.typecheck.json)
 pnpm lint
 pnpm format:check   # prettier over ts, tsx, mjs, md, mdx and css files; use `pnpm format` to fix
-pnpm check:bundle   # after a build: fails if the main or RSC entry can reach @tiptap/html or happy-dom
+pnpm check:bundle   # after a build: fails if the main, RSC or rules entry can reach @tiptap/html or happy-dom, or the rules entry reaches React, Tiptap or node:*
 pnpm audit:gate     # pnpm audit; fails only on advisories in versions that ship with core or the plugin
 pnpm verify         # test, typecheck, lint, format:check, build, check:bundle, audit:gate (in that order)
 pnpm smoke          # puppeteer drag-and-drop smoke test; needs the demo running on :3000
@@ -71,6 +71,7 @@ Core tests use Jest with ts-jest and jsdom. They are `*.spec.ts(x)` files inside
 - `bundle/rsc.tsx` is served under the `react-server` export condition and as `@tzuchi/tceditor/rsc`. It exposes `Render` from `components/ServerRender`, the data helpers and the richtext renderer. Code it reaches must not import client-only code (zustand store, context, effects).
 - `bundle/internal.ts` (`@tzuchi/tceditor/internal`) exposes internals such as `createReducer`.
 - `bundle/richtext-migrate.ts` (`@tzuchi/tceditor/richtext-migrate`) is the server-only converter from legacy HTML richtext to JSON. It is the only entry allowed to reach `@tiptap/html` and `happy-dom`. Its CJS build needs Node >= 22.12 (`require(esm)`); on Node 20 use the ESM build.
+- `bundle/rules.ts` (`@tzuchi/tceditor/rules`) holds the React-free rules that validators and server code share with the editor: `normalizeRichText`, `isSafeHref`, `textToRichText`, `fitRichTextToTypes`, the richtext feature helpers (`RICHTEXT_FEATURES`, `richTextFeaturesToOptions`, `richTextFeaturesToTypes`), `stableStringify` and `isComponentAllowed`. It is built by a second tsup run with its own config, `tsup.rules.config.ts`, because the shared config in `packages/tsup-config` injects `import React from "react"` into every output file. It imports each module by path, never `lib/richtext/index.ts` (which also exports the React renderer), and `pnpm check:bundle` fails if `dist/rules.*` mention `react`, `react-dom` or `@tiptap/`, or import a `node:` module.
 
 Importing the package must have no side effects, so it can run in edge runtimes. For example, the fallback store in `store/index.ts` is created lazily so `crypto.randomUUID` isn't called at import time. `__tests__/edge-runtime.spec.ts` enforces this.
 

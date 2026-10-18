@@ -52,6 +52,11 @@
       "import": "./dist/richtext-migrate.mjs",
       "require": "./dist/richtext-migrate.js"
     },
+    "./rules": {
+      "types": "./dist/rules.d.ts",
+      "import": "./dist/rules.mjs",
+      "require": "./dist/rules.js"
+    },
     "./tceditor.css": "./dist/index.css",
     "./package.json": "./package.json"
   },
@@ -62,6 +67,9 @@
       ],
       "richtext-migrate": [
         "./dist/richtext-migrate.d.ts"
+      ],
+      "rules": [
+        "./dist/rules.d.ts"
       ]
     }
   },
@@ -71,7 +79,7 @@
   },
   "scripts": {
     "lint": "eslint \"**/*.ts*\"",
-    "build": "rm -rf dist && tsup bundle/index.ts bundle/rsc.tsx bundle/internal.ts bundle/richtext-migrate.ts",
+    "build": "rm -rf dist && tsup bundle/index.ts bundle/rsc.tsx bundle/internal.ts bundle/richtext-migrate.ts && tsup --config tsup.rules.config.ts",
     "test": "jest",
     "typecheck": "tsc -p tsconfig.typecheck.json",
     "prepare": "pnpm build"
