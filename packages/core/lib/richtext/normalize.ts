@@ -52,27 +52,57 @@ const linkRel = (rel: unknown): string | null => {
   return types.length > 0 ? types.join(" ") : null;
 };
 
+// Nodes whose text starts and ends a line when extractText joins texts
+const LINE_TYPES = new Set([...BLOCK_TYPES, "listItem"]);
+
+// Pushed onto the stack of extractText after the children of a LINE_TYPES
+// node. Data can never contain this object.
+const LINE_END = {};
+
 /**
  * Collects the text of a subtree. Uses an explicit stack instead of recursion
- * so that it works for any depth.
+ * so that it works for any depth. The texts of different blocks (paragraphs,
+ * headings, list items and so on) are joined with a line break, so "a" and
+ * "b" in two paragraphs become "a\nb" and not "ab". There is no line break
+ * before the first text or after the last one.
  */
 export function extractText(value: unknown): string {
   const parts: string[] = [];
   const stack: unknown[] = [value];
   const seen = new Set<unknown>();
+  // A block started or ended since the last text
+  let newLine = false;
+
+  const add = (text: string) => {
+    if (text === "") return;
+    if (newLine && parts.length > 0) parts.push("\n");
+
+    newLine = false;
+    parts.push(text);
+  };
 
   while (stack.length > 0) {
     const node = stack.pop();
+
+    if (node === LINE_END) {
+      newLine = true;
+      continue;
+    }
 
     if (!isRecord(node) || seen.has(node)) continue;
 
     seen.add(node);
 
     if (node.type === "text") {
-      if (typeof node.text === "string") parts.push(node.text);
+      if (typeof node.text === "string") add(node.text);
     } else if (node.type === "hardBreak") {
-      parts.push("\n");
+      add("\n");
     } else if (Array.isArray(node.content)) {
+      if (typeof node.type === "string" && LINE_TYPES.has(node.type)) {
+        newLine = true;
+        stack.push(LINE_END);
+      }
+
       for (let i = node.content.length - 1; i >= 0; i--) {
         stack.push(node.content[i]);
       }
@@ -346,13 +376,16 @@ function normalizeKnownNode(
  * - Nodes nested deeper than `maxDepth` are reduced to their text.
  *   `maxDepth` defaults to RICHTEXT_MAX_DEPTH and can only be lowered: a
  *   value that is not a non-negative integer is ignored, and a larger one is
- *   capped at RICHTEXT_MAX_DEPTH.
+ *   capped at RICHTEXT_MAX_DEPTH. `options` may be null or undefined.
+ * - Text taken from several blocks keeps a line break between the blocks.
  *
- * Valid editor output (editor.getJSON()) is returned unchanged.
+ * Valid output of an editor with the default options (editor.getJSON()) is
+ * returned unchanged; paragraphs and headings without attrs (an editor without
+ * text alignment) get textAlign null.
  */
 export function normalizeRichText(
   value: unknown,
-  options: { maxDepth?: number } = {}
+  options?: { maxDepth?: number } | null
 ): RichTextDoc {
   if (typeof value === "string") return textToRichText(value);
 
@@ -360,7 +393,7 @@ export function normalizeRichText(
 
   const isDoc = value.type === "doc";
   const walk: Walk = {
-    maxDepth: toMaxDepth(options.maxDepth),
+    maxDepth: toMaxDepth(options?.maxDepth),
     ancestors: new Set(isDoc ? [value] : []),
   };
   const content = isDoc ? value.content : [value];

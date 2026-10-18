@@ -1,4 +1,8 @@
-import { normalizeRichText, RICHTEXT_MAX_DEPTH } from "../normalize";
+import {
+  extractText,
+  normalizeRichText,
+  RICHTEXT_MAX_DEPTH,
+} from "../normalize";
 import {
   allTypicalContent,
   deepBlockquotes,
@@ -145,6 +149,14 @@ describe("normalizeRichText", () => {
           )
         )
       ).toEqual(doc(p(t("caption")), p(t("a "), t("@b"))));
+    });
+
+    it("puts the text of separate blocks inside unknown nodes on separate lines", () => {
+      expect(
+        normalizeRichText(
+          doc({ type: "columns", content: [p(t("a")), p(t("b"))] })
+        )
+      ).toEqual(doc(p(t("a\nb"))));
     });
 
     it.each(["constructor", "__proto__", "toString", "hasOwnProperty"])(
@@ -441,6 +453,20 @@ describe("normalizeRichText", () => {
       }
     );
 
+    it.each([null, undefined])(
+      "uses the defaults when options is %p",
+      (options) => {
+        const normalize = () =>
+          normalizeRichText(deepBlockquotes(5000), options);
+
+        expect(normalize).not.toThrow();
+        expect(unwrapBlockquotes(normalize())).toEqual({
+          blockquotes: RICHTEXT_MAX_DEPTH,
+          innermost: [p(t("deep"))],
+        });
+      }
+    );
+
     it("does not overflow the stack on 100,000 levels when maxDepth is Infinity", () => {
       expect(() =>
         normalizeRichText(deepBlockquotes(100_000), { maxDepth: Infinity })
@@ -453,6 +479,18 @@ describe("normalizeRichText", () => {
       ).toEqual(doc(p(t("bottom"))));
     });
 
+    it("puts the text of separate blocks below maxDepth on separate lines", () => {
+      expect(
+        normalizeRichText(
+          doc({
+            type: "blockquote",
+            content: [{ type: "blockquote", content: [p(t("a")), p(t("b"))] }],
+          }),
+          { maxDepth: 1 }
+        )
+      ).toEqual(doc({ type: "blockquote", content: [p(t("a\nb"))] }));
+    });
+
     it("stops at cycles", () => {
       const node: RichTextNode = { type: "blockquote", content: [] };
       node.content!.push(node, p(t("x")));
@@ -461,5 +499,64 @@ describe("normalizeRichText", () => {
         doc({ type: "blockquote", content: [p(t("x"))] })
       );
     });
+  });
+});
+
+describe("extractText", () => {
+  const li = (...content: RichTextNode[]): RichTextNode => ({
+    type: "listItem",
+    content,
+  });
+
+  it.each<[string, RichTextNode, string]>([
+    [
+      "paragraphs in an unknown node",
+      { type: "columns", content: [p(t("a")), p(t("b"))] },
+      "a\nb",
+    ],
+    [
+      "paragraphs in a blockquote",
+      { type: "blockquote", content: [p(t("a")), p(t("b"))] },
+      "a\nb",
+    ],
+    [
+      "loose text followed by a paragraph",
+      { type: "x", content: [t("a"), p(t("b"))] },
+      "a\nb",
+    ],
+    [
+      "a paragraph followed by loose text",
+      { type: "x", content: [p(t("a")), t("b")] },
+      "a\nb",
+    ],
+    [
+      "nested list items",
+      {
+        type: "bulletList",
+        content: [
+          li(p(t("a"))),
+          li(p(t("b")), { type: "bulletList", content: [li(p(t("c")))] }),
+        ],
+      },
+      "a\nb\nc",
+    ],
+    [
+      "an empty paragraph between two others",
+      { type: "x", content: [p(t("a")), p(), p(t("b"))] },
+      "a\nb",
+    ],
+    ["a hard break", p(t("a"), { type: "hardBreak" }, t("b")), "a\nb"],
+    [
+      "inline nodes",
+      p(t("a "), { type: "mention", content: [t("@b")] }),
+      "a @b",
+    ],
+    ["a single block", { type: "blockquote", content: [p(t("a"))] }, "a"],
+  ])("extracts the text of %s", (_, value, text) => {
+    expect(extractText(value)).toBe(text);
+  });
+
+  it("handles 100,000 levels without recursion", () => {
+    expect(extractText(deepBlockquotes(100_000, "bottom"))).toBe("bottom");
   });
 });

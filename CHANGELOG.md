@@ -24,6 +24,8 @@ tceditor is a fork of [Puck](https://github.com/puckeditor/puck) v0.23.0 (git ta
 * look up component configs, `migrateDynamicZonesForComponent` callbacks and `transformProps` transforms by own key only, and keep the node and zone indexes free of `Object.prototype`, so component types or ids such as `constructor`, `__proto__` or `toString` no longer crash or corrupt data in `<Render>`, the editor, `resolveAllData`, `migrate` or `transformProps`; such types render like any other type without a configuration
 * add an optional `nonce` prop to `<Puck>`; it is set on the editor UI styles, the iframe interaction styles, the drag-and-drop styles, the base styles of the rich text editor and the host styles that already carry the nonce when they are mirrored into the preview iframe, so the editor can run under a nonce-based `style-src` Content Security Policy
 * replace the upstream README, contributing guide and demo README with tceditor documentation, add `CLAUDE.md` with the architecture notes and security rules, and remove the upstream code of conduct, whose only enforcement channel was the Puck Discord server
+* `normalizeRichText(value, options)` accepts `null` as `options` and uses the defaults instead of throwing a `TypeError`
+* when `normalizeRichText` reduces unknown or too deeply nested content to text, the texts of separate blocks are joined with a line break (`"a\nb"`) instead of running together (`"ab"`)
 
 ## [0.23.0](/compare/v0.22.4...v0.23.0) (2026-08-07)
 
