@@ -1,8 +1,13 @@
 import { getSchema, Mark, Node } from "@tiptap/core";
+import { Document } from "@tiptap/extension-document";
+import { Heading } from "@tiptap/extension-heading";
+import { Paragraph } from "@tiptap/extension-paragraph";
+import { Text } from "@tiptap/extension-text";
 import type { Schema } from "@tiptap/pm/model";
 import { Node as ProseMirrorNode } from "@tiptap/pm/model";
 import { PuckRichText, PuckRichTextOptions } from "../../extension";
 import {
+  defaultTextblock,
   findUnrenderableTypes,
   fitToSchema as fitToSchemaUnchecked,
 } from "../fit-to-schema";
@@ -135,6 +140,115 @@ describe("fitToSchema", () => {
     );
     expect(fitToSchema(typicalContent.horizontalRule, schema)).toEqual(
       doc(p(t("above")), p(t("below")))
+    );
+  });
+});
+
+describe("fitToSchema without paragraphs", () => {
+  // Tiptap's listItem requires paragraph, so a field can turn paragraph off
+  // only together with listItem
+  const content = doc(
+    p(
+      t("plain "),
+      t("bold", [{ type: "bold" }]),
+      { type: "hardBreak" },
+      t("end")
+    ),
+    p(),
+    {
+      type: "heading",
+      attrs: { textAlign: null, level: 2 },
+      content: [t("Title")],
+    }
+  );
+
+  it("uses the paragraph as the text block when the schema has one", () => {
+    expect(defaultTextblock(getSchema([PuckRichText]))?.name).toBe("paragraph");
+  });
+
+  it("turns paragraphs into code blocks of plain text when the first text block is a code block", () => {
+    const schema = schemaWith({ paragraph: false, listItem: false });
+
+    expect(defaultTextblock(schema)?.name).toBe("codeBlock");
+    expect(fitToSchema(content, schema)).toEqual(
+      doc(
+        {
+          type: "codeBlock",
+          attrs: { language: null },
+          content: [t("plain bold\nend")],
+        },
+        { type: "codeBlock", attrs: { language: null } },
+        {
+          type: "heading",
+          attrs: { textAlign: null, level: 2 },
+          content: [t("Title")],
+        }
+      )
+    );
+  });
+
+  it("turns paragraphs into level 1 headings when the first text block is a heading", () => {
+    const schema = schemaWith({
+      paragraph: false,
+      listItem: false,
+      blockquote: false,
+      codeBlock: false,
+    });
+
+    expect(defaultTextblock(schema)?.name).toBe("heading");
+    expect(fitToSchema(content, schema)).toEqual(
+      doc(
+        {
+          type: "heading",
+          attrs: { textAlign: null, level: 1 },
+          content: [
+            t("plain "),
+            t("bold", [{ type: "bold" }]),
+            { type: "hardBreak" },
+            t("end"),
+          ],
+        },
+        { type: "heading", attrs: { textAlign: null, level: 1 } },
+        {
+          type: "heading",
+          attrs: { textAlign: null, level: 2 },
+          content: [t("Title")],
+        }
+      )
+    );
+  });
+
+  it("drops text blocks only when the schema has no text block at all", () => {
+    const schema = schemaWith({
+      paragraph: false,
+      listItem: false,
+      codeBlock: false,
+      heading: false,
+    });
+
+    expect(defaultTextblock(schema)).toBeNull();
+    // Unchecked: ProseMirror's toJSON leaves out an empty content array
+    expect(fitToSchemaUnchecked(content, schema)).toEqual(doc());
+  });
+});
+
+describe("fitToSchema without text alignment", () => {
+  it("removes textAlign from paragraphs and headings", () => {
+    const schema = getSchema([Document, Paragraph, Heading, Text]);
+
+    // Checked: the editor loads the result exactly as it is
+    expect(fitToSchema(typicalContent.alignment, schema)).toEqual(
+      doc(
+        { type: "paragraph", content: [t("left")] },
+        { type: "paragraph", content: [t("center")] },
+        { type: "paragraph", content: [t("right")] },
+        { type: "paragraph", content: [t("justify")] },
+        {
+          type: "heading",
+          attrs: { level: 2 },
+          content: [t("centered heading")],
+        }
+      )
     );
   });
 });

@@ -6,14 +6,27 @@ import { useDebounce } from "use-debounce";
 import { UiState } from "../../../types";
 import { useAppStoreApi } from "../../../store";
 import { normalizeRichText } from "../../../lib/richtext/normalize";
-import type { RichTextDoc } from "../../../lib/richtext/types";
-import { findUnrenderableTypes, fitToSchema } from "./fit-to-schema";
-import { stableStringify } from "./stable-stringify";
+import { stableStringify } from "../../../lib/richtext/stable-stringify";
+import type { RichTextDoc, RichTextNode } from "../../../lib/richtext/types";
+import {
+  defaultTextblock,
+  findUnrenderableTypes,
+  fitToSchema,
+} from "./fit-to-schema";
 
-// Tiptap needs at least one block to place the cursor in
-const EMPTY_EDITOR_DOC: RichTextDoc = {
-  type: "doc",
-  content: [{ type: "paragraph", attrs: { textAlign: null } }],
+/**
+ * Tiptap needs at least one block to place the cursor in. The block is an
+ * empty defaultTextblock, the same text block fitToSchema uses, so a field
+ * without paragraphs does not get a paragraph its schema lacks. ProseMirror
+ * creates it, so it has exactly the attributes of the schema.
+ */
+const emptyEditorDoc = (schema: Schema): RichTextDoc => {
+  const block = defaultTextblock(schema)?.createAndFill();
+
+  return {
+    type: "doc",
+    content: block ? [block.toJSON() as RichTextNode] : [],
+  };
 };
 
 /**
@@ -26,7 +39,7 @@ const EMPTY_EDITOR_DOC: RichTextDoc = {
 const toEditorDoc = (content: unknown, schema: Schema): RichTextDoc => {
   const doc = fitToSchema(normalizeRichText(content), schema);
 
-  return doc.content?.length ? doc : EMPTY_EDITOR_DOC;
+  return doc.content?.length ? doc : emptyEditorDoc(schema);
 };
 
 // Types already reported, so each one is reported once

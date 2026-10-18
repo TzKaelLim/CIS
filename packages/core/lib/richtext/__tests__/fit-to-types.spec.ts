@@ -1,0 +1,210 @@
+import fs from "fs";
+import path from "path";
+import { fitRichTextToTypes, RichTextTypes } from "../fit-to-types";
+import {
+  allTypicalContent,
+  doc,
+  typicalContent,
+} from "../__helpers__/fixtures";
+import type { RichTextMark, RichTextNode } from "../types";
+
+/** The types of a richtext field with the default options */
+const ALL_TYPES: RichTextTypes = {
+  nodes: [
+    "blockquote",
+    "bulletList",
+    "codeBlock",
+    "doc",
+    "hardBreak",
+    "heading",
+    "horizontalRule",
+    "listItem",
+    "orderedList",
+    "paragraph",
+    "text",
+  ],
+  marks: ["bold", "code", "italic", "link", "strike", "underline"],
+};
+
+const without = (...names: string[]): RichTextTypes => ({
+  nodes: ALL_TYPES.nodes.filter((name) => !names.includes(name)),
+  marks: ALL_TYPES.marks.filter((name) => !names.includes(name)),
+});
+
+const p = (...content: RichTextNode[]): RichTextNode =>
+  content.length
+    ? { type: "paragraph", attrs: { textAlign: null }, content }
+    : { type: "paragraph", attrs: { textAlign: null } };
+
+const t = (text: string, marks?: RichTextMark[]): RichTextNode =>
+  marks ? { type: "text", marks, text } : { type: "text", text };
+
+const bold: RichTextMark = { type: "bold" };
+
+const hardBreak: RichTextNode = { type: "hardBreak" };
+
+const heading = (
+  level: number,
+  text: string,
+  textAlign: string | null = null
+): RichTextNode => ({
+  type: "heading",
+  attrs: { textAlign, level },
+  content: [t(text)],
+});
+
+describe("fitRichTextToTypes", () => {
+  it("returns content the types allow unchanged", () => {
+    expect(fitRichTextToTypes(allTypicalContent, ALL_TYPES)).toEqual(
+      allTypicalContent
+    );
+  });
+
+  it("does not modify the document it is given", () => {
+    const input = JSON.parse(JSON.stringify(allTypicalContent));
+
+    fitRichTextToTypes(input, {
+      ...without("paragraph", "heading", "bulletList", "bold", "link"),
+      textblock: "codeBlock",
+      textAlign: false,
+    });
+
+    expect(input).toEqual(allTypicalContent);
+  });
+
+  it("turns text blocks the types lack into paragraphs by default", () => {
+    expect(
+      fitRichTextToTypes(doc(heading(2, "Title", "center")), without("heading"))
+    ).toEqual(
+      doc({
+        type: "paragraph",
+        attrs: { textAlign: "center" },
+        content: [t("Title")],
+      })
+    );
+  });
+
+  it("drops text blocks by default when the types have no paragraph", () => {
+    expect(
+      fitRichTextToTypes(
+        doc(p(t("a")), heading(2, "Title"), { type: "horizontalRule" }),
+        { nodes: ["doc", "horizontalRule", "text"], marks: [] }
+      )
+    ).toEqual(doc({ type: "horizontalRule" }));
+  });
+
+  it("turns text blocks into level 1 headings when textblock is heading", () => {
+    expect(
+      fitRichTextToTypes(
+        doc(
+          {
+            type: "paragraph",
+            attrs: { textAlign: "center" },
+            content: [t("a", [bold]), hardBreak, t("b")],
+          },
+          {
+            type: "codeBlock",
+            attrs: { language: "js" },
+            content: [t("x\ny")],
+          }
+        ),
+        {
+          nodes: ["doc", "hardBreak", "heading", "text"],
+          marks: ["bold"],
+          textblock: "heading",
+        }
+      )
+    ).toEqual(
+      doc(
+        {
+          type: "heading",
+          attrs: { textAlign: "center", level: 1 },
+          content: [t("a", [bold]), hardBreak, t("b")],
+        },
+        {
+          type: "heading",
+          attrs: { textAlign: null, level: 1 },
+          content: [t("x\ny")],
+        }
+      )
+    );
+  });
+
+  it("turns text blocks into code blocks of plain text when textblock is codeBlock", () => {
+    expect(
+      fitRichTextToTypes(doc(p(t("a", [bold]), hardBreak, t("b")), p()), {
+        nodes: ["codeBlock", "doc", "hardBreak", "text"],
+        marks: ["bold"],
+        textblock: "codeBlock",
+      })
+    ).toEqual(
+      doc(
+        {
+          type: "codeBlock",
+          attrs: { language: null },
+          content: [t("a\nb")],
+        },
+        { type: "codeBlock", attrs: { language: null } }
+      )
+    );
+  });
+
+  it("drops the text of text blocks when textblock is null", () => {
+    expect(
+      fitRichTextToTypes(doc(p(t("a")), heading(2, "Title")), {
+        ...without("paragraph"),
+        textblock: null,
+      })
+    ).toEqual(doc(heading(2, "Title")));
+  });
+
+  it("ignores a textblock the types lack", () => {
+    expect(
+      fitRichTextToTypes(doc(p(t("a"))), {
+        nodes: ["doc", "text"],
+        marks: [],
+        textblock: "heading",
+      })
+    ).toEqual(doc());
+  });
+
+  it("removes textAlign from paragraphs and headings when textAlign is false", () => {
+    expect(
+      fitRichTextToTypes(typicalContent.alignment, {
+        ...ALL_TYPES,
+        textAlign: false,
+      })
+    ).toEqual(
+      doc(
+        { type: "paragraph", content: [t("left")] },
+        { type: "paragraph", content: [t("center")] },
+        { type: "paragraph", content: [t("right")] },
+        { type: "paragraph", content: [t("justify")] },
+        {
+          type: "heading",
+          attrs: { level: 2 },
+          content: [t("centered heading")],
+        }
+      )
+    );
+    expect(
+      fitRichTextToTypes(doc(heading(2, "Title", "center"), p()), {
+        ...without("heading"),
+        textAlign: false,
+      })
+    ).toEqual(
+      doc({ type: "paragraph", content: [t("Title")] }, { type: "paragraph" })
+    );
+  });
+
+  it("imports nothing but other React-free richtext modules", () => {
+    const source = fs.readFileSync(
+      path.join(__dirname, "../fit-to-types.ts"),
+      "utf8"
+    );
+
+    expect(
+      Array.from(source.matchAll(/from "([^"]+)"/g), (match) => match[1])
+    ).toEqual(["./stable-stringify", "./types"]);
+  });
+});

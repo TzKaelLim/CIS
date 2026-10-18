@@ -105,6 +105,54 @@ describe("Editor", () => {
     );
   });
 
+  // Tiptap's listItem requires paragraph, so a field can turn paragraph off
+  // only together with listItem
+  it.each<[string, RichtextField["options"], string]>([
+    ["code blocks", { paragraph: false, listItem: false }, "pre"],
+    [
+      "headings",
+      {
+        paragraph: false,
+        listItem: false,
+        blockquote: false,
+        codeBlock: false,
+      },
+      "h1",
+    ],
+  ])(
+    "shows paragraphs as %s in a field without paragraphs",
+    async (_, options, selector) => {
+      const editorDom = await renderEditor(
+        doc(p(t("first")), p(t("second", [{ type: "bold" }]))),
+        { type: "richtext", options }
+      );
+
+      expect(
+        Array.from(editorDom.querySelectorAll(selector)).map(
+          (el) => el.textContent
+        )
+      ).toEqual(["first", "second"]);
+      expect(warnings()).not.toContainEqual(
+        expect.stringContaining("Invalid content")
+      );
+    }
+  );
+
+  it("opens an empty field without paragraphs with an empty code block", async () => {
+    const { editor } = await renderEditor("", {
+      type: "richtext",
+      options: { paragraph: false, listItem: false },
+    });
+
+    expect(editor.getJSON()).toEqual({
+      type: "doc",
+      content: [{ type: "codeBlock", attrs: { language: null } }],
+    });
+    expect(warnings()).not.toContainEqual(
+      expect.stringContaining("Invalid content")
+    );
+  });
+
   it("warns about types from tiptap.extensions and shows only their text", async () => {
     const Highlight = Mark.create({
       name: "highlight",

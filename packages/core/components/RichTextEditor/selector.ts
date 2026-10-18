@@ -9,46 +9,59 @@ export const defaultEditorState = (
 
   const canChain = () => editor.can().chain();
 
+  // A command can throw instead of returning false when the schema lacks a
+  // type it needs: toggleCodeBlock toggles back to a paragraph, which a field
+  // with `paragraph: false` does not have
+  const can = (check: () => boolean | undefined) => {
+    if (readOnly) return false;
+
+    try {
+      return Boolean(check());
+    } catch {
+      return false;
+    }
+  };
+
   return {
     isAlignLeft: editor.isActive({ textAlign: "left" }),
-    canAlignLeft: !readOnly && canChain().setTextAlign?.("left").run(),
+    canAlignLeft: can(() => canChain().setTextAlign?.("left").run()),
 
     isAlignCenter: editor.isActive({ textAlign: "center" }),
-    canAlignCenter: !readOnly && canChain().setTextAlign?.("center").run(),
+    canAlignCenter: can(() => canChain().setTextAlign?.("center").run()),
 
     isAlignRight: editor.isActive({ textAlign: "right" }),
-    canAlignRight: !readOnly && canChain().setTextAlign?.("right").run(),
+    canAlignRight: can(() => canChain().setTextAlign?.("right").run()),
 
     isAlignJustify: editor.isActive({ textAlign: "justify" }),
-    canAlignJustify: !readOnly && canChain().setTextAlign?.("justify").run(),
+    canAlignJustify: can(() => canChain().setTextAlign?.("justify").run()),
 
     isBold: editor.isActive("bold"),
-    canBold: !readOnly && canChain().toggleBold?.().run(),
+    canBold: can(() => canChain().toggleBold?.().run()),
 
     isItalic: editor.isActive("italic"),
-    canItalic: !readOnly && canChain().toggleItalic?.().run(),
+    canItalic: can(() => canChain().toggleItalic?.().run()),
 
     isUnderline: editor.isActive("underline"),
-    canUnderline: !readOnly && canChain().toggleUnderline?.().run(),
+    canUnderline: can(() => canChain().toggleUnderline?.().run()),
 
     isStrike: editor.isActive("strike"),
-    canStrike: !readOnly && canChain().toggleStrike?.().run(),
+    canStrike: can(() => canChain().toggleStrike?.().run()),
 
     isInlineCode: editor.isActive("code"),
-    canInlineCode: !readOnly && canChain().toggleCode?.().run(),
+    canInlineCode: can(() => canChain().toggleCode?.().run()),
 
     isBulletList: editor.isActive("bulletList"),
-    canBulletList: !readOnly && canChain().toggleBulletList?.().run(),
+    canBulletList: can(() => canChain().toggleBulletList?.().run()),
 
     isOrderedList: editor.isActive("orderedList"),
-    canOrderedList: !readOnly && canChain().toggleOrderedList?.().run(),
+    canOrderedList: can(() => canChain().toggleOrderedList?.().run()),
 
     isCodeBlock: editor.isActive("codeBlock"),
-    canCodeBlock: !readOnly && canChain().toggleCodeBlock?.().run(),
+    canCodeBlock: can(() => canChain().toggleCodeBlock?.().run()),
 
     isBlockquote: editor.isActive("blockquote"),
-    canBlockquote: !readOnly && canChain().toggleBlockquote?.().run(),
+    canBlockquote: can(() => canChain().toggleBlockquote?.().run()),
 
-    canHorizontalRule: !readOnly && canChain().setHorizontalRule?.().run(),
+    canHorizontalRule: can(() => canChain().setHorizontalRule?.().run()),
   };
 };
