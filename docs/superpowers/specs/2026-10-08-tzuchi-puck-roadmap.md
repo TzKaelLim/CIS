@@ -28,7 +28,7 @@
 | # | 子專案 | 範圍 | 依賴 | 狀態 |
 |---|---|---|---|---|
 | S1 | Fork 基線與開發基礎設施 | 建立 fork 分支、改名為 tceditor、yarn 改 pnpm、移除不需要的套件、函式庫層資安修補（含 richtext 改為 JSON 與共用渲染器）、自架 Supabase 開發環境 | — | 規格見 `2026-10-08-s1-fork-baseline-design.md` |
-| S2 | 元件規格（唯一 schema） | 以 zod 為唯一來源，產生 Puck fields、Storybook stories、MCP 元件目錄與整頁驗證器；8 個示範區塊（uikit HeroUI 線）與示範站 | S1 | 規格見 `2026-10-12-s2-block-spec-design.md` |
+| S2 | 元件規格（唯一 schema） | 以 zod 為唯一來源，產生 Puck fields、Storybook stories、MCP 元件目錄與整頁驗證器；8 個示範區塊（uikit HeroUI 線）與示範站 | S1 | 已完成（2026-10-19）。規格見 `2026-10-12-s2-block-spec-design.md`，實作計畫見 `docs/superpowers/plans/2026-10-19-s2-block-spec.md` |
 | S3 | Supabase 後端 | 驗證與授權、RLS、頁面與版本、草稿、審核狀態機、媒體庫、寫入 API（伺服器端以 schema 驗證） | S1、S2 | 待 brainstorm |
 | S4 | MCP server | 以 S3 的 API 與 S2 的 schema 為基礎；LLM 只能建立草稿，發佈必須經過人工 | S2、S3 | 待 brainstorm |
 | S5 | 編輯器效能 | 權限 slice 的全樹走訪、增量索引、history 改存 patch、虛擬化正式化。目標規模待定 | S1，可與 S3 並行 | 待 brainstorm |
