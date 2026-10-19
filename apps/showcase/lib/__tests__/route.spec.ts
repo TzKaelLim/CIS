@@ -264,6 +264,72 @@ describe("POST /api/activity", () => {
     expect(() => readFileSync(publishedFile())).toThrow();
   });
 
+  // The checks run in the order 403 → 415 → 413 → 422: each request below
+  // breaks every check from its own on, so only the first check may answer.
+  // A refused origin or Content-Type must not read any of the body.
+  describe("check order", () => {
+    const FOREIGN = { origin: "http://evil.example" };
+    const TEXT = { "content-type": "text/plain" };
+
+    /** A body that is not JSON and never ends; counts the chunks read. */
+    function endlessBody() {
+      const read = { chunks: 0 };
+      const chunk = new TextEncoder().encode("x".repeat(64 * 1024));
+      const stream = new ReadableStream<Uint8Array>(
+        {
+          pull(controller) {
+            read.chunks += 1;
+            controller.enqueue(chunk);
+          },
+        },
+        // Nothing is pulled until someone reads
+        { highWaterMark: 0 }
+      );
+
+      return { read, stream };
+    }
+
+    it.each<[string, number, string, Record<string, string>]>([
+      ["a foreign origin", 403, "forbidden_origin", { ...FOREIGN, ...TEXT }],
+      ["a wrong Content-Type", 415, "unsupported_media_type", TEXT],
+    ])(
+      "answers %s with %i before reading the body",
+      async (_label, status, error, headers) => {
+        const { read, stream } = endlessBody();
+        const response = await handlers().POST(
+          post(stream, headers, { duplex: "half" })
+        );
+
+        expect(response.status).toBe(status);
+        expect((await response.json()).error).toBe(error);
+        expect(read.chunks).toBe(0);
+        expect(() => readFileSync(publishedFile())).toThrow();
+      }
+    );
+
+    it("answers a body over 2 MB with 413 before validating it", async () => {
+      const { read, stream } = endlessBody();
+      const response = await handlers().POST(
+        post(stream, {}, { duplex: "half" })
+      );
+
+      expect(response.status).toBe(413);
+      expect((await response.json()).error).toBe("too_large");
+      expect(read.chunks).toBeGreaterThan(0);
+      expect(() => readFileSync(publishedFile())).toThrow();
+    });
+
+    it("answers a body within 2 MB that is not JSON with 422", async () => {
+      const response = await handlers().POST(post("x".repeat(64 * 1024)));
+
+      expect(response.status).toBe(422);
+      expect((await response.json()).errors).toEqual([
+        expect.objectContaining({ code: "invalid_json" }),
+      ]);
+      expect(() => readFileSync(publishedFile())).toThrow();
+    });
+  });
+
   it.each(["localhost:3010", "127.0.0.1:3019"])(
     "accepts a same-origin publish to %s",
     async (host) => {
