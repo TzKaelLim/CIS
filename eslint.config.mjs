@@ -157,6 +157,15 @@ const PUBLIC_IMPORTS = {
       name: "./editor",
       message: "Views must not import the editor-only image picker.",
     },
+    {
+      name: "./editor-config",
+      message: "The render config must not import the editor config.",
+    },
+    {
+      name: "./image/editor",
+      message:
+        "The render config must not import the editor-only image picker.",
+    },
   ],
   patterns: ZOD_IMPORT_PATTERNS,
 };
@@ -224,6 +233,7 @@ const config = [
   {
     files: [
       "packages/blocks/src/**/view.tsx",
+      "packages/blocks/src/views.ts",
       "packages/blocks/src/render-config.tsx",
       "apps/showcase/app/(public)/**/*.ts",
       "apps/showcase/app/(public)/**/*.tsx",

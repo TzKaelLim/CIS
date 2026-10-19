@@ -26,6 +26,14 @@
         "$TURBO_ROOT$/packages/plugin-heading-analyzer/NOTICE"
       ]
     },
+    "@tzuchi/tceditor-blocks#test": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/vendor/uikit/**",
+        "$TURBO_ROOT$/apps/showcase/public/demo-assets/**"
+      ]
+    },
     "dev": {
       "cache": false,
       "persistent": true
