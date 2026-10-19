@@ -1,0 +1,693 @@
+[
+  {
+    "name": "完整的活動頁：8 種區塊與巢狀放置區",
+    "input": {
+      "root": {
+        "props": {
+          "title": "淨灘活動",
+          "description": "每月第一個週六上午在福隆海灘集合。"
+        }
+      },
+      "content": [
+        {
+          "type": "Heading",
+          "props": {
+            "id": "Heading-1",
+            "text": "2026 年淨灘活動",
+            "level": "h1",
+            "align": "center"
+          }
+        },
+        {
+          "type": "Paragraph",
+          "props": {
+            "id": "Paragraph-1",
+            "body": {
+              "type": "doc",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "attrs": { "textAlign": null },
+                  "content": [{ "type": "text", "text": "一起守護海岸。" }]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "type": "Section",
+          "props": {
+            "id": "Section-1",
+            "background": "secondary",
+            "paddingY": "64",
+            "content": [
+              {
+                "type": "Columns",
+                "props": {
+                  "id": "Columns-1",
+                  "gap": "32",
+                  "columns": [
+                    {
+                      "content": [
+                        {
+                          "type": "Card",
+                          "props": {
+                            "id": "Card-1",
+                            "title": "報名方式",
+                            "summary": "線上報名或電話報名。",
+                            "href": "",
+                            "content": [
+                              {
+                                "type": "Paragraph",
+                                "props": {
+                                  "id": "Paragraph-2",
+                                  "body": {
+                                    "type": "doc",
+                                    "content": [
+                                      {
+                                        "type": "paragraph",
+                                        "attrs": { "textAlign": null },
+                                        "content": [
+                                          {
+                                            "type": "text",
+                                            "text": "名額有限。"
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                }
+                              },
+                              {
+                                "type": "Button",
+                                "props": {
+                                  "id": "Button-1",
+                                  "label": "立即報名",
+                                  "href": "/register",
+                                  "size": "sm"
+                                }
+                              },
+                              {
+                                "type": "Button",
+                                "props": {
+                                  "id": "Button-2",
+                                  "label": "電話報名",
+                                  "href": "tel:+886-2-1234-5678",
+                                  "variant": "outline"
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "content": [
+                        {
+                          "type": "Image",
+                          "props": {
+                            "id": "Image-1",
+                            "image": {
+                              "assetId": "demo-1",
+                              "alt": "志工在海灘上撿拾垃圾",
+                              "decorative": false
+                            },
+                            "ratio": "16:9",
+                            "caption": "去年的活動照片"
+                          }
+                        },
+                        {
+                          "type": "TagList",
+                          "props": {
+                            "id": "TagList-1",
+                            "tags": [{ "label": "環保" }, { "label": "戶外" }]
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "Button",
+          "props": {
+            "id": "Button-3",
+            "label": "寫信詢問",
+            "href": "mailto:volunteer@example.org",
+            "fullWidth": true
+          }
+        }
+      ]
+    },
+    "expect": { "ok": true }
+  },
+  {
+    "name": "空白頁面",
+    "input": { "root": { "props": {} }, "content": [] },
+    "expect": { "ok": true }
+  },
+  {
+    "name": "編輯器送出的格式：zones 為空物件、uuid id、富文字不含 attrs",
+    "input": {
+      "root": { "props": { "title": "未命名頁面", "description": "" } },
+      "content": [
+        {
+          "type": "Paragraph",
+          "props": {
+            "id": "Paragraph-6f1c2b9e-8d4a-4c6b-9f0e-1a2b3c4d5e6f",
+            "body": {
+              "type": "doc",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [{ "type": "text", "text": "請輸入內文。" }]
+                }
+              ]
+            },
+            "align": "start"
+          }
+        }
+      ],
+      "zones": {}
+    },
+    "expect": { "ok": true }
+  },
+  {
+    "name": "多欄的一欄沒有 content、卡片沒有 content",
+    "input": {
+      "root": { "props": {} },
+      "content": [
+        {
+          "type": "Columns",
+          "props": { "id": "Columns-1", "columns": [{}, { "content": [] }] }
+        },
+        { "type": "Card", "props": { "id": "Card-1", "title": "卡片" } }
+      ]
+    },
+    "expect": { "ok": true }
+  },
+  {
+    "name": "節點的 readOnly 會被移除",
+    "input": {
+      "root": { "props": {} },
+      "content": [
+        {
+          "type": "Heading",
+          "props": { "id": "Heading-1" },
+          "readOnly": { "text": true }
+        }
+      ]
+    },
+    "expect": { "ok": true }
+  },
+  {
+    "name": "純裝飾圖片不需要替代文字",
+    "input": {
+      "root": { "props": {} },
+      "content": [
+        {
+          "type": "Image",
+          "props": {
+            "id": "Image-1",
+            "image": { "assetId": "demo-3", "alt": "", "decorative": true }
+          }
+        }
+      ]
+    },
+    "expect": { "ok": true }
+  },
+  {
+    "name": "按鈕文字 40 個中文字",
+    "input": {
+      "root": { "props": {} },
+      "content": [
+        {
+          "type": "Button",
+          "props": {
+            "id": "Button-1",
+            "label": "字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字",
+            "href": "/register"
+          }
+        }
+      ]
+    },
+    "expect": { "ok": true }
+  },
+  {
+    "name": "按鈕文字 41 個中文字",
+    "input": {
+      "root": { "props": {} },
+      "content": [
+        {
+          "type": "Button",
+          "props": {
+            "id": "Button-1",
+            "label": "字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字",
+            "href": "/register"
+          }
+        }
+      ]
+    },
+    "expect": {
+      "ok": false,
+      "errors": [
+        { "code": "invalid_value", "pathText": "content[0].props.label" }
+      ]
+    }
+  },
+  {
+    "name": "javascript: 連結",
+    "input": {
+      "root": { "props": {} },
+      "content": [
+        {
+          "type": "Button",
+          "props": {
+            "id": "Button-1",
+            "label": "立即報名",
+            "href": "javascript:alert(1)"
+          }
+        }
+      ]
+    },
+    "expect": {
+      "ok": false,
+      "errors": [{ "code": "unsafe_href", "pathText": "content[0].props.href" }]
+    }
+  },
+  {
+    "name": "卡片的選填連結是 data: 網址",
+    "input": {
+      "root": { "props": {} },
+      "content": [
+        {
+          "type": "Card",
+          "props": {
+            "id": "Card-1",
+            "href": "data:text/html,<script>alert(1)</script>"
+          }
+        }
+      ]
+    },
+    "expect": {
+      "ok": false,
+      "errors": [{ "code": "unsafe_href", "pathText": "content[0].props.href" }]
+    }
+  },
+  {
+    "name": "富文字是舊的 HTML 字串",
+    "input": {
+      "root": { "props": {} },
+      "content": [
+        {
+          "type": "Paragraph",
+          "props": { "id": "Paragraph-1", "body": "<p>舊網站的內文</p>" }
+        }
+      ]
+    },
+    "expect": {
+      "ok": false,
+      "errors": [
+        { "code": "invalid_value", "pathText": "content[0].props.body" }
+      ]
+    }
+  },
+  {
+    "name": "未宣告的欄位",
+    "input": {
+      "root": { "props": {} },
+      "content": [
+        {
+          "type": "Button",
+          "props": {
+            "id": "Button-1",
+            "label": "立即報名",
+            "href": "/register",
+            "onClick": "alert(1)"
+          }
+        }
+      ]
+    },
+    "expect": {
+      "ok": false,
+      "errors": [
+        { "code": "unknown_prop", "pathText": "content[0].props.onClick" }
+      ]
+    }
+  },
+  {
+    "name": "清單項目裡未宣告的欄位",
+    "input": {
+      "root": { "props": {} },
+      "content": [
+        {
+          "type": "TagList",
+          "props": {
+            "id": "TagList-1",
+            "tags": [{ "label": "志工", "color": "red" }]
+          }
+        }
+      ]
+    },
+    "expect": {
+      "ok": false,
+      "errors": [
+        { "code": "unknown_prop", "pathText": "content[0].props.tags[0].color" }
+      ]
+    }
+  },
+  {
+    "name": "標題層級不在白名單",
+    "input": {
+      "root": { "props": {} },
+      "content": [
+        { "type": "Heading", "props": { "id": "Heading-1", "level": "h5" } }
+      ]
+    },
+    "expect": {
+      "ok": false,
+      "errors": [
+        { "code": "invalid_value", "pathText": "content[0].props.level" }
+      ]
+    }
+  },
+  {
+    "name": "多欄只有 1 欄",
+    "input": {
+      "root": { "props": {} },
+      "content": [
+        {
+          "type": "Columns",
+          "props": { "id": "Columns-1", "columns": [{ "content": [] }] }
+        }
+      ]
+    },
+    "expect": {
+      "ok": false,
+      "errors": [
+        { "code": "invalid_value", "pathText": "content[0].props.columns" }
+      ]
+    }
+  },
+  {
+    "name": "缺替代文字",
+    "input": {
+      "root": { "props": {} },
+      "content": [
+        {
+          "type": "Image",
+          "props": {
+            "id": "Image-1",
+            "image": { "assetId": "demo-1", "alt": "  ", "decorative": false }
+          }
+        }
+      ]
+    },
+    "expect": {
+      "ok": false,
+      "errors": [
+        { "code": "alt_required", "pathText": "content[0].props.image.alt" }
+      ]
+    }
+  },
+  {
+    "name": "圖片編號格式不合",
+    "input": {
+      "root": { "props": {} },
+      "content": [
+        {
+          "type": "Image",
+          "props": {
+            "id": "Image-1",
+            "image": {
+              "assetId": "../demo-1",
+              "alt": "海灘",
+              "decorative": false
+            }
+          }
+        }
+      ]
+    },
+    "expect": {
+      "ok": false,
+      "errors": [
+        {
+          "code": "invalid_value",
+          "pathText": "content[0].props.image.assetId"
+        }
+      ]
+    }
+  },
+  {
+    "name": "區塊類型是 constructor",
+    "input": {
+      "root": { "props": {} },
+      "content": [{ "type": "constructor", "props": { "id": "constructor-1" } }]
+    },
+    "expect": {
+      "ok": false,
+      "errors": [{ "code": "unknown_type", "pathText": "content[0].type" }]
+    }
+  },
+  {
+    "name": "id 含空白",
+    "input": {
+      "root": { "props": {} },
+      "content": [{ "type": "Heading", "props": { "id": "Heading 1" } }]
+    },
+    "expect": {
+      "ok": false,
+      "errors": [{ "code": "invalid_id", "pathText": "content[0].props.id" }]
+    }
+  },
+  {
+    "name": "id 是 root",
+    "input": {
+      "root": { "props": {} },
+      "content": [{ "type": "Heading", "props": { "id": "root" } }]
+    },
+    "expect": {
+      "ok": false,
+      "errors": [{ "code": "invalid_id", "pathText": "content[0].props.id" }]
+    }
+  },
+  {
+    "name": "id 重複",
+    "input": {
+      "root": { "props": {} },
+      "content": [
+        { "type": "Heading", "props": { "id": "Heading-1" } },
+        { "type": "Heading", "props": { "id": "Heading-1" } }
+      ]
+    },
+    "expect": {
+      "ok": false,
+      "errors": [{ "code": "duplicate_id", "pathText": "content[1].props.id" }]
+    }
+  },
+  {
+    "name": "舊的 DropZone zones",
+    "input": {
+      "root": { "props": {} },
+      "content": [],
+      "zones": {
+        "Section-1:content": [
+          { "type": "Heading", "props": { "id": "Heading-1" } }
+        ]
+      }
+    },
+    "expect": {
+      "ok": false,
+      "errors": [{ "code": "legacy_zones", "pathText": "zones" }]
+    }
+  },
+  {
+    "name": "區段裡放區段",
+    "input": {
+      "root": { "props": {} },
+      "content": [
+        {
+          "type": "Section",
+          "props": {
+            "id": "Section-1",
+            "content": [{ "type": "Section", "props": { "id": "Section-2" } }]
+          }
+        }
+      ]
+    },
+    "expect": {
+      "ok": false,
+      "errors": [
+        {
+          "code": "not_allowed_here",
+          "pathText": "content[0].props.content[0]"
+        }
+      ]
+    }
+  },
+  {
+    "name": "多欄裡放區段",
+    "input": {
+      "root": { "props": {} },
+      "content": [
+        {
+          "type": "Columns",
+          "props": {
+            "id": "Columns-1",
+            "columns": [
+              {
+                "content": [
+                  { "type": "Section", "props": { "id": "Section-1" } }
+                ]
+              },
+              { "content": [] }
+            ]
+          }
+        }
+      ]
+    },
+    "expect": {
+      "ok": false,
+      "errors": [
+        {
+          "code": "not_allowed_here",
+          "pathText": "content[0].props.columns[0].content[0]"
+        }
+      ]
+    }
+  },
+  {
+    "name": "content 不是陣列",
+    "input": { "root": { "props": {} }, "content": {} },
+    "expect": {
+      "ok": false,
+      "errors": [{ "code": "invalid_shape", "pathText": "content" }]
+    }
+  },
+  {
+    "name": "頁面根節點有未宣告的欄位",
+    "input": { "root": { "props": { "keywords": "淨灘" } }, "content": [] },
+    "expect": {
+      "ok": false,
+      "errors": [{ "code": "unknown_prop", "pathText": "root.props.keywords" }]
+    }
+  },
+  {
+    "name": "頁面標題超過 80 字",
+    "input": {
+      "root": {
+        "props": {
+          "title": "標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標標"
+        }
+      },
+      "content": []
+    },
+    "expect": {
+      "ok": false,
+      "errors": [{ "code": "invalid_value", "pathText": "root.props.title" }]
+    }
+  },
+  {
+    "name": "props 有 __proto__",
+    "input": {
+      "root": { "props": {} },
+      "content": [
+        {
+          "type": "Button",
+          "props": {
+            "id": "Button-1",
+            "label": "立即報名",
+            "href": "/register",
+            "__proto__": { "polluted": true }
+          }
+        }
+      ]
+    },
+    "expect": {
+      "ok": false,
+      "errors": [
+        { "code": "unknown_prop", "pathText": "content[0].props.__proto__" }
+      ]
+    }
+  },
+  {
+    "name": "清單項目有 constructor",
+    "input": {
+      "root": { "props": {} },
+      "content": [
+        {
+          "type": "TagList",
+          "props": {
+            "id": "TagList-1",
+            "tags": [
+              { "label": "志工", "constructor": { "prototype": { "x": 1 } } }
+            ]
+          }
+        }
+      ]
+    },
+    "expect": {
+      "ok": false,
+      "errors": [
+        {
+          "code": "unknown_prop",
+          "pathText": "content[0].props.tags[0].constructor"
+        }
+      ]
+    }
+  },
+  {
+    "name": "區塊類型是 __proto__",
+    "input": {
+      "root": { "props": {} },
+      "content": [{ "type": "__proto__", "props": { "id": "x-1" } }]
+    },
+    "expect": {
+      "ok": false,
+      "errors": [{ "code": "unknown_type", "pathText": "content[0].type" }]
+    }
+  },
+  {
+    "name": "前面有空白、大小寫混用的 javascript: 連結",
+    "input": {
+      "root": { "props": {} },
+      "content": [
+        {
+          "type": "Button",
+          "props": {
+            "id": "Button-1",
+            "label": "立即報名",
+            "href": " JavaScript:alert(1)"
+          }
+        }
+      ]
+    },
+    "expect": {
+      "ok": false,
+      "errors": [{ "code": "unsafe_href", "pathText": "content[0].props.href" }]
+    }
+  },
+  {
+    "name": "中間夾 tab 的 javascript: 連結",
+    "input": {
+      "root": { "props": {} },
+      "content": [
+        {
+          "type": "Button",
+          "props": {
+            "id": "Button-1",
+            "label": "立即報名",
+            "href": "java\tscript:alert(1)"
+          }
+        }
+      ]
+    },
+    "expect": {
+      "ok": false,
+      "errors": [{ "code": "unsafe_href", "pathText": "content[0].props.href" }]
+    }
+  }
+]
