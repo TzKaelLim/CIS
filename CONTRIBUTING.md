@@ -74,7 +74,7 @@ pnpm dev
 - 新增或升級依賴後，一併提交 `pnpm-lock.yaml`，並以 `pnpm install --frozen-lockfile` 確認一致。
 - `@tiptap/*` 全部釘在同一個精確版本，要升級就一起升。
 - S2 起新增的依賴一律寫精確版本（不加 `^`）；zod 鎖在 4.6.5。
-- `pnpm-workspace.yaml` 的 `onlyBuiltDependencies` 與 `overrides` 保持最少，每一項都要註解原因；override 要註明 GHSA 編號。
+- `pnpm-workspace.yaml` 的 `onlyBuiltDependencies`、`ignoredBuiltDependencies` 與 `overrides` 保持最少，每一項都要註解原因；為了修補漏洞而加的 override 要註明 GHSA 編號（例如 `yaml`），其他原因的 override 寫明原因即可（例如鎖定單一版本的 `zod`）。
 
 ## 移植上游的修正
 

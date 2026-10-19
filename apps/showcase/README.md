@@ -24,7 +24,7 @@ pnpm dev:showcase
 | `POST /api/activity` | 發布：先跑整頁驗證器，通過才存檔                                                                                                                                    |
 
 - 公開頁與編輯器在 `app/(public)` 與 `app/(editor)` 各有自己的根 layout。公開頁是 `<html lang="zh-Hant" data-theme="tzuchi">`；編輯器的 `<html>` 不設 `data-theme`（設了會蓋掉預覽 iframe 的主題），由 `overrides.iframe` 在預覽 iframe 的 `<html>` 設定慈濟主題。
-- 樣式只 import `@tzuchi/tceditor-blocks/styles.css`。
+- 公開頁的樣式只 import `@tzuchi/tceditor-blocks/styles.css`；編輯器的 layout 另外載入標題大綱外掛的樣式（`@tzuchi/tceditor-plugin-heading-analyzer/dist/index.css`）。編輯器本身的樣式由 core 在執行期注入。
 - 公開頁的檔案（`app/(public)/**`）不得 import `@tzuchi/tceditor` 主入口的執行期值或區塊的編輯器設定（ESLint 檢查），`pnpm check:public-bundle` 會在 build 之後掃描 `/activity` 的瀏覽器端程式確認這一點。
 
 ## 發布 API
@@ -35,7 +35,7 @@ pnpm dev:showcase
 - 成功回 200 與 `{ notices }`，並把補齊預設值、清理過富文字的資料寫入 `apps/showcase/.data/activity.json`（不進版控）。寫入時先寫暫存檔再改名，不會留下寫到一半的檔案；寫檔失敗時保留原本的檔案。
 - 設定 `SHOWCASE_DATA_DIR` 可以把資料目錄改到別處（相對路徑以 `apps/showcase` 為準），例如測試時。
 - 要還原成範例活動頁，刪除資料目錄裡的 `activity.json` 即可。
-- S3 會把這個 API 換成 Supabase 的 Edge Function，沿用同一個驗證器與 422 的錯誤格式。
+- S3 會把這個 API 換成 Supabase 的 Edge Function，沿用同一個驗證器、2 MB 上限與 422 的錯誤格式。同源檢查、`127.0.0.1`／`localhost` 白名單與存檔的方式只屬於這個沒有登入的本機示範站，S3 改用登入驗證與編輯器網域的 CORS 白名單，資料存在 Postgres（見 `CLAUDE.md` 的 Security rules）。
 
 用 curl 發布一份頁面資料（要帶同源的 `Origin`）：
 
@@ -66,10 +66,10 @@ curl -s -X POST http://127.0.0.1:3010/api/activity \
 ```sh
 pnpm --filter @tzuchi/tceditor-showcase test   # 發布 API 的各種回應、發布結果與錯誤定位，以及範例頁通過驗證
 pnpm check:public-bundle                        # 需先 pnpm build
-pnpm smoke                                      # 需先啟動 demo（3000）與示範站（3010）
+pnpm smoke                                      # 需先啟動 demo（3000，或設定 DEMO_URL）與示範站（3010，或設定 SHOWCASE_URL）
 ```
 
-- 發布 API 的測試涵蓋 200 與寫檔、422、413（含 2 MB 的中文內容）、415、403（含 DNS rebinding），以及寫檔失敗時保留原本的檔案。
+- 發布 API 的測試涵蓋 200 與寫檔、422、413（含 2 MB 的中文內容）、415、403（含 DNS rebinding）、檢查順序 403 → 415 → 413 → 422（來源或 Content-Type 不對時完全不讀 body），以及寫檔失敗時保留原本的檔案。
 - `pnpm check:public-bundle` 確認 `/activity` 的瀏覽器端程式不含編輯器（`header-toggle-leftsidebar`）、圖片挑選器（`tcb-picker-option`）與 zod（`__zod_globalConfig`），並以 `/activity/edit` 當對照組（三個字串都必須出現在那裡）。
 - `pnpm check:public-bundle` 也會在開頭印出 `/activity` 載入的 JS 與 CSS 大小（原始與 gzip -9），只作紀錄，不是門檻。S2 的實測值：JS 5 個檔、約 502 KB（gzip 後約 142 KB，不含只給舊瀏覽器的 polyfill），全部是 Next.js 與 React 的執行環境，區塊畫面是伺服器元件，不送 JS；CSS 1 個檔、約 532 KB（gzip 後約 51 KB），包含 tokens、`@heroui/styles`、慈濟主題與區塊樣式。CSS 依元件拆分留待日後。
 - `pnpm smoke` 的第二段是 `scripts/e2e/showcase-smoke.mjs`：從 `/activity/edit?blank=1` 的空白頁開始，把 8 個區塊各拖一個進頁面、填好必填欄位、發布，再確認 `/activity` 的 HTML 含有這些內容。失敗時以非 0 結束。結束時（含失敗）會把已發布的頁面還原成測試前的狀態；示範站不在 `http://127.0.0.1:3010` 時用 `SHOWCASE_URL` 指定。
@@ -77,3 +77,5 @@ pnpm smoke                                      # 需先啟動 demo（3000）與
 ## 注意
 
 示範站沒有任何登入驗證，只能在本機開發使用，不要部署或對外開放。scripts 設定了 `NEXT_TELEMETRY_DISABLED=1`，頁面不從第三方網域載入字型、樣式、腳本或圖片。
+
+唯一已知的對外請求來自開發伺服器：`pnpm dev:showcase`（`next dev`）在第一個瀏覽器連上時，會向 `https://registry.npmjs.org/-/package/next/dist-tags` 查詢 Next 的最新版本，用來提示 Next 是否過時。Next 16.2.6 沒有關閉它的設定（`NEXT_TELEMETRY_DISABLED` 管不到）；這是對固定網址的 GET，不帶任何頁面資料。建置後的 `next start` 與公開頁都不會發出這個請求；不能對外連線的環境請改用 `pnpm build` 之後的 `pnpm --filter @tzuchi/tceditor-showcase start`。

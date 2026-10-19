@@ -4,7 +4,7 @@ tceditor 是慈濟自行維護的 React 視覺化頁面編輯器，衍生自開�
 
 ## 來源與授權
 
-- 來源：Puck v0.23.0（git tag `v0.23.0`，commit `b4204f09`），MIT 授權，著作權屬於 The Puck Contributors。授權全文在 `LICENSE`，衍生關係記錄在 `NOTICE`；兩個套件打包時都會附上這兩個檔案。
+- 來源：Puck v0.23.0（git tag `v0.23.0`，commit `b4204f09`），MIT 授權，著作權屬於 The Puck Contributors。授權全文在 `LICENSE`，衍生關係記錄在 `NOTICE`；core（`@tzuchi/tceditor`）與標題大綱外掛（`@tzuchi/tceditor-plugin-heading-analyzer`）打包時都會附上這兩個檔案。
 - tceditor 的修改同樣以 MIT 授權釋出。
 - `infra/supabase/docker/` 是官方 Supabase self-hosting 設定的原樣副本，以 Apache License 2.0 授權（見 `infra/supabase/LICENSE`），不在 MIT 授權範圍內。
 - `vendor/uikit/` 是慈濟 uikit（`spike/heroui-v3` 分支）指定 commit 的快照。其中 `heroui/styles` 衍生自 HeroUI，以 Apache License 2.0 授權（見 `vendor/uikit/heroui/LICENSE` 與 `vendor/uikit/heroui/NOTICE.md`），不在 MIT 授權範圍內；`packages/tokens` 是 uikit 自己的設計 token。快照不得手改，只能用 `pnpm sync:uikit` 更新。
@@ -140,7 +140,7 @@ pnpm verify
 | `pnpm audit:gate`                                            | 執行 `pnpm audit`，只有隨套件出貨的依賴（core、外掛、spec、blocks）有 advisory 時才失敗，其餘（app 與開發工具）只列出                                    |
 | `pnpm gen:blocks`                                            | 依規格重新產生 stories 與 `packages/blocks/generated/`，產生的檔案要 commit                                                                              |
 | `pnpm sync:uikit -- --dir ../puck-tzuchi-poc --commit <sha>` | 從本機 uikit repo 的指定 commit 更新 `vendor/uikit` 與 uikit 選項快照                                                                                    |
-| `pnpm smoke`                                                 | puppeteer 冒煙測試：先跑 demo 的拖放測試，再跑示範站流程；需先啟動 demo（3000 port）與示範站（3010 port）                                                |
+| `pnpm smoke`                                                 | puppeteer 冒煙測試：先跑 demo 的拖放測試，再跑示範站流程；需先啟動 demo（`DEMO_URL`，預設 3000 port）與示範站（`SHOWCASE_URL`，預設 3010 port）          |
 
 只跑一個測試檔或一個測試：
 
