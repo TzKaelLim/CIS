@@ -3,7 +3,7 @@
 import type { CustomField, CustomFieldRender } from "@tzuchi/tceditor";
 import { IMAGE_ALT_MAX_LENGTH } from "@tzuchi/tceditor-spec";
 import type { FieldFactories, ImageValue } from "@tzuchi/tceditor-spec";
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import type { Asset, AssetSource } from "../asset-source";
 
 type AssetList =
@@ -38,6 +38,7 @@ function ImagePicker({
   readOnly: boolean;
 }) {
   const [list, setList] = useState<AssetList>({ status: "loading" });
+  const group = useId();
 
   useEffect(() => {
     let active = true;
@@ -84,29 +85,36 @@ function ImagePicker({
           <p className="tcb-picker-status">目前沒有可選的圖片。</p>
         ) : null}
         {list.status === "ready" && list.assets.length > 0 ? (
-          <ul className="tcb-picker-grid" aria-label="可選的圖片">
+          // One picture at most: native radio buttons with one name, so the
+          // arrow keys move the choice and the group is a single Tab stop
+          <div
+            className="tcb-picker-grid"
+            role="radiogroup"
+            aria-label="可選的圖片"
+          >
             {list.assets.map((asset) => (
-              <li key={asset.id}>
-                <button
-                  type="button"
-                  className="tcb-picker-option"
-                  aria-pressed={asset.id === current.assetId}
-                  onClick={() => update({ assetId: asset.id })}
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element -- a thumbnail in the editor panel, not page content */}
-                  <img
-                    className="tcb-picker-thumb"
-                    src={asset.src}
-                    width={asset.width}
-                    height={asset.height}
-                    alt=""
-                    loading="lazy"
-                  />
-                  <span className="tcb-picker-name">{asset.label}</span>
-                </button>
-              </li>
+              <label key={asset.id} className="tcb-picker-option">
+                <input
+                  className="tcb-picker-radio"
+                  type="radio"
+                  name={group}
+                  value={asset.id}
+                  checked={asset.id === current.assetId}
+                  onChange={() => update({ assetId: asset.id })}
+                />
+                {/* eslint-disable-next-line @next/next/no-img-element -- a thumbnail in the editor panel, not page content */}
+                <img
+                  className="tcb-picker-thumb"
+                  src={asset.src}
+                  width={asset.width}
+                  height={asset.height}
+                  alt=""
+                  loading="lazy"
+                />
+                <span className="tcb-picker-name">{asset.label}</span>
+              </label>
             ))}
-          </ul>
+          </div>
         ) : null}
         {gone ? (
           <p className="tcb-picker-alert" role="alert">

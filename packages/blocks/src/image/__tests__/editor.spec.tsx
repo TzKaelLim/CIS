@@ -35,8 +35,11 @@ function renderPicker(
 
 /** Waits until list() has resolved, so no state update lands after the test. */
 async function listed() {
-  return screen.findByRole("list", { name: "可選的圖片" });
+  return screen.findByRole("radiogroup", { name: "可選的圖片" });
 }
+
+const radio = (name: string) =>
+  screen.getByRole("radio", { name }) as HTMLInputElement;
 
 describe("createImagePickerField", () => {
   it("returns a custom field labelled with the spec title", () => {
@@ -47,15 +50,31 @@ describe("createImagePickerField", () => {
     return listed();
   });
 
-  it("shows a loading state, then the assets as toggle buttons", async () => {
+  it("shows a loading state, then the assets as one group of radio buttons", async () => {
     renderPicker({ assetId: "team", alt: "志工合照", decorative: false });
     expect(screen.getByRole("status").textContent).toBe("正在載入圖片…");
-    await listed();
+    const group = await listed();
     expect(screen.queryByRole("status")).toBeNull();
-    const beach = screen.getByRole("button", { name: "海灘" });
-    const team = screen.getByRole("button", { name: "志工" });
-    expect(beach.getAttribute("aria-pressed")).toBe("false");
-    expect(team.getAttribute("aria-pressed")).toBe("true");
+    // Picking a picture is a single choice: native radios share one name,
+    // so the arrow keys move the choice and Tab stops once
+    const options = screen.getAllByRole("radio") as HTMLInputElement[];
+    expect(options.map((option) => option.checked)).toEqual([false, true]);
+    expect(new Set(options.map((option) => option.name)).size).toBe(1);
+    expect(options[0].name).not.toBe("");
+    expect(options.every((option) => group.contains(option))).toBe(true);
+    expect(radio("海灘").checked).toBe(false);
+    expect(radio("志工").checked).toBe(true);
+    expect(screen.queryByRole("button")).toBeNull();
+  });
+
+  it("checks no radio button when no picture is selected", async () => {
+    renderPicker({ assetId: "", alt: "", decorative: false });
+    await listed();
+    expect(
+      (screen.getAllByRole("radio") as HTMLInputElement[]).some(
+        (option) => option.checked
+      )
+    ).toBe(false);
   });
 
   it("emits the whole value when a picture is selected", async () => {
@@ -65,7 +84,7 @@ describe("createImagePickerField", () => {
       decorative: false,
     });
     await listed();
-    fireEvent.click(screen.getByRole("button", { name: "志工" }));
+    fireEvent.click(radio("志工"));
     expect(onChange).toHaveBeenCalledTimes(1);
     expect(onChange).toHaveBeenCalledWith({
       assetId: "team",
@@ -142,7 +161,8 @@ describe("createImagePickerField", () => {
       name: "圖片",
     }) as HTMLFieldSetElement;
     expect(group.disabled).toBe(true);
-    fireEvent.click(screen.getByRole("button", { name: "志工" }));
+    expect(radio("志工").matches(":disabled")).toBe(true);
+    fireEvent.click(radio("志工"));
     fireEvent.change(screen.getByLabelText("替代文字"), {
       target: { value: "改不了" },
     });

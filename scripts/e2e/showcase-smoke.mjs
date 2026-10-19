@@ -64,8 +64,10 @@ const PARAGRAPH_TEXT = "冒煙測試段落";
 const RICHTEXT_FIELD = '.ProseMirror[contenteditable="true"]';
 
 // The image picker (packages/blocks/src/image/editor.tsx) shows every asset
-// as a button with its thumbnail, above a text input for the alt text.
-const IMAGE_PICKER_DEMO_1 = 'button:has(img[src="/demo-assets/demo-1.svg"])';
+// as a radio button whose label holds its thumbnail, above a text input for
+// the alt text. Clicking the label checks the radio button.
+const IMAGE_PICKER_DEMO_1 =
+  '.tcb-picker-option:has(img[src="/demo-assets/demo-1.svg"])';
 
 // Blocks without drop zones first. Every block after the first is dropped at
 // the top edge of the page's drop zone, so none lands inside a drop zone of

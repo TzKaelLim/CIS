@@ -226,12 +226,10 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--tc-space-8);
-  margin: 0;
-  padding: 0;
-  list-style: none;
 }
 
 .tcb-picker-option {
+  position: relative;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -252,17 +250,27 @@
   border-color: var(--tc-color-blue-500);
 }
 
-.tcb-picker-option:focus-visible {
+/* The radio button stays focusable and announced; the card shows its state */
+.tcb-picker-radio {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.tcb-picker-option:has(.tcb-picker-radio:focus-visible) {
   outline: 2px solid var(--tc-color-blue-500);
   outline-offset: 2px;
 }
 
-.tcb-picker-option[aria-pressed="true"] {
+.tcb-picker-option:has(.tcb-picker-radio:checked) {
   border-color: var(--tc-color-blue-900);
   box-shadow: 0 0 0 1px var(--tc-color-blue-900);
 }
 
-.tcb-picker-option:disabled {
+.tcb-picker-option:has(.tcb-picker-radio:disabled) {
   cursor: default;
   opacity: 0.6;
 }
