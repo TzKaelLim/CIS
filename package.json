@@ -10,15 +10,16 @@
     "lint": "turbo run lint",
     "format:check": "prettier --check \"**/*.{ts,tsx,mjs,md,mdx,css}\"",
     "format": "prettier --write \"**/*.{ts,tsx,mjs,md,mdx,css}\"",
-    "smoke": "node scripts/e2e/smoke.mjs",
+    "smoke": "node scripts/e2e/smoke.mjs && node scripts/e2e/showcase-smoke.mjs",
     "gen:blocks": "tsx packages/blocks/scripts/gen-blocks.ts",
     "sync:uikit": "node scripts/uikit/sync-uikit.mjs",
-    "test": "turbo run test && node --test scripts/audit-gate-lib.test.mjs packages/core/scripts/check-bundle-imports.test.mjs scripts/uikit/uikit.test.mjs scripts/single-react.test.mjs scripts/check-edge.test.mjs scripts/storybook-smoke.test.mjs",
+    "test": "turbo run test && node --test scripts/audit-gate-lib.test.mjs packages/core/scripts/check-bundle-imports.test.mjs scripts/uikit/uikit.test.mjs scripts/single-react.test.mjs scripts/check-edge.test.mjs scripts/storybook-smoke.test.mjs scripts/check-public-bundle.test.mjs",
     "typecheck": "turbo run typecheck",
     "audit:gate": "node scripts/audit-gate.mjs",
     "check:bundle": "node packages/core/scripts/check-bundle-imports.mjs",
     "check:edge": "node scripts/check-edge.mjs",
-    "verify": "pnpm test && pnpm typecheck && pnpm lint && pnpm format:check && pnpm build && pnpm check:bundle && pnpm check:edge && pnpm storybook:smoke && pnpm audit:gate"
+    "check:public-bundle": "node scripts/check-public-bundle.mjs",
+    "verify": "pnpm test && pnpm typecheck && pnpm lint && pnpm format:check && pnpm build && pnpm check:bundle && pnpm check:edge && pnpm check:public-bundle && pnpm storybook:smoke && pnpm audit:gate"
   },
   "devDependencies": {
     "asciichart": "^1.5.25",
