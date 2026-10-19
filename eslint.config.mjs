@@ -32,13 +32,16 @@ const ZOD_SYNTAX = [
       "ImportDeclaration[source.value=/^zod(\\/v4)?$/][importKind='value'] > ImportSpecifier[importKind='value']",
     message: 'Import zod as a namespace: import * as z from "zod".',
   },
+  // z.locales and z.config, also through zod's core namespace (z.core.…)
   {
-    selector: "MemberExpression[object.name='z'][property.name='locales']",
-    message: "Do not use z.locales: it bundles every zod locale.",
+    selector:
+      "MemberExpression[property.name='locales']:matches([object.name='z'], [object.object.name='z'][object.property.name='core'])",
+    message:
+      "Do not use z.locales or z.core.locales: they bundle every zod locale.",
   },
   {
     selector:
-      "CallExpression[callee.object.name='z'][callee.property.name='config']",
+      "CallExpression[callee.property.name='config']:matches([callee.object.name='z'], [callee.object.object.name='z'][callee.object.property.name='core'])",
     message:
       "Do not change zod's global config; pass messages to safeParse instead.",
   },
@@ -61,15 +64,46 @@ const ZOD_IMPORT_PATTERNS = [
   },
 ];
 
-// The rules a block spec.ts must follow (spec §4.3 rules 1-2 and 9, §3.3).
+// The rules a block spec.ts must follow (spec §4.3 rules 1-2 and 9, §3.3,
+// §18 #3).
 const SPEC_FILE_SYNTAX = [
   {
     // C.4's seven methods, plus the ones that silently change or swallow a
-    // value (z.preprocess, .catch, the string case and normalize transforms).
+    // value or add a check (z.preprocess, .catch, the string case and
+    // normalize transforms, .slugify, .with and .apply, which can call any of
+    // them).
     selector:
-      "CallExpression[callee.property.name=/^(refine|superRefine|overwrite|transform|trim|check|pipe|preprocess|catch|toLowerCase|toUpperCase|normalize)$/]",
+      "CallExpression[callee.property.name=/^(refine|superRefine|overwrite|transform|trim|check|pipe|preprocess|catch|toLowerCase|toUpperCase|normalize|slugify|with|apply)$/]",
     message:
       "spec.ts must not use checks that JSON Schema cannot express; add a packages/spec helper and list the check in x-lost-checks.",
+  },
+  {
+    selector: "CallExpression[callee.property.name='prefault']",
+    message:
+      "spec.ts must not call .prefault(): only the required link() and image() use it. Give the field a .default() that passes validation.",
+  },
+  {
+    // zod emits exclusiveMinimum, exclusiveMaximum and multipleOf for these,
+    // which the editor fields ignore (checkSpecRules rejects them too).
+    selector:
+      "CallExpression[callee.property.name=/^(gt|lt|positive|negative|nonnegative|nonpositive|multipleOf|step)$/]",
+    message: "Limit numbers with .int(), .min() and .max() only.",
+  },
+  {
+    // Their JSON Schema says "string", but zod stores a boolean or another
+    // type.
+    selector:
+      "MemberExpression[object.name='z'][property.name=/^(stringbool|codec)$/]",
+    message:
+      "spec.ts must not use z.stringbool() or z.codec(): the stored value would not match the JSON Schema.",
+  },
+  {
+    // zod's .default(value) copies the value one level deep, so every page
+    // would share the nested objects.
+    selector:
+      "CallExpression[callee.property.name=/^(default|prefault)$/] > :matches(ArrayExpression, ObjectExpression).arguments",
+    message:
+      "Object and array defaults are functions: .default(() => [...]), because zod copies a default value only shallowly.",
   },
   {
     // A call on the result of .meta(): .meta().default(), .meta().meta(), …
