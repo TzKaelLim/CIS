@@ -1,0 +1,51 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "background": {
+      "enum": [
+        "default",
+        "secondary",
+        "transparent"
+      ],
+      "type": "string"
+    },
+    "content": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "props": {
+            "additionalProperties": {},
+            "propertyNames": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "type": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "props",
+          "type"
+        ],
+        "type": "object"
+      },
+      "type": "array",
+      "x-slot": {
+        "disallow": [
+          "Section"
+        ]
+      }
+    },
+    "paddingY": {
+      "enum": [
+        "16",
+        "32",
+        "48",
+        "64"
+      ],
+      "type": "string"
+    }
+  },
+  "type": "object"
+}

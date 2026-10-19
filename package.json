@@ -7,6 +7,7 @@
     "format:check": "prettier --check \"**/*.{ts,tsx,mjs,md,mdx,css}\"",
     "format": "prettier --write \"**/*.{ts,tsx,mjs,md,mdx,css}\"",
     "smoke": "node scripts/e2e/smoke.mjs",
+    "gen:blocks": "tsx packages/blocks/scripts/gen-blocks.ts",
     "sync:uikit": "node scripts/uikit/sync-uikit.mjs",
     "test": "turbo run test && node --test scripts/audit-gate-lib.test.mjs packages/core/scripts/check-bundle-imports.test.mjs scripts/uikit/uikit.test.mjs scripts/single-react.test.mjs",
     "typecheck": "turbo run typecheck",
@@ -22,6 +23,7 @@
     "prettier": "^2.5.1",
     "puppeteer": "^24.8.2",
     "style-dictionary": "4.4.0",
+    "tsx": "4.23.15",
     "turbo": "^2.5.8"
   },
   "name": "tceditor-repo",

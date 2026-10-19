@@ -1,0 +1,63 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "content": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "props": {
+            "additionalProperties": {},
+            "propertyNames": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "type": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "props",
+          "type"
+        ],
+        "type": "object"
+      },
+      "type": "array",
+      "x-slot": {
+        "allow": [
+          "Button",
+          "Image",
+          "Paragraph",
+          "TagList"
+        ]
+      }
+    },
+    "href": {
+      "maxLength": 2048,
+      "type": "string",
+      "x-link": {
+        "optional": true
+      },
+      "x-lost-checks": [
+        "safe-href"
+      ]
+    },
+    "summary": {
+      "maxLength": 200,
+      "type": "string"
+    },
+    "title": {
+      "maxLength": 80,
+      "minLength": 1,
+      "type": "string"
+    },
+    "variant": {
+      "enum": [
+        "default",
+        "secondary"
+      ],
+      "type": "string"
+    }
+  },
+  "type": "object"
+}
