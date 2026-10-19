@@ -200,7 +200,24 @@ function fitNode(
       return;
     case "listItem":
       if (context === "list") {
-        out.push(withContent(node, fitChildren("block")));
+        const content = fitChildren("block");
+
+        // A list item is "paragraph block*": like ProseMirror's
+        // createAndFill, start one whose first block is something else with
+        // an empty paragraph, and drop one that has nothing left
+        if (content.length > 0 && content[0].type !== "paragraph") {
+          content.unshift(
+            withContent(
+              {
+                type: "paragraph",
+                attrs: textblockAttrs({ textAlign: null }, allowed),
+              },
+              []
+            )
+          );
+        }
+
+        if (content.length > 0) out.push(withContent(node, content));
 
         return;
       }
@@ -208,7 +225,11 @@ function fitNode(
       break;
     case "blockquote":
       if (supported) {
-        out.push(withContent(node, fitChildren("block")));
+        const content = fitChildren("block");
+
+        // A blockquote is "block+": drop one that has nothing left, as when
+        // it only held horizontal rules the types lack
+        if (content.length > 0) out.push(withContent(node, content));
 
         return;
       }
@@ -216,8 +237,16 @@ function fitNode(
       break;
     case "bulletList":
     case "orderedList":
-      if (supported && allowed.nodes.has("listItem")) {
-        out.push(withContent(node, fitChildren("list")));
+      // List items need paragraphs
+      if (
+        supported &&
+        allowed.nodes.has("listItem") &&
+        allowed.nodes.has("paragraph")
+      ) {
+        const content = fitChildren("list");
+
+        // A list is "listItem+": drop one that has no items left
+        if (content.length > 0) out.push(withContent(node, content));
 
         return;
       }
@@ -239,9 +268,15 @@ function fitNode(
  * - a paragraph, heading or code block the types lack becomes a `textblock`
  *   (a paragraph by default; a heading gets level 1, a code block gets the
  *   text without marks), or is dropped when `textblock` is null;
- * - a blockquote or list is replaced by the blocks inside it;
+ * - a blockquote or list the types lack is replaced by the blocks inside it
+ *   (lists also need the paragraph type, which list items start with);
  * - a hard break becomes a line break in the text, and a horizontal rule is
  *   dropped;
+ * - a blockquote, list or list item with nothing left in it is dropped, and a
+ *   list item whose first block is not a paragraph starts with an empty one,
+ *   so the result fits the structure of Tiptap's schema ("block+",
+ *   "listItem+", "paragraph block*"); only the document itself can be left
+ *   empty;
  * - with `textAlign: false`, paragraphs and headings lose their textAlign,
  *   and their attrs when nothing else is left.
  *

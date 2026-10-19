@@ -13,6 +13,7 @@ import {
 } from "../fit-to-schema";
 import {
   allTypicalContent,
+  containerContent,
   doc,
   typicalContent,
 } from "../../../../lib/richtext/__helpers__/fixtures";
@@ -22,11 +23,16 @@ import type {
   RichTextNode,
 } from "../../../../lib/richtext/types";
 
-/** Also checks that the editor would load the result exactly as it is. */
+/**
+ * Also checks that the editor would load the result exactly as it is, and
+ * that the result fits the schema's structure.
+ */
 const fitToSchema = (value: RichTextDoc, schema: Schema) => {
   const result = fitToSchemaUnchecked(value, schema);
+  const loaded = ProseMirrorNode.fromJSON(schema, result);
 
-  expect(ProseMirrorNode.fromJSON(schema, result).toJSON()).toEqual(result);
+  expect(loaded.toJSON()).toEqual(result);
+  expect(() => loaded.check()).not.toThrow();
 
   return result;
 };
@@ -130,6 +136,69 @@ describe("fitToSchema", () => {
         p(t("sibling"))
       )
     );
+  });
+
+  it("drops blockquotes and list items left empty, and starts list items with a paragraph", () => {
+    const schema = schemaWith({ horizontalRule: false });
+
+    expect(fitToSchema(containerContent.blockquoteOfRules, schema)).toEqual(
+      doc(p(t("before")))
+    );
+    expect(fitToSchema(containerContent.listItemsOfRules, schema)).toEqual(
+      doc({
+        type: "bulletList",
+        content: [{ type: "listItem", content: [p(t("item"))] }],
+      })
+    );
+    expect(
+      fitToSchema(containerContent.listItemsWithoutParagraph, schema).content
+    ).toEqual([
+      {
+        type: "bulletList",
+        content: [
+          {
+            type: "listItem",
+            content: [
+              { type: "paragraph", attrs: { textAlign: null } },
+              {
+                type: "heading",
+                attrs: { textAlign: null, level: 2 },
+                content: [t("heading")],
+              },
+              p(t("after")),
+            ],
+          },
+          {
+            type: "listItem",
+            content: [
+              { type: "paragraph", attrs: { textAlign: null } },
+              { type: "blockquote", content: [p(t("quote"))] },
+            ],
+          },
+          {
+            type: "listItem",
+            content: [
+              { type: "paragraph", attrs: { textAlign: null } },
+              {
+                type: "bulletList",
+                content: [{ type: "listItem", content: [p(t("nested"))] }],
+              },
+            ],
+          },
+          {
+            type: "listItem",
+            content: [
+              { type: "paragraph", attrs: { textAlign: null } },
+              {
+                type: "codeBlock",
+                attrs: { language: null },
+                content: [t("code")],
+              },
+            ],
+          },
+        ],
+      },
+    ]);
   });
 
   it("turns hard breaks into line breaks and drops horizontal rules", () => {

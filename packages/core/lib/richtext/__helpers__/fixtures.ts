@@ -172,6 +172,67 @@ export const allTypicalContent: RichTextDoc = doc(
   ...Object.values(typicalContent).flatMap((value) => value.content ?? [])
 );
 
+/**
+ * Normalized documents (normalizeRichText returns them unchanged) whose
+ * blockquotes, lists and list items are empty, or become empty when the
+ * horizontal rules are removed, and list items that do not start with a
+ * paragraph. Tiptap's schema rejects such containers: a blockquote is
+ * "block+", a list "listItem+" and a list item "paragraph block*".
+ */
+export const containerContent: Record<string, RichTextDoc> = {
+  blockquoteOfRules: doc(
+    paragraph([text("before")]),
+    { type: "blockquote", content: [{ type: "horizontalRule" }] },
+    {
+      type: "blockquote",
+      content: [
+        { type: "blockquote", content: [{ type: "horizontalRule" }] },
+        { type: "horizontalRule" },
+      ],
+    }
+  ),
+  emptyContainers: doc(
+    { type: "blockquote" },
+    { type: "bulletList" },
+    { type: "orderedList", attrs: { start: 1, type: null } },
+    { type: "bulletList", content: [{ type: "listItem" }] },
+    paragraph([text("after")])
+  ),
+  listItemsOfRules: doc(
+    {
+      type: "orderedList",
+      attrs: { start: 1, type: null },
+      content: [listItem({ type: "horizontalRule" })],
+    },
+    {
+      type: "bulletList",
+      content: [
+        listItem({ type: "horizontalRule" }),
+        listItem(paragraph([text("item")])),
+      ],
+    }
+  ),
+  listItemsWithoutParagraph: doc({
+    type: "bulletList",
+    content: [
+      listItem(heading(2, [text("heading")]), paragraph([text("after")])),
+      listItem({
+        type: "blockquote",
+        content: [paragraph([text("quote")])],
+      }),
+      listItem({
+        type: "bulletList",
+        content: [listItem(paragraph([text("nested")]))],
+      }),
+      listItem({
+        type: "codeBlock",
+        attrs: { language: null },
+        content: [text("code")],
+      }),
+    ],
+  }),
+};
+
 /** A chain of `depth` nested blockquotes around a paragraph, built without recursion. */
 export const deepBlockquotes = (depth: number, value = "deep"): RichTextDoc => {
   let node: RichTextNode = paragraph([text(value)]);

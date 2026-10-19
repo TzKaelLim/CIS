@@ -197,6 +197,100 @@ describe("fitRichTextToTypes", () => {
     );
   });
 
+  describe("containers that must have content", () => {
+    const hr: RichTextNode = { type: "horizontalRule" };
+    const blockquote = (...content: RichTextNode[]): RichTextNode =>
+      content.length ? { type: "blockquote", content } : { type: "blockquote" };
+    const item = (...content: RichTextNode[]): RichTextNode =>
+      content.length ? { type: "listItem", content } : { type: "listItem" };
+    const bulletList = (...content: RichTextNode[]): RichTextNode =>
+      content.length ? { type: "bulletList", content } : { type: "bulletList" };
+
+    it("drops a blockquote that has nothing left in it", () => {
+      expect(
+        fitRichTextToTypes(
+          doc(p(t("a")), blockquote(hr), blockquote(blockquote(hr), hr)),
+          without("horizontalRule")
+        )
+      ).toEqual(doc(p(t("a"))));
+    });
+
+    it("drops empty blockquotes, lists and list items", () => {
+      expect(
+        fitRichTextToTypes(
+          doc(
+            blockquote(),
+            bulletList(),
+            { type: "orderedList", attrs: { start: 1, type: null } },
+            bulletList(item(), item()),
+            p(t("a"))
+          ),
+          ALL_TYPES
+        )
+      ).toEqual(doc(p(t("a"))));
+    });
+
+    it("drops list items, and then lists, that have nothing left in them", () => {
+      expect(
+        fitRichTextToTypes(
+          doc(bulletList(item(hr)), bulletList(item(hr), item(p(t("a"))))),
+          without("horizontalRule")
+        )
+      ).toEqual(doc(bulletList(item(p(t("a"))))));
+    });
+
+    it("starts a list item with an empty paragraph when its first block is not one", () => {
+      expect(
+        fitRichTextToTypes(
+          doc(bulletList(item(heading(2, "Title"), p(t("a"))), item(hr))),
+          ALL_TYPES
+        )
+      ).toEqual(
+        doc(
+          bulletList(item(p(), heading(2, "Title"), p(t("a"))), item(p(), hr))
+        )
+      );
+      expect(
+        fitRichTextToTypes(doc(bulletList(item(bulletList(item(p(t("a"))))))), {
+          ...ALL_TYPES,
+          textAlign: false,
+        })
+      ).toEqual(
+        doc(
+          bulletList(
+            item(
+              { type: "paragraph" },
+              bulletList(item({ type: "paragraph", content: [t("a")] }))
+            )
+          )
+        )
+      );
+    });
+
+    it("keeps the blocks of lists when the types have no paragraph", () => {
+      expect(
+        fitRichTextToTypes(doc(bulletList(item(p(t("a"))), item(p(t("b"))))), {
+          nodes: ["bulletList", "doc", "heading", "listItem", "text"],
+          marks: [],
+          textblock: "heading",
+        })
+      ).toEqual(
+        doc(
+          {
+            type: "heading",
+            attrs: { textAlign: null, level: 1 },
+            content: [t("a")],
+          },
+          {
+            type: "heading",
+            attrs: { textAlign: null, level: 1 },
+            content: [t("b")],
+          }
+        )
+      );
+    });
+  });
+
   it("imports nothing but other React-free richtext modules", () => {
     const source = fs.readFileSync(
       path.join(__dirname, "../fit-to-types.ts"),
