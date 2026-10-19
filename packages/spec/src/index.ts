@@ -77,3 +77,12 @@ export type { Catalog, CatalogBlock } from "./convert/catalog";
 export { buildPageShellSchema } from "./convert/page-shell";
 export { diffContracts, toDataContract } from "./convert/contract";
 export type { ContractBreak } from "./convert/contract";
+export { DEFAULT_LIMITS, NODE_ID_PATTERN } from "./limits";
+export { createPageValidator, formatPathText, ISSUE_CODES } from "./validator";
+export type {
+  Issue,
+  IssueCode,
+  PageValidator,
+  ValidateResult,
+  ValidatorLimits,
+} from "./validator";
