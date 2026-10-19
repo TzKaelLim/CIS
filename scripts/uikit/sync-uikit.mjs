@@ -70,6 +70,12 @@ const REQUIRED_FILES = [
 // vendor/uikit files that describe the snapshot rather than belong to it
 const SNAPSHOT_META = ["README.md", "SOURCE.json"];
 
+// The top-level folders of the snapshot ("heroui", "packages"), which the sync
+// deletes and copies again from the archive
+const SNAPSHOT_DIRS = [
+  ...new Set(ARCHIVE_PATHS.map((path) => path.split("/")[0])),
+];
+
 // Written by macOS Finder and ignored by git, so never part of the snapshot
 const OS_FILES = [".DS_Store"];
 
@@ -107,6 +113,22 @@ export function hashVendorFiles(vendorDir) {
           .update(readFileSync(join(vendorDir, path)))
           .digest("hex"),
       ])
+  );
+}
+
+/**
+ * Files under `vendorDir` that are neither SNAPSHOT_META nor inside the
+ * SNAPSHOT_DIRS, which the sync rebuilds from scratch. The sync refuses to run
+ * while there are any, because it would record them in SOURCE.json as part of
+ * the snapshot.
+ */
+export function unexpectedVendorFiles(vendorDir) {
+  if (!existsSync(vendorDir)) return [];
+
+  return listFiles(vendorDir).filter(
+    (path) =>
+      !SNAPSHOT_META.includes(path) &&
+      !SNAPSHOT_DIRS.some((dir) => path.startsWith(`${dir}/`))
   );
 }
 
@@ -183,6 +205,19 @@ function parseCli(argv) {
 export async function syncUikit({ dir, commit, branch }) {
   const uikitDir = resolve(repoRoot, dir);
   const vendorDir = join(repoRoot, "vendor/uikit");
+  const unexpected = unexpectedVendorFiles(vendorDir);
+
+  if (unexpected.length > 0) {
+    throw new Error(
+      `vendor/uikit holds files that are not part of the snapshot: ${unexpected.join(
+        ", "
+      )}. Move or delete them first; only ${SNAPSHOT_META.join(
+        " and "
+      )} are kept next to ${SNAPSHOT_DIRS.map((name) => `${name}/`).join(
+        " and "
+      )}.`
+    );
+  }
 
   const sha = git(uikitDir, ["rev-parse", "--verify", `${commit}^{commit}`]);
   const onBranch = spawnSync("git", [
@@ -252,7 +287,8 @@ export async function syncUikit({ dir, commit, branch }) {
     // 4. Refuse files that git would not commit
     assertCommittable(listFiles(tree));
 
-    // 5. Replace the previous snapshot; README.md is kept
+    // 5. Replace the previous snapshot: heroui/ and packages/ are rebuilt
+    //    from the tree, README.md is kept and SOURCE.json is rewritten below
     rmSync(join(vendorDir, "heroui"), { recursive: true, force: true });
     rmSync(join(vendorDir, "packages"), { recursive: true, force: true });
     mkdirSync(vendorDir, { recursive: true });
@@ -269,7 +305,8 @@ export async function syncUikit({ dir, commit, branch }) {
   // 6. Record the snapshot: same input, same bytes (no time of the sync)
   const files = hashVendorFiles(vendorDir);
 
-  // Also catches a file put into vendor/uikit by hand
+  // vendor/uikit now holds only the tree checked in step 4 (any other file
+  // was refused at the start), so this checks the copy that SOURCE.json lists
   assertCommittable(Object.keys(files));
 
   const source = {

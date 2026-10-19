@@ -26,17 +26,20 @@ pnpm sync:uikit -- --dir ../puck-tzuchi-poc --commit <sha>
 
 腳本只用 `git archive` 讀取 uikit repo 的指定 commit，不修改 uikit，也不會帶入尚未 commit 的修改。它依序做這些事：
 
-1. 在暫存目錄 `vendor/.sync-uikit-*` 取出 `heroui/styles`、`heroui/LICENSE`、`heroui/NOTICE.md` 與 `packages/tokens`；
-2. 移除 `REMOVE_RULES` 列的檔案；
-3. 建出 tokens 並檢查；
-4. 確認沒有檔案會被 `.gitignore` 忽略，否則 clone 下來的 repo 會少檔案；
-5. 用暫存目錄的內容取代 `heroui` 與 `packages`；
-6. 重寫 `SOURCE.json`；
-7. 重新產生 `packages/blocks/generated/uikit-options.json`。
+1. 確認這個目錄只有 `heroui`、`packages`、`README.md` 與 `SOURCE.json`，有其他檔案就拒絕執行（否則它們會被當成快照記進 `SOURCE.json`）；
+2. 在暫存目錄 `vendor/.sync-uikit-*` 取出 `heroui/styles`、`heroui/LICENSE`、`heroui/NOTICE.md` 與 `packages/tokens`；
+3. 移除 `REMOVE_RULES` 列的檔案；
+4. 建出 tokens 並檢查；
+5. 確認沒有檔案會被 `.gitignore` 忽略，否則 clone 下來的 repo 會少檔案；
+6. 刪除整個 `heroui` 與 `packages`，換成暫存目錄的內容；
+7. 重寫 `SOURCE.json`（含 `--branch` 指定的分支）；
+8. 重新產生 `packages/blocks/generated/uikit-options.json`。
 
-前四步失敗時，這個目錄不會被改動，暫存目錄也會刪掉。同步完成後，檢查 `git diff`，再把 `vendor/uikit` 與 `uikit-options.json` 一起 commit。
+前五步失敗時，這個目錄不會被改動，暫存目錄也會刪掉。同步完成後，檢查 `git diff`，再把 `vendor/uikit` 與 `uikit-options.json` 一起 commit。
 
 `style-dictionary` 固定在 uikit 使用的 4.4.0。它有 GHSA-vj5c-m527-mpff（high，`convertTokenData` 的 prototype pollution），但只在 `pnpm sync:uikit` 時讀這個固定 commit 的 token JSON，不會出貨，所以 `pnpm audit:gate` 只列出、不擋。uikit 升級 style-dictionary 時，這裡一起升。
+
+`pnpm audit` 不檢查 `link:` 進來的套件，所以 `@heroui/styles` 與 `@tzuchi/tokens` 本身不在 `pnpm audit:gate` 的稽核範圍內。pnpm 也不會替 `link:` 套件安裝依賴，`@heroui/styles` 的執行期依賴（`tailwind-variants`、`tw-animate-css`）因此由 `packages/blocks` 自己宣告，照常稽核（`scripts/audit-gate-lib.test.mjs` 會檢查兩邊的版本一致）；`@tzuchi/tokens` 沒有執行期依賴。HeroUI 本身的 advisory 要人工追蹤，直到 S3 改從 registry 安裝。
 
 ## 之後
 

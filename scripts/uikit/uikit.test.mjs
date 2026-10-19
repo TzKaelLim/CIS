@@ -2,12 +2,21 @@
 // and the uikit options snapshot that the block tests compare against.
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { existsSync, readdirSync, readFileSync } from "node:fs";
-import { join, relative, sep } from "node:path";
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
+import { tmpdir } from "node:os";
+import { dirname, join, relative, sep } from "node:path";
 import { test } from "node:test";
 
 import { scanUikitOptions, UIKIT_OPTIONS_PATH } from "./scan-options.mjs";
-import { REMOVE_RULES } from "./sync-uikit.mjs";
+import { REMOVE_RULES, unexpectedVendorFiles } from "./sync-uikit.mjs";
 
 const repoRoot = join(import.meta.dirname, "../..");
 const vendorDir = join(repoRoot, "vendor/uikit");
@@ -73,7 +82,9 @@ test("SOURCE.json names the full commit and lists what was removed", () => {
     /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(Z|[+-]\d{2}:\d{2})$/
   );
   assert.equal(source.repository, "puck-tzuchi-poc");
-  assert.equal(source.branch, "spike/heroui-v3");
+  // The branch the commit was checked against (sync:uikit's --branch); any
+  // branch will do, as long as it is recorded
+  assert.match(source.branch, /^[^\s]+$/);
 
   // Sorted and free of duplicates, so a re-sync only shows real changes
   assert.deepEqual(source.removed, [...new Set(source.removed)].sort());
@@ -139,4 +150,34 @@ test("REMOVE_RULES drop stories, tests and the upstream tooling only", () => {
   ]) {
     assert.equal(removed(path), false, path);
   }
+});
+
+test("sync:uikit refuses files outside the snapshot's folders", (t) => {
+  const dir = mkdtempSync(join(tmpdir(), "uikit-vendor-"));
+
+  t.after(() => rmSync(dir, { recursive: true, force: true }));
+
+  for (const path of [
+    "README.md",
+    "SOURCE.json",
+    ".DS_Store",
+    "heroui/LICENSE",
+    "heroui/styles/package.json",
+    "packages/tokens/dist/tokens.css",
+    // put there by hand: SOURCE.json would list them as part of the snapshot
+    "notes.md",
+    "extra/x.css",
+    "packages.md",
+  ]) {
+    mkdirSync(dirname(join(dir, path)), { recursive: true });
+    writeFileSync(join(dir, path), "");
+  }
+
+  assert.deepEqual(unexpectedVendorFiles(dir), [
+    "extra/x.css",
+    "notes.md",
+    "packages.md",
+  ]);
+  assert.deepEqual(unexpectedVendorFiles(vendorDir), []);
+  assert.deepEqual(unexpectedVendorFiles(join(dir, "missing")), []);
 });
