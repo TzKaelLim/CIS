@@ -1,0 +1,35 @@
+{
+  "name": "@tzuchi/tceditor-storybook",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Block Storybook for tceditor: the stories, docs pages and controls of every block",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/storybook.mjs dev",
+    "build": "node scripts/storybook.mjs build",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@tzuchi/tceditor": "workspace:*",
+    "@tzuchi/tceditor-blocks": "workspace:*",
+    "react": "19.2.6",
+    "react-dom": "19.2.6"
+  },
+  "devDependencies": {
+    "@storybook/addon-a11y": "10.6.0",
+    "@storybook/addon-docs": "10.6.0",
+    "@storybook/react-vite": "10.6.0",
+    "@tailwindcss/vite": "4.3.3",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "5.2.0",
+    "eslint": "9.39.4",
+    "eslint-config-custom": "workspace:*",
+    "storybook": "10.6.0",
+    "tailwindcss": "4.3.3",
+    "typescript": "5.9.3",
+    "vite": "7.3.5"
+  }
+}

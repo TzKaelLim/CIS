@@ -44,3 +44,9 @@ dist
 # The built design tokens are part of the vendored uikit snapshot
 # (pnpm sync:uikit builds them), so re-include them after the dist rule above
 !vendor/uikit/packages/tokens/dist/
+
+# Block Storybook: the HOME the Storybook CLI writes to, the debug log it
+# leaves after a failed run, and the static build
+apps/storybook/.home/
+apps/storybook/debug-storybook.log
+storybook-static/

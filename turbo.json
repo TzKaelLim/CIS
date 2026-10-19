@@ -5,7 +5,24 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**", "dist/**"]
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**",
+        "dist/**",
+        "storybook-static/**"
+      ]
+    },
+    "@tzuchi/tceditor-storybook#build": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/packages/blocks/src/**",
+        "$TURBO_ROOT$/packages/blocks/styles.css",
+        "$TURBO_ROOT$/packages/spec/src/**",
+        "$TURBO_ROOT$/vendor/uikit/**",
+        "$TURBO_ROOT$/apps/showcase/public/demo-assets/**"
+      ],
+      "outputs": ["storybook-static/**"]
     },
     "lint": {
       "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/eslint.config.mjs"]

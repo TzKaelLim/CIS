@@ -4,6 +4,7 @@ CHANGELOG.md
 dist/
 .next/
 build/
+storybook-static/
 
 # Local agent workspace (git-ignored; Prettier 2 does not read .gitignore)
 .superpowers/
