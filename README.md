@@ -125,22 +125,22 @@ pnpm verify
 
 `pnpm verify` 依序執行 test、typecheck、lint、format:check、build、check:bundle、check:edge、check:public-bundle、storybook:smoke、audit:gate，全部通過才算完成。目前沒有 CI，提交前請在本機執行一次。`audit:gate` 需要連網。
 
-| 指令                                                         | 作用                                                                                                                             |
-| ------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
-| `pnpm test`                                                  | 各套件的 jest 測試（core、spec、blocks、示範站），以及 `scripts/` 與 `packages/core/scripts/` 的 `node:test` 測試                |
-| `pnpm typecheck`                                             | core（不含測試檔）、spec、blocks、示範站與區塊 Storybook 的型別檢查                                                              |
-| `pnpm lint`                                                  | ESLint                                                                                                                           |
-| `pnpm format:check`                                          | Prettier 檢查；`pnpm format` 會直接修正                                                                                          |
-| `pnpm build`                                                 | 建置 core、外掛、Edge 單檔驗證器、demo、示範站與區塊 Storybook                                                                   |
-| `pnpm storybook:build`                                       | 只建置區塊 Storybook 的靜態版（`pnpm build` 也會建置）                                                                           |
-| `pnpm check:bundle`                                          | 確認主入口、RSC 入口與 rules 入口不會引用 `@tiptap/html`、`happy-dom`，且 rules 入口不碰 React、Tiptap 與 `node:*`（需先 build） |
-| `pnpm check:edge`                                            | 檢查 `packages/blocks/dist/validator.edge.mjs`：不 import 外部模組、gzip 後不超過 60 KB、結果與原始碼版相同（需先 build）        |
-| `pnpm check:public-bundle`                                   | 確認示範站公開頁 `/activity` 的瀏覽器端程式不含編輯器、圖片挑選器與 zod（需先 build）                                            |
-| `pnpm storybook:smoke`                                       | 在 `127.0.0.1:6008` 提供建好的區塊 Storybook，用 puppeteer 逐一開啟每個 story（需先 build）                                      |
-| `pnpm audit:gate`                                            | 執行 `pnpm audit`，只有隨套件出貨的依賴（core、外掛、spec、blocks）有 advisory 時才失敗，其餘（app 與開發工具）只列出            |
-| `pnpm gen:blocks`                                            | 依規格重新產生 stories 與 `packages/blocks/generated/`，產生的檔案要 commit                                                      |
-| `pnpm sync:uikit -- --dir ../puck-tzuchi-poc --commit <sha>` | 從本機 uikit repo 的指定 commit 更新 `vendor/uikit` 與 uikit 選項快照                                                            |
-| `pnpm smoke`                                                 | puppeteer 冒煙測試：先跑 demo 的拖放測試，再跑示範站流程；需先啟動 demo（3000 port）與示範站（3010 port）                        |
+| 指令                                                         | 作用                                                                                                                                                     |
+| ------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pnpm test`                                                  | 各套件的 jest 測試（core、spec、blocks、示範站），以及 `scripts/` 與 `packages/core/scripts/` 的 `node:test` 測試                                        |
+| `pnpm typecheck`                                             | core（不含測試檔）、spec、blocks、示範站與區塊 Storybook 的型別檢查                                                                                      |
+| `pnpm lint`                                                  | ESLint                                                                                                                                                   |
+| `pnpm format:check`                                          | Prettier 檢查；`pnpm format` 會直接修正                                                                                                                  |
+| `pnpm build`                                                 | 建置 core、外掛、Edge 單檔驗證器、demo、示範站與區塊 Storybook                                                                                           |
+| `pnpm storybook:build`                                       | 只建置區塊 Storybook 的靜態版（`pnpm build` 也會建置）                                                                                                   |
+| `pnpm check:bundle`                                          | 確認主入口、RSC 入口與 rules 入口不會引用 `@tiptap/html`、`happy-dom`，且 rules 入口不碰 React、Tiptap 與 Node 內建模組（`node:fs` 或 `fs`；需先 build） |
+| `pnpm check:edge`                                            | 檢查 `packages/blocks/dist/validator.edge.mjs`：不 import 外部模組、gzip 後不超過 60 KB、結果與原始碼版相同（需先 build）                                |
+| `pnpm check:public-bundle`                                   | 確認示範站公開頁 `/activity` 的瀏覽器端程式不含編輯器、圖片挑選器與 zod（需先 build）                                                                    |
+| `pnpm storybook:smoke`                                       | 在 `127.0.0.1:6008` 提供建好的區塊 Storybook，用 puppeteer 逐一開啟每個 story（需先 build）                                                              |
+| `pnpm audit:gate`                                            | 執行 `pnpm audit`，只有隨套件出貨的依賴（core、外掛、spec、blocks）有 advisory 時才失敗，其餘（app 與開發工具）只列出                                    |
+| `pnpm gen:blocks`                                            | 依規格重新產生 stories 與 `packages/blocks/generated/`，產生的檔案要 commit                                                                              |
+| `pnpm sync:uikit -- --dir ../puck-tzuchi-poc --commit <sha>` | 從本機 uikit repo 的指定 commit 更新 `vendor/uikit` 與 uikit 選項快照                                                                                    |
+| `pnpm smoke`                                                 | puppeteer 冒煙測試：先跑 demo 的拖放測試，再跑示範站流程；需先啟動 demo（3000 port）與示範站（3010 port）                                                |
 
 只跑一個測試檔或一個測試：
 
