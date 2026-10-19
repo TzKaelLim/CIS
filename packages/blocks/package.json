@@ -19,6 +19,7 @@
     "./generated/page-shell.draft07.json": "./generated/page-shell.draft07.json"
   },
   "scripts": {
+    "build": "node scripts/build-edge.mjs",
     "lint": "eslint \"**/*.ts*\"",
     "test": "jest --ci",
     "typecheck": "tsc -p tsconfig.json"
@@ -42,6 +43,7 @@
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
     "ajv": "8.20.0",
+    "esbuild": "0.27.7",
     "eslint": "9.39.4",
     "eslint-config-custom": "workspace:*",
     "jest": "29.7.0",
