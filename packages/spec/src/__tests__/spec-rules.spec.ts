@@ -14,6 +14,7 @@ import {
   checkSpecRules,
 } from "../spec-rules";
 import type { SpecRuleId, SpecRuleViolation } from "../spec-rules";
+import { createPageValidator } from "../validator";
 import {
   boxSpec,
   leafSpec,
@@ -600,6 +601,275 @@ describe("checkSpecRules", () => {
     });
   });
 
+  describe("helpers changed after they were made", () => {
+    /** Keeps "" (no link) and turns any other link into a script. */
+    const toScript = (value: string) =>
+      value === "" ? "" : "javascript:alert(1)";
+    const body = () => richText({ features: ["bold"] });
+    const bodyDefault = () => fitted("內文", ["bold"]);
+    const noCheck = () => undefined;
+    const imageDefault = () => ({ assetId: "a", alt: "圖", decorative: false });
+
+    const changed: [string, z.core.$ZodLooseShape, string][] = [
+      [
+        "link() with .overwrite()",
+        {
+          href: link({ optional: true })
+            .overwrite(toScript)
+            .meta({ title: "連結" }),
+        },
+        "href",
+      ],
+      [
+        "link() with .refine()",
+        {
+          href: link()
+            .refine(() => true)
+            .meta({ title: "連結" }),
+        },
+        "href",
+      ],
+      [
+        "link() with .check()",
+        { href: link().check(noCheck).meta({ title: "連結" }) },
+        "href",
+      ],
+      [
+        "richText() with .overwrite()",
+        {
+          body: body()
+            .overwrite((value) => value)
+            .default(bodyDefault)
+            .meta({ title: "內文" }),
+        },
+        "body",
+      ],
+      [
+        "richText() with .refine()",
+        {
+          body: body()
+            .refine(() => true)
+            .default(bodyDefault)
+            .meta({ title: "內文" }),
+        },
+        "body",
+      ],
+      [
+        "richText() with .check()",
+        {
+          body: body()
+            .check(noCheck)
+            .default(bodyDefault)
+            .meta({ title: "內文" }),
+        },
+        "body",
+      ],
+      [
+        "image() with .overwrite()",
+        {
+          picture: image()
+            .overwrite((value) => value)
+            .meta({ title: "圖片" }),
+        },
+        "picture",
+      ],
+      [
+        "image() with .refine()",
+        {
+          picture: image()
+            .refine(() => true)
+            .meta({ title: "圖片" }),
+        },
+        "picture",
+      ],
+      [
+        "image() with .check()",
+        { picture: image().check(noCheck).meta({ title: "圖片" }) },
+        "picture",
+      ],
+      [
+        "slot() with .overwrite()",
+        {
+          content: slot({ allow: ["Leaf"] })
+            .overwrite((value) => value)
+            .meta({ title: "內容" }),
+        },
+        "content",
+      ],
+      [
+        "a helper changed before .meta() and .describe()",
+        {
+          href: link({ optional: true })
+            .overwrite(toScript)
+            .describe("連結")
+            .meta({ title: "連結" }),
+        },
+        "href",
+      ],
+      [
+        "a check on the .default() around a helper",
+        {
+          href: link({ optional: true })
+            .default("")
+            .overwrite(toScript)
+            .meta({ title: "連結" }),
+        },
+        "href",
+      ],
+      [
+        "a helper in .catch()",
+        {
+          href: link({ optional: true })
+            .catch("javascript:alert(1)")
+            .meta({ title: "連結" }),
+        },
+        "href",
+      ],
+      [
+        "a helper piped through .transform()",
+        {
+          href: link({ optional: true })
+            .transform(toScript)
+            .meta({ title: "連結" }),
+        },
+        "href",
+      ],
+      [
+        "a helper in z.preprocess()",
+        {
+          picture: z
+            .preprocess((value) => value, image())
+            .default(imageDefault)
+            .meta({ title: "圖片" }),
+        },
+        "picture",
+      ],
+      [
+        "a changed helper in z.lazy()",
+        {
+          href: z
+            .lazy(() => link({ optional: true }).overwrite(toScript))
+            .meta({ title: "連結" }),
+        },
+        "href",
+      ],
+      [
+        "a changed helper inside list items",
+        {
+          items: z
+            .array(
+              z.strictObject({
+                href: link()
+                  .refine(() => true)
+                  .meta({ title: "網址" }),
+              })
+            )
+            .max(3)
+            .default(() => [])
+            .meta({ title: "項目" }),
+        },
+        "items[].href",
+      ],
+      [
+        "a group whose .transform() can change the helper in it",
+        {
+          group: z
+            .strictObject({
+              href: link({ optional: true }).meta({ title: "連結" }),
+            })
+            .default(() => ({ href: "" }))
+            .transform((value) => ({ href: toScript(value.href) }))
+            .meta({ title: "群組" }),
+        },
+        "group.href",
+      ],
+      [
+        "a list whose .overwrite() can change the helpers in its items",
+        {
+          items: z
+            .array(z.strictObject({ href: link().meta({ title: "網址" }) }))
+            .max(3)
+            .overwrite((value) => value)
+            .default(() => [])
+            .meta({ title: "項目" }),
+        },
+        "items[].href",
+      ],
+    ];
+
+    it.each(changed)("reports %s", (_name, shape, path) => {
+      const violations = check([block("Changed", shape)]);
+
+      expect(pick(violations, "meta-keys")).toEqual([
+        { type: "Changed", path },
+      ]);
+      expect(
+        violations.find((violation) => violation.rule === "meta-keys")?.message
+      ).toMatch(/must stay as the helper made it/);
+    });
+
+    it("reports a helper under a props object with .refine()", () => {
+      const violations = check([
+        rawBlock(
+          "Changed",
+          z
+            .strictObject({
+              href: link({ optional: true }).meta({ title: "連結" }),
+            })
+            .refine(() => true)
+        ),
+      ]);
+
+      expect(pick(violations, "meta-keys")).toEqual([
+        { type: "Changed", path: "href" },
+      ]);
+    });
+
+    it("keeps the page validator from storing what the change makes", () => {
+      const blocks = [
+        leafSpec,
+        block("Changed", {
+          href: link({ optional: true })
+            .overwrite(toScript)
+            .meta({ title: "連結" }),
+        }),
+      ];
+
+      expect(() => createPageValidator({ blocks, root: emptyRoot })).toThrow(
+        /must stay as the helper made it/
+      );
+    });
+
+    it("accepts lists with limits, and helpers inside groups and list items", () => {
+      expect(
+        check([
+          block("Plain", {
+            items: z
+              .array(
+                z.strictObject({
+                  href: link().meta({ title: "網址" }),
+                  picture: image().describe("圖片").meta({ title: "圖片" }),
+                })
+              )
+              .min(1)
+              .max(3)
+              .default(() => [{ href: "/one", picture: imageDefault() }])
+              .meta({ title: "項目" }),
+            group: z
+              .strictObject({
+                more: link({ optional: true })
+                  .default("/about")
+                  .meta({ title: "更多" }),
+                body: body().default(bodyDefault).meta({ title: "內文" }),
+              })
+              .default(() => ({ more: "/about", body: bodyDefault() }))
+              .meta({ title: "群組" }),
+          }),
+        ])
+      ).toEqual([]);
+    });
+  });
+
   describe("defaults", () => {
     const headingDoc = () => ({
       type: "doc" as const,
@@ -673,6 +943,39 @@ describe("checkSpecRules", () => {
         "a top-level field without a default",
         { text: z.string().max(5).meta({ title: "文字" }) },
         "text",
+      ],
+      [
+        "a top-level .optional() text without a default",
+        { text: z.string().max(5).optional().meta({ title: "文字" }) },
+        "text",
+      ],
+      [
+        "a top-level .optional() list without a default",
+        {
+          items: z
+            .array(z.strictObject({ label: title("名稱") }))
+            .max(3)
+            .optional()
+            .meta({ title: "項目" }),
+        },
+        "items",
+      ],
+      [
+        "a top-level .optional() yes/no field without a default",
+        { flag: z.boolean().optional().meta({ title: "開關" }) },
+        "flag",
+      ],
+      [
+        "a top-level .optional() group without a default",
+        {
+          group: z
+            .strictObject({
+              caption: z.string().max(40).default("").meta({ title: "說明" }),
+            })
+            .optional()
+            .meta({ title: "群組" }),
+        },
+        "group",
       ],
       [
         "a default on a required link()",
@@ -767,11 +1070,34 @@ describe("checkSpecRules", () => {
                 z.strictObject({
                   label: z.string().min(1).max(20).meta({ title: "名稱" }),
                   href: link().meta({ title: "網址" }),
+                  note: z.string().max(20).optional().meta({ title: "備註" }),
                 })
               )
               .max(3)
               .default(() => [{ label: "一", href: "/one" }])
               .meta({ title: "項目" }),
+            group: z
+              .strictObject({
+                caption: z.string().max(40).optional().meta({ title: "說明" }),
+              })
+              .default(() => ({}))
+              .meta({ title: "群組" }),
+          }),
+        ])
+      ).toEqual([]);
+    });
+
+    it("accepts a top-level .optional() field that has a default", () => {
+      expect(
+        check([
+          block("Defaulted", {
+            text: z
+              .string()
+              .max(5)
+              .optional()
+              .default("文字")
+              .meta({ title: "文字" }),
+            more: link({ optional: true }).meta({ title: "更多連結" }),
           }),
         ])
       ).toEqual([]);

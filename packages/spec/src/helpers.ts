@@ -50,6 +50,14 @@ const fail = (helper: string, message: string): never => {
 const helperRegistry = z.registry<HelperMeta>();
 
 /**
+ * The defs (`_zod.def`) of the schemas that the helpers returned. A copy made
+ * by .meta() or .describe() shares its def; .overwrite(), .refine(), .check()
+ * and the other checks make a copy with a new def, which still inherits the
+ * helper's meta through the registry.
+ */
+const helperDefs = new WeakSet<object>();
+
+/**
  * Sets the helper-only meta on a helper's schema. GlobalMeta types these keys
  * as never, so this casts; the registry keeps its own frozen copy.
  */
@@ -57,18 +65,30 @@ function withHelperMeta<S extends z.ZodType>(schema: S, meta: HelperMeta): S {
   const result = schema.meta(meta as z.GlobalMeta) as S;
 
   helperRegistry.add(result, deepFreeze(JSON.parse(JSON.stringify(meta))));
+  helperDefs.add(result._zod.def);
 
   return result;
 }
 
 /**
  * The helper-only meta of a schema that slot(), richText(), image() or link()
- * returned, or of a copy that .meta() or .describe() made of it; undefined for
- * any other schema, including a wrapper that the author added, such as
- * .optional() or .default(). Internal: checkSpecRules uses it.
+ * returned, or of a copy that zod made of it: .meta() and .describe(), but
+ * also the checks (.overwrite(), .refine(), .check()), which isHelperSchema
+ * tells apart. undefined for any other schema, including a wrapper that the
+ * author added, such as .optional() or .default(). Internal: checkSpecRules
+ * uses it.
  */
 export const helperMetaOf = (schema: z.core.$ZodType): HelperMeta | undefined =>
   helperRegistry.get(schema);
+
+/**
+ * Whether a schema is one that slot(), richText(), image() or link() returned,
+ * or a copy that only .meta() or .describe() made of it (they share its def),
+ * so that it checks and cleans values exactly as the helper does. Internal:
+ * checkSpecRules uses it.
+ */
+export const isHelperSchema = (schema: z.core.$ZodType): boolean =>
+  helperDefs.has(schema._zod.def);
 
 /**
  * The JSON Schema of a props object with only the meta that the helpers

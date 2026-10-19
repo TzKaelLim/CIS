@@ -2,7 +2,7 @@ import * as z from "zod";
 import { stableStringify } from "@tzuchi/tceditor/rules";
 import { BLOCK_TYPE_PATTERN } from "./define";
 import type { AnyBlockSpec, PageRootSpec } from "./define";
-import { helperMetaOf, toHelperJsonSchema } from "./helpers";
+import { helperMetaOf, isHelperSchema, toHelperJsonSchema } from "./helpers";
 import {
   JSON_SCHEMA_OPTIONS,
   eachField,
@@ -575,6 +575,111 @@ function nestedShape(
   return undefined;
 }
 
+/** The checks that lists use (.min(), .max(), .length()): they can only reject a value. */
+const LENGTH_CHECKS = new Set(["min_length", "max_length", "length_equals"]);
+
+const HELPER_NAMES: [keyof HelperMeta, string][] = [
+  ["x-slot", "slot()"],
+  ["x-richtext", "richText()"],
+  ["x-image", "image()"],
+  ["x-link", "link()"],
+];
+
+const helperName = (meta: HelperMeta): string =>
+  HELPER_NAMES.find(([key]) => hasOwn(meta, key))?.[1] ?? "a helper";
+
+type ZodNodeDef = {
+  type: string;
+  checks?: readonly z.core.$ZodCheck[];
+  innerType?: z.core.$ZodType;
+  in?: z.core.$ZodType;
+  out?: z.core.$ZodType;
+  element?: z.core.$ZodType;
+  shape?: z.core.$ZodShape;
+};
+
+/** What in a schema that is not a helper can change the values under it. */
+function valueChange(def: ZodNodeDef): string | undefined {
+  if (def.type === "catch") return ".catch()";
+  if (def.type === "pipe")
+    return "a pipe (.transform(), .pipe(), z.preprocess())";
+  if (
+    def.checks?.some((check) => !LENGTH_CHECKS.has(check._zod.def.check)) ===
+    true
+  ) {
+    return "a check (.overwrite(), .refine(), .check(), …) on a schema that wraps or holds it";
+  }
+
+  return undefined;
+}
+
+/**
+ * Reports, under "meta-keys", every helper whose value something other than
+ * the helper can change: checks added to the helper after it was made (zod
+ * copies the schema with a new def, and the copy inherits the helper's meta),
+ * or a .catch(), a pipe or a check other than a length limit on a schema that
+ * wraps or holds the helper, up to the props object. The JSON Schema shows
+ * none of them, so the editor, the catalog and the database would trust a
+ * value, such as a javascript: link, that the helper never checked.
+ */
+function checkHelperChanges(
+  schema: z.core.$ZodType,
+  path: readonly string[],
+  changedBy: string | undefined,
+  ancestors: Set<z.core.$ZodType>,
+  report: Report
+) {
+  if (ancestors.has(schema)) return;
+
+  const helper = helperMetaOf(schema);
+
+  if (helper !== undefined) {
+    const change = isHelperSchema(schema)
+      ? changedBy
+      : changedBy ??
+        "a check added after it was made (.overwrite(), .refine(), .check(), …)";
+
+    if (change !== undefined) {
+      report(
+        "meta-keys",
+        fieldPathKey(path),
+        `${helperName(
+          helper
+        )} must stay as the helper made it: ${change} can change its value without changing its JSON Schema; put such logic in a packages/spec helper`
+      );
+    }
+
+    return;
+  }
+
+  const def = schema._zod.def as ZodNodeDef;
+  const change = changedBy ?? valueChange(def);
+  const children: [z.core.$ZodType, readonly string[]][] = [];
+
+  if (def.type === "object" && def.shape !== undefined) {
+    for (const name of Object.keys(def.shape)) {
+      children.push([def.shape[name], [...path, name]]);
+    }
+  } else if (def.type === "array" && def.element !== undefined) {
+    children.push([def.element, [...path, "[]"]]);
+  } else if (def.type === "pipe") {
+    if (def.in !== undefined) children.push([def.in, path]);
+    if (def.out !== undefined) children.push([def.out, path]);
+  } else if (def.type === "lazy") {
+    children.push([(schema as z.core.$ZodLazy)._zod.innerType, path]);
+  } else if (WRAPPER_TYPES.has(def.type) && def.innerType !== undefined) {
+    children.push([def.innerType, path]);
+  }
+
+  ancestors.add(schema);
+
+  for (const [child, childPath] of children) {
+    checkHelperChanges(child, childPath, change, ancestors, report);
+  }
+
+  ancestors.delete(schema);
+}
+
 /** safeParse, with a default function or a check that throws counted as a failure. */
 const tryParse = (schema: z.core.$ZodType, value: unknown) => {
   try {
@@ -587,7 +692,8 @@ const tryParse = (schema: z.core.$ZodType, value: unknown) => {
 /**
  * What is wrong with the default of a field, if anything. A required link()
  * or image() must fail without a value (its .prefault() is incomplete on
- * purpose); every other top-level field needs a default; and a default must
+ * purpose); every other top-level field needs a default, and .optional()
+ * alone, which leaves the prop undefined, is not one; and a default must
  * pass validation unchanged, because zod returns it as it is.
  */
 function defaultProblem(
@@ -607,7 +713,11 @@ function defaultProblem(
       ? "needs a default that passes validation (only the required link() and image() may lack one)"
       : undefined;
   }
-  if (first.data === undefined) return undefined;
+  if (first.data === undefined) {
+    return topLevel
+      ? "needs a default: .optional() without .default() leaves the prop undefined when a page lacks it"
+      : undefined;
+  }
 
   const expected = stableStringify(first.data);
   const second = tryParse(field, first.data);
@@ -623,7 +733,7 @@ function defaultProblem(
 /**
  * The "defaults" rule for the fields of an object schema, then for the fields
  * of its groups and list items. Fields inside groups and list items may lack
- * a default: their object's default holds them.
+ * a default, .optional() included: their object's default holds them.
  */
 function checkDefaults(
   shape: z.core.$ZodShape,
@@ -676,13 +786,15 @@ function checkDefaults(
  * names (including Object.prototype's), keys limited to SCHEMA_KEYWORDS and
  * META_KEYS with .meta() adding META_KEYS only (so no steps or exclusive
  * number bounds), one JSON type per node, helper-only keys exactly as the
- * helpers wrote them, x-item-label placeholders that name text or number
- * fields of the item, the same structure for every field name that holds
- * slots (rule 8), slot rules that name registered blocks, at least one
- * example, and defaults ("defaults": every top-level field has a default
- * except the required link() and image(), which must fail without a value
- * and are never wrapped in .optional() or .nullable(); a default, at any
- * level, passes validation unchanged).
+ * helpers wrote them, helpers that nothing changes after they were made (no
+ * checks added to them, and no .catch(), pipe or value-changing check on a
+ * schema that wraps or holds them), x-item-label placeholders that name text
+ * or number fields of the item, the same structure for every field name that
+ * holds slots (rule 8), slot rules that name registered blocks, at least one
+ * example, and defaults ("defaults": every top-level field has a default,
+ * which .optional() alone is not, except the required link() and image(),
+ * which must fail without a value and are never wrapped in .optional() or
+ * .nullable(); a default, at any level, passes validation unchanged).
  *
  * It only looks at the specs: "every example passes the page validator" is
  * tested with the validator. A spec that zod cannot convert to JSON Schema
@@ -721,6 +833,7 @@ export function checkSpecRules(input: {
       report
     );
     checkHelperMeta(schema, toHelperJsonSchema(spec.props), "", report);
+    checkHelperChanges(spec.props, [], undefined, new Set(), report);
 
     eachField(schema, ({ path, name, node }) => {
       const key = fieldPathKey(path);
