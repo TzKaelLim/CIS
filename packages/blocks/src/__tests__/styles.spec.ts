@@ -3,7 +3,12 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { eachField, toJsonSchema } from "@tzuchi/tceditor-spec";
 import { blockSpecs } from "../specs";
-import { tokenClass } from "../token-classes";
+import {
+  TOKEN_CLASS_PURPOSES,
+  TOKEN_PURPOSES,
+  tokenClass,
+} from "../token-classes";
+import { nodesWithKey } from "./__helpers__/schema-nodes";
 
 const packageRoot = join(__dirname, "..", "..");
 const repoRoot = join(packageRoot, "..", "..");
@@ -13,18 +18,13 @@ const tokensCss = readFileSync(
   "utf8"
 );
 
-/** tokenClass purpose of each x-token field. A new token field must be added here and to blocks.css. */
-const TOKEN_PURPOSES = new Map<string, "padding-y" | "gap">([
-  ["paddingY", "padding-y"],
-  ["gap", "gap"],
-]);
-
 function tokenFields() {
   const found: {
     field: string;
     name: string;
     group: unknown;
     values: string[];
+    node: object;
   }[] = [];
   for (const spec of blockSpecs) {
     eachField(toJsonSchema(spec), ({ name, node }) => {
@@ -35,11 +35,21 @@ function tokenFields() {
         name,
         group: token.group,
         values: (node.enum as string[] | undefined) ?? [],
+        node,
       });
     });
   }
   return found;
 }
+
+/** Every custom property that blocks.css reads with var(), once each. */
+const usedVariables = [
+  ...new Set(
+    [...blocksCss.matchAll(/var\(\s*(--[A-Za-z0-9_-]+)/g)].map(
+      (match) => match[1]
+    )
+  ),
+];
 
 describe("blocks.css", () => {
   it("maps token values to tcb- classes", () => {
@@ -48,31 +58,46 @@ describe("blocks.css", () => {
     expect(tokenClass("space", "gap", "24 tcb-page")).toBe("");
   });
 
-  it("finds the token fields of the blocks", () => {
-    expect(tokenFields().map((field) => field.field)).toEqual([
-      "Section.paddingY",
-      "Columns.gap",
-    ]);
+  it("finds every token field of the blocks", () => {
+    const found = tokenFields().map((field) => field.node);
+    const all = blockSpecs.flatMap((spec) =>
+      nodesWithKey(toJsonSchema(spec), "x-token")
+    );
+    expect(found.length).toBeGreaterThan(0);
+    expect(found).toHaveLength(all.length);
+    expect(all.every((node) => found.includes(node))).toBe(true);
   });
 
   it.each(tokenFields())(
     "$field: every value has its class, set from the token",
     ({ name, group, values }) => {
-      const purpose = TOKEN_PURPOSES.get(name);
-      if (!purpose) throw new Error(`add ${name} to TOKEN_PURPOSES`);
+      if (!Object.prototype.hasOwnProperty.call(TOKEN_PURPOSES, name)) {
+        throw new Error(
+          `add ${name} to TOKEN_PURPOSES in src/token-classes.ts`
+        );
+      }
+      const purpose = TOKEN_PURPOSES[name];
       expect(group).toBe("space");
       expect(values.length).toBeGreaterThan(0);
       for (const value of values) {
         // A token() value is a @tzuchi/tokens name (spec §4.2)
         expect(tokensCss).toContain(`--tc-${group}-${value}:`);
         const className = tokenClass("space", purpose, value);
-        const property = purpose === "gap" ? "gap" : "padding-block";
+        const { property } = TOKEN_CLASS_PURPOSES[purpose];
         expect(blocksCss).toContain(
           `.${className} {\n  ${property}: var(--tc-space-${value});\n}`
         );
       }
     }
   );
+
+  it("reads only token variables that the vendored tokens define", () => {
+    const tokens = usedVariables.filter((name) => name.startsWith("--tc-"));
+    expect(tokens.length).toBeGreaterThan(10);
+    expect(tokens.filter((name) => !tokensCss.includes(`${name}:`))).toEqual(
+      []
+    );
+  });
 
   it("stacks the columns below the tokens' tablet breakpoint", () => {
     const tablet = /--tc-breakpoint-tablet:\s*(\d+)px;/.exec(tokensCss);

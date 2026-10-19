@@ -3,13 +3,19 @@ import { join } from "node:path";
 import { eachField, toJsonSchema } from "@tzuchi/tceditor-spec";
 import { blockSpecs, pageRootSpec } from "../specs";
 import { STYLE_DECISIONS } from "../style-decisions";
+import { nodesWithKey } from "./__helpers__/schema-nodes";
 
 type UikitOptions = {
   components: Record<string, { variants: Record<string, string[]> }>;
 };
 
 /** One style() field: which uikit variant it maps to and the options it offers. */
-type StyleField = { field: string; styleKey: string; offered: string[] };
+type StyleField = {
+  field: string;
+  styleKey: string;
+  offered: string[];
+  node: object;
+};
 
 const uikit = JSON.parse(
   readFileSync(join(__dirname, "../../generated/uikit-options.json"), "utf8")
@@ -30,8 +36,9 @@ function uikitOptions(styleKey: string): string[] {
 }
 
 const styleFields: StyleField[] = [];
+const specs = [...blockSpecs, pageRootSpec];
 
-for (const spec of [...blockSpecs, pageRootSpec]) {
+for (const spec of specs) {
   const owner = spec.kind === "block" ? spec.type : "root";
 
   eachField(toJsonSchema(spec), ({ path, node }) => {
@@ -44,6 +51,7 @@ for (const spec of [...blockSpecs, pageRootSpec]) {
         field: `${owner}.${path.join(".")}`,
         styleKey: `${xStyle.component}.${xStyle.key}`,
         offered: node.enum as string[],
+        node,
       });
     }
   });
@@ -57,17 +65,14 @@ for (const { styleKey, offered: values } of styleFields) {
 }
 
 describe("style options against the uikit snapshot (spec §5.5)", () => {
-  it("covers the uikit variants that the blocks use", () => {
-    expect([...offered.keys()].sort()).toEqual([
-      "button.size",
-      "button.variant",
-      "card.variant",
-      "chip.color",
-      "chip.variant",
-      "surface.variant",
-      "typography.align",
-      "typography.type",
-    ]);
+  it("finds every style() field of the blocks and the page root", () => {
+    const found = styleFields.map((field) => field.node);
+    const all = specs.flatMap((spec) =>
+      nodesWithKey(toJsonSchema(spec), "x-style")
+    );
+    expect(found.length).toBeGreaterThan(0);
+    expect(found).toHaveLength(all.length);
+    expect(all.every((node) => found.includes(node))).toBe(true);
   });
 
   it("#2: offers only options that exist in uikit", () => {
