@@ -237,6 +237,265 @@
     "expect": { "ok": true }
   },
   {
+    "name": "富文字的 javascript: 連結只保留文字",
+    "input": {
+      "root": { "props": {} },
+      "content": [
+        {
+          "type": "Paragraph",
+          "props": {
+            "id": "Paragraph-1",
+            "body": {
+              "type": "doc",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "marks": [
+                        {
+                          "type": "link",
+                          "attrs": { "href": "javascript:alert(1)" }
+                        }
+                      ],
+                      "text": "報名"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "expect": {
+      "ok": true,
+      "notices": [
+        { "code": "richtext_cleaned", "pathText": "content[0].props.body" }
+      ]
+    }
+  },
+  {
+    "name": "富文字裡段落不開放的標題與引言改成段落",
+    "input": {
+      "root": { "props": {} },
+      "content": [
+        {
+          "type": "Paragraph",
+          "props": {
+            "id": "Paragraph-1",
+            "body": {
+              "type": "doc",
+              "content": [
+                {
+                  "type": "heading",
+                  "attrs": { "level": 2 },
+                  "content": [{ "type": "text", "text": "活動說明" }]
+                },
+                {
+                  "type": "blockquote",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [{ "type": "text", "text": "一段引言" }]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "expect": {
+      "ok": true,
+      "notices": [
+        { "code": "richtext_cleaned", "pathText": "content[0].props.body" }
+      ]
+    }
+  },
+  {
+    "name": "富文字裡不認得的節點與格式只保留文字",
+    "input": {
+      "root": { "props": {} },
+      "content": [
+        {
+          "type": "Paragraph",
+          "props": {
+            "id": "Paragraph-1",
+            "body": {
+              "type": "doc",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "mention",
+                      "attrs": { "id": "u1" },
+                      "content": [{ "type": "text", "text": "@志工" }]
+                    },
+                    {
+                      "type": "text",
+                      "marks": [{ "type": "underline" }],
+                      "text": "底線"
+                    },
+                    {
+                      "type": "text",
+                      "marks": [
+                        { "type": "highlight", "attrs": { "color": "yellow" } }
+                      ],
+                      "text": "螢光"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "expect": {
+      "ok": true,
+      "notices": [
+        { "code": "richtext_cleaned", "pathText": "content[0].props.body" }
+      ]
+    }
+  },
+  {
+    "name": "富文字的對齊方式會移除",
+    "input": {
+      "root": { "props": {} },
+      "content": [
+        {
+          "type": "Paragraph",
+          "props": {
+            "id": "Paragraph-1",
+            "body": {
+              "type": "doc",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "attrs": { "textAlign": "center" },
+                  "content": [{ "type": "text", "text": "置中" }]
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "expect": {
+      "ok": true,
+      "notices": [
+        { "code": "richtext_cleaned", "pathText": "content[0].props.body" }
+      ]
+    }
+  },
+  {
+    "name": "只寫 href 的連結會補上預設屬性",
+    "input": {
+      "root": { "props": {} },
+      "content": [
+        {
+          "type": "Paragraph",
+          "props": {
+            "id": "Paragraph-1",
+            "body": {
+              "type": "doc",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "marks": [
+                        { "type": "link", "attrs": { "href": "/register" } }
+                      ],
+                      "text": "報名"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "expect": {
+      "ok": true,
+      "notices": [
+        { "code": "richtext_cleaned", "pathText": "content[0].props.body" }
+      ]
+    }
+  },
+  {
+    "name": "區段裡的段落：只有需要整理的那一個有提示",
+    "input": {
+      "root": { "props": {} },
+      "content": [
+        {
+          "type": "Section",
+          "props": {
+            "id": "Section-1",
+            "content": [
+              {
+                "type": "Paragraph",
+                "props": {
+                  "id": "Paragraph-1",
+                  "body": {
+                    "type": "doc",
+                    "content": [
+                      {
+                        "type": "paragraph",
+                        "content": [{ "type": "text", "text": "不必整理" }]
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "type": "Paragraph",
+                "props": {
+                  "id": "Paragraph-2",
+                  "body": {
+                    "type": "doc",
+                    "content": [
+                      {
+                        "type": "paragraph",
+                        "content": [
+                          {
+                            "type": "text",
+                            "marks": [
+                              {
+                                "type": "link",
+                                "attrs": { "href": " JavaScript:alert(1)" }
+                              }
+                            ],
+                            "text": "點我"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "expect": {
+      "ok": true,
+      "notices": [
+        {
+          "code": "richtext_cleaned",
+          "pathText": "content[0].props.content[1].props.body"
+        }
+      ]
+    }
+  },
+  {
     "name": "按鈕文字 41 個中文字",
     "input": {
       "root": { "props": {} },

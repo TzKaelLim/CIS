@@ -6,12 +6,13 @@ import { blockSpecs } from "../specs";
 import { validatePage, validatePageJson } from "../validator";
 import type { IssueCode, ValidateResult } from "../validator";
 
+type Found = { code: IssueCode; pathText: string };
+
 type Case = {
   name: string;
   input: unknown;
-  expect:
-    | { ok: true }
-    | { ok: false; errors: { code: IssueCode; pathText: string }[] };
+  // notices defaults to [] (scripts/check-edge.mjs reads the same file)
+  expect: { ok: true; notices?: Found[] } | { ok: false; errors: Found[] };
 };
 
 const byPath = (a: { pathText: string; code: string }, b: typeof a) =>
@@ -19,16 +20,14 @@ const byPath = (a: { pathText: string; code: string }, b: typeof a) =>
     ? a.code.localeCompare(b.code)
     : a.pathText.localeCompare(b.pathText);
 
-/** code + pathText of each error, sorted, or { ok: true } */
+const found = (issues: readonly Found[]): Found[] =>
+  issues.map(({ code, pathText }) => ({ code, pathText })).sort(byPath);
+
+/** code + pathText of each error or notice, sorted */
 const summarize = (result: ValidateResult): Case["expect"] =>
   result.ok
-    ? { ok: true }
-    : {
-        ok: false,
-        errors: result.errors
-          .map(({ code, pathText }) => ({ code, pathText }))
-          .sort(byPath),
-      };
+    ? { ok: true, notices: found(result.notices) }
+    : { ok: false, errors: found(result.errors) };
 
 const expectOk = (result: ValidateResult) => {
   if (!result.ok) throw new Error(JSON.stringify(result.errors, null, 2));
@@ -359,8 +358,8 @@ describe("validatePage with the 8 blocks", () => {
     ({ input, expect: expected }) => {
       const normalized =
         expected.ok === true
-          ? expected
-          : { ok: false, errors: [...expected.errors].sort(byPath) };
+          ? { ok: true, notices: found(expected.notices ?? []) }
+          : { ok: false, errors: found(expected.errors) };
 
       expect(summarize(validatePage(input))).toEqual(normalized);
       expect(summarize(validatePageJson(JSON.stringify(input)))).toEqual(

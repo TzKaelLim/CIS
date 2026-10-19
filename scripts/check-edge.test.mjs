@@ -86,7 +86,33 @@ test("gzipSize measures gzip -9", () => {
 test("summarize keeps code and pathText, sorted by path", () => {
   assert.deepEqual(summarize({ ok: true, data: {}, notices: [] }), {
     ok: true,
+    notices: [],
   });
+  assert.deepEqual(
+    summarize({
+      ok: true,
+      data: {},
+      notices: [
+        {
+          code: "richtext_cleaned",
+          pathText: "content[1].props.body",
+          message: "…",
+        },
+        {
+          code: "richtext_cleaned",
+          pathText: "content[0].props.body",
+          message: "…",
+        },
+      ],
+    }),
+    {
+      ok: true,
+      notices: [
+        { code: "richtext_cleaned", pathText: "content[0].props.body" },
+        { code: "richtext_cleaned", pathText: "content[1].props.body" },
+      ],
+    }
+  );
   assert.deepEqual(
     summarize({
       ok: false,
@@ -137,6 +163,39 @@ test("compareCases reports each function whose result differs", () => {
   );
 });
 
+test("compareCases checks the notices of a valid page", () => {
+  const notice = {
+    code: "richtext_cleaned",
+    pathText: "content[0].props.body",
+  };
+  // A bundle whose rich text cleaning is broken: it passes the page as it is
+  const cleansNothing = {
+    validatePage: () => ({ ok: true, data: {}, notices: [] }),
+    validatePageJson: () => ({
+      ok: true,
+      data: {},
+      notices: [{ ...notice, message: "…" }],
+    }),
+  };
+  const cases = [
+    {
+      name: "needs cleaning",
+      input: { root: { props: {} }, content: [] },
+      expect: { ok: true, notices: [notice] },
+    },
+    {
+      name: "clean",
+      input: { root: { props: {} }, content: [] },
+      expect: { ok: true },
+    },
+  ];
+
+  assert.deepEqual(
+    compareCases(cleansNothing, cases).map(({ name, fn }) => `${name} ${fn}`),
+    ["needs cleaning validatePage", "clean validatePageJson"]
+  );
+});
+
 test("compareWithSource reports results that differ beyond the codes", () => {
   const validator = (data) => ({
     validatePage: () => ({ ok: true, data, notices: [] }),
@@ -176,6 +235,7 @@ test("rawInputs builds bodies at the byte and block limits", () => {
       "too_large",
       "too_large",
       null,
+      "too_large",
       "invalid_json",
       "invalid_json",
       "too_many_blocks",
@@ -187,7 +247,10 @@ test("rawInputs builds bodies at the byte and block limits", () => {
   assert.ok(raws[1].raw instanceof Uint8Array);
   assert.equal(bytes(raws[1].raw), bytes(raws[0].raw));
   assert.equal(bytes(raws[2].raw), limits.maxBytes);
-  assert.equal(JSON.parse(raws[5].raw).content.length, limits.maxBlocks + 1);
+  // Within the limit; the links' filled-in attributes take it over
+  assert.ok(bytes(raws[3].raw) <= limits.maxBytes);
+  assert.ok(bytes(raws[3].raw) > limits.maxBytes - 1024);
+  assert.equal(JSON.parse(raws[6].raw).content.length, limits.maxBlocks + 1);
 });
 
 test("checkRawCodes reports a result other than the expected code", () => {

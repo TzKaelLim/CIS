@@ -6,8 +6,9 @@
 //   2. gzip -9 keeps it within 60 KB;
 //   3. it returns exactly the same results as the source (loaded with tsx)
 //      for the shared cases in packages/blocks/src/__fixtures__/
-//      validator-cases.json and for generated raw inputs (size, JSON and
-//      block count limits), and the expected codes for both.
+//      validator-cases.json (rich text that needs cleaning included) and for
+//      generated raw inputs (size, JSON and block count limits), and the
+//      expected error and notice codes for both.
 //
 // Usage: node scripts/check-edge.mjs
 import { existsSync, readFileSync, realpathSync } from "node:fs";
@@ -75,26 +76,29 @@ const byPath = (a, b) =>
     ? a.code.localeCompare(b.code)
     : a.pathText.localeCompare(b.pathText);
 
-/** { ok: true }, or the code and pathText of each error, sorted (as in validator.spec.ts). */
+const found = (issues) =>
+  issues.map(({ code, pathText }) => ({ code, pathText })).sort(byPath);
+
+/** The code and pathText of each notice or error, sorted (as in validator.spec.ts). */
 export function summarize(result) {
   return result.ok
-    ? { ok: true }
-    : {
-        ok: false,
-        errors: result.errors
-          .map(({ code, pathText }) => ({ code, pathText }))
-          .sort(byPath),
-      };
+    ? { ok: true, notices: found(result.notices) }
+    : { ok: false, errors: found(result.errors) };
 }
 
-/** Runs each case through validatePage and validatePageJson; returns where the codes differ from the case's expect. */
+/**
+ * Runs each case through validatePage and validatePageJson; returns where the
+ * codes differ from the case's expect. A valid case lists the notices it
+ * expects (none when `notices` is left out), so a bundle whose rich text
+ * cleaning is broken fails here too.
+ */
 export function compareCases(validator, cases) {
   const failures = [];
 
   for (const { name, input, expect: expected } of cases) {
     const wanted = expected.ok
-      ? { ok: true }
-      : { ok: false, errors: [...expected.errors].sort(byPath) };
+      ? { ok: true, notices: found(expected.notices ?? []) }
+      : { ok: false, errors: found(expected.errors) };
     const results = {
       validatePage: summarize(validator.validatePage(structuredClone(input))),
       validatePageJson: summarize(
@@ -113,6 +117,36 @@ export function compareCases(validator, cases) {
 }
 
 const utf8Length = (text) => new TextEncoder().encode(text).length;
+
+/**
+ * A Paragraph of links written with only their href, as close to maxBytes as
+ * it gets: cleaning fills in each link's other attributes, which takes the
+ * data over the limit.
+ */
+function growingPage(maxBytes) {
+  const link =
+    '{"type":"text","marks":[{"type":"link","attrs":{"href":"/register"}}],"text":"報名"},{"type":"text","text":"、"}';
+  const shell = JSON.stringify({
+    root: { props: {} },
+    content: [
+      {
+        type: "Paragraph",
+        props: {
+          id: "Paragraph-1",
+          body: { type: "doc", content: [{ type: "paragraph", content: [] }] },
+        },
+      },
+    ],
+  });
+  const count = Math.floor(
+    (maxBytes - utf8Length(shell)) / (utf8Length(link) + 1)
+  );
+
+  return shell.replace(
+    '"content":[]',
+    `"content":[${new Array(count).fill(link).join(",")}]`
+  );
+}
 
 /**
  * Raw request bodies that validator-cases.json cannot hold (spec §6.2 #1, #2,
@@ -144,6 +178,11 @@ export function rawInputs({ maxBytes, maxBlocks }) {
       name: `exactly ${maxBytes} bytes`,
       raw: small + " ".repeat(maxBytes - utf8Length(small)),
       code: null,
+    },
+    {
+      name: `within ${maxBytes} bytes, over them once cleaned`,
+      raw: growingPage(maxBytes),
+      code: "too_large",
     },
     { name: "invalid JSON", raw: "{", code: "invalid_json" },
     {
