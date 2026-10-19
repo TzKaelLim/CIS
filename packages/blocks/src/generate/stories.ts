@@ -29,9 +29,14 @@ const literal = (value: unknown): string => JSON.stringify(value);
  * and one story per example. Every story renders a one-block page with the
  * RSC Render, so Storybook shows the same HTML as the public page.
  * The output is formatted with Prettier 2 and the repo's Prettier config for
- * the file's path, the same as `pnpm format:check`.
+ * the file's path, the same as `pnpm format:check`. `packageDir` is the
+ * absolute path of packages/blocks, given by the caller so this module does
+ * not depend on CommonJS's __dirname.
  */
-export function renderStoryFile(spec: AnyBlockSpec): string {
+export function renderStoryFile(
+  spec: AnyBlockSpec,
+  packageDir: string
+): string {
   const defaults = toStoryArgs(spec);
   const examples = spec.examples.map(
     (example, index) =>
@@ -64,11 +69,12 @@ export function renderStoryFile(spec: AnyBlockSpec): string {
     ...examples.flatMap((story) => ["", story]),
   ].join("\n");
 
-  // packages/blocks/<story path>: the config that format:check uses for it
-  const filepath = join(__dirname, "../..", storyFilePath(spec));
+  // packages/blocks/<story path>: the config that format:check uses for it,
+  // which also reads .editorconfig (the Prettier 2 CLI does by default)
+  const filepath = join(packageDir, storyFilePath(spec));
 
   return prettier.format(source, {
-    ...prettier.resolveConfig.sync(filepath),
+    ...prettier.resolveConfig.sync(filepath, { editorconfig: true }),
     filepath,
   });
 }

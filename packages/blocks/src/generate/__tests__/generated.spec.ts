@@ -5,7 +5,7 @@ import { findStoryFiles } from "../disk";
 import { generateFiles } from "../files";
 
 const packageDir = join(__dirname, "../../..");
-const files = generateFiles();
+const files = generateFiles(packageDir);
 
 const readOrNull = (path: string): string | null => {
   const target = join(packageDir, path);

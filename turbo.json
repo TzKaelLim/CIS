@@ -30,6 +30,8 @@
       "dependsOn": ["^build"],
       "inputs": [
         "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/.editorconfig",
+        "$TURBO_ROOT$/.prettierrc.json",
         "$TURBO_ROOT$/vendor/uikit/**",
         "$TURBO_ROOT$/apps/showcase/public/demo-assets/**"
       ]

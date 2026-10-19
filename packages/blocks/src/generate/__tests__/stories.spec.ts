@@ -9,6 +9,8 @@ import {
   storyId,
 } from "../stories";
 
+const packageDir = join(__dirname, "../../..");
+
 describe("story files", () => {
   it("names folders, files and ids after the block type", () => {
     expect(blockFolder("TagList")).toBe("tag-list");
@@ -25,7 +27,7 @@ describe("story files", () => {
   it.each(blockSpecs.map((spec) => [spec.type, spec] as const))(
     "%s: CSF3 with the spec's title, defaults, argTypes and examples",
     (_type, spec) => {
-      const source = renderStoryFile(spec);
+      const source = renderStoryFile(spec, packageDir);
 
       expect(source.startsWith(`${GENERATED_HEADER}\n`)).toBe(true);
       expect(source).toContain(
@@ -54,11 +56,12 @@ describe("story files", () => {
         expect(source).toContain(`name: ${JSON.stringify(example.name)}`);
       }
 
-      const filepath = join(__dirname, "../../..", storyFilePath(spec));
+      const filepath = join(packageDir, storyFilePath(spec));
 
+      // the options `pnpm format:check` uses for the file, .editorconfig included
       expect(
         prettier.format(source, {
-          ...prettier.resolveConfig.sync(filepath),
+          ...prettier.resolveConfig.sync(filepath, { editorconfig: true }),
           filepath,
         })
       ).toBe(source);

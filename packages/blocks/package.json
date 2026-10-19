@@ -20,7 +20,7 @@
   },
   "scripts": {
     "lint": "eslint \"**/*.ts*\"",
-    "test": "jest",
+    "test": "jest --ci",
     "typecheck": "tsc -p tsconfig.json"
   },
   "dependencies": {

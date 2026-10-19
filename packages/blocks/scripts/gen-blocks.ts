@@ -16,62 +16,64 @@ import {
   describeContractProblem,
 } from "../src/generate/contracts";
 import { findStoryFiles, readSnapshots } from "../src/generate/disk";
-import { generateFiles } from "../src/generate/files";
-import { GENERATED_HEADER } from "../src/generate/stories";
+import { generateFiles, planGeneration } from "../src/generate/files";
 import { blockSpecs } from "../src/specs";
 
 // process.argv[1] is this script's path under tsx in both module formats
 const packageDir = resolve(dirname(process.argv[1]), "..");
 
-const problems = checkContracts(
-  blockSpecs,
-  readSnapshots(join(packageDir, "generated/schemas"))
-).filter((problem) => problem.kind !== "missing");
+const read = (path: string): string | null => {
+  const target = join(packageDir, path);
 
-if (problems.length > 0) {
+  return existsSync(target) ? readFileSync(target, "utf8") : null;
+};
+
+// planGeneration (src/generate/files.ts, tested in files.spec.ts) decides
+// everything; this script only carries it out.
+const files = generateFiles(packageDir);
+const plan = planGeneration({
+  files,
+  problems: checkContracts(
+    blockSpecs,
+    readSnapshots(join(packageDir, "generated/schemas"))
+  ),
+  read,
+  storyFiles: findStoryFiles(packageDir),
+});
+
+if (!plan.ok) {
   console.error("gen:blocks: nothing written; fix the specs first:");
-  for (const problem of problems) {
+  for (const problem of plan.problems) {
     console.error(`  ${describeContractProblem(problem)}`);
   }
   process.exit(1);
 }
 
-const files = generateFiles();
-let written = 0;
-
-for (const file of files) {
+for (const file of plan.write) {
   const target = join(packageDir, file.path);
-  const current = existsSync(target) ? readFileSync(target, "utf8") : null;
-
-  // Unchanged files are left alone. An existing snapshot can only differ in
-  // formatting here: checkContracts above stops on any change to a contract.
-  if (current === file.contents) continue;
 
   mkdirSync(dirname(target), { recursive: true });
   writeFileSync(target, file.contents);
-  written++;
   console.log(`gen:blocks: wrote ${file.path}`);
 }
 
-const expected = new Set(files.map((file) => file.path));
-let deleted = 0;
+for (const path of plan.keep) {
+  console.warn(
+    `gen:blocks: ${path} differs from a fresh snapshot in formatting only; snapshots never change once committed, so restore it from git`
+  );
+}
 
-for (const path of findStoryFiles(packageDir)) {
-  if (expected.has(path)) continue;
+for (const path of plan.remove) {
+  rmSync(join(packageDir, path));
+  console.log(`gen:blocks: deleted ${path} (its block is gone)`);
+}
 
-  const target = join(packageDir, path);
-
-  if (readFileSync(target, "utf8").startsWith(GENERATED_HEADER)) {
-    rmSync(target);
-    deleted++;
-    console.log(`gen:blocks: deleted ${path} (its block is gone)`);
-  } else {
-    console.warn(
-      `gen:blocks: ${path} was not generated; stories are generated from the specs, so remove it`
-    );
-  }
+for (const path of plan.foreign) {
+  console.warn(
+    `gen:blocks: ${path} was not generated; stories are generated from the specs, so remove it`
+  );
 }
 
 console.log(
-  `gen:blocks: ${files.length} files checked, ${written} written, ${deleted} deleted`
+  `gen:blocks: ${files.length} files checked, ${plan.write.length} written, ${plan.remove.length} deleted`
 );
