@@ -141,13 +141,15 @@ packages/blocks/
 
 ## Edge 單檔驗證器
 
-`pnpm build`（或 `pnpm --filter @tzuchi/tceditor-blocks build`）以 esbuild 把 `src/validator.ts` 打包成 `dist/validator.edge.mjs`：單一 ESM 檔，內含 zod、`@tzuchi/tceditor/rules` 與 8 個區塊的規格，可在 Supabase Edge Function 這類環境直接 import：
+`pnpm build` 以 esbuild 把 `src/validator.ts` 打包成 `dist/validator.edge.mjs`：單一 ESM 檔，內含 zod、`@tzuchi/tceditor/rules` 與 8 個區塊的規格，可在 Supabase Edge Function 這類環境直接 import：
 
 ```ts
 import { validatePageJson } from "./validator.edge.mjs";
 ```
 
-`pnpm check:edge` 確認它不 import 任何外部模組（包括 `node:` 模組）、沒有 `react` 與 `@tiptap` 字樣、gzip 後不超過 60 KB，並用 `src/__fixtures__/validator-cases.json` 比對它與原始碼版的結果。在真正的 edge-runtime 上執行是 S3 的工作。
+打包的是 core 已建置的 `dist/rules.mjs`。`pnpm build` 經由 turbo 先重建 core；只建置本套件時要用 `pnpm exec turbo run build --filter=@tzuchi/tceditor-blocks`，它同樣會先建置 core。`pnpm --filter @tzuchi/tceditor-blocks build` 只執行 `scripts/build-edge.mjs`，core 的 `dist` 是什麼版本就打包什麼版本：修改 core（例如 `isSafeHref` 或 normalize）之後若沒有重建，打包出來的仍是舊規則，而 `pnpm check:edge` 抓不到這種情況，因為它比對的原始碼版也讀同一份過期的 core `dist`。
+
+`pnpm check:edge` 確認它不 import 任何外部模組（包括 `node:` 模組）、沒有 `react` 與 `@tiptap` 字樣、gzip 後不超過 60 KB，並用 `src/__fixtures__/validator-cases.json` 與依上限產生的原始輸入（大小、JSON、區塊數）比對它與原始碼版的完整結果（資料、提示與訊息）。案例檔也寫明預期的提示，其中幾筆是需要清理的富文字（不安全的連結、欄位不開放的節點與格式、對齊方式、只寫 href 的連結），所以打包版的富文字清理和原始碼版不同時，檢查會失敗。在真正的 edge-runtime 上執行是 S3 的工作。
 
 ## 測試
 

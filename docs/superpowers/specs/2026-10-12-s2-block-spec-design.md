@@ -685,6 +685,7 @@ uikit 的 `variant` 另有 `danger`、`danger-soft`、`ghost`、`tertiary`，初
 | `AssetSource` 介面 | S3 | 媒體庫要實作的介面 |
 | 上限：2 MB、32 層、5,000 個區塊 | S3、S4 | API 層必須在資料庫之前擋下 |
 | 「頁面資料不記錄版本號」的約定 | S3 | 第 4.6 節 |
+| 驗證器放行 `\u0000` 與不成對的 surrogate | S3 | 通過驗證的資料的字串可能含這兩種字元（JSON 允許），Postgres `jsonb` 會拒收；寫進 `jsonb` 之前要拒絕（最好在驗證器加檢查，回 422）或替換 |
 
 ## 16. 風險
 

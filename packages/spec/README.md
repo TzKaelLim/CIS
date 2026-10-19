@@ -53,7 +53,7 @@ export const buttonSpec = defineBlockSpec({
 - 頁面根節點用 `definePageRoot({ label?, props })` 宣告，`label` 預設「頁面」。
 - 寫法規則的完整清單在 `CLAUDE.md` 的 Spec rules：`checkSpecRules` 檢查規格本身，ESLint 檢查 `packages/blocks/src/` 底下名為 `spec.ts` 的檔案（規則由 `scripts/eslint-rules.test.mjs` 鎖住），文字用中文則是慣例，只靠 review。重點：
   - 物件一律 `z.strictObject`；每個欄位只有一種 JSON 型別（不用 `.nullable()` 與 union）。
-  - 清單的項目是 `z.strictObject({...})`，不能直接放輔助函式的值：圖片清單寫成 `z.array(z.strictObject({ image: image() }))`。清單一定要有 `.max()`（`object-arrays` 規則：驗證器只檢查到清單上限多 1 項，所以它的工作量受上限約束，與頁面中清單欄位的長度無關；富文字文件則受 2 MB 的上限約束）。
+  - 清單的項目是 `z.strictObject({...})`，不能直接放輔助函式的值：圖片清單寫成 `z.array(z.strictObject({ image: image() }))`。清單一定要有 `.max()`（`object-arrays` 規則：驗證器只檢查到清單上限多 1 項，所以它的工作量受上限約束，與頁面中清單欄位的長度無關；富文字文件的工作量與記憶體則和文件的大小成正比，受 2 MB 的上限約束）。
   - `.meta()` 放在鏈的最後、只呼叫一次；每個欄位都要有 `title`（慣例是中文）。
   - 不宣告 `id`，欄位名稱也不得是 `puck`、`editMode`、`children`（Puck 傳給畫面的 props）、`key`、`ref`（React 不交給元件），或 `constructor`、`toString` 這類 `Object.prototype` 的名稱。
   - `spec.ts` 不用 `.refine()`、`.transform()`、`.slugify()`、`.with()`、`.apply()` 這類 JSON Schema 表達不了或會悄悄改值的方法，也不用 `z.stringbool()`、`z.codec()`；數字只用 `.int()`、`.min()`、`.max()` 限制（不用 `.gt()`、`.positive()`、`.multipleOf()` 這類寫法，`checkSpecRules` 也拒絕它們產生的 `multipleOf`、`exclusiveMinimum`、`exclusiveMaximum`）。
@@ -152,14 +152,16 @@ export function save(rawBody: string) {
     // result.errors：{ path, pathText, blockType, code, message }[]
     return { status: 422, errors: result.errors };
   }
-  // 只存 result.data：已補齊預設值、清理過富文字。result.notices 是清理的提示
+  // 只存 result.data：已補齊預設值、清理過富文字，大小也在上限內。
+  // result.notices 是清理的提示。字串可能含 \u0000 與不成對的 surrogate，
+  // Postgres 的 jsonb 會拒收：寫進 jsonb 之前要拒絕或替換它們
   return { status: 200, data: result.data, notices: result.notices };
 }
 ```
 
 - `createPageValidator` 建立時先跑 `checkSpecRules`，規格有問題就拋出錯誤。
-- 上限（`DEFAULT_LIMITS`，可用 `limits` 覆寫）：原始資料 2,097,152 bytes（以 UTF-8 計，在解析 JSON 之前檢查）、巢狀 32 層（頂層區塊是第 1 層）、5,000 個區塊、最多回報 100 筆。只有 `validatePageJson` 會量大小，所以收到請求內容的程式要用它，不要自己 `JSON.parse` 之後再呼叫 `validatePage`。
-- 驗證器不依頁面的深度遞迴（2 MB 的 JSON 可以寫出約 4 萬層）：以明確的 stack 走訪區塊，超過 32 層的區塊不再進入，也從不複製整頁。測試 `stops at level 33 of a 30,000-level page without overflowing the stack` 確認這一點。
+- 上限（`DEFAULT_LIMITS`，可用 `limits` 覆寫）：原始資料 2,097,152 bytes（以 UTF-8 計，在解析 JSON 之前檢查）、巢狀 32 層（頂層區塊是第 1 層）、5,000 個區塊、最多回報 100 筆。只有 `validatePageJson` 會量大小，所以收到請求內容的程式要用它，不要自己 `JSON.parse` 之後再呼叫 `validatePage`。它也量回傳的 `data`（`JSON.stringify` 之後）：補上的預設值與清理時補齊的連結屬性會讓資料變大，超過上限同樣回 `too_large`，所以存下的資料再送一次一定通過。
+- 驗證器不依頁面的深度遞迴（2 MB 的 JSON 可以寫出約 4 萬層）：以明確的 stack 走訪區塊，超過 32 層的區塊不再進入，也從不複製整頁。測試 `stops at level 33 of a 30,000-level page without overflowing the stack` 確認這一點。比較富文字有沒有被清理（`isRichTextChanged`）時同時走訪送來的與清理後的文件，不複製、遇到第一個差異就停止，所以不會因為節點很多而多用記憶體；`memory.spec.ts` 在 heap 只有 96 MB 的子 process 裡驗證由大量極小節點組成的 2 MB 頁面。
 - id 符合 `NODE_ID_PATTERN`（`^[A-Za-z0-9_-]{1,64}$`），不是 `root`，整頁不重複。
 - 富文字是唯一會被修正的欄位：先 `normalizeRichText`，再依欄位的 `features` 過濾；內容真的改變時才記一筆 `richtext_cleaned` 提示。比較時忽略值為 `null` 的屬性與空的 `attrs`、`content`、`marks`，所以編輯器送出的內容與 `textToRichText` 的結果不會產生提示。其他問題一律拒絕。
 - `path` 指向出錯的位置：`unknown_type` 是 `<節點>.type`；`not_allowed_here` 是子區塊本身；`invalid_id` 與 `duplicate_id` 是 `<節點>.props.id`（重複時回報第二次出現的那一個）；`legacy_zones` 是 `zones`；富文字內部的問題截到欄位本身。同一個路徑只回報一筆，所以維持預設值的圖片欄位有兩筆：`<欄位>.assetId`（`invalid_value`）與 `<欄位>.alt`（`alt_required`）。
@@ -167,7 +169,7 @@ export function save(rawBody: string) {
 
 | `code`             | 意義                                                               |
 | ------------------ | ------------------------------------------------------------------ |
-| `too_large`        | 原始資料超過 2 MB                                                  |
+| `too_large`        | 原始資料，或補上預設值、清理富文字之後的資料超過 2 MB              |
 | `invalid_json`     | 不是合法的 JSON                                                    |
 | `invalid_shape`    | 頂層、`root` 或節點的結構不對，例如多出 `type`、`props` 以外的欄位 |
 | `legacy_zones`     | 使用舊的 DropZone `zones` 格式（只接受空物件）                     |
