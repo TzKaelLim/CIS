@@ -9,6 +9,19 @@ import { basename, dirname, join } from "node:path";
 // edge validator. A vulnerable package that ships with one of them fails the
 // gate. Findings anywhere else (apps/demo, build and lint tooling) are
 // printed but do not fail it.
+//
+// `pnpm audit` never checks `link:` dependencies: pnpm 10 leaves them out of
+// the tree it audits. packages/blocks takes @heroui/styles and @tzuchi/tokens
+// that way from the vendored uikit snapshot (vendor/uikit), so
+// shippedPackages() counts them as shipped, but no advisory is ever matched
+// against them. That is acceptable because they bring no dependencies of
+// their own into the install: pnpm installs nothing for a `link:` package, so
+// packages/blocks declares @heroui/styles's runtime dependencies
+// (tailwind-variants, tw-animate-css) itself and they are audited there
+// (audit-gate-lib.test.mjs checks this), and @tzuchi/tokens has none. What
+// stays unaudited is the vendored code itself, a pinned uikit commit rather
+// than an npm release: follow HeroUI's advisories by hand until S3 installs
+// the uikit packages from a registry.
 export const GATED_IMPORTERS = [
   "packages/core",
   "packages/plugin-heading-analyzer",

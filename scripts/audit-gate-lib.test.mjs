@@ -2,12 +2,13 @@ import assert from "node:assert/strict";
 import {
   mkdirSync,
   mkdtempSync,
+  readFileSync,
   rmSync,
   symlinkSync,
   writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { after, test } from "node:test";
 
 import {
@@ -103,6 +104,38 @@ test("the gate covers the published packages", () => {
   assert.deepEqual(BUNDLED_DEV_DEPENDENCIES, {
     "packages/core": ["css-box-model", "lucide-react"],
   });
+});
+
+// pnpm audit skips `link:` dependencies and pnpm installs nothing for them
+// (see GATED_IMPORTERS), so their runtime dependencies are only installed and
+// audited when the gated project declares them too, at the same version.
+test("the runtime dependencies of a link: dependency are the gated project's own", () => {
+  const repoRoot = join(import.meta.dirname, "..");
+  const manifest = (dir) =>
+    JSON.parse(readFileSync(join(dir, "package.json"), "utf8"));
+  const linked = [];
+
+  for (const importer of GATED_IMPORTERS) {
+    const dir = join(repoRoot, importer);
+    const own = manifest(dir).dependencies ?? {};
+
+    for (const [name, specifier] of Object.entries(own)) {
+      if (!specifier.startsWith("link:")) continue;
+
+      const target = manifest(resolve(dir, specifier.slice("link:".length)));
+
+      linked.push(name);
+      assert.deepEqual(target.optionalDependencies ?? {}, {}, name);
+
+      for (const [dependency, version] of Object.entries(
+        target.dependencies ?? {}
+      )) {
+        assert.equal(own[dependency], version, `${name} needs ${dependency}`);
+      }
+    }
+  }
+
+  assert.deepEqual(linked.sort(), ["@heroui/styles", "@tzuchi/tokens"]);
 });
 
 test("shippedPackages follows dependencies through pnpm symlinks", () => {

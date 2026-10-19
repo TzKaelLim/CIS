@@ -12,13 +12,20 @@ autoInstallPeers: true
 # Supply-chain mitigation: pnpm 10 only runs dependency lifecycle scripts for
 # packages listed in onlyBuiltDependencies. Keep this list minimal.
 onlyBuiltDependencies:
-  - esbuild # installs/verifies the platform binary used by tsup (core/plugin builds)
-  - puppeteer # downloads Chromium for the e2e smoke test (pnpm smoke)
+  # Installs and verifies esbuild's platform binary, which tsup (the core and
+  # plugin builds), tsx (gen:blocks), Vite (the Storybook build) and the
+  # scripts that call esbuild directly (the edge validator build, the uikit
+  # options scan) need
+  - esbuild
+  # Downloads the Chrome that pnpm storybook:smoke (part of pnpm verify) and
+  # the e2e smoke tests (pnpm smoke) drive
+  - puppeteer
 
-# Install scripts we deliberately skip. Each one only builds from source when
-# the prebuilt optional binary is missing. Listing them here silences pnpm's
-# "Ignored build scripts" warning.
+# Install scripts we deliberately skip, each with the reason it is safe.
+# Listing them here silences pnpm's "Ignored build scripts" warning.
 ignoredBuiltDependencies:
+  # The three below only build from source (or, for unrs-resolver, download)
+  # a binary when the prebuilt optional binary is missing.
   - "@parcel/watcher" # via sass (next, typescript-plugin-css-modules)
   - sharp # via next; the demo does not use next/image
   - unrs-resolver # via eslint-config-next's import resolver
