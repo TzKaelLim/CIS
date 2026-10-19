@@ -17,6 +17,7 @@ import { fileURLToPath } from "node:url";
 import {
   collectFiles,
   findForbidden,
+  NODE_BUILTIN_IMPORT,
   NODE_IMPORT,
   RULES_ENTRIES,
   RULES_FORBIDDEN,
@@ -37,7 +38,8 @@ const CJS_FOOTER =
 // rules.mjs -> rules-chunk.mjs (re-export), which imports React and happy-dom
 // rules.js mentions node: only in esbuild's CommonJS comment, and the rules
 // type declarations are clean
-// migrate.mjs and node-import.mjs are not reachable from any entry
+// migrate.mjs, node-import.mjs and builtin-import.mjs are not reachable from
+// any entry
 write("index.mjs", 'import { a } from "./shared.mjs";\nexport { a };\n');
 write("shared.mjs", 'export const a = () => import("./lazy.mjs");\n');
 write("lazy.mjs", 'import { generateJSON } from "@tiptap/html";\n');
@@ -56,6 +58,7 @@ write("rules.d.ts", "declare const a: number;\nexport { a };\n");
 write("rules.d.mts", "declare const a: number;\nexport { a };\n");
 write("migrate.mjs", 'import "happy-dom";\n');
 write("node-import.mjs", 'import { readFileSync } from "node:fs";\n');
+write("builtin-import.mjs", 'import { createHash } from "crypto";\n');
 
 test("collectFiles follows static, dynamic, bare and require imports and re-exports", () => {
   assert.deepEqual(collectFiles(dist, "index.mjs").sort(), [
@@ -137,6 +140,44 @@ test("NODE_IMPORT matches only imports and requires of node: modules", () => {
   }
 });
 
+test("the rules check reports imports of Node built-ins without the node: prefix", () => {
+  assert.deepEqual(
+    findForbidden(dist, ["builtin-import.mjs"], RULES_FORBIDDEN),
+    [
+      {
+        entry: "builtin-import.mjs",
+        file: "builtin-import.mjs",
+        name: NODE_BUILTIN_IMPORT.name,
+      },
+    ]
+  );
+});
+
+test("NODE_BUILTIN_IMPORT matches only imports and requires of Node built-ins", () => {
+  for (const source of [
+    'import { createHash } from "crypto";',
+    'export * from "fs";',
+    'import "path";',
+    'const fs = await import("fs/promises");',
+    "const os = require('os');",
+    'const util = require ( "util" );',
+    'import type { Buffer } from "buffer";',
+  ]) {
+    assert.ok(NODE_BUILTIN_IMPORT.pattern.test(source), source);
+  }
+
+  for (const source of [
+    CJS_FOOTER,
+    'import { a } from "./fs.mjs";',
+    'import CryptoJS from "crypto-js";',
+    'import { join } from "pathe";',
+    'import { readFileSync } from "node:fs";',
+    'const name = "fs";',
+  ]) {
+    assert.ok(!NODE_BUILTIN_IMPORT.pattern.test(source), source);
+  }
+});
+
 // Runs a copy of the CLI through a symlink: the copy in root/pkg/scripts/
 // checks root/pkg/dist, and root/link points to root/pkg. `files` replaces the
 // clean dist files; null leaves a file out
@@ -191,6 +232,19 @@ test("the CLI fails when the rules entry requires React", (t) => {
 
   assert.equal(status, 1);
   assert.match(stderr, /rules\.js reaches rules\.js, which mentions react/);
+  assert.match(stderr, /check:bundle FAILED: the rules entry/);
+});
+
+test("the CLI fails when the rules entry requires a Node built-in", (t) => {
+  const { status, stderr } = runCli(t, {
+    "rules.js": 'const { createHash } = require("crypto");\n',
+  });
+
+  assert.equal(status, 1);
+  assert.match(
+    stderr,
+    /rules\.js reaches rules\.js, which mentions an import of a Node built-in/
+  );
   assert.match(stderr, /check:bundle FAILED: the rules entry/);
 });
 

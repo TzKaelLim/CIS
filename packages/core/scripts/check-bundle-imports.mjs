@@ -4,11 +4,12 @@
 //   Those two are only for the richtext-migrate entry (server-side conversion
 //   of legacy HTML), and must never ship to public pages.
 // - the rules entry, including its type declarations, must also stay free of
-//   React, Tiptap and Node built-ins, so validators can bundle it for edge
-//   runtimes without React.
+//   React, Tiptap and Node built-in modules (node:fs as well as fs), so
+//   validators can bundle it for edge runtimes without React.
 //
 // Usage: node packages/core/scripts/check-bundle-imports.mjs (after pnpm build)
 import { existsSync, readFileSync, realpathSync } from "node:fs";
+import { builtinModules } from "node:module";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -36,7 +37,30 @@ export const NODE_IMPORT = {
   pattern:
     /(?:\bfrom\s*|\bimport\s*\(\s*|\bimport\s+|\brequire\s*\(\s*)["']node:/,
 };
-export const RULES_FORBIDDEN = ["react", "react-dom", "@tiptap/", NODE_IMPORT];
+const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+// The Node built-ins without the node: prefix, such as "fs", "crypto" or
+// "fs/promises" (builtinModules of the Node that runs the check). Bundlers
+// for edge runtimes resolve them no better than node:fs
+export const NODE_BUILTIN_IMPORT = {
+  name: "an import of a Node built-in",
+  pattern: new RegExp(
+    `(?:\\bfrom\\s*|\\bimport\\s*\\(\\s*|\\bimport\\s+|\\brequire\\s*\\(\\s*)(["'])(?:${builtinModules
+      .filter((name) => !name.startsWith("node:"))
+      .map(escapeRegExp)
+      .join("|")})\\1`
+  ),
+};
+export const RULES_FORBIDDEN = [
+  "react",
+  "react-dom",
+  "@tiptap/",
+  NODE_IMPORT,
+  NODE_BUILTIN_IMPORT,
+];
+
+const RULES_DESCRIPTION =
+  "import react, react-dom, @tiptap/* or Node built-in modules (node:fs or fs)";
 
 const CHECKS = [
   {
@@ -49,8 +73,7 @@ const CHECKS = [
   {
     entries: RULES_ENTRIES,
     forbidden: RULES_FORBIDDEN,
-    reason:
-      "the rules entry must not import react, react-dom, @tiptap/* or node:* modules.",
+    reason: `the rules entry must not ${RULES_DESCRIPTION}.`,
   },
 ];
 
@@ -163,6 +186,6 @@ if (isMain) {
       ", "
     )} do not mention ${FORBIDDEN.join(
       " or "
-    )}, and the rules entry does not import react, react-dom, @tiptap/* or node:* modules.`
+    )}, and the rules entry does not ${RULES_DESCRIPTION}.`
   );
 }
