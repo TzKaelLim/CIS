@@ -3,6 +3,7 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev --filter=demo",
+    "dev:showcase": "pnpm --filter @tzuchi/tceditor-showcase dev",
     "storybook": "pnpm --filter @tzuchi/tceditor-storybook dev",
     "storybook:build": "pnpm --filter @tzuchi/tceditor-storybook build",
     "storybook:smoke": "node scripts/storybook-smoke.mjs",

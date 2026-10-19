@@ -1,0 +1,302 @@
+{
+  "root": {
+    "props": {
+      "title": "2026 福隆淨灘志工日",
+      "description": "和慈濟志工一起守護海岸：活動時間、集合地點、報名方式與行前準備。"
+    }
+  },
+  "content": [
+    {
+      "type": "Heading",
+      "props": {
+        "id": "Heading-intro",
+        "text": "2026 福隆淨灘志工日",
+        "level": "h1",
+        "align": "center"
+      }
+    },
+    {
+      "type": "Image",
+      "props": {
+        "id": "Image-hero",
+        "image": {
+          "assetId": "demo-1",
+          "alt": "綠色山丘與黃色太陽的插畫",
+          "decorative": false
+        },
+        "ratio": "16:9",
+        "caption": "活動地點：新北市貢寮區福隆海水浴場"
+      }
+    },
+    {
+      "type": "Paragraph",
+      "props": {
+        "id": "Paragraph-intro",
+        "body": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "每年夏天，海灘上都會留下大量的塑膠垃圾。今年我們在"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "bold"
+                    }
+                  ],
+                  "text": "7 月 18 日（六）上午"
+                },
+                {
+                  "type": "text",
+                  "text": "回到福隆，歡迎全家一起參加。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "有任何問題，歡迎"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "link",
+                      "attrs": {
+                        "href": "mailto:volunteer@example.org",
+                        "target": "_blank",
+                        "rel": "noopener noreferrer nofollow",
+                        "class": null,
+                        "title": null
+                      }
+                    }
+                  ],
+                  "text": "寫信給活動小組"
+                },
+                {
+                  "type": "text",
+                  "text": "。"
+                }
+              ]
+            }
+          ]
+        },
+        "align": "start"
+      }
+    },
+    {
+      "type": "TagList",
+      "props": {
+        "id": "TagList-intro",
+        "tags": [
+          {
+            "label": "環保"
+          },
+          {
+            "label": "戶外"
+          },
+          {
+            "label": "親子"
+          }
+        ],
+        "color": "accent",
+        "variant": "soft"
+      }
+    },
+    {
+      "type": "Section",
+      "props": {
+        "id": "Section-details",
+        "background": "secondary",
+        "paddingY": "48",
+        "content": [
+          {
+            "type": "Heading",
+            "props": {
+              "id": "Heading-details",
+              "text": "活動資訊",
+              "level": "h2",
+              "align": "start"
+            }
+          },
+          {
+            "type": "Columns",
+            "props": {
+              "id": "Columns-details",
+              "columns": [
+                {
+                  "content": [
+                    {
+                      "type": "Card",
+                      "props": {
+                        "id": "Card-schedule",
+                        "title": "時間與地點",
+                        "summary": "上午 8:00 在福隆火車站前廣場集合，活動約 3 小時。",
+                        "href": "",
+                        "variant": "default",
+                        "content": [
+                          {
+                            "type": "Paragraph",
+                            "props": {
+                              "id": "Paragraph-schedule",
+                              "body": {
+                                "type": "doc",
+                                "content": [
+                                  {
+                                    "type": "paragraph",
+                                    "content": [
+                                      {
+                                        "type": "text",
+                                        "text": "請攜帶環保杯、帽子與防曬用品，工具由現場提供。"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              },
+                              "align": "start"
+                            }
+                          },
+                          {
+                            "type": "TagList",
+                            "props": {
+                              "id": "TagList-schedule",
+                              "tags": [
+                                {
+                                  "label": "免費參加"
+                                },
+                                {
+                                  "label": "限額 120 人"
+                                }
+                              ],
+                              "color": "default",
+                              "variant": "secondary"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                },
+                {
+                  "content": [
+                    {
+                      "type": "Card",
+                      "props": {
+                        "id": "Card-register",
+                        "title": "報名方式",
+                        "summary": "線上報名至 7 月 10 日，額滿為止。",
+                        "href": "mailto:volunteer@example.org",
+                        "variant": "secondary",
+                        "content": [
+                          {
+                            "type": "Paragraph",
+                            "props": {
+                              "id": "Paragraph-register",
+                              "body": {
+                                "type": "doc",
+                                "content": [
+                                  {
+                                    "type": "paragraph",
+                                    "content": [
+                                      {
+                                        "type": "text",
+                                        "text": "報名後會收到行前通知信，當天請出示報名序號。"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              },
+                              "align": "start"
+                            }
+                          },
+                          {
+                            "type": "Button",
+                            "props": {
+                              "id": "Button-register",
+                              "label": "立即報名",
+                              "href": "mailto:volunteer@example.org",
+                              "variant": "primary",
+                              "size": "md",
+                              "fullWidth": true
+                            }
+                          },
+                          {
+                            "type": "TagList",
+                            "props": {
+                              "id": "TagList-register",
+                              "tags": [
+                                {
+                                  "label": "線上報名"
+                                },
+                                {
+                                  "label": "7 月 10 日截止"
+                                }
+                              ],
+                              "color": "success",
+                              "variant": "soft"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ],
+              "gap": "24"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Columns",
+      "props": {
+        "id": "Columns-gallery",
+        "columns": [
+          {
+            "content": [
+              {
+                "type": "Image",
+                "props": {
+                  "id": "Image-gallery-1",
+                  "image": {
+                    "assetId": "demo-2",
+                    "alt": "海面上的夕陽插畫",
+                    "decorative": false
+                  },
+                  "ratio": "4:3",
+                  "caption": "傍晚的福隆海面"
+                }
+              }
+            ]
+          },
+          {
+            "content": [
+              {
+                "type": "Image",
+                "props": {
+                  "id": "Image-gallery-2",
+                  "image": {
+                    "assetId": "demo-4",
+                    "alt": "",
+                    "decorative": true
+                  },
+                  "ratio": "4:3",
+                  "caption": ""
+                }
+              }
+            ]
+          }
+        ],
+        "gap": "16"
+      }
+    }
+  ]
+}

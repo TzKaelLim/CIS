@@ -177,6 +177,8 @@ const config = [
       "**/storybook-static/**",
       "apps/storybook/.home/**",
       "apps/showcase/.data/**",
+      // eslint-config-next ignores .next/** relative to this file only
+      "apps/showcase/.next/**",
     ],
   },
   ...custom,

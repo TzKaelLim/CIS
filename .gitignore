@@ -50,3 +50,6 @@ dist
 apps/storybook/.home/
 apps/storybook/debug-storybook.log
 storybook-static/
+
+# Showcase: pages published through its publish API (delete to restore the preset)
+apps/showcase/.data/
