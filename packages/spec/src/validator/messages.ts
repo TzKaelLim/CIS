@@ -47,7 +47,8 @@ export type IdProblem =
   | { kind: "root" };
 
 export type MessageParams = {
-  too_large: { maxBytes: number };
+  /** `filled`: the request fit, the data with its defaults and cleaned rich text did not */
+  too_large: { maxBytes: number; filled?: boolean };
   invalid_json: { reason: "syntax" | "encoding" | "input" };
   invalid_shape: ShapeProblem;
   legacy_zones: { count: number };
@@ -211,8 +212,12 @@ const RICHTEXT_CLEANED =
 export const MESSAGES: {
   readonly [Code in IssueCode]: (params: MessageParams[Code]) => string;
 } = {
-  too_large: ({ maxBytes }) =>
-    `頁面資料超過上限：最多 ${formatBytes(maxBytes)}，以 UTF-8 計算。`,
+  too_large: ({ maxBytes, filled }) =>
+    filled
+      ? `頁面資料補上預設值、整理富文字之後超過上限：最多 ${formatBytes(
+          maxBytes
+        )}，以 UTF-8 計算。請減少一些內容。`
+      : `頁面資料超過上限：最多 ${formatBytes(maxBytes)}，以 UTF-8 計算。`,
   invalid_json: ({ reason }) =>
     reason === "encoding"
       ? "頁面資料不是合法的 UTF-8 文字。"

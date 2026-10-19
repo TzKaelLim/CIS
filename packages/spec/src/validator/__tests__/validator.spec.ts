@@ -429,6 +429,60 @@ describe("invalid pages", () => {
     ).toEqual([["", "too_large"]]);
   });
 
+  it("rejects a page whose data grows over the size limit", () => {
+    // A link sent with only its href gets target, rel, class and title
+    const linked = {
+      type: "text",
+      marks: [{ type: "link", attrs: { href: "/register" } }],
+      text: "報名",
+    };
+    const content = Array.from({ length: 20 }, () => [
+      linked,
+      { type: "text", text: "、" },
+    ]).flat();
+    const json = JSON.stringify(
+      page([
+        kitchenSink("k", {
+          body: { type: "doc", content: [{ type: "paragraph", content }] },
+        }),
+      ])
+    );
+    const bytes = (text: string) => new TextEncoder().encode(text).byteLength;
+    const withLimit = (maxBytes: number) =>
+      createPageValidator({
+        blocks: testBlocks,
+        root: testRoot,
+        limits: { maxBytes },
+      });
+    const stored = JSON.stringify(
+      accepted(validator.validatePageJson(json)).data
+    );
+
+    expect(bytes(stored)).toBeGreaterThan(bytes(json));
+
+    // The request fits the limit, the data to store does not
+    const exact = withLimit(bytes(json));
+    const result = exact.validatePageJson(json);
+
+    expect(errorsOf(result)).toEqual([["", "too_large"]]);
+    expect(!result.ok && result.errors[0].message).toMatch(
+      /^頁面資料補上預設值、整理富文字之後超過上限/
+    );
+    expect(
+      errorsOf(exact.validatePageJson(new TextEncoder().encode(json)))
+    ).toEqual([["", "too_large"]]);
+    // validatePage does not measure sizes
+    expect(exact.validatePage(JSON.parse(json)).ok).toBe(true);
+
+    // Once the data fits, it can be sent again as it was stored
+    const roomy = withLimit(bytes(stored));
+
+    expect(accepted(roomy.validatePageJson(json)).data).toEqual(
+      JSON.parse(stored)
+    );
+    expect(accepted(roomy.validatePageJson(stored)).notices).toEqual([]);
+  });
+
   it("rejects the legacy zones format", () => {
     expect(
       errorsOf(

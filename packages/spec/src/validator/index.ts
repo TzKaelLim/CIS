@@ -18,7 +18,9 @@ export type PageValidator = {
   /**
    * Checks the size in UTF-8 bytes (strings through TextEncoder), then
    * JSON.parse, then validatePage. A leading byte order mark is ignored, in a
-   * string as in bytes (RFC 8259 §8.1, like fetch's Response.json()).
+   * string as in bytes (RFC 8259 §8.1, like fetch's Response.json()). The
+   * data it returns is within the size limit too (JSON.stringify of `data`),
+   * so stored data passes again when it is sent back.
    */
   validatePageJson(raw: string | Uint8Array): ValidateResult;
   blockTypes: readonly string[];
@@ -103,8 +105,16 @@ export function createPageValidator(options: {
       .map((spec) => `${spec.label}（${spec.type}）`),
   };
   const encoder = new TextEncoder();
-  const tooLarge = () =>
-    pageError("too_large", MESSAGES.too_large({ maxBytes: limits.maxBytes }));
+  // A UTF-16 code unit is never less than one UTF-8 byte, so a longer string
+  // is too large without encoding it.
+  const isTooLarge = (text: string) =>
+    text.length > limits.maxBytes ||
+    encoder.encode(text).byteLength > limits.maxBytes;
+  const tooLarge = (filled = false) =>
+    pageError(
+      "too_large",
+      MESSAGES.too_large({ maxBytes: limits.maxBytes, filled })
+    );
 
   const validatePage = (data: unknown): ValidateResult =>
     walkPage(data, context);
@@ -113,14 +123,7 @@ export function createPageValidator(options: {
     let text: string;
 
     if (typeof raw === "string") {
-      // A UTF-16 code unit is never less than one UTF-8 byte, so a longer
-      // string is too large without encoding it.
-      if (
-        raw.length > limits.maxBytes ||
-        encoder.encode(raw).byteLength > limits.maxBytes
-      ) {
-        return tooLarge();
-      }
+      if (isTooLarge(raw)) return tooLarge();
 
       // TextDecoder drops a leading BOM from bytes; do the same for strings
       text = raw.charCodeAt(0) === BOM ? raw.slice(1) : raw;
@@ -153,7 +156,16 @@ export function createPageValidator(options: {
       );
     }
 
-    return validatePage(data);
+    const result = validatePage(data);
+
+    // Filled-in defaults and cleaned rich text can make the data larger than
+    // the request: a link sent with only its href gets four more attributes.
+    // Data over the limit could be stored but never sent again.
+    if (result.ok && isTooLarge(JSON.stringify(result.data))) {
+      return tooLarge(true);
+    }
+
+    return result;
   };
 
   return {
