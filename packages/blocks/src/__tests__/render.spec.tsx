@@ -4,23 +4,42 @@ import { join } from "node:path";
 import { Render as ClientRender, type Data } from "@tzuchi/tceditor";
 import { Render } from "@tzuchi/tceditor/rsc";
 import {
+  fitRichTextToTypes,
+  richTextFeaturesToTypes,
+  textToRichText,
+} from "@tzuchi/tceditor/rules";
+import {
+  choice,
   defineBlockSpec,
+  diffContracts,
+  eachField,
   exampleToPageData,
   fieldKindOf,
   image,
   isJsonSchemaNode,
+  richText,
   slot,
+  slotLocations,
+  toDataContract,
+  toDefaultProps,
   toJsonSchema,
 } from "@tzuchi/tceditor-spec";
 import type { BlockNode, JsonSchema, PageData } from "@tzuchi/tceditor-spec";
-import type { ReactNode } from "react";
+import { createPageValidator } from "@tzuchi/tceditor-spec/validator";
+import { forwardRef, lazy, memo, type ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import * as z from "zod";
 import { demoAssetSource } from "../demo-assets";
 import { createEditorConfig } from "../editor-config";
+import type { headingSpec } from "../heading/spec";
+import { HeadingView } from "../heading/view";
 import type { ResolvedImage } from "../image/view";
-import { buildRenderConfig, createRenderConfig } from "../render-config";
-import { blockSpecs } from "../specs";
+import {
+  buildRenderConfig,
+  createRenderConfig,
+  type ViewProps,
+} from "../render-config";
+import { blockSpecs, pageRootSpec } from "../specs";
 import { validatePage } from "../validator";
 import { views } from "../views";
 
@@ -181,6 +200,50 @@ describe("block views through RSC Render", () => {
       expect(markup).toBe(
         `<main class="tcb-page tcb-stack"><${level} class="typography typography--align-center typography--color-default typography--${level}">淨灘活動</${level}></main>`
       );
+    }
+  );
+
+  // Render must not trust its data: a page that never went through the
+  // validator (a draft preview, a stored page edited by hand) must not pick
+  // the element a view renders.
+  it.each(["script", "img", "__proto__", "constructor", 2])(
+    "renders a Heading whose level is %p as h2, never as that element",
+    (level) => {
+      const raw = onePage({
+        type: "Heading",
+        props: {
+          id: "Heading-1",
+          text: "alert(document.domain)",
+          level,
+          align: "start",
+        },
+      });
+      expect(validatePage(raw).ok).toBe(false);
+      expect(html(raw as PageData)).toBe(
+        '<main class="tcb-page tcb-stack"><h2 class="typography typography--align-start typography--color-default typography--h2">alert(document.domain)</h2></main>'
+      );
+    }
+  );
+
+  it.each(blockSpecs.map((spec) => ({ type: spec.type, spec })))(
+    "$type takes no element from a choice field",
+    ({ spec }) => {
+      const props: Record<string, unknown> = {
+        ...toDefaultProps(spec),
+        id: `${spec.type}-1`,
+      };
+      eachField(toJsonSchema(spec), ({ path, name, node }) => {
+        if (path.length === 1 && fieldKindOf(node) === "choice") {
+          props[name] = "script";
+        }
+      });
+      const markup = html(
+        onePage({
+          type: spec.type,
+          props: props as BlockNode["props"],
+        }) as PageData
+      );
+      expect(markup).not.toMatch(/<script/i);
     }
   );
 
@@ -514,6 +577,241 @@ describe("buildRenderConfig", () => {
         assets: demoAssetSource,
       })
     ).toThrow(new TypeError('buildRenderConfig: block "Feature" has no view'));
+    expect(() =>
+      buildRenderConfig({
+        blocks: [featureSpec],
+        // @ts-expect-error -- an object without $$typeof is not a component
+        views: { Feature: { render: FeatureView } },
+        assets: demoAssetSource,
+      })
+    ).toThrow(new TypeError('buildRenderConfig: block "Feature" has no view'));
+  });
+
+  it("accepts views made with memo, forwardRef and lazy", () => {
+    const heading = onePage({
+      type: "Heading",
+      props: { id: "Heading-1", text: "淨灘活動", level: "h3" },
+    });
+    const expected = html(validated(heading));
+    const Forwarded = forwardRef<HTMLElement, ViewProps<typeof headingSpec>>(
+      (props, _ref) => <HeadingView {...props} />
+    );
+    Forwarded.displayName = "Forwarded";
+
+    for (const Heading of [memo(HeadingView), Forwarded]) {
+      const config = buildRenderConfig({
+        blocks: blockSpecs,
+        views: { ...views, Heading },
+        assets: demoAssetSource,
+      });
+      expect(html(validated(heading), config)).toBe(expected);
+    }
+
+    // lazy() needs Suspense to render; building the config must accept it
+    const config = buildRenderConfig({
+      blocks: blockSpecs,
+      views: {
+        ...views,
+        Heading: lazy(async () => ({ default: HeadingView })),
+      },
+      assets: demoAssetSource,
+    });
+    expect(config.components.Heading.label).toBe("標題");
+  });
+});
+
+describe("buildRenderConfig with pages saved before a compatible change", () => {
+  const LABEL = z.string().min(1).max(20).meta({ title: "文字" });
+  const BODY_TYPES = richTextFeaturesToTypes(["bold"]);
+
+  /** A block that exists only in this test, before the change. */
+  const noticeV1 = defineBlockSpec({
+    type: "Notice",
+    label: "公告",
+    category: "內容",
+    description: "只在測試中使用：相容修改之前的版本。",
+    version: 1,
+    props: z.strictObject({
+      title: z.string().min(1).max(40).default("公告").meta({ title: "標題" }),
+      items: z
+        .array(z.strictObject({ label: LABEL }))
+        .max(5)
+        .default(() => [{ label: "第一則" }])
+        .meta({ title: "項目" }),
+    }),
+    examples: [{ name: "預設", props: {} }],
+  });
+
+  /**
+   * Version 2 (spec §4.6): new fields with defaults, at the top level (a
+   * list, a richtext and a choice) and inside the list items (a text and a
+   * choice).
+   */
+  const noticeV2 = defineBlockSpec({
+    type: "Notice",
+    label: "公告",
+    category: "內容",
+    description: "只在測試中使用：相容修改之後的版本。",
+    version: 2,
+    props: z.strictObject({
+      title: noticeV1.props.shape.title,
+      items: z
+        .array(
+          z.strictObject({
+            label: LABEL,
+            note: z
+              .string()
+              .max(40)
+              .default("詳情另行公告")
+              .meta({ title: "說明" }),
+            tone: choice(["info", "warning"])
+              .default("info")
+              .meta({ title: "語氣" }),
+          })
+        )
+        .max(5)
+        .default(() => [
+          { label: "第一則", note: "詳情另行公告", tone: "info" as const },
+        ])
+        .meta({ title: "項目" }),
+      tags: z
+        .array(z.strictObject({ label: LABEL }))
+        .max(3)
+        .default(() => [{ label: "新" }])
+        .meta({ title: "標籤" }),
+      body: richText({ features: ["bold"] })
+        .default(() =>
+          fitRichTextToTypes(textToRichText("補充說明"), BODY_TYPES)
+        )
+        .meta({ title: "內文" }),
+      size: choice(["md", "lg"]).default("md").meta({ title: "大小" }),
+    }),
+    examples: [{ name: "預設", props: {} }],
+  });
+
+  function NoticeView({
+    title,
+    items,
+    tags,
+    body,
+    size,
+  }: ViewProps<typeof noticeV2>) {
+    return (
+      <section className={size}>
+        <h2>{title}</h2>
+        <ul>
+          {items.map((item, index) => (
+            <li key={index} className={item.tone}>
+              {`${item.label}：${item.note}`}
+            </li>
+          ))}
+        </ul>
+        <p>{tags.map((tag) => tag.label).join("、")}</p>
+        {body}
+      </section>
+    );
+  }
+
+  const v1 = createPageValidator({ blocks: [noticeV1], root: pageRootSpec });
+  const v2 = createPageValidator({ blocks: [noticeV2], root: pageRootSpec });
+  const config = buildRenderConfig({
+    blocks: [noticeV2],
+    views: { Notice: NoticeView },
+    assets: demoAssetSource,
+  });
+
+  /** A page stored under version 1: the validator filled v1's defaults only. */
+  const stored = (() => {
+    const result = v1.validatePage(
+      onePage({
+        type: "Notice",
+        props: {
+          id: "Notice-1",
+          items: [{ label: "停車資訊" }, { label: "交通接駁" }],
+        },
+      })
+    );
+    if (!result.ok) throw new Error(JSON.stringify(result.errors, null, 2));
+    return result.data;
+  })();
+
+  /** The same page with version 2's defaults filled in, as saving it again would store it. */
+  function filled(data: PageData): PageData {
+    const result = v2.validatePage(data);
+    if (!result.ok) throw new Error(JSON.stringify(result.errors, null, 2));
+    return result.data;
+  }
+
+  it("is a compatible change", () => {
+    expect(
+      diffContracts(toDataContract(noticeV1), toDataContract(noticeV2))
+    ).toEqual([]);
+    expect(stored.content[0].props).toEqual({
+      id: "Notice-1",
+      title: "公告",
+      items: [{ label: "停車資訊" }, { label: "交通接駁" }],
+    });
+  });
+
+  it("renders the old page like the same page with the new defaults", () => {
+    const markup = html(stored, config);
+    expect(markup).toBe(html(filled(stored), config));
+    // RichTextContent's outer class is core's hashed CSS module name
+    expect(markup).toMatch(
+      /^<main class="tcb-page tcb-stack"><section class="md"><h2>公告<\/h2><ul><li class="info">停車資訊：詳情另行公告<\/li><li class="info">交通接駁：詳情另行公告<\/li><\/ul><p>新<\/p><div class="[^"]+"><div class="rich-text"><p>補充說明<\/p><\/div><\/div><\/section><\/main>$/
+    );
+  });
+
+  it("uses the defaults for values a Storybook control or Render left empty", () => {
+    const props = stored.content[0].props;
+    const emptied: PageData = {
+      ...stored,
+      content: [
+        {
+          type: "Notice",
+          props: {
+            ...props,
+            title: undefined,
+            items: [{ label: "停車資訊", note: undefined, tone: null }],
+            body: null,
+          },
+        },
+      ],
+    };
+    expect(html(emptied, config)).toBe(
+      html(
+        filled({
+          ...stored,
+          content: [
+            {
+              type: "Notice",
+              props: { id: "Notice-1", items: [{ label: "停車資訊" }] },
+            },
+          ],
+        }),
+        config
+      )
+    );
+  });
+
+  it.each(
+    blockSpecs
+      // A slot inside a list item that Render did not map renders nothing,
+      // where an empty one renders an empty <div class="tcb-stack">
+      .filter((spec) =>
+        slotLocations(spec).every((location) => !location.path.includes("[]"))
+      )
+      .map((spec) => ({ type: spec.type, spec }))
+  )("renders a $type that has only its id with toDefaultProps", ({ spec }) => {
+    const id = `${spec.type}-1`;
+    expect(html(onePage({ type: spec.type, props: { id } }) as PageData)).toBe(
+      html(
+        onePage({
+          type: spec.type,
+          props: { ...toDefaultProps(spec), id },
+        }) as PageData
+      )
+    );
   });
 });
 

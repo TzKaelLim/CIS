@@ -4,6 +4,7 @@ import type {
   CustomField,
   SlotComponent,
 } from "@tzuchi/tceditor";
+import { RichTextContent } from "@tzuchi/tceditor/rsc";
 import type { RichTextDoc } from "@tzuchi/tceditor/rules";
 import {
   eachField,
@@ -75,17 +76,31 @@ const factories: FieldFactories = { image: renderOnlyImageField };
 /** Turns one stored value (or what Render made of it) into a view's value. */
 type Convert = (value: unknown) => unknown;
 
-/** A spec field and the fields inside it (an object's, or a list's items'). */
-type SpecField = { name: string; kind: FieldKind; fields: SpecField[] };
+/** A spec field, the fields inside it (an object's, or a list's items') and its default. */
+type SpecField = {
+  name: string;
+  kind: FieldKind;
+  fields: SpecField[];
+  /** The `default` of its JSON Schema node (frozen with the schema); undefined without one. */
+  fallback: unknown;
+};
+
+/** A field for `picker`: its name, how to convert its value, and its default. */
+type PickedField = readonly [name: string, convert: Convert, fallback: unknown];
 
 const passThrough: Convert = (value) => value;
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
-/** Richtext arrives as React (RichTextContent, or the inline editor); anything else renders nothing. */
+/**
+ * Richtext arrives as React (RichTextContent, or the inline editor). A
+ * document that did not, a default filled in by `picker`, goes through the
+ * shared renderer too; anything else renders nothing.
+ */
 function asNode(value: unknown): ReactNode {
-  return isValidElement(value) ? value : null;
+  if (isValidElement(value)) return value;
+  return isRecord(value) ? <RichTextContent content={value} /> : null;
 }
 
 /** A slot is a component once Render or the editor has mapped it; a list item without its slot renders nothing. */
@@ -118,14 +133,25 @@ function resolveImage(
   };
 }
 
-/** The spec's fields as a tree, read from its JSON Schema. */
+/**
+ * The spec's fields as a tree, read from its JSON Schema, with their
+ * defaults: at the top level the values of toDefaultProps(spec), in a list's
+ * items those of the editor's defaultItemProps, and in a group its fields'.
+ */
 function specFields(spec: AnyBlockSpec): SpecField[] {
   const top: SpecField[] = [];
   const children = new Map<string, SpecField[]>([["", top]]);
   // eachField visits a field before the fields inside it. A list item's
   // field belongs to the list: ["columns", "[]", "content"] → "columns".
   eachField(toJsonSchema(spec), ({ path, name, node }) => {
-    const field: SpecField = { name, kind: fieldKindOf(node), fields: [] };
+    const field: SpecField = {
+      name,
+      kind: fieldKindOf(node),
+      fields: [],
+      fallback: Object.prototype.hasOwnProperty.call(node, "default")
+        ? node.default
+        : undefined,
+    };
     const parent = path.slice(0, path[path.length - 2] === "[]" ? -2 : -1);
     children.get(fieldPathKey(parent))?.push(field);
     children.set(fieldPathKey(path), field.fields);
@@ -133,36 +159,54 @@ function specFields(spec: AnyBlockSpec): SpecField[] {
   return top;
 }
 
-/** Picks exactly these fields (own properties only) and converts each value. */
+/**
+ * Picks exactly these fields (own properties only) and converts each value.
+ * A missing value (undefined or null) becomes the field's default first:
+ * pages saved before a compatible change added the field (spec §4.6) lack
+ * it, Storybook sets a cleared control to undefined, and Render turns a
+ * missing richtext, or a missing list or group around one, into null. The
+ * validator never stores null, because specs have no nullable fields.
+ */
 function picker(
-  fields: readonly (readonly [string, Convert])[]
+  fields: readonly PickedField[]
 ): (value: unknown) => Record<string, unknown> {
   return (value) => {
     const record = isRecord(value) ? value : {};
     return Object.fromEntries(
-      fields.map(([name, convert]) => [
-        name,
-        convert(
-          Object.prototype.hasOwnProperty.call(record, name)
-            ? record[name]
-            : undefined
-        ),
-      ])
+      fields.map(([name, convert, fallback]) => {
+        const stored = Object.prototype.hasOwnProperty.call(record, name)
+          ? record[name]
+          : undefined;
+        return [name, convert(stored ?? fallback)];
+      })
     );
   };
 }
 
-/** Converts an object's fields, or null when no field inside needs converting. */
+/**
+ * Converts an object's fields, or null when no field inside needs
+ * converting or has a default.
+ */
 function objectConverter(
   fields: readonly SpecField[],
   assets: Pick<AssetSource, "get">
 ): Convert | null {
-  const converters = fields.map(
-    (field) => [field.name, converterOf(field, assets)] as const
+  const picks = fields.map(
+    (field) => [field.name, converterOf(field, assets), field.fallback] as const
   );
-  if (converters.every(([, convert]) => convert === null)) return null;
+  if (
+    picks.every(
+      ([, convert, fallback]) => convert === null && fallback === undefined
+    )
+  ) {
+    return null;
+  }
   return picker(
-    converters.map(([name, convert]) => [name, convert ?? passThrough])
+    picks.map(([name, convert, fallback]) => [
+      name,
+      convert ?? passThrough,
+      fallback,
+    ])
   );
 }
 
@@ -189,6 +233,16 @@ function converterOf(
   }
 }
 
+/** A function or class component, or what memo(), forwardRef() and lazy() return. */
+function isComponentType(value: unknown): boolean {
+  return (
+    typeof value === "function" ||
+    (typeof value === "object" &&
+      value !== null &&
+      typeof (value as { $$typeof?: unknown }).$$typeof === "symbol")
+  );
+}
+
 function viewOf(
   views: object,
   type: string
@@ -196,7 +250,7 @@ function viewOf(
   const view: unknown = Object.prototype.hasOwnProperty.call(views, type)
     ? (views as Record<string, unknown>)[type]
     : undefined;
-  if (typeof view !== "function") {
+  if (!isComponentType(view)) {
     throw new TypeError(`buildRenderConfig: block "${type}" has no view`);
   }
   // BlockViews ties each view's props to its spec (ViewProps); the values
@@ -207,10 +261,13 @@ function viewOf(
 /**
  * The Puck config for Render (spec §7.1), built from the specs alone: each
  * block's render picks exactly the spec's fields (never Puck's props, which
- * hold functions such as renderDropZone), turns slots into <Slot />,
+ * hold functions such as renderDropZone), fills a missing field with the
+ * spec's default (also in list items and groups), turns slots into <Slot />,
  * richtext into React and images into a ResolvedImage with `assets.get`,
- * passes everything else through, and renders the block's view. Server-safe:
- * no "use client", no runtime import of the main @tzuchi/tceditor entry.
+ * passes everything else through, and renders the block's view. A slot
+ * missing from a list item renders nothing, which looks like an empty one.
+ * Server-safe: no "use client", no runtime import of the main
+ * @tzuchi/tceditor entry.
  */
 export function buildRenderConfig<
   const B extends readonly AnyBlockSpec[]
@@ -227,6 +284,7 @@ export function buildRenderConfig<
         specFields(spec).map((field) => [
           field.name,
           converterOf(field, assets) ?? passThrough,
+          field.fallback,
         ])
       );
       const component: ComponentConfig = {
