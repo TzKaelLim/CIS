@@ -56,8 +56,8 @@ export const buttonSpec = defineBlockSpec({
   - 清單的項目是 `z.strictObject({...})`，不能直接放輔助函式的值：圖片清單寫成 `z.array(z.strictObject({ image: image() }))`。清單一定要有 `.max()`（`object-arrays` 規則：驗證器只檢查到清單上限多 1 項，所以它的工作量受上限約束，與頁面中清單欄位的長度無關；富文字文件的工作量與記憶體則和文件的大小成正比，受 2 MB 的上限約束）。
   - `.meta()` 放在鏈的最後、只呼叫一次；每個欄位都要有 `title`（慣例是中文）。
   - 不宣告 `id`，欄位名稱也不得是 `puck`、`editMode`、`children`（Puck 傳給畫面的 props）、`key`、`ref`（React 不交給元件），或 `constructor`、`toString` 這類 `Object.prototype` 的名稱。
-  - `spec.ts` 不用 `.refine()`、`.transform()`、`.slugify()`、`.with()`、`.apply()` 這類 JSON Schema 表達不了或會悄悄改值的方法，也不用 `z.stringbool()`、`z.codec()`；數字只用 `.int()`、`.min()`、`.max()` 限制（不用 `.gt()`、`.positive()`、`.multipleOf()` 這類寫法，`checkSpecRules` 也拒絕它們產生的 `multipleOf`、`exclusiveMinimum`、`exclusiveMaximum`）。
-  - 預設值（`defaults` 規則）：zod 不驗證、不清理 `.default()` 的值，所以每個頂層欄位都要有預設值，而且再驗證一次必須通過、結果不變。富文字的預設值要先整理成輸出形狀：`.default(() => fitRichTextToTypes(textToRichText("…"), richTextFeaturesToTypes(features)))`；物件的預設值要寫齊每個欄位。群組與清單項目裡的欄位可以沒有預設值，有的話一樣檢查。物件與陣列的預設值寫成函式，因為 zod 只複製預設值的第一層；ESLint 會擋下直接傳入陣列或物件字面值的寫法，但擋不到存在變數裡的值。
+  - `spec.ts` 不用 `.refine()`、`.transform()`、`.slugify()`、`.with()`、`.apply()` 這類 JSON Schema 表達不了或會悄悄改值的方法，也不用 `z.stringbool()`、`z.codec()`（`checkSpecRules` 只在它們可能改掉輔助函式的值時回報，見「`x-*` 擴充欄位」最後一段）；數字只用 `.int()`、`.min()`、`.max()` 限制（不用 `.gt()`、`.positive()`、`.multipleOf()` 這類寫法，`checkSpecRules` 也拒絕它們產生的 `multipleOf`、`exclusiveMinimum`、`exclusiveMaximum`）。
+  - 預設值（`defaults` 規則）：zod 不驗證、不清理 `.default()` 的值，所以每個頂層欄位都要有預設值（只寫 `.optional()` 不算：頁面缺少這個欄位時 prop 會是 `undefined`），而且再驗證一次必須通過、結果不變。富文字的預設值要先整理成輸出形狀：`.default(() => fitRichTextToTypes(textToRichText("…"), richTextFeaturesToTypes(features)))`；物件的預設值要寫齊每個欄位。群組與清單項目裡的欄位可以沒有預設值，也可以是 `.optional()`，有預設值的話一樣檢查。物件與陣列的預設值寫成函式，因為 zod 只複製預設值的第一層；ESLint 會擋下直接傳入陣列或物件字面值的寫法，但擋不到存在變數裡的值。
 
 ## 欄位種類
 
@@ -106,6 +106,10 @@ export const buttonSpec = defineBlockSpec({
 | `x-lost-checks` | 輔助函式     | 只有 zod 驗證器會做的檢查：`safe-href`、`alt-required`、`richtext-normalize`                                                                                                 |
 
 `x-slot`、`x-richtext`、`x-image`、`x-link`、`x-lost-checks` 在 `GlobalMeta` 裡宣告成 `never`，規格在 `.meta()` 寫了就編譯失敗；輔助函式以 `HelperMeta` 寫入。`GlobalMeta` 有 index signature，拼錯的 key 照樣能編譯，所以 `checkSpecRules` 會確認 JSON Schema 只出現 `META_KEYS` 列出的 key，而且 `.meta()` 沒有加入或改寫 JSON Schema 的關鍵字（例如 `type`、`additionalProperties`）。型別轉換可以繞過 `never`，所以輔助函式另外把自己寫的 meta 登記在 `helpers.ts` 模組內的 zod registry；`checkSpecRules` 以這個 registry 再產生一份 JSON Schema，逐節點比對這 5 個 key：多出、缺少或值不同（例如改了 `x-richtext.features` 或 `x-link.optional`）都會回報 `meta-keys`。
+
+輔助函式的值也必須維持輔助函式寫的檢查，否則一樣回報 `meta-keys`。輔助函式另外記下回傳的 schema 的 `_zod.def`：`.meta()`、`.describe()` 產生的副本共用同一個 def；`.overwrite()`、`.refine()`、`.check()` 這類檢查會產生新的 def，副本卻仍經由 registry 繼承輔助函式的 meta，所以 `checkSpecRules` 以 def 是否相同來分辨。另外，從 props 物件一路到輔助函式，外層的 schema（`.default()` 這類 wrapper、群組、清單、props 物件本身）不能是 `.catch()`、pipe（`.transform()`、`.pipe()`、`z.preprocess()`），也不能有清單長度限制以外的檢查。這些寫法都會改值而不出現在 JSON Schema 裡，例如 `link({ optional: true }).overwrite(() => "javascript:…")` 會讓驗證器存下 `javascript:` 連結。
+
+這個 registry 與 def 清單都是 `helpers.ts` 的模組變數：規格與 `checkSpecRules` 必須來自同一份 `packages/spec` 模組實例，否則每個輔助函式都會被當成偽造而回報，`createPageValidator` 也會拒絕建立（fail-closed）。jest、Edge 單檔、Next 與 Vite 目前都只載入一份。
 
 ## 轉換器
 
