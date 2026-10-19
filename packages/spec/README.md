@@ -49,9 +49,15 @@ export const buttonSpec = defineBlockSpec({
 });
 ```
 
-- zod 一律寫成 `import * as z from "zod"`（ESLint 檢查）。其他寫法會讓 esbuild 打包全部語系，Edge 單檔會超過 60 KB。不要 import `zod/v4/locales/*`，也不要呼叫 `z.config`。
+- zod 一律寫成 `import * as z from "zod"`（ESLint 檢查）。其他寫法會讓 esbuild 打包全部語系，Edge 單檔會超過 60 KB。不要 import `zod/v4/locales/*`、不要用 `z.locales`，也不要呼叫 `z.config` 或 `z.core.config`。
 - 頁面根節點用 `definePageRoot({ label?, props })` 宣告，`label` 預設「頁面」。
-- 寫法規則（`checkSpecRules` 與 ESLint 檢查）的完整清單在 `CLAUDE.md` 的 Spec rules。重點：物件一律 `z.strictObject`；每個欄位只有一種 JSON 型別（不用 `.nullable()` 與 union）；清單一定要有 `.max()`（`object-arrays` 規則：驗證器只檢查到清單上限多 1 項，所以它的工作量受上限約束，與頁面中清單欄位的長度無關；富文字文件則受 2 MB 的上限約束）；`.meta()` 放在鏈的最後、只呼叫一次；每個欄位都要有中文 `title`；不宣告 `id`，欄位名稱也不得是 `puck`、`editMode`、`children`，或 `constructor`、`toString` 這類 `Object.prototype` 的名稱；`spec.ts` 不直接用 `.refine()`、`.transform()` 這類 JSON Schema 表達不了的方法；物件與陣列的預設值寫成函式。
+- 寫法規則的完整清單在 `CLAUDE.md` 的 Spec rules：`checkSpecRules` 檢查規格本身，ESLint 檢查 `packages/blocks/src/` 底下名為 `spec.ts` 的檔案（規則由 `scripts/eslint-rules.test.mjs` 鎖住），文字用中文則是慣例，只靠 review。重點：
+  - 物件一律 `z.strictObject`；每個欄位只有一種 JSON 型別（不用 `.nullable()` 與 union）。
+  - 清單的項目是 `z.strictObject({...})`，不能直接放輔助函式的值：圖片清單寫成 `z.array(z.strictObject({ image: image() }))`。清單一定要有 `.max()`（`object-arrays` 規則：驗證器只檢查到清單上限多 1 項，所以它的工作量受上限約束，與頁面中清單欄位的長度無關；富文字文件則受 2 MB 的上限約束）。
+  - `.meta()` 放在鏈的最後、只呼叫一次；每個欄位都要有 `title`（慣例是中文）。
+  - 不宣告 `id`，欄位名稱也不得是 `puck`、`editMode`、`children`（Puck 傳給畫面的 props）、`key`、`ref`（React 不交給元件），或 `constructor`、`toString` 這類 `Object.prototype` 的名稱。
+  - `spec.ts` 不用 `.refine()`、`.transform()`、`.slugify()`、`.with()`、`.apply()` 這類 JSON Schema 表達不了或會悄悄改值的方法，也不用 `z.stringbool()`、`z.codec()`；數字只用 `.int()`、`.min()`、`.max()` 限制（不用 `.gt()`、`.positive()`、`.multipleOf()` 這類寫法，`checkSpecRules` 也拒絕它們產生的 `multipleOf`、`exclusiveMinimum`、`exclusiveMaximum`）。
+  - 預設值（`defaults` 規則）：zod 不驗證、不清理 `.default()` 的值，所以每個頂層欄位都要有預設值，而且再驗證一次必須通過、結果不變。富文字的預設值要先整理成輸出形狀：`.default(() => fitRichTextToTypes(textToRichText("…"), richTextFeaturesToTypes(features)))`；物件的預設值要寫齊每個欄位。群組與清單項目裡的欄位可以沒有預設值，有的話一樣檢查。物件與陣列的預設值寫成函式，因為 zod 只複製預設值的第一層；ESLint 會擋下直接傳入陣列或物件字面值的寫法，但擋不到存在變數裡的值。
 
 ## 欄位種類
 
@@ -81,25 +87,25 @@ export const buttonSpec = defineBlockSpec({
 | `slot(rule)`                    | `allow` 與 `disallow` 只能擇一，名稱必須是已登記的區塊類型；預設空陣列                                                                                                                               |
 | `image()`                       | `assetId` 符合 `ASSET_ID_PATTERN`（`^[A-Za-z0-9_-]{1,64}$`）；`alt` 最多 200 字（`IMAGE_ALT_MAX_LENGTH`），`decorative` 為 `false` 時不得為空。只檢查格式，不檢查素材是否存在                        |
 
-必填的 `link()` 與 `image()` 用 `.prefault()`：新加入的按鈕與圖片的預設值刻意不完整，要在編輯器填好網址、選好圖片才能發布。
+必填的 `link()` 與 `image()` 用 `.prefault()`：新加入的按鈕與圖片的預設值刻意不完整，要在編輯器填好網址、選好圖片才能發布。規格本身不呼叫 `.prefault()`（ESLint 檢查）。`checkSpecRules` 不允許在任何一層替必填的 `link()`、`image()` 另給 `.default()`，或包上 `.optional()`、`.nullable()`，因為目錄與資料契約仍會把它們當成必填：選填連結用 `link({ optional: true })`，`image()` 沒有選填版本。
 
 ## `x-*` 擴充欄位
 
-| key             | 誰寫         | 說明                                                                                           |
-| --------------- | ------------ | ---------------------------------------------------------------------------------------------- |
-| `x-labels`      | 規格         | 選項的中文名稱，例如 `{ primary: "主要" }`。只用在畫面，不存進資料庫                           |
-| `x-inline`      | 規格         | `true`：短文字可在畫布上直接編輯                                                               |
-| `x-field`       | 規格         | `"textarea"`：長文字                                                                           |
-| `x-item-label`  | 規格         | 清單項目的摘要樣板：`{欄位名}` 代入項目的欄位值，`{n}` 代入從 1 起算的序號，例如 `"第 {n} 欄"` |
-| `x-style`       | `style()`    | `{ component, key }`                                                                           |
-| `x-token`       | `token()`    | `{ group }`                                                                                    |
-| `x-slot`        | `slot()`     | `{ allow }` 或 `{ disallow }`                                                                  |
-| `x-richtext`    | `richText()` | `{ features }`                                                                                 |
-| `x-image`       | `image()`    | `true`                                                                                         |
-| `x-link`        | `link()`     | `{ optional }`                                                                                 |
-| `x-lost-checks` | 輔助函式     | 只有 zod 驗證器會做的檢查：`safe-href`、`alt-required`、`richtext-normalize`                   |
+| key             | 誰寫         | 說明                                                                                                                                                                         |
+| --------------- | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `x-labels`      | 規格         | 選項的中文名稱，例如 `{ primary: "主要" }`。只用在畫面，不存進資料庫                                                                                                         |
+| `x-inline`      | 規格         | `true`：短文字可在畫布上直接編輯                                                                                                                                             |
+| `x-field`       | 規格         | `"textarea"`：長文字                                                                                                                                                         |
+| `x-item-label`  | 規格         | 清單項目的摘要樣板：`{欄位名}` 代入項目的欄位值，`{n}` 代入從 1 起算的序號，例如 `"第 {n} 欄"`。只能放在清單上，`{欄位名}` 必須是項目中的文字或數字欄位（`item-label` 規則） |
+| `x-style`       | `style()`    | `{ component, key }`                                                                                                                                                         |
+| `x-token`       | `token()`    | `{ group }`                                                                                                                                                                  |
+| `x-slot`        | `slot()`     | `{ allow }` 或 `{ disallow }`                                                                                                                                                |
+| `x-richtext`    | `richText()` | `{ features }`                                                                                                                                                               |
+| `x-image`       | `image()`    | `true`                                                                                                                                                                       |
+| `x-link`        | `link()`     | `{ optional }`                                                                                                                                                               |
+| `x-lost-checks` | 輔助函式     | 只有 zod 驗證器會做的檢查：`safe-href`、`alt-required`、`richtext-normalize`                                                                                                 |
 
-`x-slot`、`x-richtext`、`x-image`、`x-link`、`x-lost-checks` 在 `GlobalMeta` 裡宣告成 `never`，規格在 `.meta()` 寫了就編譯失敗；輔助函式以 `HelperMeta` 寫入。`GlobalMeta` 有 index signature，拼錯的 key 照樣能編譯，所以 `checkSpecRules` 會確認 JSON Schema 只出現 `META_KEYS` 列出的 key、`.meta()` 沒有加入或改寫 JSON Schema 的關鍵字（例如 `type`、`additionalProperties`），而且 `x-link`、`x-image`、`x-richtext`、`x-lost-checks` 確實由對應的輔助函式寫入。
+`x-slot`、`x-richtext`、`x-image`、`x-link`、`x-lost-checks` 在 `GlobalMeta` 裡宣告成 `never`，規格在 `.meta()` 寫了就編譯失敗；輔助函式以 `HelperMeta` 寫入。`GlobalMeta` 有 index signature，拼錯的 key 照樣能編譯，所以 `checkSpecRules` 會確認 JSON Schema 只出現 `META_KEYS` 列出的 key，而且 `.meta()` 沒有加入或改寫 JSON Schema 的關鍵字（例如 `type`、`additionalProperties`）。型別轉換可以繞過 `never`，所以輔助函式另外把自己寫的 meta 登記在 `helpers.ts` 模組內的 zod registry；`checkSpecRules` 以這個 registry 再產生一份 JSON Schema，逐節點比對這 5 個 key：多出、缺少或值不同（例如改了 `x-richtext.features` 或 `x-link.optional`）都會回報 `meta-keys`。
 
 ## 轉換器
 
