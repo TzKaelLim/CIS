@@ -13,7 +13,8 @@
 // file again when there was none), also when it is stopped with Ctrl-C or a
 // signal. The data dir is SHOWCASE_DATA_DIR resolved against apps/showcase, or
 // apps/showcase/.data: run the script with the same SHOWCASE_DATA_DIR as the
-// server.
+// server. Before publishing, the script checks that the server serves that
+// file (or the preset, when there is none) and stops otherwise.
 //
 // Exits with 1 on any failure.
 import {
@@ -42,7 +43,13 @@ const DATA_FILE = join(
     : join(SHOWCASE_DIR, ".data"),
   "activity.json"
 );
+// What the server serves while nothing is published (lib/activity-store.ts).
+const PRESET_FILE = join(SHOWCASE_DIR, "content/activity.preset.json");
 const TIMEOUT = 15_000;
+
+// The published page before the test, read once: restore() writes it back,
+// and run() compares against it.
+const backup = existsSync(DATA_FILE) ? readFileSync(DATA_FILE) : null;
 
 // The header button's text: core's dictionary key "header-publish".
 const PUBLISH_LABEL = "Publish";
@@ -176,25 +183,43 @@ async function typeText(input, text) {
 }
 
 async function run() {
-  try {
-    const response = await fetch(`${BASE}/api/activity`);
+  let current;
 
-    check(response.ok, `GET ${BASE}/api/activity returned ${response.status}`);
-  } catch (error) {
-    if (error instanceof SmokeError) throw error;
+  try {
+    current = await fetch(`${BASE}/api/activity`);
+  } catch {
     throw new SmokeError(
       `The showcase is not reachable at ${BASE}. Start it first (pnpm dev:showcase).`
     );
   }
 
-  const before = existsSync(DATA_FILE) ? readFileSync(DATA_FILE, "utf8") : "";
-  const { browser, page } = await setup(`${BASE}/activity/edit?blank=1`);
+  check(current.ok, `GET ${BASE}/api/activity returned ${current.status}`);
+
+  const before = backup === null ? "" : backup.toString("utf8");
+
+  // Only DATA_FILE is restored, so publish only when the server reads the same
+  // data dir: it must serve DATA_FILE, or the preset while there is none.
+  // Otherwise publishing would replace a page this script cannot put back.
+  const expectedFile = backup === null ? PRESET_FILE : DATA_FILE;
+  const expected = JSON.parse(
+    backup === null ? readFileSync(PRESET_FILE, "utf8") : before
+  );
+
+  check(
+    JSON.stringify(await current.json()) === JSON.stringify(expected),
+    `${BASE}/api/activity does not serve ${expectedFile}, so the server uses another data dir; nothing was published. Start the server with the same SHOWCASE_DATA_DIR as this script`
+  );
+
+  // Open a blank page first, so that page errors thrown while the editor
+  // loads, hydrates and mounts are collected too.
+  const { browser, page } = await setup("about:blank");
   const pageErrors = [];
 
   page.on("pageerror", (error) => pageErrors.push(error.message));
 
   try {
     await page.setViewport({ width: 1440, height: 900 });
+    await page.goto(`${BASE}/activity/edit?blank=1`);
     await waitFor("the editor canvas", () => getBox(page, ROOT_ZONE));
     check((await countBlocks(page)) === 0, "?blank=1 did not start empty");
 
@@ -250,15 +275,16 @@ async function run() {
       } blocks on the canvas, found ${await countBlocks(page)}`
     );
 
-    const published = page.waitForResponse(
-      (r) =>
-        r.url() === `${BASE}/api/activity` && r.request().method() === "POST",
-      { timeout: TIMEOUT }
-    );
-
-    await page.locator(`::-p-text(${PUBLISH_LABEL})`).click();
-
-    const response = await published;
+    // Awaited together, so a click that fails first does not leave the
+    // response promise to reject unhandled.
+    const [response] = await Promise.all([
+      page.waitForResponse(
+        (r) =>
+          r.url() === `${BASE}/api/activity` && r.request().method() === "POST",
+        { timeout: TIMEOUT }
+      ),
+      page.locator(`::-p-text(${PUBLISH_LABEL})`).click(),
+    ]);
 
     check(
       response.status() === 200,
@@ -305,8 +331,6 @@ async function run() {
   }
 }
 
-const backup = existsSync(DATA_FILE) ? readFileSync(DATA_FILE) : null;
-
 /** Puts the published page back the way it was before the test. */
 function restore() {
   if (backup === null) {
@@ -321,7 +345,10 @@ function restore() {
 }
 
 // Ctrl-C or a signal skips the finally below, so restore here too. Puppeteer
-// closes Chrome on process exit.
+// closes Chrome on process exit. A signal that arrives after the publish
+// request is sent but before the server has written the file is not covered:
+// restore() runs first and the server's write lands after it (a window of a
+// few milliseconds).
 for (const signal of ["SIGINT", "SIGTERM", "SIGHUP"]) {
   process.once(signal, () => {
     restore();

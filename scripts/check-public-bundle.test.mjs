@@ -34,7 +34,11 @@ const write = (root, file, text) => {
   writeFileSync(join(root, file), text);
 };
 
-const route = (root, entryKey, { main, clientChunks, css }) => {
+const route = (
+  root,
+  entryKey,
+  { main, clientChunks, css, plainCss = false }
+) => {
   write(
     root,
     `server/app/${entryKey}/build-manifest.json`,
@@ -60,10 +64,9 @@ const route = (root, entryKey, { main, clientChunks, css }) => {
         },
         entryJSFiles: { [`[project]/app/${entryKey}`]: clientChunks },
         entryCSSFiles: {
-          [`[project]/app/${entryKey}`]: css.map((path) => ({
-            path,
-            inlined: false,
-          })),
+          [`[project]/app/${entryKey}`]: plainCss
+            ? css
+            : css.map((path) => ({ path, inlined: false })),
         },
       }) +
       ";\n"
@@ -73,9 +76,14 @@ const route = (root, entryKey, { main, clientChunks, css }) => {
 /**
  * A fake `.next` directory with both routes. The editor page loads
  * editor.js, which loads lazy.js and lazy.css on demand; `publicExtra` adds
- * text to the public page's client chunk.
+ * text to the public page's client chunk, and `plainCss` lists the public
+ * page's stylesheets as plain paths.
  */
-function fakeBuild({ publicExtra = "", lazy = "EDITOR_ONLY" } = {}) {
+function fakeBuild({
+  publicExtra = "",
+  lazy = "EDITOR_ONLY",
+  plainCss = false,
+} = {}) {
   const root = mkdtempSync(join(tmpdir(), "check-public-bundle-"));
   roots.push(root);
 
@@ -105,6 +113,7 @@ function fakeBuild({ publicExtra = "", lazy = "EDITOR_ONLY" } = {}) {
     main: ["static/chunks/main.js"],
     clientChunks: ["static/chunks/public.js"],
     css: ["static/chunks/public.css"],
+    plainCss,
   });
   route(root, "/(editor)/activity/edit/page", {
     main: ["static/chunks/main.js"],
@@ -143,6 +152,27 @@ test("listRouteChunks follows the manifests and chunk references", () => {
     "static/chunks/editor.css",
     "static/chunks/lazy.css",
   ]);
+});
+
+test("listRouteChunks accepts stylesheets listed as plain paths", () => {
+  assert.deepEqual(
+    listRouteChunks(fakeBuild({ plainCss: true }), "/activity").css,
+    ["static/chunks/public.css"]
+  );
+});
+
+test("listRouteChunks fails clearly when the route has no page", () => {
+  const root = fakeBuild();
+
+  write(
+    root,
+    "app-path-routes-manifest.json",
+    JSON.stringify({ "/(editor)/activity/edit/page": "/activity/edit" })
+  );
+  assert.throws(
+    () => checkPublicBundle(root, MARKERS),
+    /app-path-routes-manifest\.json has no page for \/activity\./
+  );
 });
 
 test("measures the public route's JS without the polyfills, and its CSS", () => {
@@ -215,6 +245,30 @@ test("the CLI prints the public route's sizes before the marker report", () => {
     lines[5],
     "check:public-bundle passed: /activity ships no editor code."
   );
+});
+
+test("the CLI exits 1 and names the chunks when a marker reaches /activity", () => {
+  const root = fakeBuild({
+    publicExtra: 'x=>t.l("static/chunks/lazy.js")',
+    lazy: REAL_MARKERS.map(({ value }) => value).join(" "),
+  });
+  const { status, stdout, stderr } = spawnSync(
+    process.execPath,
+    [SCRIPT, root],
+    { encoding: "utf8" }
+  );
+
+  assert.equal(status, 1);
+  // The sizes and the marker report are still printed, but no "passed".
+  assert.equal(stdout.trimEnd().split("\n").length, 5);
+  assert.doesNotMatch(stdout, /passed/);
+  assert.deepEqual(stderr.trimEnd().split("\n"), [
+    ...REAL_MARKERS.map(
+      ({ name, value }) =>
+        `/activity ships ${name}: "${value}" is in static/chunks/lazy.js`
+    ),
+    "check:public-bundle FAILED",
+  ]);
 });
 
 test("the CLI fails clearly when the build output is missing", () => {

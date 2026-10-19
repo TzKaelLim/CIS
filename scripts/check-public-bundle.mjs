@@ -3,8 +3,9 @@
 // route in the Turbopack `next build` output and searches them for strings
 // that only the editor contains. /activity/edit is the control: every marker
 // must be found there, or the scan itself is broken. It also prints the size
-// of the JS and CSS that /activity loads, for the record (spec §16); the
-// sizes are not checked.
+// of the JS and CSS that /activity can load, for the record (spec §16): the
+// files the page lists and the chunks those load on demand (the public page
+// has none today, so this is what it loads). The sizes are not checked.
 //
 // Usage: node scripts/check-public-bundle.mjs [<.next dir>] (after pnpm build)
 import { existsSync, readFileSync, realpathSync } from "node:fs";
@@ -165,8 +166,10 @@ export function findMarker(nextDir, chunks, marker) {
 
 /**
  * Scans both routes; returns the public route's sizes, one report line per
- * marker and the problems. The sizes are what a browser with ES modules
- * downloads; they are recorded, never a problem.
+ * marker and the problems. The sizes count every file a browser with ES
+ * modules can download for the page, including chunks it only loads on
+ * demand, so with such chunks they are more than the first load. They are
+ * recorded, never a problem.
  */
 export function checkPublicBundle(nextDir, markers = MARKERS) {
   const publicRoute = listRouteChunks(nextDir, PUBLIC_ROUTE);
@@ -207,6 +210,7 @@ export function checkPublicBundle(nextDir, markers = MARKERS) {
   return { sizes, report, problems };
 }
 
+// "loads" counts on-demand chunks too (see checkPublicBundle).
 const describeSize = (kind, { files, bytes, gzipped }, note = "") =>
   `check:public-bundle: ${PUBLIC_ROUTE} loads ${files} ${kind} file${
     files === 1 ? "" : "s"
