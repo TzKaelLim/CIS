@@ -50,7 +50,7 @@ export const buttonSpec = defineBlockSpec({
 ```
 
 - zod 一律寫成 `import * as z from "zod"`（ESLint 檢查）。其他寫法會讓 esbuild 打包全部語系，Edge 單檔會超過 60 KB。不要 import `zod/v4/locales/*`、不要用 `z.locales`，也不要呼叫 `z.config` 或 `z.core.config`。
-- 頁面根節點用 `definePageRoot({ label?, props })` 宣告，`label` 預設「頁面」。
+- 頁面根節點用 `definePageRoot({ label?, version?, props })` 宣告，`label` 預設「頁面」，`version` 預設 1。根節點的資料契約和區塊一樣分版本，相容修改時把 `version` 加 1。
 - 寫法規則的完整清單在 `CLAUDE.md` 的 Spec rules：`checkSpecRules` 檢查規格本身，ESLint 檢查 `packages/blocks/src/` 底下名為 `spec.ts` 的檔案（規則由 `scripts/eslint-rules.test.mjs` 鎖住），文字用中文則是慣例，只靠 review。重點：
   - 物件一律 `z.strictObject`；每個欄位只有一種 JSON 型別（不用 `.nullable()` 與 union）。
   - 清單的項目是 `z.strictObject({...})`，不能直接放輔助函式的值：圖片清單寫成 `z.array(z.strictObject({ image: image() }))`。清單一定要有 `.max()`（`object-arrays` 規則：驗證器只檢查到清單上限多 1 項，所以它的工作量受上限約束，與頁面中清單欄位的長度無關；富文字文件的工作量與記憶體則和文件的大小成正比，受 2 MB 的上限約束）。
@@ -117,7 +117,7 @@ export const buttonSpec = defineBlockSpec({
 | `toArgTypes(spec)`、`toStoryArgs(spec)`   | Storybook 的 argTypes 與預設 args，不依賴 Storybook 的型別                                                                                   |
 | `buildCatalog({ blocks, root })`          | MCP 元件目錄（`CATALOG_VERSION` 為 1）                                                                                                       |
 | `buildPageShellSchema({ blocks })`        | 資料庫外殼 schema（draft-07，不用 `oneOf`／`anyOf`／`allOf`，放置區依欄位名稱辨認）                                                          |
-| `toDataContract(spec)`、`diffContracts()` | 資料契約，以及兩版契約之間的不相容差異                                                                                                       |
+| `toDataContract(spec)`、`diffContracts()` | 區塊或頁面根節點的資料契約，以及兩版契約之間的不相容差異                                                                                     |
 | `checkSpecRules({ blocks, root })`        | 規格寫法檢查，回傳 `SpecRuleViolation[]`                                                                                                     |
 | `exampleToPageData(spec, index)`          | 把一個範例變成只含這個區塊的頁面，並補上決定性的 id（stories 與測試使用）                                                                    |
 

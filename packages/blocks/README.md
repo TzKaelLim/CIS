@@ -20,7 +20,7 @@ tceditor 的 8 個示範區塊與頁面根節點：規格（zod）、畫面、�
 | `Image`     | 圖片   | 內容 | `image` 圖片（素材、替代文字、純裝飾）、`ratio` 比例、`caption` 圖說                                                |
 
 - 卡片的放置區只能放段落、按鈕、標籤列與圖片；多欄的每一欄可以放區段與多欄以外的區塊。
-- 頁面根節點（`src/root/`）有 `title` 頁面標題（輸出成 `<title>`）與 `description` 頁面說明（輸出成 meta description）。
+- 頁面根節點（`src/root/`）有 `title` 頁面標題（輸出成 `<title>`）與 `description` 頁面說明（輸出成 meta description）。它和區塊一樣有版本號（`definePageRoot({ version })`）與資料契約。
 - 新加入的按鈕沒有網址、新加入的圖片沒有選圖，要填好才能發布。圖片還沒選時顯示「尚未選擇圖片」，素材已不存在時顯示「圖片已不存在」，兩種情況都不會讓頁面出錯。
 - 白名單是工程師的初版，由設計師在區塊 Storybook 檢查後調整。uikit 有、但沒有開放的選項，理由寫在 `src/style-decisions.ts`。
 
@@ -80,7 +80,9 @@ export function ActivityEditor({
 - 樣式：在根 layout import `@tzuchi/tceditor-blocks/styles.css`，並在 `<html>` 加上 `data-theme="tzuchi"`。只放在外層 div 時，portal 到 body 的元件會失去主題。`styles.css` 依序載入 `@tzuchi/tokens/tokens.css`、`@heroui/styles`（它本身就是 Tailwind 的入口，不要再另外 import `tailwindcss`）、慈濟主題與 `src/blocks.css`。
 - 編輯器頁的 `<html>` 不要設 `data-theme`，預覽 iframe 的主題用 `overrides.iframe` 設定，做法見 `apps/showcase`。
 - 圖片：`AssetSource` 的 `get(id)` 是同步函式，因為公開頁在渲染途中查圖；`list()` 給編輯器的圖片挑選器使用。S2 用 `demoAssetSource`（示範站的 6 張圖），S3 的媒體庫實作同一個介面，渲染前先查好整頁用到的圖片。
-- 存檔前用 `validatePage(data)` 或 `validatePageJson(raw)` 檢查，只存回傳的 `data`（已補齊預設值，公開頁的 `<Render>` 不會補）。錯誤格式見 `packages/spec/README.md`。
+- 存檔前用 `validatePage(data)` 或 `validatePageJson(raw)` 檢查，只存回傳的 `data`（已補齊預設值）。錯誤格式見 `packages/spec/README.md`。
+- `buildRenderConfig` 把 props 交給畫面之前，先用規格的預設值補上缺少的欄位（值是 `undefined` 或 `null` 也算缺少），頂層與清單項目、群組裡的欄位都一樣。所以相容修改新增欄位之前存下的頁面、Storybook 清掉的控制項，畫出來都和補齊預設值的資料相同，不會拋錯；只有清單項目裡缺少的放置區畫成空的。`<Render>` 本身不補預設值。
+- 畫面不信任資料：資料裡的值不能直接當成 HTML 元素或標記。要依值選標籤時，經過固定的對照表並給安全的預設（例如 `Heading` 的 `level` 不是 h1–h4 時畫成 `h2`），class 名稱只來自樣式函式、`tokenClass()` 或 `switch`。驗證器之外的資料（例如 S3 的草稿預覽）也可能送進 `<Render>`。
 
 ## 檔案
 
@@ -109,26 +111,26 @@ packages/blocks/
 
 ### 產生的檔案
 
-| 檔案                                  | 產生方式          | 用途                               |
-| ------------------------------------- | ----------------- | ---------------------------------- |
-| `src/<區塊>/<Block>.stories.tsx`      | `pnpm gen:blocks` | 區塊 Storybook 的 stories（CSF3）  |
-| `generated/catalog.json`              | `pnpm gen:blocks` | MCP 元件目錄，交給 S4              |
-| `generated/page-shell.draft07.json`   | `pnpm gen:blocks` | 資料庫外殼 schema，交給 S3         |
-| `generated/schemas/<Type>.v<n>.json`  | `pnpm gen:blocks` | 每個版本的資料契約，用來檢查相容性 |
-| `generated/uikit-options.json`        | `pnpm sync:uikit` | uikit 每個樣式函式的選項快照       |
-| `dist/validator.edge.mjs`（不進版控） | `pnpm build`      | Edge 單檔驗證器，交給 S3 與 S4     |
+| 檔案                                  | 產生方式          | 用途                                                              |
+| ------------------------------------- | ----------------- | ----------------------------------------------------------------- |
+| `src/<區塊>/<Block>.stories.tsx`      | `pnpm gen:blocks` | 區塊 Storybook 的 stories（CSF3）                                 |
+| `generated/catalog.json`              | `pnpm gen:blocks` | MCP 元件目錄，交給 S4                                             |
+| `generated/page-shell.draft07.json`   | `pnpm gen:blocks` | 資料庫外殼 schema，交給 S3                                        |
+| `generated/schemas/<Type>.v<n>.json`  | `pnpm gen:blocks` | 每個版本的資料契約，用來檢查相容性；頁面根節點是 `Root.v<n>.json` |
+| `generated/uikit-options.json`        | `pnpm sync:uikit` | uikit 每個樣式函式的選項快照                                      |
+| `dist/validator.edge.mjs`（不進版控） | `pnpm build`      | Edge 單檔驗證器，交給 S3 與 S4                                    |
 
-產生的檔案要 commit。`pnpm test` 會重新產生一次並比對，不一致就失敗；它也會檢查規格、stories、MCP 目錄與編輯器欄位的欄位名稱一致，以及每個 `style()` 選項都存在於 uikit 快照。資料契約每個版本只寫一次：`pnpm gen:blocks` 只為新版本寫快照；契約變了卻沒改版本號，或與舊版不相容時，它直接失敗，任何檔案都不寫。
+產生的檔案要 commit。`pnpm test` 會重新產生一次並比對，不一致就失敗；它也會檢查規格、stories、MCP 目錄與編輯器欄位的欄位名稱一致，以及每個 `style()` 選項都存在於 uikit 快照。資料契約每個版本只寫一次（區塊與頁面根節點都是）：`pnpm gen:blocks` 只為新版本寫快照；契約變了卻沒改版本號，或與舊版不相容時，它直接失敗，任何檔案都不寫。已 commit 的快照永遠不改寫，測試以 JSON 內容比對快照，所以產生器的排版改變之後，舊快照照原樣保留，不必處理。
 
 ## 新增區塊
 
 1. 寫 `src/<區塊>/spec.ts`：`defineBlockSpec({ type, label, category, description, version: 1, props, examples })`。`category` 用 `CATEGORIES` 的中文名稱之一（文字、互動、內容、版面）。`spec.ts` 不得 import React、`@heroui/*` 或 core 的主入口。
 2. 寫 `src/<區塊>/view.tsx`：不加 `'use client'` 的伺服器元件，只接收規格欄位，只用 `@heroui/styles` 的樣式函式與 `tokenClass()` 畫出一般 HTML。可以在畫布上編輯的文字欄位在編輯器裡是 ReactNode，所以 props 型別要接受 `ReactNode`。
-3. 在 `src/specs.ts` 的 `blockSpecs` 登記規格，在 `src/views.ts` 的 `views` 登記畫面，各一行；少了畫面時 TypeScript 會失敗。`buildRenderConfig` 依規格自動把 props 交給畫面，編輯器設定、分類與本套件的測試也都依 `blockSpecs` 產生，不必修改。需要自訂的欄位介面時才寫 `editor.tsx`。
-4. 用到 `style()` 時，把 uikit 有、但不開放的選項與理由寫進 `src/style-decisions.ts`；用到新的 `token()` 值時，在 `src/blocks.css` 加上對應的 `tcb-*` class。
+3. 在 `src/specs.ts` 的 `blockSpecs` 登記規格，在 `src/views.ts` 的 `views` 登記畫面（函式元件，或 `memo`、`forwardRef`、`lazy` 包起來的元件），各一行；少了畫面時 TypeScript 會失敗。`buildRenderConfig` 依規格自動把 props 交給畫面，編輯器設定、分類與本套件的測試也都依 `blockSpecs` 產生，測試檔不必修改。需要自訂的欄位介面時才寫 `editor.tsx`。
+4. 用到 `style()` 時，把 uikit 有、但不開放的選項與理由寫進 `src/style-decisions.ts`。`token()` 欄位的每個值都要在 `src/blocks.css` 有對應的 `tcb-*` class；欄位名稱不是 `paddingY` 或 `gap` 時，還要在 `src/token-classes.ts` 的 `TOKEN_PURPOSES` 寫上它的用途，新的用途要在同一檔的 `TOKEN_CLASS_PURPOSES` 寫上 class 前綴與 CSS 屬性。`styles.spec.ts` 會檢查這些，也檢查 `blocks.css` 用到的每個 `--tc-*` 變數都存在於 vendor 的 tokens。
 5. 執行 `pnpm gen:blocks`，commit 產生的 stories 與 `generated/` 檔案。新區塊要在編輯器欄位快照 `src/__tests__/__snapshots__/editor-fields.spec.ts.snap` 加一筆：測試以 `jest --ci` 執行，不會自動寫入，要用下方的 `-u` 指令寫入，連同 `.snap` 一起 commit。最後跑 `pnpm verify`。
 
-修改既有區塊時只允許相容修改：新增有預設值的欄位、放寬上下限、新增選項或允許的區塊要把 `version` 加 1；只改標籤、說明、範例或選項順序不必。不相容的修改改成新增區塊類型，舊類型設 `deprecated: true`。
+修改既有區塊時只允許相容修改：新增有預設值的欄位、放寬上下限、新增選項或允許的區塊要把 `version` 加 1；只改標籤、說明、範例或選項順序不必。不相容的修改改成新增區塊類型，舊類型設 `deprecated: true`。頁面根節點（`src/root/spec.ts`）也一樣要加 `version`，但它無法改用新類型，所以只能做相容修改。
 
 編輯器欄位快照記錄每個區塊與頁面根節點的 `fields` 與 `defaultProps`。改了欄位之後這個測試會失敗：確認 diff 是預期的修改，再執行 `pnpm --filter @tzuchi/tceditor-blocks test -u src/__tests__/editor-fields.spec.ts` 更新快照，連同 `.snap` 一起 commit。
 
@@ -158,5 +160,5 @@ pnpm --filter @tzuchi/tceditor-blocks test
 pnpm --filter @tzuchi/tceditor-blocks typecheck
 ```
 
-- jest 與 ts-jest，以 `jest --ci` 執行（不會自動寫入新的快照），測試放在 `src/**/__tests__/`。測試會讀 repo 根目錄的四項：`.prettierrc.json` 與 `.editorconfig`（產生的 stories 依 Prettier 的設定排版後再比對；目前沒有 `.editorconfig`，加上後也會生效）、`vendor/uikit/**` 與 `apps/showcase/public/demo-assets/**`，所以 `turbo.json` 的 `@tzuchi/tceditor-blocks#test` 把這四項列在 `inputs`。
+- jest 與 ts-jest，以 `jest --ci` 執行（不會自動寫入新的快照），測試放在 `src/**/__tests__/`。測試會讀 repo 根目錄的四項：`.prettierrc.json` 與 `.editorconfig`（產生的 stories 依 Prettier 的設定排版後再比對；目前沒有 `.editorconfig`，加上後也會生效）、`vendor/uikit/**` 與 `apps/showcase/public/demo-assets/**`，所以 `turbo.json` 的 `@tzuchi/tceditor-blocks#test` 把這四項列在 `inputs`。`typecheck` 經由 `link:` 檢查 `vendor/uikit` 的 `.ts` 原始檔，所以 `@tzuchi/tceditor-blocks#typecheck` 也把 `vendor/uikit/**` 列在 `inputs`。
 - 本套件經由 `workspace:*` 使用 core 建置後的 `dist`。修改 core 之後，單獨執行本套件的測試前先 `pnpm --filter @tzuchi/tceditor build`。
