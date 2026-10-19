@@ -195,6 +195,13 @@ const normalizeMarks = (value: unknown): RichTextMark[] => {
     if (normalized) byType.set(mark.type, normalized);
   }
 
+  // Tiptap's code mark excludes every other mark (`excludes: "_"`): adding
+  // code to marked text removes the other marks, and adding a mark to code
+  // does nothing. A node with code and another mark fails the schema's check.
+  const code = byType.get("code");
+
+  if (code) return [code];
+
   const marks: RichTextMark[] = [];
 
   for (const type of MARK_ORDER) {
@@ -373,6 +380,9 @@ function normalizeKnownNode(
  * - Unknown or misplaced nodes and marks are reduced to their text.
  * - Attributes are checked one by one; invalid values fall back to defaults,
  *   and links with an unsafe href are removed.
+ * - Marks are sorted into schema order without duplicates; a text or hard
+ *   break with the code mark keeps only that mark, because Tiptap's code mark
+ *   excludes all others.
  * - Nodes nested deeper than `maxDepth` are reduced to their text.
  *   `maxDepth` defaults to RICHTEXT_MAX_DEPTH and can only be lowered: a
  *   value that is not a non-negative integer is ignored, and a larger one is

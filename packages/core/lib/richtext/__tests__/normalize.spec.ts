@@ -112,6 +112,43 @@ describe("normalizeRichText", () => {
         ).content?.[0].content?.[0].marks
       ).toEqual([{ type: "bold" }, { type: "italic" }, { type: "underline" }]);
     });
+
+    it("keeps only the code mark on text that carries other marks too, as Tiptap's code mark excludes them", () => {
+      const link = { type: "link", attrs: { href: "https://a.test" } };
+      const marksOf = (marks: unknown[], type = "text") =>
+        normalizeRichText(
+          doc({
+            type: "paragraph",
+            content: [
+              type === "text" ? { type, text: "x", marks } : { type, marks },
+            ],
+          })
+        ).content?.[0].content?.[0].marks;
+
+      expect(marksOf([{ type: "bold" }, { type: "code" }])).toEqual([
+        { type: "code" },
+      ]);
+      expect(marksOf([{ type: "code" }, link])).toEqual([{ type: "code" }]);
+      expect(
+        marksOf([
+          { type: "underline" },
+          { type: "code" },
+          { type: "strike" },
+          { type: "italic" },
+        ])
+      ).toEqual([{ type: "code" }]);
+      expect(
+        marksOf([{ type: "italic" }, { type: "code" }], "hardBreak")
+      ).toEqual([{ type: "code" }]);
+      // Marks that are dropped anyway do not count
+      expect(
+        marksOf([
+          { type: "code" },
+          { type: "highlight" },
+          { type: "link", attrs: { href: "javascript:alert(1)" } },
+        ])
+      ).toEqual([{ type: "code" }]);
+    });
   });
 
   describe("non-document input", () => {

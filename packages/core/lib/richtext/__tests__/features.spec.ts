@@ -67,10 +67,22 @@ const seededRandom = (seed: number) => () => {
   return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
 };
 
+/** Any mix of marks, in any order, the code mark with the marks it excludes included. */
+const randomMarks = (random: () => number) =>
+  [
+    { type: "link", attrs: { href: "https://a.test" } },
+    { type: "bold" },
+    { type: "italic" },
+    { type: "code" },
+    { type: "strike" },
+    { type: "underline" },
+  ]
+    .filter(() => random() < 0.3)
+    .sort(() => random() - 0.5);
+
 /**
  * Random blocks of any type in any place, often empty, for normalizeRichText
- * to turn into a normalized document. A text has at most one mark: Tiptap's
- * code mark excludes the others, which is not what this test is about.
+ * to turn into a normalized document.
  */
 const randomBlocks = (
   random: () => number,
@@ -97,14 +109,11 @@ const randomBlocks = (
         attrs: { level: 2 },
         content: Array.from({ length: Math.floor(random() * 3) }, () =>
           random() < 0.2
-            ? { type: "hardBreak" }
+            ? { type: "hardBreak", marks: randomMarks(random) }
             : {
                 type: "text",
                 text: pick(["a", "b"]),
-                marks:
-                  random() < 0.3
-                    ? [{ type: pick(["bold", "italic", "code", "strike"]) }]
-                    : [],
+                marks: randomMarks(random),
               }
         ),
       };
@@ -311,6 +320,55 @@ describe("documents fitted to the features, against the editor's schema", () => 
       expect(normalizeRichText(document)).toEqual(document);
     }
   });
+
+  it("gives text with the code mark and the marks it excludes a mark set the schema accepts", () => {
+    const link = { type: "link", attrs: { href: "https://a.test" } };
+    const document = normalizeRichText({
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [
+            {
+              type: "text",
+              text: "a",
+              marks: [{ type: "bold" }, { type: "code" }],
+            },
+            {
+              type: "hardBreak",
+              marks: [{ type: "code" }, { type: "italic" }],
+            },
+            { type: "text", text: "b", marks: [link, { type: "code" }] },
+            {
+              type: "text",
+              text: "c",
+              marks: [
+                { type: "underline" },
+                link,
+                { type: "strike" },
+                { type: "italic" },
+                { type: "bold" },
+              ],
+            },
+          ],
+        },
+      ],
+    });
+    const failures = allFeatureSets().filter(
+      (features) =>
+        !isValidIn(
+          ProseMirrorNode.fromJSON(
+            schemaFor(features),
+            fitRichTextToTypes(document, richTextFeaturesToTypes(features))
+          )
+        )
+    );
+
+    expect(() =>
+      ProseMirrorNode.fromJSON(schemaFor(RICHTEXT_FEATURES), document).check()
+    ).not.toThrow();
+    expect(failures).toEqual([]);
+  }, 30_000);
 
   it("gives random normalized documents a structure the schema accepts, and fitting them again changes nothing", () => {
     const random = seededRandom(20261019);
