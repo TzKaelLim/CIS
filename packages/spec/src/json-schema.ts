@@ -26,7 +26,8 @@ const hasOwn = (value: object, key: string): boolean =>
 export const isJsonSchemaNode = (value: unknown): value is JsonSchema =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
-function deepFreeze<T>(value: T): T {
+/** Freezes an object and everything in it. Internal: the helpers use it too. */
+export function deepFreeze<T>(value: T): T {
   if (typeof value === "object" && value !== null && !Object.isFrozen(value)) {
     Object.freeze(value);
     for (const key of Object.keys(value)) {

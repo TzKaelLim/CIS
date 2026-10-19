@@ -7,6 +7,8 @@ import {
   richTextFeaturesToTypes,
 } from "@tzuchi/tceditor/rules";
 import type { RichTextDoc, RichTextFeature } from "@tzuchi/tceditor/rules";
+import { JSON_SCHEMA_OPTIONS, deepFreeze } from "./json-schema";
+import type { JsonSchema } from "./json-schema";
 import type { HelperMeta, SlotRule } from "./meta";
 
 /** Longest link, in characters. */
@@ -40,8 +42,44 @@ const fail = (helper: string, message: string): never => {
   throw new TypeError(`${helper}(): ${message}`);
 };
 
-/** GlobalMeta types the helper-only keys as never, so the helpers cast. */
-const helperMeta = (meta: HelperMeta) => meta as z.GlobalMeta;
+/**
+ * The meta that each helper wrote, in a registry that only this module can
+ * add to. checkSpecRules compares it with the JSON Schema, so helper-only
+ * keys that a cast put in .meta() are reported even when they look right.
+ */
+const helperRegistry = z.registry<HelperMeta>();
+
+/**
+ * Sets the helper-only meta on a helper's schema. GlobalMeta types these keys
+ * as never, so this casts; the registry keeps its own frozen copy.
+ */
+function withHelperMeta<S extends z.ZodType>(schema: S, meta: HelperMeta): S {
+  const result = schema.meta(meta as z.GlobalMeta) as S;
+
+  helperRegistry.add(result, deepFreeze(JSON.parse(JSON.stringify(meta))));
+
+  return result;
+}
+
+/**
+ * The helper-only meta of a schema that slot(), richText(), image() or link()
+ * returned, or of a copy that .meta() or .describe() made of it; undefined for
+ * any other schema, including a wrapper that the author added, such as
+ * .optional() or .default(). Internal: checkSpecRules uses it.
+ */
+export const helperMetaOf = (schema: z.core.$ZodType): HelperMeta | undefined =>
+  helperRegistry.get(schema);
+
+/**
+ * The JSON Schema of a props object with only the meta that the helpers
+ * wrote (JSON_SCHEMA_OPTIONS otherwise). Internal: checkSpecRules compares
+ * its helper-only keys with toJsonSchema's.
+ */
+export const toHelperJsonSchema = (props: z.ZodObject): JsonSchema =>
+  z.toJSONSchema(props, {
+    ...JSON_SCHEMA_OPTIONS,
+    metadata: helperRegistry,
+  }) as JsonSchema;
 
 function enumOf<const V extends EnumValues>(
   helper: string,
@@ -121,27 +159,31 @@ export function link(
   options: { optional?: boolean } = {}
 ): z.ZodPrefault<z.ZodString> | z.ZodDefault<z.ZodString> {
   const optional = options.optional === true;
-  const meta = helperMeta({
+  const meta: HelperMeta = {
     "x-link": { optional },
     "x-lost-checks": ["safe-href"],
-  });
+  };
 
   if (optional) {
-    return z
-      .string()
-      .max(LINK_MAX_LENGTH, { abort: true })
-      .refine((value) => value === "" || isSafeHref(value), unsafeHref)
-      .default("")
-      .meta(meta);
+    return withHelperMeta(
+      z
+        .string()
+        .max(LINK_MAX_LENGTH, { abort: true })
+        .refine((value) => value === "" || isSafeHref(value), unsafeHref)
+        .default(""),
+      meta
+    );
   }
 
-  return z
-    .string()
-    .min(1, { abort: true })
-    .max(LINK_MAX_LENGTH, { abort: true })
-    .refine((value) => isSafeHref(value), unsafeHref)
-    .prefault("")
-    .meta(meta);
+  return withHelperMeta(
+    z
+      .string()
+      .min(1, { abort: true })
+      .max(LINK_MAX_LENGTH, { abort: true })
+      .refine((value) => isSafeHref(value), unsafeHref)
+      .prefault(""),
+    meta
+  );
 }
 
 /**
@@ -150,6 +192,11 @@ export function link(
  * text alignment, becomes plain text. paragraph, text and doc are always on.
  * A string is rejected (convert legacy HTML with richtext-migrate first), so
  * zod agrees with the JSON Schema's `type: "object"`.
+ *
+ * zod returns a `.default()` value as it is, without this cleanup, so a
+ * default must already be in the output shape (checkSpecRules, rule
+ * "defaults"):
+ * `.default(() => fitRichTextToTypes(textToRichText("…"), richTextFeaturesToTypes(features)))`.
  */
 export function richText(options: {
   features: readonly RichTextFeature[];
@@ -174,12 +221,10 @@ export function richText(options: {
       fitRichTextToTypes(normalizeRichText(value), types)
     ) as unknown as RichTextSchema;
 
-  return schema.meta(
-    helperMeta({
-      "x-richtext": { features },
-      "x-lost-checks": ["richtext-normalize"],
-    })
-  );
+  return withHelperMeta(schema, {
+    "x-richtext": { features },
+    "x-lost-checks": ["richtext-normalize"],
+  });
 }
 
 const validateSlotRule = (rule: SlotRule): SlotRule => {
@@ -221,10 +266,10 @@ export function slot(rule: SlotRule): SlotSchema {
     props: z.record(z.string(), z.unknown()),
   });
 
-  return z
-    .array(item)
-    .default(() => [])
-    .meta(helperMeta({ "x-slot": xSlot }));
+  return withHelperMeta(
+    z.array(item).default(() => []),
+    { "x-slot": xSlot }
+  );
 }
 
 /**
@@ -236,16 +281,18 @@ export function slot(rule: SlotRule): SlotSchema {
  * that leaves the image out fails at `assetId`.
  */
 export function image(): ImageSchema {
-  return z
-    .strictObject({
-      assetId: z.string().regex(ASSET_ID_PATTERN).meta({ title: "圖片" }),
-      alt: z.string().max(IMAGE_ALT_MAX_LENGTH).meta({ title: "替代文字" }),
-      decorative: z.boolean().meta({ title: "裝飾用圖片" }),
-    })
-    .refine((value) => value.decorative || value.alt.trim() !== "", {
-      path: ["alt"],
-      params: { code: "alt_required" },
-    })
-    .prefault(() => ({ assetId: "", alt: "", decorative: false }))
-    .meta(helperMeta({ "x-image": true, "x-lost-checks": ["alt-required"] }));
+  return withHelperMeta(
+    z
+      .strictObject({
+        assetId: z.string().regex(ASSET_ID_PATTERN).meta({ title: "圖片" }),
+        alt: z.string().max(IMAGE_ALT_MAX_LENGTH).meta({ title: "替代文字" }),
+        decorative: z.boolean().meta({ title: "裝飾用圖片" }),
+      })
+      .refine((value) => value.decorative || value.alt.trim() !== "", {
+        path: ["alt"],
+        params: { code: "alt_required" },
+      })
+      .prefault(() => ({ assetId: "", alt: "", decorative: false })),
+    { "x-image": true, "x-lost-checks": ["alt-required"] }
+  );
 }

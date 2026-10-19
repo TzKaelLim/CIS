@@ -1,6 +1,8 @@
 import * as z from "zod";
+import { stableStringify } from "@tzuchi/tceditor/rules";
 import { BLOCK_TYPE_PATTERN } from "./define";
 import type { AnyBlockSpec, PageRootSpec } from "./define";
+import { helperMetaOf, toHelperJsonSchema } from "./helpers";
 import {
   JSON_SCHEMA_OPTIONS,
   eachField,
@@ -9,8 +11,8 @@ import {
   toJsonSchema,
 } from "./json-schema";
 import type { JsonSchema } from "./json-schema";
-import { META_KEYS } from "./meta";
-import type { LostCheck } from "./meta";
+import { ITEM_LABEL_PLACEHOLDER, META_KEYS } from "./meta";
+import type { HelperMeta } from "./meta";
 
 export type SpecRuleId =
   | "type-name"
@@ -25,7 +27,9 @@ export type SpecRuleId =
   | "meta-keys"
   | "slot-shape"
   | "slot-targets"
-  | "example-count";
+  | "example-count"
+  | "defaults"
+  | "item-label";
 
 export type SpecRuleViolation = {
   rule: SpecRuleId;
@@ -36,11 +40,18 @@ export type SpecRuleViolation = {
   message: string;
 };
 
+/**
+ * Props that Puck passes to every view (id, puck, editMode; children on the
+ * root) or that React keeps out of a component's props (key, and ref outside
+ * React 19 function components).
+ */
 export const RESERVED_FIELD_NAMES = [
   "id",
   "puck",
   "editMode",
   "children",
+  "key",
+  "ref",
 ] as const;
 
 /** The intersection of Puck's field names and MCP's property key rules. */
@@ -67,9 +78,6 @@ export const SCHEMA_KEYWORDS = [
   "pattern",
   "minimum",
   "maximum",
-  "exclusiveMinimum",
-  "exclusiveMaximum",
-  "multipleOf",
   "minItems",
   "maxItems",
   "propertyNames",
@@ -81,13 +89,34 @@ const REF_KEYS = ["$ref", "$defs", "definitions"];
 const NESTED_KEYS = ["additionalProperties", "propertyNames"];
 const LIST_KEYS = ["anyOf", "oneOf", "allOf", "prefixItems"];
 const RESERVED = new Set<string>(RESERVED_FIELD_NAMES);
+/** Number keywords that zod emits for .gt(), .lt(), .positive(), .multipleOf() and the like. */
+const NUMBER_KEYWORDS = new Set([
+  "exclusiveMinimum",
+  "exclusiveMaximum",
+  "multipleOf",
+]);
 
-/** The key that link(), image() and richText() write, the check they list in x-lost-checks and their JSON type. */
-const HELPER_KEYS: readonly (readonly [string, LostCheck, string])[] = [
-  ["x-link", "safe-href", "string"],
-  ["x-image", "alt-required", "object"],
-  ["x-richtext", "richtext-normalize", "object"],
+/** The keys that only slot(), richText(), image() and link() write (HelperMeta). */
+const HELPER_META_KEYS: readonly (keyof HelperMeta)[] = [
+  "x-slot",
+  "x-richtext",
+  "x-image",
+  "x-link",
+  "x-lost-checks",
 ];
+/** The keys that mark a node as the value of a helper. */
+const HELPER_NODE_KEYS = ["x-slot", "x-richtext", "x-image", "x-link"];
+
+/** zod wrappers that keep the schema they wrap in def.innerType. */
+const WRAPPER_TYPES = new Set([
+  "optional",
+  "nullable",
+  "default",
+  "prefault",
+  "nonoptional",
+  "readonly",
+  "catch",
+]);
 
 const hasOwn = (value: object, key: string): boolean =>
   Object.prototype.hasOwnProperty.call(value, key);
@@ -101,27 +130,126 @@ const sameJson = (a: unknown, b: unknown) =>
 type Report = (rule: SpecRuleId, path: string, message: string) => void;
 
 /**
- * x-link, x-image, x-richtext and x-lost-checks come from link(), image() and
- * richText() only (GlobalMeta types them as never): a node carries at most one
- * of the three helper keys, with the helper's JSON type and exactly the
- * helper's lost check.
+ * Compares the helper-only keys of a props schema (`actual`, from
+ * toJsonSchema) with the ones the helpers wrote (`written`, from
+ * toHelperJsonSchema), node by node: a key that no helper wrote, a missing
+ * one or a changed value breaks "meta-keys". GlobalMeta types these keys as
+ * never, so this catches the ones that a cast put in .meta().
  */
-function checkHelperKeys(node: JsonSchema, path: string, report: Report) {
-  const helpers = HELPER_KEYS.filter(([key]) => hasOwn(node, key));
+function checkHelperMeta(
+  actual: unknown,
+  written: unknown,
+  path: string,
+  report: Report
+) {
+  if (!isJsonSchemaNode(actual)) return;
 
-  if (helpers.length === 0 && !hasOwn(node, "x-lost-checks")) return;
+  const helper: JsonSchema = isJsonSchemaNode(written) ? written : {};
+  const differ = HELPER_META_KEYS.filter(
+    (key) =>
+      hasOwn(actual, key) !== hasOwn(helper, key) ||
+      stableStringify(actual[key]) !== stableStringify(helper[key])
+  );
 
-  const [helper] = helpers;
-
-  if (
-    helpers.length !== 1 ||
-    node.type !== helper[2] ||
-    !sameJson(node["x-lost-checks"], [helper[1]])
-  ) {
+  if (differ.length > 0) {
     report(
       "meta-keys",
       path,
-      "x-link, x-image, x-richtext and x-lost-checks are written by link(), image() and richText(); do not set them in .meta()"
+      `${differ.join(
+        ", "
+      )} must be exactly what slot(), richText(), image() and link() write; do not set ${
+        differ.length === 1 ? "it" : "them"
+      } in .meta()`
+    );
+  }
+
+  const child = (key: string): unknown =>
+    hasOwn(helper, key) ? helper[key] : undefined;
+  const { properties } = actual;
+  const helperProperties = child("properties");
+
+  if (isJsonSchemaNode(properties)) {
+    for (const name of Object.keys(properties)) {
+      checkHelperMeta(
+        properties[name],
+        isJsonSchemaNode(helperProperties) && hasOwn(helperProperties, name)
+          ? helperProperties[name]
+          : undefined,
+        childPath(path, name),
+        report
+      );
+    }
+  }
+
+  checkHelperMeta(actual.items, child("items"), `${path}[]`, report);
+
+  for (const key of NESTED_KEYS) {
+    checkHelperMeta(actual[key], child(key), `${path}{${key}}`, report);
+  }
+
+  for (const key of LIST_KEYS) {
+    const list = actual[key];
+    const helperList = child(key);
+
+    if (Array.isArray(list)) {
+      list.forEach((item, index) =>
+        checkHelperMeta(
+          item,
+          Array.isArray(helperList) ? helperList[index] : undefined,
+          `${path}{${key}[${index}]}`,
+          report
+        )
+      );
+    }
+  }
+}
+
+/**
+ * x-item-label goes on a list, and its placeholders name text or number
+ * fields of the item (or {n}, the index), because the editor only inserts
+ * those.
+ */
+function checkItemLabel(node: JsonSchema, path: string, report: Report) {
+  const template = node["x-item-label"];
+  const { items } = node;
+
+  if (
+    node.type !== "array" ||
+    hasOwn(node, "x-slot") ||
+    !isJsonSchemaNode(items) ||
+    items.type !== "object"
+  ) {
+    report("item-label", path, "x-item-label is only valid on a list");
+
+    return;
+  }
+  if (typeof template !== "string") {
+    report("item-label", path, "x-item-label must be a string");
+
+    return;
+  }
+
+  const properties = isJsonSchemaNode(items.properties) ? items.properties : {};
+  const invalid: string[] = [];
+
+  for (const [placeholder, name] of template.matchAll(ITEM_LABEL_PLACEHOLDER)) {
+    if (name === "n") continue;
+
+    const field = hasOwn(properties, name) ? properties[name] : undefined;
+    const type = isJsonSchemaNode(field) ? field.type : undefined;
+
+    if (type !== "string" && type !== "number" && type !== "integer") {
+      invalid.push(placeholder);
+    }
+  }
+
+  if (invalid.length > 0) {
+    report(
+      "item-label",
+      path,
+      `x-item-label names ${invalid.join(
+        ", "
+      )}: a placeholder must be {n} or a text or number field of the item`
     );
   }
 }
@@ -257,13 +385,15 @@ function checkNode(
   }
 
   for (const key of Object.keys(node)) {
-    if (REF_KEYS.indexOf(key) === -1 && !ALLOWED_KEYS.has(key)) {
-      report(
-        "meta-keys",
-        path,
-        `"${key}" is not an allowed JSON Schema keyword or meta key`
-      );
-    }
+    if (REF_KEYS.indexOf(key) !== -1 || ALLOWED_KEYS.has(key)) continue;
+
+    report(
+      "meta-keys",
+      path,
+      NUMBER_KEYWORDS.has(key)
+        ? `"${key}" is not allowed: limit numbers with .int(), .min() and .max(), because the editor fields ignore steps and exclusive bounds`
+        : `"${key}" is not an allowed JSON Schema keyword or meta key`
+    );
   }
 
   // .nullable() and unions of plain types give type: ["string", "null"].
@@ -275,7 +405,7 @@ function checkNode(
     );
   }
 
-  checkHelperKeys(node, path, report);
+  if (hasOwn(node, "x-item-label")) checkItemLabel(node, path, report);
 
   if (hasOwn(node, "x-slot")) {
     // The item shell's props record is open on purpose: the page validator
@@ -296,9 +426,20 @@ function checkNode(
     );
   }
 
-  if (
+  const { items } = node;
+  const helperItems =
+    isJsonSchemaNode(items) &&
+    HELPER_NODE_KEYS.some((key) => hasOwn(items, key));
+
+  if (node.type === "array" && helperItems) {
+    report(
+      "object-arrays",
+      path,
+      "list items must be z.strictObject({...}): put the helper in a field of the item, e.g. z.array(z.strictObject({ image: image() }))"
+    );
+  } else if (
     node.type === "array" &&
-    !(isJsonSchemaNode(node.items) && node.items.type === "object")
+    !(isJsonSchemaNode(items) && items.type === "object")
   ) {
     report(
       "object-arrays",
@@ -383,17 +524,165 @@ function objectSignature(node: JsonSchema): string | null {
 
 type FieldUse = { type: string; path: string; signature: string | null };
 
+type ZodWrapperDef = { type: string; innerType?: z.core.$ZodType };
+
+/**
+ * Strips the zod wrappers (.optional(), .default(), …) off a field down to the
+ * schema a helper made, or down to the first schema that is not a wrapper.
+ */
+function unwrapField(field: z.core.$ZodType): {
+  schema: z.core.$ZodType;
+  wrappers: string[];
+  helper: HelperMeta | undefined;
+} {
+  const wrappers: string[] = [];
+  let schema = field;
+
+  for (;;) {
+    const helper = helperMetaOf(schema);
+
+    if (helper !== undefined) return { schema, wrappers, helper };
+
+    const def = schema._zod.def as ZodWrapperDef;
+
+    if (!WRAPPER_TYPES.has(def.type) || def.innerType === undefined) {
+      return { schema, wrappers, helper };
+    }
+    wrappers.push(def.type);
+    schema = def.innerType;
+  }
+}
+
+/** The object schema of a group field, or of the items of a list field. */
+function nestedShape(
+  schema: z.core.$ZodType,
+  path: readonly string[]
+): [z.core.$ZodShape, string[]] | undefined {
+  const def = schema._zod.def;
+
+  if (def.type === "object") {
+    return [(def as z.core.$ZodObjectDef).shape, [...path]];
+  }
+  if (def.type === "array") {
+    const item = unwrapField((def as z.core.$ZodArrayDef).element);
+    const itemDef = item.schema._zod.def;
+
+    if (item.helper === undefined && itemDef.type === "object") {
+      return [(itemDef as z.core.$ZodObjectDef).shape, [...path, "[]"]];
+    }
+  }
+
+  return undefined;
+}
+
+/** safeParse, with a default function or a check that throws counted as a failure. */
+const tryParse = (schema: z.core.$ZodType, value: unknown) => {
+  try {
+    return z.safeParse(schema, value);
+  } catch {
+    return { success: false as const };
+  }
+};
+
+/**
+ * What is wrong with the default of a field, if anything. A required link()
+ * or image() must fail without a value (its .prefault() is incomplete on
+ * purpose); every other top-level field needs a default; and a default must
+ * pass validation unchanged, because zod returns it as it is.
+ */
+function defaultProblem(
+  field: z.core.$ZodType,
+  required: boolean,
+  topLevel: boolean
+): string | undefined {
+  const first = tryParse(field, undefined);
+
+  if (required) {
+    return first.success
+      ? "a required link() or image() must stay required: do not give it a default (an optional link is link({ optional: true }))"
+      : undefined;
+  }
+  if (!first.success) {
+    return topLevel
+      ? "needs a default that passes validation (only the required link() and image() may lack one)"
+      : undefined;
+  }
+  if (first.data === undefined) return undefined;
+
+  const expected = stableStringify(first.data);
+  const second = tryParse(field, first.data);
+
+  if (!second.success) return "the default does not pass validation";
+  if (stableStringify(second.data) !== expected) {
+    return "validation changes the default: write it in the shape the field outputs (rich text through fitRichTextToTypes, objects with every field)";
+  }
+
+  return undefined;
+}
+
+/**
+ * The "defaults" rule for the fields of an object schema, then for the fields
+ * of its groups and list items. Fields inside groups and list items may lack
+ * a default: their object's default holds them.
+ */
+function checkDefaults(
+  shape: z.core.$ZodShape,
+  path: readonly string[],
+  topLevel: boolean,
+  report: Report
+) {
+  for (const name of Object.keys(shape)) {
+    const field = shape[name];
+    const fieldPath = [...path, name];
+    const key = fieldPathKey(fieldPath);
+    const { schema, wrappers, helper } = unwrapField(field);
+    const linkOrImage =
+      helper !== undefined &&
+      (hasOwn(helper, "x-link") || hasOwn(helper, "x-image"));
+
+    if (
+      linkOrImage &&
+      wrappers.some((type) => type === "optional" || type === "nullable")
+    ) {
+      report(
+        "defaults",
+        key,
+        "do not wrap link() or image() in .optional() or .nullable(): an optional link is link({ optional: true }), and image() is always required"
+      );
+      continue;
+    }
+
+    const required =
+      helper?.["x-image"] === true || helper?.["x-link"]?.optional === false;
+    const problem = defaultProblem(field, required, topLevel);
+
+    if (problem !== undefined) report("defaults", key, problem);
+
+    // Slots, rich text, images and links have no fields of their own.
+    if (helper !== undefined) continue;
+
+    const nested = nestedShape(schema, fieldPath);
+
+    if (nested) checkDefaults(nested[0], nested[1], false, report);
+  }
+}
+
 /**
  * Checks the writing rules of spec §4.3 on a set of block specs and the page
  * root: type names, unique types, props that convert to an inline
  * `type: "object"` schema, strict objects (except the slot item's props and
- * rich text), arrays of objects only and with a maximum (slots excepted), a
- * title on every field, field names and
- * reserved names (including Object.prototype's), keys limited to
- * SCHEMA_KEYWORDS and META_KEYS with .meta() adding META_KEYS only, one JSON
- * type per node, helper-only keys left to the helpers, the same structure for
- * every field name that holds slots (rule 8), slot rules that name registered
- * blocks, and at least one example.
+ * rich text), arrays of objects only (not of helper values) and with a
+ * maximum (slots excepted), a title on every field, field names and reserved
+ * names (including Object.prototype's), keys limited to SCHEMA_KEYWORDS and
+ * META_KEYS with .meta() adding META_KEYS only (so no steps or exclusive
+ * number bounds), one JSON type per node, helper-only keys exactly as the
+ * helpers wrote them, x-item-label placeholders that name text or number
+ * fields of the item, the same structure for every field name that holds
+ * slots (rule 8), slot rules that name registered blocks, at least one
+ * example, and defaults ("defaults": every top-level field has a default
+ * except the required link() and image(), which must fail without a value
+ * and are never wrapped in .optional() or .nullable(); a default, at any
+ * level, passes validation unchanged).
  *
  * It only looks at the specs: "every example passes the page validator" is
  * tested with the validator. A spec that zod cannot convert to JSON Schema
@@ -431,6 +720,7 @@ export function checkSpecRules(input: {
       "",
       report
     );
+    checkHelperMeta(schema, toHelperJsonSchema(spec.props), "", report);
 
     eachField(schema, ({ path, name, node }) => {
       const key = fieldPathKey(path);
@@ -456,6 +746,8 @@ export function checkSpecRules(input: {
       uses.push({ type, path: key, signature: slotSignature(node) });
       fieldUses.set(name, uses);
     });
+
+    checkDefaults(spec.props.shape, [], true, report);
   };
 
   for (const spec of input.blocks) {

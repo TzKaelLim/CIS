@@ -21,6 +21,13 @@ export const X_KEYS = [
 
 export type XKey = (typeof X_KEYS)[number];
 
+/**
+ * A placeholder in an `x-item-label` template: `{n}` (the item's 1-based
+ * index) or `{<field>}`. Other braces are plain text. Internal: the editor
+ * fields and checkSpecRules share it.
+ */
+export const ITEM_LABEL_PLACEHOLDER = /\{([A-Za-z][A-Za-z0-9_-]{0,63})\}/g;
+
 /** Every key `.meta()` may set. `id` is left out on purpose: it turns the node into a `$ref`. */
 export const META_KEYS = [
   "title",

@@ -61,6 +61,9 @@ export function requiredOf(node: JsonSchema): string[] {
 /**
  * 必填的 link() 與 image()。它們用 .prefault()，在 io "input" 下不列入 required，
  * 預設值（""、assetId ""）卻刻意不合格，所以省略它們的資料會被拒絕。
+ * JSON Schema 分不出外面再接的 .optional()、.default()，這個判斷要靠
+ * checkSpecRules 的 "defaults" 規則：它不允許這兩個 helper 被包成選填或另給預設值，
+ * x-link、x-image 也一定是 helper 寫的（"meta-keys"）。
  */
 export function hasFailingDefault(node: JsonSchema): boolean {
   const link = node["x-link"];

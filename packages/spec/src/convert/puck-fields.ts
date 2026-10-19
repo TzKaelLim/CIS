@@ -11,6 +11,7 @@ import type * as z from "zod";
 import type { AnyBlockSpec, PageRootSpec } from "../define";
 import { fieldKindOf } from "../field-kind";
 import { toJsonSchema, type JsonSchema } from "../json-schema";
+import { ITEM_LABEL_PLACEHOLDER } from "../meta";
 import {
   RADIO_MAX_OPTIONS,
   enumValues,
@@ -26,9 +27,6 @@ export type FieldFactories = {
   /** 產生圖片欄位（Puck 的 custom 欄位）。name 是欄位名稱，label 是欄位的 title。 */
   image?: (ctx: { name: string; label: string }) => Field;
 };
-
-/** x-item-label 樣板中的 {欄位名} 與 {n}。 */
-const ITEM_LABEL_PLACEHOLDER = /\{([A-Za-z][A-Za-z0-9_-]{0,63})\}/g;
 
 /**
  * 依 x-item-label 樣板產生清單項目的摘要：{n} 代入從 1 起算的序號，

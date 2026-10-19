@@ -2,7 +2,11 @@
 // compile when the inferred type drifts, and each @ts-expect-error fails when
 // the line it marks starts to compile.
 import * as z from "zod";
-import { textToRichText } from "@tzuchi/tceditor/rules";
+import {
+  fitRichTextToTypes,
+  richTextFeaturesToTypes,
+  textToRichText,
+} from "@tzuchi/tceditor/rules";
 import type { RichTextDoc } from "@tzuchi/tceditor/rules";
 import { defineBlockSpec } from "../define";
 import type { BlockProps } from "../define";
@@ -104,7 +108,9 @@ export const chained = {
   href: link().meta({ title: "連結" }),
   more: link({ optional: true }).meta({ title: "更多" }),
   body: richText({ features: ["bold"] })
-    .default(() => textToRichText(""))
+    .default(() =>
+      fitRichTextToTypes(textToRichText(""), richTextFeaturesToTypes(["bold"]))
+    )
     .meta({ title: "內文" }),
   content: slot({ allow: ["Leaf"] }).meta({ title: "內容" }),
   picture: image().meta({ title: "圖片" }),
