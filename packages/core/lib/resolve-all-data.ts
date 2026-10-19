@@ -9,7 +9,7 @@ import {
   RootData,
 } from "../types";
 import {
-  ResolveDataCache,
+  createResolveDataCache,
   resolveComponentData,
 } from "./resolve-component-data";
 import { groupZonesByComponent } from "./group-zones-by-component";
@@ -35,7 +35,7 @@ export async function resolveAllData<
   // returns, rather than accumulating in the shared module-level cache. This
   // prevents unbounded memory growth when resolving many pages with unique
   // component IDs.
-  const cacheStore: ResolveDataCache = { lastChange: {} };
+  const cacheStore = createResolveDataCache();
 
   let resolvedZones: Record<string, Content> = {};
 

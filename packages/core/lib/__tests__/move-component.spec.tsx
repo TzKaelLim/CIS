@@ -112,7 +112,7 @@ describe("moveComponent", () => {
   beforeEach(async () => {
     resetStores();
     jest.clearAllMocks();
-    cache.lastChange = {};
+    cache.lastChange = Object.create(null);
 
     // Initialize resolveData cache
     await act(async () => {

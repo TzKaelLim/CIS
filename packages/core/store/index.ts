@@ -281,7 +281,8 @@ export const createAppStore = (initialAppStore?: Partial<AppStore>) =>
         const parentNode = parentId ? state.indexes.nodes[parentId] : null;
         const parentData = parentNode?.data ?? null;
 
-        const timeouts: Record<string, () => void> = {};
+        // Keyed by component id
+        const timeouts: Record<string, () => void> = Object.create(null);
 
         return await resolveComponentData(
           componentData,

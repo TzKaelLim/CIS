@@ -14,10 +14,20 @@ import { lookupComponentConfig } from "./lookup-component-config";
 import { deepEqual } from "fast-equals";
 
 export type ResolveDataCache = {
+  /** Keyed by component id ("root" for the root) */
   lastChange: Record<string, any>;
 };
 
-export const cache: ResolveDataCache = { lastChange: {} };
+/**
+ * A cache without a prototype: a component id such as "__proto__" is an own
+ * entry like any other id, instead of replacing the prototype that the
+ * lookups of other ids go through.
+ */
+export const createResolveDataCache = (): ResolveDataCache => ({
+  lastChange: Object.create(null),
+});
+
+export const cache: ResolveDataCache = createResolveDataCache();
 
 export const resolveComponentData = async <
   T extends ComponentData | RootDataWithProps

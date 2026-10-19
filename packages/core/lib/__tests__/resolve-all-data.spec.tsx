@@ -1,5 +1,6 @@
 import { ComponentData, Config, Data, RootData } from "../../types";
 import { resolveAllData } from "../resolve-all-data";
+import * as resolveComponentDataModule from "../resolve-component-data";
 import { cache } from "../resolve-component-data";
 
 const item4 = {
@@ -366,8 +367,42 @@ describe("resolve-data", () => {
     expect(receivedParentById[item1_2_1.props.id]?.props.prop).toBe("Resolved");
   });
 
+  it("keeps the local cache entry of a component with the id __proto__ as an own entry", async () => {
+    const spy = jest.spyOn(resolveComponentDataModule, "resolveComponentData");
+
+    try {
+      await resolveAllData(
+        {
+          root: { props: {} },
+          content: [
+            {
+              type: "ComponentWithResolveProps",
+              props: { id: "__proto__", prop: "Original", slot: [] },
+            },
+          ],
+        },
+        config
+      );
+
+      const caches = new Set(spy.mock.calls.map((call) => call[8]));
+
+      expect(caches.size).toBe(1);
+
+      const [local] = caches;
+
+      expect(local).not.toBe(cache);
+      expect(Object.keys(local!.lastChange).sort()).toEqual([
+        "__proto__",
+        "root",
+      ]);
+      expect(Object.getPrototypeOf(local!.lastChange)).toBeNull();
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
   it("should not write to the shared module-level cache", async () => {
-    cache.lastChange = {};
+    cache.lastChange = Object.create(null);
 
     await resolveAllData(data, config);
 

@@ -88,7 +88,7 @@ describe("resolveDataById", () => {
   beforeEach(async () => {
     resetStores();
     jest.clearAllMocks();
-    cache.lastChange = {};
+    cache.lastChange = Object.create(null);
   });
 
   it("resolves when called", async () => {

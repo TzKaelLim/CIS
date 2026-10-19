@@ -111,7 +111,7 @@ const config: Config<{
 
 describe("resolveComponentData", () => {
   beforeEach(() => {
-    cache.lastChange = {};
+    cache.lastChange = Object.create(null);
     appStore.setState({ ...appStore.getInitialState(), config }, true);
     jest.clearAllMocks();
   });
@@ -469,5 +469,53 @@ describe("resolveComponentData", () => {
     expect(insertedResolution.didChange).toBe(true);
     expect(movedResolution.node).toStrictEqual({});
     expect(movedResolution.didChange).toBe(false);
+  });
+});
+
+describe("resolveComponentData with ids named like Object.prototype members", () => {
+  it("keeps the cache entry of the id __proto__ as an own entry", async () => {
+    // A fresh copy of the module, so that the cache is the one it starts with
+    let fresh: typeof import("../resolve-component-data") | undefined;
+
+    jest.isolateModules(() => {
+      fresh = require("../resolve-component-data");
+    });
+
+    const { cache: freshCache, resolveComponentData: resolve } = fresh!;
+    const resolver = jest.fn(({ props }) => ({
+      props: { ...props, prop: "Resolved" },
+    }));
+    const protoConfig: Config = {
+      components: {
+        Comp: {
+          fields: { prop: { type: "text" } },
+          resolveData: resolver,
+          render: () => <div />,
+        },
+      },
+    };
+    const items = ["__proto__", "constructor"].map((id) => ({
+      type: "Comp",
+      props: { id, prop: "Hello" },
+    }));
+
+    for (const item of items) {
+      await resolve(item, protoConfig);
+    }
+
+    // The same data again: both entries are found, so the resolver is skipped
+    for (const item of items) {
+      expect((await resolve(item, protoConfig)).didChange).toBe(false);
+    }
+
+    expect(resolver).toHaveBeenCalledTimes(2);
+    expect(Object.keys(freshCache.lastChange)).toEqual([
+      "__proto__",
+      "constructor",
+    ]);
+    expect(freshCache.lastChange["__proto__"].item).toBe(items[0]);
+    // Another id does not find the fields of that entry
+    expect(freshCache.lastChange["item"]).toBeUndefined();
+    expect(Object.getPrototypeOf(freshCache.lastChange)).toBeNull();
   });
 });
