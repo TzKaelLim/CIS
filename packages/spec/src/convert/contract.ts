@@ -1,4 +1,4 @@
-import type { AnyBlockSpec } from "../define";
+import type { AnyBlockSpec, PageRootSpec } from "../define";
 import { fieldKindOf } from "../field-kind";
 import { toJsonSchema, type JsonSchema } from "../json-schema";
 import {
@@ -75,10 +75,10 @@ function sortKeysDeep(value: unknown): unknown {
 }
 
 /**
- * 區塊的資料契約：規格 JSON Schema 去掉標籤、說明、範例、預設值後的結構，
+ * 區塊或頁面根節點的資料契約：規格 JSON Schema 去掉標籤、說明、範例、預設值後的結構，
  * enum、required、x-slot、x-richtext.features、x-lost-checks 排序，物件 key 排序（規格 §4.6）。
  */
-export function toDataContract(spec: AnyBlockSpec): JsonSchema {
+export function toDataContract(spec: AnyBlockSpec | PageRootSpec): JsonSchema {
   return sortKeysDeep(
     rewriteSchema(toJsonSchema(spec), canonicalNode)
   ) as JsonSchema;

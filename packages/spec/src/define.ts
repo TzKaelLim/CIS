@@ -25,6 +25,8 @@ export type AnyBlockSpec = BlockSpec<string, z.ZodObject>;
 export type PageRootSpec<P extends z.ZodObject = z.ZodObject> = Readonly<{
   kind: "root";
   label: string;
+  /** Raised by 1 for each compatible change, like a block's (spec §4.6). */
+  version: number;
   props: P;
 }>;
 
@@ -125,18 +127,28 @@ export function defineBlockSpec<
   });
 }
 
-/** Declares the page root (page title, description, …). `label` defaults to "頁面". */
+/**
+ * Declares the page root (page title, description, …). `label` defaults to
+ * "頁面" and `version` to 1; the root's data contract is versioned like a
+ * block's. Throws a TypeError for an empty label, a version that is not a
+ * positive integer or props that are not a z.strictObject.
+ */
 export function definePageRoot<P extends z.ZodObject>(input: {
   label?: string;
+  version?: number;
   props: P;
 }): PageRootSpec<P> {
   const fn = "definePageRoot";
   const label = input.label ?? "頁面";
+  const version = input.version ?? 1;
 
   if (!isNonEmptyString(label)) fail(fn, "label must not be empty");
+  if (!Number.isInteger(version) || version < 1) {
+    fail(fn, "version must be a positive integer");
+  }
   if (!isStrictObject(input.props)) {
     fail(fn, "props must be a z.strictObject");
   }
 
-  return Object.freeze({ kind: "root", label, props: input.props });
+  return Object.freeze({ kind: "root", label, version, props: input.props });
 }

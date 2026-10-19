@@ -3,6 +3,8 @@ import { definePageRoot } from "@tzuchi/tceditor-spec";
 import type { BlockProps } from "@tzuchi/tceditor-spec";
 
 export const pageRootSpec = definePageRoot({
+  // Versioned like a block: generated/schemas/Root.v<version>.json (spec §4.6)
+  version: 1,
   props: z.strictObject({
     title: z.string().min(1).max(80).default("未命名頁面").meta({
       title: "頁面標題",

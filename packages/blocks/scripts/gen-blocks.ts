@@ -1,6 +1,7 @@
 // Writes the files generated from the block specs: one story per block, the
-// MCP catalog, the database page shell and a data contract snapshot per block
-// version. Run from the repo root with `pnpm gen:blocks`; commit the result.
+// MCP catalog, the database page shell and a data contract snapshot per
+// version of each block and of the page root. Run from the repo root with
+// `pnpm gen:blocks`; commit the result.
 //
 // generated.spec.ts and compat.spec.ts fail when these files are out of date.
 import {
@@ -16,8 +17,11 @@ import {
   describeContractProblem,
 } from "../src/generate/contracts";
 import { findStoryFiles, readSnapshots } from "../src/generate/disk";
-import { generateFiles, planGeneration } from "../src/generate/files";
-import { blockSpecs } from "../src/specs";
+import {
+  contractSpecs,
+  generateFiles,
+  planGeneration,
+} from "../src/generate/files";
 
 // process.argv[1] is this script's path under tsx in both module formats
 const packageDir = resolve(dirname(process.argv[1]), "..");
@@ -34,7 +38,7 @@ const files = generateFiles(packageDir);
 const plan = planGeneration({
   files,
   problems: checkContracts(
-    blockSpecs,
+    contractSpecs,
     readSnapshots(join(packageDir, "generated/schemas"))
   ),
   read,
@@ -58,8 +62,8 @@ for (const file of plan.write) {
 }
 
 for (const path of plan.keep) {
-  console.warn(
-    `gen:blocks: ${path} differs from a fresh snapshot in formatting only; snapshots never change once committed, so restore it from git`
+  console.log(
+    `gen:blocks: kept ${path}: the same contract in other formatting (committed snapshots are never rewritten, and the tests compare their contents)`
   );
 }
 

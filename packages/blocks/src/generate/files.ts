@@ -1,10 +1,15 @@
+import { stableStringify } from "@tzuchi/tceditor/rules";
 import {
   buildCatalog,
   buildPageShellSchema,
   toDataContract,
 } from "@tzuchi/tceditor-spec";
 import { blockSpecs, pageRootSpec } from "../specs";
-import { snapshotFileName, type ContractProblem } from "./contracts";
+import {
+  snapshotFileName,
+  type ContractProblem,
+  type ContractSpec,
+} from "./contracts";
 import { GENERATED_HEADER, renderStoryFile, storyFilePath } from "./stories";
 
 export type GeneratedFile = {
@@ -13,14 +18,35 @@ export type GeneratedFile = {
   contents: string;
   /**
    * "regenerate": gen:blocks rewrites it whenever the specs change.
-   * "snapshot": a data contract, written once per block version and never changed.
+   * "snapshot": a data contract, written once per version of a block or the
+   * page root and never changed.
    */
   kind: "regenerate" | "snapshot";
 };
 
+/** The specs with a data contract snapshot: every block, then the page root. */
+export const contractSpecs: readonly ContractSpec[] = [
+  ...blockSpecs,
+  pageRootSpec,
+];
+
 /** How every generated JSON file is written. */
 export function jsonFile(value: unknown): string {
   return `${JSON.stringify(value, null, 2)}\n`;
+}
+
+/**
+ * Whether two snapshot files hold the same data contract: the same JSON,
+ * whatever the formatting and key order. A committed snapshot keeps the
+ * formatting it was written with, even after jsonFile or the order of
+ * toDataContract's output changes. False when either is not JSON.
+ */
+export function sameSnapshot(a: string, b: string): boolean {
+  try {
+    return stableStringify(JSON.parse(a)) === stableStringify(JSON.parse(b));
+  } catch {
+    return false;
+  }
 }
 
 /**
@@ -44,18 +70,19 @@ export function generateFiles(packageDir: string): GeneratedFile[] {
   ];
 
   for (const spec of blockSpecs) {
-    files.push(
-      {
-        path: storyFilePath(spec),
-        contents: renderStoryFile(spec, packageDir),
-        kind: "regenerate",
-      },
-      {
-        path: `generated/schemas/${snapshotFileName(spec)}`,
-        contents: jsonFile(toDataContract(spec)),
-        kind: "snapshot",
-      }
-    );
+    files.push({
+      path: storyFilePath(spec),
+      contents: renderStoryFile(spec, packageDir),
+      kind: "regenerate",
+    });
+  }
+
+  for (const spec of contractSpecs) {
+    files.push({
+      path: `generated/schemas/${snapshotFileName(spec)}`,
+      contents: jsonFile(toDataContract(spec)),
+      kind: "snapshot",
+    });
   }
 
   return files.sort((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0));
@@ -74,8 +101,8 @@ export type GenerationPlan =
       write: GeneratedFile[];
       /**
        * Committed snapshots that differ from a fresh one. checkContracts found
-       * no contract change, so only the formatting differs: they are never
-       * rewritten, and generated.spec.ts asks to restore them from git.
+       * no contract change, so only the formatting differs (sameSnapshot):
+       * they are never rewritten, and the tests accept them as they are.
        */
       keep: string[];
       /** Stories with GENERATED_HEADER whose block is gone. */

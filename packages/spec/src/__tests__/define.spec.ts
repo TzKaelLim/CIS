@@ -116,12 +116,19 @@ describe("defineBlockSpec", () => {
 });
 
 describe("definePageRoot", () => {
-  it("defaults the label to 頁面", () => {
+  it("defaults the label to 頁面 and the version to 1", () => {
     const root = definePageRoot({ props });
 
-    expect(root).toEqual({ kind: "root", label: "頁面", props });
+    expect(root).toEqual({ kind: "root", label: "頁面", version: 1, props });
     expect(Object.isFrozen(root)).toBe(true);
     expect(definePageRoot({ label: "活動頁", props }).label).toBe("活動頁");
+    expect(definePageRoot({ version: 3, props }).version).toBe(3);
+  });
+
+  it.each([0, -1, 1.5, Number.NaN])("rejects version %p", (version) => {
+    expect(() => definePageRoot({ version, props })).toThrow(
+      new TypeError("definePageRoot: version must be a positive integer")
+    );
   });
 
   it("rejects an empty label and non-strict props", () => {

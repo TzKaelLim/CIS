@@ -2,7 +2,7 @@ import * as z from "zod";
 import { defineBlockSpec } from "../../define";
 import { choice, image, link, richText, slot } from "../../helpers";
 import type { JsonSchema } from "../../json-schema";
-import { kitchenSinkSpec } from "../../__fixtures__/test-specs";
+import { kitchenSinkSpec, testRoot } from "../../__fixtures__/test-specs";
 import { diffContracts, toDataContract } from "../contract";
 
 /** 第 1 版的欄位；每個測試只改其中一個。 */
@@ -48,6 +48,17 @@ const kinds = (previous: JsonSchema, next: JsonSchema) =>
   diffContracts(previous, next).map((item) => `${item.path} ${item.kind}`);
 
 describe("toDataContract", () => {
+  it("gives the page root a contract too", () => {
+    expect(toDataContract(testRoot)).toEqual({
+      additionalProperties: false,
+      properties: {
+        description: { maxLength: 160, type: "string" },
+        title: { maxLength: 80, minLength: 1, type: "string" },
+      },
+      type: "object",
+    });
+  });
+
   it("drops labels, descriptions, examples, defaults and editor-only keys", () => {
     const contract = toDataContract(kitchenSinkSpec);
     const text = JSON.stringify(contract);

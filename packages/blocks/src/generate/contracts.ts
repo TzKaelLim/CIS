@@ -4,14 +4,30 @@ import type {
   AnyBlockSpec,
   ContractBreak,
   JsonSchema,
+  PageRootSpec,
 } from "@tzuchi/tceditor-spec";
+
+/** A spec with a versioned data contract: a block or the page root. */
+export type ContractSpec = AnyBlockSpec | PageRootSpec;
+
+/**
+ * The page root's name in snapshot file names. defineBlockSpec rejects
+ * "Root" as a block type, so it never names a block's snapshot.
+ */
+export const ROOT_CONTRACT_NAME = "Root";
 
 /** File name of a data contract snapshot in generated/schemas. */
 export const SNAPSHOT_FILE_PATTERN =
   /^([A-Z][A-Za-z0-9]{0,26})\.v([1-9][0-9]*)\.json$/;
 
-export function snapshotFileName(spec: AnyBlockSpec): string {
-  return `${spec.type}.v${spec.version}.json`;
+/** The block's type, or "Root" for the page root. */
+export function contractName(spec: ContractSpec): string {
+  return spec.kind === "root" ? ROOT_CONTRACT_NAME : spec.type;
+}
+
+/** `<Type>.v<version>.json`, or `Root.v<version>.json` for the page root. */
+export function snapshotFileName(spec: ContractSpec): string {
+  return `${contractName(spec)}.v${spec.version}.json`;
 }
 
 export type ContractProblem =
@@ -25,31 +41,34 @@ export type ContractProblem =
   | { kind: "orphan"; file: string; reason: string };
 
 /**
- * Compares each spec's current data contract with the committed snapshots
- * (file name → parsed JSON). Snapshots are written once per block version and
- * never change: a contract change needs a version bump, and every older
- * version's contract must stay compatible with the current one (spec §4.6).
+ * Compares the current data contract of each spec (the blocks and the page
+ * root) with the committed snapshots (file name → parsed JSON). Snapshots are
+ * written once per version and never change: a contract change needs a
+ * version bump, and every older version's contract must stay compatible with
+ * the current one (spec §4.6).
  */
 export function checkContracts(
-  specs: readonly AnyBlockSpec[],
+  specs: readonly ContractSpec[],
   snapshots: Readonly<Record<string, unknown>>
 ): ContractProblem[] {
   const has = (file: string) =>
     Object.prototype.hasOwnProperty.call(snapshots, file);
-  const specsByType: Record<string, AnyBlockSpec> = Object.create(null);
+  const specsByName: Record<string, ContractSpec> = Object.create(null);
   const current: Record<string, JsonSchema> = Object.create(null);
   const problems: ContractProblem[] = [];
 
   for (const spec of specs) {
-    specsByType[spec.type] = spec;
-    current[spec.type] = toDataContract(spec);
+    const name = contractName(spec);
+
+    specsByName[name] = spec;
+    current[name] = toDataContract(spec);
 
     const file = snapshotFileName(spec);
 
     if (!has(file)) {
       problems.push({ kind: "missing", file });
     } else if (
-      stableStringify(snapshots[file]) !== stableStringify(current[spec.type])
+      stableStringify(snapshots[file]) !== stableStringify(current[name])
     ) {
       problems.push({ kind: "changed-without-bump", file });
     }
@@ -67,15 +86,18 @@ export function checkContracts(
       continue;
     }
 
-    const [, type, versionText] = match;
+    const [, name, versionText] = match;
     const version = Number(versionText);
-    const spec = type in specsByType ? specsByType[type] : undefined;
+    const spec = name in specsByName ? specsByName[name] : undefined;
 
     if (!spec) {
       problems.push({
         kind: "orphan",
         file,
-        reason: `no block spec has type "${type}" (never remove a block type; set deprecated: true instead)`,
+        reason:
+          name === ROOT_CONTRACT_NAME
+            ? "the page root's spec was not checked"
+            : `no block spec has type "${name}" (never remove a block type; set deprecated: true instead)`,
       });
     } else if (version > spec.version) {
       problems.push({
@@ -86,7 +108,7 @@ export function checkContracts(
     } else if (version < spec.version) {
       const breaks = diffContracts(
         snapshots[file] as JsonSchema,
-        current[type]
+        current[name]
       );
 
       if (breaks.length > 0)
@@ -109,7 +131,11 @@ export function describeContractProblem(problem: ContractProblem): string {
         problem.file
       }: the current spec rejects data this version accepted: ${problem.breaks
         .map((item) => `${item.kind} at ${item.path} (${item.detail})`)
-        .join("; ")}. Add a new block type and deprecate this one instead.`;
+        .join("; ")}. ${
+        problem.file.startsWith(`${ROOT_CONTRACT_NAME}.`)
+          ? "Make the change compatible: the page root cannot be replaced."
+          : "Add a new block type and deprecate this one instead."
+      }`;
     case "orphan":
       return `${problem.file}: ${problem.reason}`;
   }

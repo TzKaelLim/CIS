@@ -1,5 +1,5 @@
 import type { ContractProblem } from "../contracts";
-import { planGeneration, type GeneratedFile } from "../files";
+import { planGeneration, sameSnapshot, type GeneratedFile } from "../files";
 import { GENERATED_HEADER } from "../stories";
 
 const story = (path: string, contents: string): GeneratedFile => ({
@@ -121,5 +121,16 @@ describe("planGeneration (what pnpm gen:blocks writes and deletes)", () => {
       remove: ["src/old/Old.stories.tsx"],
       foreign: ["src/mine/Mine.stories.tsx"],
     });
+  });
+});
+
+describe("sameSnapshot", () => {
+  it("compares the JSON, not the formatting or the key order", () => {
+    expect(
+      sameSnapshot('{"a":1,"b":[1,2]}', '{\n  "b": [1, 2],\n  "a": 1\n}\n')
+    ).toBe(true);
+    expect(sameSnapshot('{"a":1}', '{"a":2}')).toBe(false);
+    expect(sameSnapshot('{"b":[1,2]}', '{"b":[2,1]}')).toBe(false);
+    expect(sameSnapshot('{"a":1}', "{")).toBe(false);
   });
 });
