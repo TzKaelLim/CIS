@@ -555,6 +555,24 @@ describe("invalid pages", () => {
     ).toEqual([["", "invalid_json"]]);
   });
 
+  it("ignores a leading byte order mark, in a string as in bytes", () => {
+    const encoder = new TextEncoder();
+    const json = `﻿${JSON.stringify(page([leaf("l")]))}`;
+    const twice = `﻿${json}`;
+
+    expect(errorsOf(validator.validatePageJson(json))).toEqual([]);
+    expect(errorsOf(validator.validatePageJson(encoder.encode(json)))).toEqual(
+      []
+    );
+    // Only one, at the start
+    expect(errorsOf(validator.validatePageJson(twice))).toEqual([
+      ["", "invalid_json"],
+    ]);
+    expect(errorsOf(validator.validatePageJson(encoder.encode(twice)))).toEqual(
+      [["", "invalid_json"]]
+    );
+  });
+
   it("collects every error in the order of spec §6.2", () => {
     expect(
       errorsOf(
@@ -593,6 +611,112 @@ describe("invalid pages", () => {
     });
 
     expect(errorsOf(small.validatePage(page(leaves(10, ""))))).toHaveLength(3);
+  });
+});
+
+describe("long arrays", () => {
+  /** An array whose items are made when read, with the indexes that were read. */
+  const lazyArray = (length: number, item: (index: number) => unknown) => {
+    const read = new Set<number>();
+    const items = new Proxy(new Array<unknown>(length).fill(null), {
+      get(target, key, receiver) {
+        if (typeof key === "string" && /^\d+$/.test(key)) {
+          read.add(Number(key));
+
+          return item(Number(key));
+        }
+
+        return Reflect.get(target, key, receiver);
+      },
+    });
+
+    return { items, read };
+  };
+
+  it("reads only the blocks that it reports on", () => {
+    const content = lazyArray(1_000_000, () => 1);
+    const slot = lazyArray(1_000_000, () => 1);
+    const top = errorsOf(validator.validatePage(page(content.items)));
+    const inSlot = errorsOf(
+      validator.validatePage(page([box("b", slot.items)]))
+    );
+
+    expect(top).toHaveLength(100);
+    expect(top[99]).toEqual(["content[99]", "invalid_shape"]);
+    expect(content.read.size).toBe(100);
+    expect(inSlot).toHaveLength(100);
+    expect(inSlot[99]).toEqual([
+      "content[0].props.content[99]",
+      "invalid_shape",
+    ]);
+    expect(slot.read.size).toBe(100);
+  });
+
+  it("stops at the block over maxBlocks without reading the rest of the slot", () => {
+    const slot = lazyArray(1_000_000, (index) => leaf(`l${index}`));
+
+    // The Box is the first block, so its child 4999 is block 5,001
+    expect(
+      errorsOf(validator.validatePage(page([box("b", slot.items)])))
+    ).toEqual([["content[0].props.content[4999]", "too_many_blocks"]]);
+    expect(slot.read.size).toBe(5000);
+  });
+
+  it("checks a list only up to one item past its maximum", () => {
+    const items = lazyArray(1_000_000, () => 0);
+    const result = validator.validatePage(
+      page([kitchenSink("k", { items: items.items })])
+    );
+    const six = validator.validatePage(
+      page([
+        kitchenSink("k", {
+          items: Array.from({ length: 6 }, () => ({ label: "一" })),
+        }),
+      ])
+    );
+
+    expect(errorsOf(result)).toEqual([
+      ...[0, 1, 2, 3, 4, 5].map((index) => [
+        `content[0].props.items[${index}]`,
+        "invalid_value",
+      ]),
+      ["content[0].props.items", "invalid_value"],
+    ]);
+    expect(items.read.size).toBe(6);
+    // The message still names the maximum of 5 items
+    expect(errorsOf(six)).toEqual([
+      ["content[0].props.items", "invalid_value"],
+    ]);
+    expect(!result.ok && result.errors[6].message).toBe(
+      !six.ok && six.errors[0].message
+    );
+  });
+
+  it("walks the slots in a list only up to one item past its maximum", () => {
+    const columns = Array.from({ length: 10 }, (_, index) => [
+      { type: "Ghost", props: { id: `g${index}` } },
+    ]);
+
+    expect(
+      errorsOf(validator.validatePage(page([pair("p", columns)])))
+    ).toEqual([
+      ...[0, 1, 2, 3].map((index) => [
+        `content[0].props.columns[${index}].content[0].type`,
+        "unknown_type",
+      ]),
+      ["content[0].props.columns", "invalid_value"],
+    ]);
+  });
+
+  it("checks a 2 MB list of a million items like a short one", () => {
+    const json = JSON.stringify(
+      page([kitchenSink("k", { items: [] })])
+    ).replace('"items":[]', `"items":[${"0,".repeat(999_999)}0]`);
+
+    expect(new TextEncoder().encode(json).byteLength).toBeLessThan(
+      DEFAULT_LIMITS.maxBytes
+    );
+    expect(errorsOf(validator.validatePageJson(json))).toHaveLength(7);
   });
 });
 

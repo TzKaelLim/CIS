@@ -1,5 +1,13 @@
+import * as z from "zod";
+import {
+  fitRichTextToTypes,
+  richTextFeaturesToTypes,
+  textToRichText,
+} from "@tzuchi/tceditor/rules";
+import { defineBlockSpec, definePageRoot } from "../../define";
+import { richText } from "../../helpers";
 import { errorsOf, kitchenSink, page, validator } from "../__helpers__/pages";
-import type { ValidateResult } from "../index";
+import { createPageValidator, type ValidateResult } from "../index";
 
 const paragraph = (content: unknown[], textAlign: string | null = null) =>
   textAlign === null
@@ -170,5 +178,95 @@ describe("rich text cleaning (spec §6.2 #11)", () => {
     expect(errorsOf(withBody(body))).toEqual([
       ["content[0].props.body", "invalid_value"],
     ]);
+  });
+
+  describe("in list items and in the page root", () => {
+    const rowsSpec = defineBlockSpec({
+      type: "Rows",
+      label: "列表",
+      category: "測試",
+      description: "清單項目裡有富文字的測試區塊。",
+      version: 1,
+      props: z.strictObject({
+        rows: z
+          .array(
+            z.strictObject({
+              body: richText({ features: ["bold"] }).meta({ title: "內文" }),
+            })
+          )
+          .max(3)
+          .default(() => [])
+          .meta({ title: "列" }),
+      }),
+      examples: [{ name: "空的", props: {} }],
+    });
+    const root = definePageRoot({
+      props: z.strictObject({
+        intro: richText({ features: ["bold"] })
+          .default(() =>
+            fitRichTextToTypes(
+              textToRichText("簡介"),
+              richTextFeaturesToTypes(["bold"])
+            )
+          )
+          .meta({ title: "簡介" }),
+      }),
+    });
+    const rows = createPageValidator({ blocks: [rowsSpec], root });
+
+    it("notes the item whose rich text was cleaned", () => {
+      const result = rows.validatePage({
+        root: { props: {} },
+        content: [
+          {
+            type: "Rows",
+            props: {
+              id: "r",
+              rows: [
+                { body: doc(paragraph([text("粗", [{ type: "bold" }])])) },
+                { body: doc(paragraph([text("斜", [{ type: "italic" }])])) },
+              ],
+            },
+          },
+        ],
+      });
+
+      if (!result.ok) throw new Error(JSON.stringify(result.errors, null, 2));
+
+      expect(result.data.content[0].props.rows).toEqual([
+        { body: doc(paragraph([text("粗", [{ type: "bold" }])])) },
+        { body: doc(paragraph([text("斜")])) },
+      ]);
+      expect(result.notices).toEqual([
+        {
+          path: ["content", 0, "props", "rows", 1, "body"],
+          pathText: "content[0].props.rows[1].body",
+          blockType: "Rows",
+          code: "richtext_cleaned",
+          message: expect.stringMatching(/^列表的『列／內文』已依/),
+        },
+      ]);
+    });
+
+    it("notes cleaned rich text in the page root, without a block type", () => {
+      const result = rows.validatePage({
+        root: { props: { intro: doc(paragraph([text("置中")], "center")) } },
+        content: [],
+      });
+
+      if (!result.ok) throw new Error(JSON.stringify(result.errors, null, 2));
+
+      expect(result.data.root.props.intro).toEqual(
+        doc(paragraph([text("置中")]))
+      );
+      expect(result.notices).toEqual([
+        {
+          path: ["root", "props", "intro"],
+          pathText: "root.props.intro",
+          code: "richtext_cleaned",
+          message: expect.stringMatching(/^頁面的『簡介』已依/),
+        },
+      ]);
+    });
   });
 });

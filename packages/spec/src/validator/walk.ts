@@ -5,7 +5,7 @@ import type { SlotLocation } from "../slots";
 import { fieldAt } from "./describe";
 import { formatPathText, IssueList } from "./issues";
 import { MESSAGES, type IdProblem } from "./messages";
-import { checkProps, richTextNotices } from "./props";
+import { capLists, checkProps, richTextNotices } from "./props";
 import { lookupEntry, type BlockEntry, type Entry } from "./registry";
 import type { ValidateResult, ValidatorLimits } from "./types";
 import {
@@ -23,7 +23,7 @@ export type WalkContext = {
   registry: Readonly<Record<string, BlockEntry>>;
   root: Entry;
   limits: ValidatorLimits;
-  /** "Type（label）" of every registered block, for messages */
+  /** "label（type）" of every registered block that is not deprecated, for messages */
   known: readonly string[];
 };
 
@@ -52,6 +52,22 @@ type Visit = {
 
 type Pending = {
   value: unknown;
+  path: Segment[];
+  depth: number;
+  placement: SlotInstance | undefined;
+  into: Visit[];
+};
+
+/**
+ * The blocks of `content` or of one slot array that are still to be walked.
+ * The walk takes them one at a time, so a long array costs nothing more than
+ * the blocks that are walked before the walk stops.
+ */
+type Frame = {
+  items: readonly unknown[];
+  /** Index of the next item to walk */
+  next: number;
+  /** Path of the array from the page root */
   path: Segment[];
   depth: number;
   placement: SlotInstance | undefined;
@@ -182,9 +198,10 @@ function checkNode(
 }
 
 /**
- * Spec §6.2 #4–#7: walks every block with an explicit stack (no recursion),
- * in document order. Blocks deeper than maxDepth are reported and not
- * entered; the walk stops at the first block over maxBlocks.
+ * Spec §6.2 #4–#7: walks every block with an explicit stack of frames (no
+ * recursion), in document order. Blocks deeper than maxDepth are reported and
+ * not entered; the walk stops at the first block over maxBlocks or when
+ * maxIssues errors are collected.
  */
 function walkBlocks(
   content: unknown[],
@@ -195,21 +212,37 @@ function walkBlocks(
   const visits: Visit[] = [];
   const top: Visit[] = [];
   const ids = new Map<string, string>();
-  const stack: Pending[] = [];
-  let count = 0;
-
-  for (let i = content.length - 1; i >= 0; i--) {
-    stack.push({
-      value: content[i],
-      path: ["content", i],
+  const stack: Frame[] = [
+    {
+      items: content,
+      next: 0,
+      path: ["content"],
       depth: 1,
       placement: undefined,
       into: top,
-    });
-  }
+    },
+  ];
+  let count = 0;
 
   while (stack.length > 0 && !errors.full) {
-    const pending = stack.pop() as Pending;
+    const frame = stack[stack.length - 1];
+
+    if (frame.next >= frame.items.length) {
+      stack.pop();
+      continue;
+    }
+
+    const index = frame.next;
+
+    frame.next += 1;
+
+    const pending: Pending = {
+      value: frame.items[index],
+      path: [...frame.path, index],
+      depth: frame.depth,
+      placement: frame.placement,
+      into: frame.into,
+    };
 
     count += 1;
 
@@ -253,8 +286,12 @@ function walkBlocks(
 
     if (visit.entry === undefined) continue;
 
+    // Slots in the items of a list: zod checks the list only up to one item
+    // past its maximum (capLists), and so does the walk
+    const props = capLists(visit.entry, visit.props);
+
     for (const slot of visit.entry.slots) {
-      eachValueAt(visit.props, slot.path, (found, path) => {
+      eachValueAt(props, slot.path, (found, path) => {
         if (Array.isArray(found)) {
           visit.slots.push({
             owner: visit,
@@ -267,19 +304,18 @@ function walkBlocks(
       });
     }
 
-    // Pushed in reverse so that they are popped in document order
+    // Pushed in reverse so that the first slot is walked first
     for (let s = visit.slots.length - 1; s >= 0; s--) {
       const instance = visit.slots[s];
 
-      for (let i = instance.items.length - 1; i >= 0; i--) {
-        stack.push({
-          value: instance.items[i],
-          path: [...visit.path, "props", ...instance.path, i],
-          depth: pending.depth + 1,
-          placement: instance,
-          into: instance.children,
-        });
-      }
+      stack.push({
+        items: instance.items,
+        next: 0,
+        path: [...visit.path, "props", ...instance.path],
+        depth: pending.depth + 1,
+        placement: instance,
+        into: instance.children,
+      });
     }
   }
 

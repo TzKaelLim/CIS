@@ -305,6 +305,10 @@ function checkNode(
       path,
       'arrays must hold objects, e.g. [{ label: "志工" }] instead of ["志工"]'
     );
+  } else if (node.type === "array" && typeof node.maxItems !== "number") {
+    // The page validator checks a list only up to one item past its maximum,
+    // so that a long list in a page costs no more than a short one.
+    report("object-arrays", path, "lists need a maximum: add .max(n)");
   }
 
   const children: [JsonSchema, string][] = [];
@@ -383,7 +387,8 @@ type FieldUse = { type: string; path: string; signature: string | null };
  * Checks the writing rules of spec §4.3 on a set of block specs and the page
  * root: type names, unique types, props that convert to an inline
  * `type: "object"` schema, strict objects (except the slot item's props and
- * rich text), arrays of objects only, a title on every field, field names and
+ * rich text), arrays of objects only and with a maximum (slots excepted), a
+ * title on every field, field names and
  * reserved names (including Object.prototype's), keys limited to
  * SCHEMA_KEYWORDS and META_KEYS with .meta() adding META_KEYS only, one JSON
  * type per node, helper-only keys left to the helpers, the same structure for

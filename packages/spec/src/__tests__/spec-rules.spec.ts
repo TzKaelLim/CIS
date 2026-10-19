@@ -235,6 +235,42 @@ describe("checkSpecRules", () => {
     ]);
   });
 
+  it("requires a maximum on every list, but not on slots", () => {
+    const violations = check([
+      block("Lists", {
+        tags: z
+          .array(z.strictObject({ label: title("名稱") }))
+          .meta({ title: "標籤" }),
+        rows: z
+          .array(
+            z.strictObject({
+              cells: z
+                .array(z.strictObject({ text: title("文字") }))
+                .meta({ title: "格" }),
+              content: slot({ allow: ["Leaf"] }).meta({ title: "內容" }),
+            })
+          )
+          .max(3)
+          .meta({ title: "列" }),
+      }),
+    ]);
+
+    expect(violations).toEqual([
+      {
+        rule: "object-arrays",
+        type: "Lists",
+        path: "tags",
+        message: "lists need a maximum: add .max(n)",
+      },
+      {
+        rule: "object-arrays",
+        type: "Lists",
+        path: "rows[].cells",
+        message: "lists need a maximum: add .max(n)",
+      },
+    ]);
+  });
+
   it("requires a title on fields at every level", () => {
     const violations = check([
       block("Untitled", {

@@ -3,6 +3,9 @@ import type { AnyBlockSpec, PageRootSpec } from "../define";
 import { eachField, toJsonSchema, type JsonSchema } from "../json-schema";
 import { slotLocations, type SlotLocation } from "../slots";
 
+/** A list field (not a slot) and its maximum number of items. */
+export type ListField = { path: readonly string[]; maxItems: number };
+
 /** What the validator needs to know about a block spec or the page root spec. */
 export type Entry = {
   /** The block type; undefined for the page root */
@@ -13,6 +16,8 @@ export type Entry = {
   slots: readonly SlotLocation[];
   /** Paths of the rich text fields, "[]" standing for array items */
   richText: readonly (readonly string[])[];
+  /** The list fields with a maximum, outer lists before the lists in their items */
+  lists: readonly ListField[];
 };
 
 export type BlockEntry = Entry & { blockType: string; deprecated: boolean };
@@ -27,6 +32,23 @@ const richTextPaths = (schema: JsonSchema) => {
   return paths;
 };
 
+// eachField visits a list before the fields of its items
+const listFields = (schema: JsonSchema) => {
+  const lists: ListField[] = [];
+
+  eachField(schema, ({ path, node }) => {
+    if (
+      node.type === "array" &&
+      node["x-slot"] === undefined &&
+      typeof node.maxItems === "number"
+    ) {
+      lists.push({ path, maxItems: node.maxItems });
+    }
+  });
+
+  return lists;
+};
+
 export function blockEntry(spec: AnyBlockSpec): BlockEntry {
   const schema = toJsonSchema(spec);
 
@@ -38,6 +60,7 @@ export function blockEntry(spec: AnyBlockSpec): BlockEntry {
     schema,
     slots: slotLocations(spec),
     richText: richTextPaths(schema),
+    lists: listFields(schema),
   };
 }
 
@@ -62,6 +85,7 @@ export function rootEntry(spec: PageRootSpec): Entry {
     schema,
     slots: [],
     richText: richTextPaths(schema),
+    lists: listFields(schema),
   };
 }
 

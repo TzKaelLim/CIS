@@ -13,13 +13,21 @@ export { ISSUE_CODES, formatPathText } from "./issues";
 export type { ValidateResult, ValidatorLimits } from "./types";
 
 export type PageValidator = {
+  /** Does not check the size (the data is already parsed): code that receives a raw request body must use validatePageJson */
   validatePage(data: unknown): ValidateResult;
-  /** Checks the size in UTF-8 bytes (strings through TextEncoder), then JSON.parse, then validatePage */
+  /**
+   * Checks the size in UTF-8 bytes (strings through TextEncoder), then
+   * JSON.parse, then validatePage. A leading byte order mark is ignored, in a
+   * string as in bytes (RFC 8259 §8.1, like fetch's Response.json()).
+   */
   validatePageJson(raw: string | Uint8Array): ValidateResult;
   blockTypes: readonly string[];
 };
 
 const LIMIT_KEYS = ["maxBytes", "maxDepth", "maxBlocks", "maxIssues"] as const;
+
+/** U+FEFF, the byte order mark */
+const BOM = 0xfeff;
 
 function resolveLimits(
   overrides: Partial<ValidatorLimits> = {}
@@ -114,7 +122,8 @@ export function createPageValidator(options: {
         return tooLarge();
       }
 
-      text = raw;
+      // TextDecoder drops a leading BOM from bytes; do the same for strings
+      text = raw.charCodeAt(0) === BOM ? raw.slice(1) : raw;
     } else if (isBytes(raw)) {
       if (raw.byteLength > limits.maxBytes) return tooLarge();
 

@@ -104,18 +104,19 @@ const rangeOf = (
     : undefined;
 };
 
+/** zod's `expected` of an invalid_type issue → the kind named in the message */
+const TYPE_KINDS: Readonly<Record<string, ValueKind>> = {
+  string: "text",
+  boolean: "boolean",
+  array: "list",
+  object: "object",
+  record: "object",
+};
+
 const typeProblem = (
   expected: string | undefined,
   node: JsonSchema | undefined
 ): ValueProblem => {
-  const kinds: Record<string, ValueKind> = {
-    string: "text",
-    boolean: "boolean",
-    array: "list",
-    object: "object",
-    record: "object",
-  };
-
   if (expected === "number" || expected === "int") {
     return {
       kind: "type",
@@ -126,8 +127,8 @@ const typeProblem = (
   }
 
   const kind =
-    expected !== undefined && hasOwn(kinds, expected)
-      ? kinds[expected]
+    expected !== undefined && hasOwn(TYPE_KINDS, expected)
+      ? TYPE_KINDS[expected]
       : undefined;
 
   return kind ? { kind: "type", expected: kind } : { kind: "other" };

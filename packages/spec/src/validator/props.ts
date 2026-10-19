@@ -16,10 +16,32 @@ import {
 const emptySlot = (found: unknown) => (Array.isArray(found) ? [] : found);
 
 /**
+ * Returns `value` with every list field cut to one item more than its
+ * maximum; `value` is not changed. zod still reports the list as too long,
+ * but neither zod nor the walk goes through the items past that one, so a
+ * 2 MB list of a million items costs no more than a short one. checkSpecRules
+ * ("object-arrays") requires a maximum on every list field.
+ */
+export function capLists(entry: Entry, value: unknown): unknown {
+  let capped = value;
+
+  for (const list of entry.lists) {
+    const keep = list.maxItems + 1;
+
+    capped = replaceAt(capped, list.path, (found) =>
+      Array.isArray(found) && found.length > keep ? found.slice(0, keep) : found
+    );
+  }
+
+  return capped;
+}
+
+/**
  * Checks props with the spec's zod schema (spec §6.2 #8, #9, #12) and returns
  * the parsed props with defaults filled, or undefined when there are errors.
  *
  * - `props.id` is taken out first (block schemas do not declare it).
+ * - Lists longer than their maximum are cut first (capLists).
  * - Slot arrays are emptied first: the blocks inside them are checked one by
  *   one by the walk, so zod only checks that each slot is an array.
  * - zod gets a null-prototype copy, so an own "__proto__" key is reported as
@@ -32,7 +54,7 @@ export function checkProps(
   errors: IssueList,
   omitId: boolean
 ): UnknownRecord | undefined {
-  let input: unknown = copyRecord(props, omitId ? "id" : undefined);
+  let input = capLists(entry, copyRecord(props, omitId ? "id" : undefined));
 
   for (const slot of entry.slots) {
     input = replaceAt(input, slot.path, emptySlot);
