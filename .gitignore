@@ -14,3 +14,4 @@ coverage/
 .astro/
 site/
 .claude/settings.local.json
+heroui/storybook/.home/

@@ -16,7 +16,9 @@
     "verify:pkg": "turbo run verify:pkg --filter=@tzuchi/tokens",
     "changeset": "changeset",
     "heroui:theme": "node heroui/styles/themes/tzuchi/generate.mjs",
-    "heroui:storybook": "pnpm --filter @heroui/storybook exec storybook dev --host 127.0.0.1 --port 6007 --no-open",
+    "heroui:storybook": "node scripts/dev/storybook.mjs",
+    "docs:dev": "node scripts/dev/docs.mjs",
+    "test:scripts": "node --test \"scripts/**/*.test.mjs\"",
     "heroui:storybook:build": "pnpm --filter @heroui/storybook build"
   },
   "devDependencies": {
