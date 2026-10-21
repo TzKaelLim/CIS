@@ -107,6 +107,12 @@ custom `"<name>-dark"` theme neither inherited the dark defaults nor triggered
 - **Changed** `styles/variants/index.css` — `dark` custom variant also matches
   `[data-theme$="-dark"]`.
 
+**Packages**
+
+- **Changed** `react/package.json`, `styles/package.json` — `"private": true` and no
+  `publishConfig.access: public`, so `changeset publish` cannot push them to npmjs.org. JSON has
+  no comments, so this entry is the LOCAL CHANGE record.
+
 **Storybook**
 
 - **Changed** `storybook/.storybook/addons/theme/{constants.ts,decorator.tsx,manager.ts}` —
