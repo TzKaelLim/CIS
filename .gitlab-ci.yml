@@ -1,7 +1,9 @@
 # 自架 GitLab（tcgitlab.tzuchi-org.tw）的 CI/CD：把 HeroUI Storybook 部署到 Cloudflare Pages。
 #
-#   build                tokens build + check → 確認 variables.css 與 tokens 同步 → storybook build，
-#                        產物 heroui/storybook/storybook-static/ 留成 artifact
+#   build                tokens build + check → scripts/ 的單元測試（test:scripts）→ 確認 variables.css
+#                        與 tokens 同步 → storybook build → grep 產物，擋下呼叫外部 API 的 story →
+#                        附上 HeroUI 的 LICENSE、NOTICE.md；產物 heroui/storybook/storybook-static/
+#                        留成 artifact
 #   deploy:staging       protected 的非 main 分支 → Pages 專案 tzuchi-uikit 的 Preview 環境，
 #                        alias 固定為 staging（https://staging.<pages 網域>）
 #   deploy:not-protected 沒受保護的分支：只印一句「所以沒部署」，讓 pipeline 頁面說清楚
@@ -27,7 +29,7 @@ stages:
   - deploy
 
 default:
-  # Node 24 LTS：符合 engines（>=20）、仍內建 corepack（Node 25 起不再隨附），
+  # Node 24 LTS：符合 engines（>=22.22.0）、仍內建 corepack（Node 25 起不再隨附），
   # 而且 wrangler 4 要求 Node >= 22 —— image 不可降到 node:20。
   image: node:24
   # 必須標 docker：另一台 shared runner 是 macOS shell executor，會接未標 tag 的 job 並忽略 image
