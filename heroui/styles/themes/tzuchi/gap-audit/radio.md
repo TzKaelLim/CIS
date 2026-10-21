@@ -45,7 +45,7 @@
 | Label colour | `tc-radio.styles.ts:70` `--tc-radio-label` → `text.default` → **#333333** / **#f2f2f2** | `radio.css:47` `text-foreground` → `--foreground` → **#333333** / **#f2f2f2** | kept — identical in both modes |
 | Row gap (control ↔ label) | `tc-radio.styles.ts:7` `--tc-space-8` → **8px** | `radio.css:47` `gap-3` → **12px** | **Changed** → `gap: var(--tc-space-8, 8px)` |
 | Field description indent | no counterpart (tc has no description slot) | `radio.css:29` `ps-7` → **28px** = 16px control + 12px gap | **Changed** → `calc(var(--tc-radio-size, 32px) + var(--tc-space-8, 8px))` = **40px**, so the text keeps lining up under the label after the size/gap change |
-| Description type / colour | — | `radio.css:29` `text-xs text-muted` → 12px, `--muted` | kept — no tc equivalent; note that `--muted` (gray-700 #828282) is flagged in `NOTICE.md` as 3.84:1 in light |
+| Description type / colour | — | `radio.css:29` `text-xs text-muted` → 12px, `--muted` | kept — no tc equivalent; note that `--muted` (gray-700 #828282) is flagged in `MAINTAINING.md` as 3.84:1 in light |
 | Field wrapper gap (row ↔ description) | — | `radio.css:14` `gap-1` → **4px** | kept — no tc equivalent |
 | Group spacing | — | `radio-group.css:6-14` vertical `mt-4` (16px) / horizontal `gap-4` | kept — tc has no radio-group; lives in `radio-group.css`, out of scope for this file |
 | Disabled | `tc-radio.styles.ts:13-15,64-66` `opacity: 0.38`, `cursor: not-allowed` | `radio.css:33-42` `status-disabled` (`utilities/index.css:61-65`) → `opacity: var(--disabled-opacity)` = `--tc-opacity-disabled` = **0.38**, `cursor: var(--cursor-disabled)`, `pointer-events: none` | kept — the theme already feeds the same 0.38 |

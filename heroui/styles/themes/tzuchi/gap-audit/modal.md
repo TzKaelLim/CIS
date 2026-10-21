@@ -73,7 +73,7 @@ Font family is already Tzu Chi's: `themes/tzuchi/variables.css:25` maps `--font-
 | body font-size | `tc-modal.styles.ts:119` `--tc-typography-body` → **16px** (`tokens.css:139`) | `modal.css:295` `text-sm` → `--text-sm` = `.875rem` = **14px** | **changed** → `font-size: var(--tc-font-size-16, 16px)` |
 | body line-height | `--tc-typography-body` → **1.6** (= 25.6px at 16px) | `modal.css:295` `leading-[1.43]` (= 20.02px at 14px) | **changed** → `line-height: var(--tc-line-height-relaxed, 1.6)` |
 | body font-weight | `--tc-typography-body` → **400** | inherited **400** | **kept** — already identical |
-| body colour | `tc-modal.styles.ts:120` `--tc-modal-fg` → `color.text.default` = `gray-900 \| gray-100` (`tokens.css:336`) | `modal.css:295` `text-muted` → `--muted` = `gray-700 #828282 \| gray-400 #b3b3b3` | **changed** → `color: var(--overlay-foreground)`. Two reasons: tc paints body copy in text.default, and `NOTICE.md` records `--muted` at **3.84:1** on white — below AA — so muted body copy would ship a contrast failure |
+| body colour | `tc-modal.styles.ts:120` `--tc-modal-fg` → `color.text.default` = `gray-900 \| gray-100` (`tokens.css:336`) | `modal.css:295` `text-muted` → `--muted` = `gray-700 #828282 \| gray-400 #b3b3b3` | **changed** → `color: var(--overlay-foreground)`. Two reasons: tc paints body copy in text.default, and `MAINTAINING.md` records `--muted` at **3.84:1** on white — below AA — so muted body copy would ship a contrast failure |
 
 ### Colour, elevation, states
 

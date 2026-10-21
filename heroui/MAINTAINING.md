@@ -26,9 +26,7 @@ not settle. They are design decisions nobody has signed off yet.
 
 ## Open items found by the theme audit (2026-09-19), not yet addressed
 
-Until 2026-10-22 these items were kept in `heroui/NOTICE.md`. The component reports in
-`styles/themes/tzuchi/gap-audit/` that say "NOTICE.md flags" the `--muted` contrast, or
-cite "Design decisions for the token owners", mean this section.
+Until 2026-10-22 these items were kept in `heroui/NOTICE.md`.
 
 **Before building a real app on this** — `react/src/hooks/use-theme.ts` (the
 package's public theme hook, not used by Storybook):

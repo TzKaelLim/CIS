@@ -86,7 +86,7 @@ Values are light / dark where they differ. Tzu Chi dark values come from the
 | trigger background (pressed) | not styled | `accordion.css:88-89` empty rule | **kept — neither paints a pressed fill** |
 | trigger background (expanded) | not styled | hover fill suppressed via `:not([aria-expanded="true"])` | **kept** |
 | chevron colour | `--tc-accordion-chevron` → `text.muted` = **#828282 / #b3b3b3** | `accordion.css:23` `text-muted` → `--muted` (tzuchi) = **#828282 / #b3b3b3** | **kept — identical** |
-| panel text | `--tc-accordion-panel-fg` → `text.default` = **#333333 / #f2f2f2** | `accordion.css:15` `text-muted` = **#828282 / #b3b3b3** | **changed** — `color: var(--foreground)`. Also clears the AA problem NOTICE.md flags for `--muted` on white (3.84:1) |
+| panel text | `--tc-accordion-panel-fg` → `text.default` = **#333333 / #f2f2f2** | `accordion.css:15` `text-muted` = **#828282 / #b3b3b3** | **changed** — `color: var(--foreground)`. Also clears the AA problem MAINTAINING.md flags for `--muted` on white (3.84:1) |
 | panel background | `surface.default` (`tc-accordion-item.styles.ts:87`) | transparent; inherits the root's fill | **kept — visually identical** |
 | elevation / shadow | none anywhere | none anywhere | **kept — neither uses one** |
 

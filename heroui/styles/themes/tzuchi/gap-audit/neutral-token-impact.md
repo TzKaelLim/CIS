@@ -194,7 +194,7 @@ worsened it. It is the thing §6 recommends fixing.
 on the page 1.21 → **1.43**; the modal close-trigger hover 1.26 → **1.49**;
 soft-50 over a card 1.07 → **1.15**. Light also improved for `--muted` on the fill
 (3.22 → **3.43**) — `kbd.css:3` and `close-button.css:48` are the consumers, both
-still below AA 4.5, which is the pre-existing `--muted` issue NOTICE.md already
+still below AA 4.5, which is the pre-existing `--muted` issue MAINTAINING.md already
 flags, not a new one.
 
 ---

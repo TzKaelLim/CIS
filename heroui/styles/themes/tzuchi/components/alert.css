@@ -22,7 +22,7 @@
  *
  * tc-alert carries the tone in the stripe and the icon, never in the words — so
  * the per-status title colours collapse to --foreground and the description
- * stops being muted (--muted is also the token flagged sub-AA in NOTICE.md).
+ * stops being muted (--muted is also the token flagged sub-AA in MAINTAINING.md).
  *
  * Variant mapping — tc `tone` attribute -> HeroUI `status` prop
  *   info -> accent | success -> success | warning -> warning | danger -> danger

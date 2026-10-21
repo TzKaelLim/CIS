@@ -90,7 +90,7 @@ in both.
 | element | HeroUI | why kept |
 |---|---|---|
 | `.menu-item--danger` | `menu-item.css:158-166` label + indicator in `--danger` | No tc equivalent. Explicitly excluded from the `color: inherit` rule so it survives. Bold 16px still applies (tc type, no colour change). |
-| `.menu-item__indicator` (check / dot) | `menu-item.css:102-141`: `absolute start-2`, `size-4` (16px) box, checkmark `size-2.5` (10px), dot `size-2` (8px), `text-muted` | tc has no selection indicator. Kept as-is; the 32px text inset clears the 8+16 = 24px indicator box, so nothing overlaps. `text-muted` on the tinted panel is the `--muted` contrast issue already logged in NOTICE.md, not a new one. |
+| `.menu-item__indicator` (check / dot) | `menu-item.css:102-141`: `absolute start-2`, `size-4` (16px) box, checkmark `size-2.5` (10px), dot `size-2` (8px), `text-muted` | tc has no selection indicator. Kept as-is; the 32px text inset clears the 8+16 = 24px indicator box, so nothing overlaps. `text-muted` on the tinted panel is the `--muted` contrast issue already logged in MAINTAINING.md, not a new one. |
 | `.menu-item__indicator--submenu` | chevron-right, `size-3` (12px) / `size-3.5` (14px) | tc's only icon is the trigger chevron (`--tc-icon-size-sm` = 20px), which is not this element. |
 | `.header` (section header) | `header.css:6` `px-2 pt-1.5 pb-1 text-xs font-medium text-muted` | No tc equivalent — but **`padding-inline` was raised to 32px** so the header stays flush with the option text; everything else kept. |
 | `.description`, `Kbd`, `Separator`, `.menu-section` | `description.css`, `separator.css`, `menu-section.css` | No tc equivalents. `--separator` (gray-300 / gray-750) still reads fine on the tinted panel. |

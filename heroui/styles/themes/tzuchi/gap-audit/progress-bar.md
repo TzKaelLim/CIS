@@ -62,7 +62,7 @@ Variant defaults: `progress-bar.styles.ts:6-9` → `color: "accent"`,
 
 `--muted` in the light theme is gray-700 `#828282`, which is **3.62:1** on the
 `--background` page — below WCAG AA 4.5:1. This is the exact issue already
-recorded in `heroui/NOTICE.md` under "Design decisions for the token owners"
+recorded in `heroui/MAINTAINING.md` under "Design decisions for the token owners"
 (it hits descriptions, breadcrumbs and every placeholder). Painting the readout
 `--muted` is faithful to `progress.tokens.json:7`; fixing the primitive is a
 token-owner decision, not a theme one.

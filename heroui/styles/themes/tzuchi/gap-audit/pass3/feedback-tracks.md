@@ -188,7 +188,7 @@ root, whose `data-slot="empty-state"` is emitted unconditionally at `empty-state
 7. **`--muted` contrast (inherited, not introduced).** The Meter readout is painted `--muted`,
    which in light is gray-700 `#828282` = **3.62:1** on the page — below AA. Identical to the
    caveat already recorded for ProgressBar in `gap-audit/progress-bar.md` and in
-   `heroui/NOTICE.md`; it is a token-owner decision, not a component one.
+   `heroui/MAINTAINING.md`; it is a token-owner decision, not a component one.
 
 ## Checklist (§13)
 
