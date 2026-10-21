@@ -81,7 +81,7 @@ test("SOURCE.json names the full commit and lists what was removed", () => {
     source.commitDate,
     /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(Z|[+-]\d{2}:\d{2})$/
   );
-  assert.equal(source.repository, "puck-tzuchi-poc");
+  assert.equal(source.repository, "tzuchi/tzuchi-uikit");
   // The branch the commit was checked against (sync:uikit's --branch); any
   // branch will do, as long as it is recorded
   assert.match(source.branch, /^[^\s]+$/);

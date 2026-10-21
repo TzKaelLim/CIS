@@ -4,7 +4,7 @@
 // The uikit repo is read only through `git archive`, so its working tree and
 // any uncommitted change in it are never touched or copied.
 //
-// Usage: pnpm sync:uikit -- --commit <sha> [--dir ../puck-tzuchi-poc] [--branch spike/heroui-v3]
+// Usage: pnpm sync:uikit -- --commit <sha> [--dir ../tzuchi-uikit] [--branch spike/heroui-v3]
 // (--dir is resolved from the repo root)
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
@@ -26,7 +26,7 @@ import { parseArgs } from "node:util";
 
 import { scanUikitOptions, writeUikitOptions } from "./scan-options.mjs";
 
-export const UIKIT_REPOSITORY = "puck-tzuchi-poc";
+export const UIKIT_REPOSITORY = "tzuchi/tzuchi-uikit";
 export const ARCHIVE_PATHS = [
   "heroui/styles",
   "heroui/LICENSE",
@@ -187,7 +187,7 @@ function parseCli(argv) {
   const { values } = parseArgs({
     args: argv.filter((arg) => arg !== "--"),
     options: {
-      dir: { type: "string", default: "../puck-tzuchi-poc" },
+      dir: { type: "string", default: "../tzuchi-uikit" },
       commit: { type: "string" },
       branch: { type: "string", default: "spike/heroui-v3" },
     },
@@ -195,7 +195,7 @@ function parseCli(argv) {
 
   if (values.commit === undefined) {
     throw new Error(
-      "Usage: pnpm sync:uikit -- --commit <sha> [--dir ../puck-tzuchi-poc] [--branch spike/heroui-v3]"
+      "Usage: pnpm sync:uikit -- --commit <sha> [--dir ../tzuchi-uikit] [--branch spike/heroui-v3]"
     );
   }
 

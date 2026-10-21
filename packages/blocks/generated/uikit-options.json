@@ -1,6 +1,6 @@
 {
   "source": {
-    "repository": "puck-tzuchi-poc",
+    "repository": "tzuchi/tzuchi-uikit",
     "commit": "2b5a6781f4a4180346550f7b5255126dafb8be85",
     "package": "@heroui/styles"
   },

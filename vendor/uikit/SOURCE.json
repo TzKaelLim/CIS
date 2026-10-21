@@ -1,6 +1,6 @@
 {
-  "repository": "puck-tzuchi-poc",
-  "branch": "spike/heroui-v3",
+  "repository": "tzuchi/tzuchi-uikit",
+  "branch": "origin/spike/heroui-v3",
   "commit": "2b5a6781f4a4180346550f7b5255126dafb8be85",
   "commitDate": "2026-09-22T12:34:45+08:00",
   "removed": [
