@@ -11,3 +11,6 @@ coverage/
 *.tsbuildinfo
 **/__screenshots__/
 **/.vitest-attachments/
+.astro/
+site/
+.claude/settings.local.json
