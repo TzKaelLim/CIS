@@ -20,3 +20,11 @@ overrides:
   # GHSA-587h-7wmj-h5pm（high）、GHSA-r825-w8mm-5pxw：vite 7.3.5 的漏洞，7.3.7（2026-10-06 發布）修正。
   # HeroUI 的 vitest 等 peer 也解析到 vite 7，用 override 讓 lockfile 只剩 7.3.7。
   'vite@>=7.0.0 <7.3.7': '7.3.7'
+
+# pnpm 把上面的 vite override 也套用到其他套件的 peerDependencies：lockfile 裡 vitefu、
+# @storybook/builder-vite、@vitest/mocker 等宣告的 vite peer 都被改寫成 7.3.7。手冊（astro 帶的
+# vite 6）和 Lit Storybook（vite 5）因此出現假的 unmet peer 警告；實際解析的版本沒有錯。
+# 這裡把它們原本的範圍放回來，消掉誤報。升 astro 7（vite 8）時重新檢查這兩段。
+peerDependencyRules:
+  allowedVersions:
+    vite: '5 || 6 || 7 || 8'
