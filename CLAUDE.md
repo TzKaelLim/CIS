@@ -99,6 +99,8 @@ HeroUI 元件的 `tv` variant 名稱（例如 Button 的 `primary`、`secondary`
 
 照 `heroui/NOTICE.md`：`heroui/` 裡的每一處修改都標 `LOCAL CHANGE`，並列入 `heroui/NOTICE.md` 的清單。JSON 不能加註解，只記在清單裡。
 
+`heroui/NOTICE.md` 會隨元件樣品室公開，只寫授權和修改清單。維護筆記（怎麼看上游的變更、主題稽核留下的待辦）寫在不公開的 `heroui/MAINTAINING.md`。
+
 ## 10. 演練分支不可 push
 
 `drill/*` 分支只在本機使用，不可 push。
