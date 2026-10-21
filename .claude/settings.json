@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "deny": [
+      "Bash(wrangler *)",
+      "Bash(npx wrangler *)",
+      "Bash(npx -y wrangler*)",
+      "Bash(npx wrangler@*)",
+      "Bash(pnpm exec wrangler*)",
+      "Bash(pnpm dlx wrangler*)",
+      "Bash(* publish*)",
+      "Bash(pkill *)",
+      "Bash(killall *)"
+    ],
+    "ask": ["Bash(git push*)"]
+  }
+}
