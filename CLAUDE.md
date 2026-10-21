@@ -68,6 +68,7 @@ pnpm lint
 ```
 
 - 改到 `heroui/` 時，加跑 `pnpm run heroui:storybook:build`。
+- 不要跑 `@heroui/react`、`@heroui/styles`、`@heroui/storybook` 的 `lint`：`heroui/standard` 的 ESLint 設定要的套件沒有安裝，一定會以 `ERR_MODULE_NOT_FOUND` 失敗（見 `heroui/NOTICE.md` 的「Known state inherited from upstream」）。不要自行補裝這些套件；要檢查這三個套件就跑它們的 `typecheck`（`pnpm --filter @heroui/react typecheck` 等）。
 - 全部通過才推。有失敗就先修好，或向共編者說明原因。
 
 本機預覽：

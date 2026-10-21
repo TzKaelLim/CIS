@@ -183,6 +183,11 @@ colour there, darker than the card) and the Slider track (`--border`; light uses
   not expand the dot-directory in `"include": [".storybook"]`. Checking
   `.storybook/**/*` for real reports 22 errors in 9 upstream files (none in the
   files added here). They do not affect the build — Vite strips types.
+- The `lint` scripts of `react`, `styles` and `storybook` (`eslint . --max-warnings=0`)
+  cannot run: their configs in `standard/eslint/*.mjs` import `@typescript-eslint/parser`,
+  `globals` and the ESLint plugins, which `standard/package.json` does not declare
+  and this repository does not install. ESLint stops with `ERR_MODULE_NOT_FOUND`.
+  These packages are checked with their `typecheck` scripts instead.
 - Theme variables reach colour, the radius scale and shadows only. Anything a
   component hard-codes in `styles/components/*.css` (shape, density, type) has to
   be overridden per component in `styles/themes/tzuchi/components/`.
