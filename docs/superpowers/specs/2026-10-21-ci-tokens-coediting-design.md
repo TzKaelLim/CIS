@@ -1,7 +1,7 @@
 # CI 設計規範（design tokens）共編機制：第一階段（設計規格）
 
 - 日期：2026-10-21
-- 狀態：草案，待使用者審閱。已依四份交叉審查修正：事實、可行性、資安、使用者意圖。
+- 狀態：已核准（2026-10-21）。§13 的 A 到 E，使用者全部採用建議（「都照你的建議」）。核准前已依四份交叉審查和一次複審修正，涵蓋事實、可行性、資安和使用者意圖。
 - 範圍：兩個 repo
   - uikit：tcgitlab 的 `tzuchi/tzuchi-uikit`，作業目錄 `~/Desktop/projects/tzuchi-uikit`
   - tceditor：本 repo
