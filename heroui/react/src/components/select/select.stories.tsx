@@ -2,7 +2,6 @@ import type {Key} from "../rac";
 import type {Meta, StoryObj} from "@storybook/react";
 
 import {Icon} from "@iconify/react";
-import {useAsyncList} from "@react-stately/data";
 import React from "react";
 
 import {Avatar, AvatarFallback, AvatarImage} from "../avatar";
@@ -14,9 +13,7 @@ import {Form} from "../form";
 import {Header} from "../header";
 import {Label} from "../label";
 import {ListBox} from "../list-box";
-import {Collection, ListBoxLoadMoreItem} from "../rac";
 import {Separator} from "../separator";
-import {Spinner} from "../spinner";
 
 import {Select} from "./index";
 
@@ -901,56 +898,7 @@ export const ControlledOpenState: Story = {
   },
 };
 
-interface Pokemon {
-  name: string;
-}
-
-export const AsynchronousLoading: Story = {
-  render: () => {
-    const list = useAsyncList<Pokemon>({
-      async load({cursor, signal}) {
-        const res = await fetch(cursor || `https://pokeapi.co/api/v2/pokemon`, {signal});
-        const json = await res.json();
-
-        return {
-          items: json.results,
-          cursor: json.next,
-        };
-      },
-    });
-
-    return (
-      <Select className="w-[256px]" placeholder="Select a Pokemon">
-        <Label>Pick a Pokemon</Label>
-        <Select.Trigger>
-          <Select.Value />
-          <Select.Indicator />
-        </Select.Trigger>
-        <Select.Popover>
-          <ListBox>
-            <Collection items={list.items}>
-              {(item: Pokemon) => (
-                <ListBox.Item id={item.name} textValue={item.name}>
-                  {item.name}
-                  <ListBox.ItemIndicator />
-                </ListBox.Item>
-              )}
-            </Collection>
-            <ListBoxLoadMoreItem
-              isLoading={list.loadingState === "loadingMore"}
-              onLoadMore={list.loadMore}
-            >
-              <div className="flex items-center justify-center gap-2 py-2">
-                <Spinner size="sm" />
-                <span className="text-sm text-muted">Loading more...</span>
-              </div>
-            </ListBoxLoadMoreItem>
-          </ListBox>
-        </Select.Popover>
-      </Select>
-    );
-  },
-};
+// LOCAL CHANGE: AsynchronousLoading removed — it fetched pokeapi.co (see heroui/NOTICE.md).
 
 export const Disabled: Story = {
   render: () => (

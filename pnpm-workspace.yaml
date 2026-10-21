@@ -15,3 +15,8 @@ onlyBuiltDependencies:
 # 只在本機更新 lockfile 時把關；CI 用 --frozen-lockfile 不重新檢查，審 MR 要看 lockfile 的 diff。
 # 安全修正不滿 14 天時，用 minimumReleaseAgeExclude 指定精確版本，由宇軒核可並註明 GHSA 編號。
 minimumReleaseAge: 20160
+
+overrides:
+  # GHSA-587h-7wmj-h5pm（high）、GHSA-r825-w8mm-5pxw：vite 7.3.5 的漏洞，7.3.7（2026-10-06 發布）修正。
+  # HeroUI 的 vitest 等 peer 也解析到 vite 7，用 override 讓 lockfile 只剩 7.3.7。
+  'vite@>=7.0.0 <7.3.7': '7.3.7'

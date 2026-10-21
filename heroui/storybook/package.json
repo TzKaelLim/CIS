@@ -21,7 +21,6 @@
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "react-aria-components": "1.21.1",
-    "react-scan": "0.5.7",
     "tailwind-variants": "3.3.1"
   },
   "devDependencies": {
@@ -41,6 +40,6 @@
     "storybook": "10.6.0",
     "tailwindcss": "4.3.3",
     "typescript": "5.9.3",
-    "vite": "7.3.5"
+    "vite": "7.3.7"
   }
 }

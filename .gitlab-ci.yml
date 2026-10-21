@@ -82,12 +82,20 @@ build:
   script:
     # tokens：build + check.mjs（純 Node，不需要瀏覽器）
     - pnpm --filter @tzuchi/tokens test
+    - pnpm run test:scripts
     # 主題變數是從 tokens 生成後 commit 進來的；不同步就紅，不要部署到過期的主題
     - pnpm run heroui:theme
     - git diff --exit-code -- heroui/styles/themes/tzuchi/variables.css
     # @heroui/react、@heroui/styles 的 exports 指向 src/，Storybook 直接吃原始碼，不必先 build 它們
     - pnpm run heroui:storybook:build
     - test -f heroui/storybook/storybook-static/index.html
+    # 這兩個網域只出現在已刪掉的 3 個 story（會把讀者打的字送出去），重新出現就擋下。
+    # 要在複製 NOTICE.md 之前檢查：NOTICE.md 自己會寫出這兩個網域。
+    - >-
+      if grep -rlE 'swapi\.py4e\.com|pokeapi\.co' heroui/storybook/storybook-static;
+      then echo '出現呼叫外部 API 的 story，見 heroui/NOTICE.md'; exit 1; fi
+    # Apache-2.0 §4：公開的樣品室附上 HeroUI 的授權和修改清單
+    - cp heroui/LICENSE heroui/NOTICE.md heroui/storybook/storybook-static/
   artifacts:
     name: storybook-$CI_COMMIT_SHORT_SHA
     paths:

@@ -57,7 +57,8 @@ const fontCode = [
 const lightTheme = create({
   ...storybookThemes.light,
   base: "light",
-  brandTitle: `<img src="/logo-dark.svg" style="width: 120px; height: auto;" alt="HeroUI"/>`,
+  // LOCAL CHANGE: text title; HeroUI's logo image (an absolute /logo-*.svg path) removed.
+  brandTitle: "慈濟元件樣品室",
   // brandUrl: "https://heroui.com",
   brandTarget: "_self",
   // Colors
@@ -91,7 +92,8 @@ const lightTheme = create({
 const darkTheme = create({
   ...storybookThemes.dark,
   base: "dark",
-  brandTitle: `<img src="/logo-light.svg" style="width: 120px; height: auto;" alt="HeroUI"/>`,
+  // LOCAL CHANGE: text title; HeroUI's logo image (an absolute /logo-*.svg path) removed.
+  brandTitle: "慈濟元件樣品室",
   // brandUrl: "https://heroui.com",
   brandTarget: "_self",
   // Colors

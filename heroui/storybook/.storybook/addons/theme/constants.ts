@@ -3,9 +3,10 @@ export const THEME_GLOBAL_TYPE_ID = "heroui-theme";
 export const THEME_PARAM_KEY = "heroui-theme";
 export const THEME_EVENT_NAME = "heroui-theme-changed";
 
-// LOCAL CHANGE: "tzuchi" / "tzuchi-dark" added (styles/themes/tzuchi). Custom
-// dark themes follow HeroUI's "<name>-dark" naming convention.
-export const THEME_VALUES = ["light", "dark", "tzuchi", "tzuchi-dark"] as const;
+// LOCAL CHANGE: Tzu Chi themes first; the gallery opens in "tzuchi"
+// (DEFAULT_THEME is THEME_VALUES[0]). "tzuchi" / "tzuchi-dark" come from
+// styles/themes/tzuchi; custom dark themes follow HeroUI's "<name>-dark" naming.
+export const THEME_VALUES = ["tzuchi", "tzuchi-dark", "light", "dark"] as const;
 export type ThemeKey = (typeof THEME_VALUES)[number];
 
 export const DEFAULT_THEME: ThemeKey = THEME_VALUES[0];
@@ -19,23 +20,23 @@ export interface ThemeOption {
 export const THEME_OPTIONS: ThemeOption[] = [
   {
     value: THEME_VALUES[0],
-    title: "Light",
-    description: "Light theme",
-  },
-  {
-    value: THEME_VALUES[1],
-    title: "Dark",
-    description: "Dark theme",
-  },
-  {
-    value: THEME_VALUES[2],
     title: "慈濟 Tzu Chi",
     description: "Tzu Chi theme (light), generated from @tzuchi/tokens",
   },
   {
-    value: THEME_VALUES[3],
+    value: THEME_VALUES[1],
     title: "慈濟 Tzu Chi Dark",
     description: "Tzu Chi theme (dark), generated from @tzuchi/tokens",
+  },
+  {
+    value: THEME_VALUES[2],
+    title: "Light",
+    description: "Light theme",
+  },
+  {
+    value: THEME_VALUES[3],
+    title: "Dark",
+    description: "Dark theme",
   },
 ];
 

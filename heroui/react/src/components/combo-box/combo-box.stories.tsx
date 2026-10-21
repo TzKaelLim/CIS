@@ -2,23 +2,19 @@ import type {Key} from "../rac";
 import type {Meta, StoryObj} from "@storybook/react";
 
 import {Icon} from "@iconify/react";
-import {useAsyncList} from "@react-stately/data";
 import React from "react";
 
 import {Avatar, AvatarFallback, AvatarImage} from "../avatar";
 import {Button} from "../button";
 import {Chip} from "../chip";
 import {Description} from "../description";
-import {EmptyState} from "../empty-state";
 import {FieldError} from "../field-error";
 import {Form} from "../form";
 import {Header} from "../header";
 import {Input} from "../input";
 import {Label} from "../label";
 import {ListBox} from "../list-box";
-import {Collection, ListBoxLoadMoreItem} from "../rac";
 import {Separator} from "../separator";
-import {Spinner} from "../spinner";
 
 import {ComboBox} from "./index";
 
@@ -594,70 +590,7 @@ export const ControlledInputValue: Story = {
   },
 };
 
-interface Character {
-  name: string;
-}
-
-export const AsynchronousLoading: Story = {
-  render: () => {
-    const list = useAsyncList<Character>({
-      async load({cursor, filterText, signal}) {
-        if (cursor) {
-          cursor = cursor.replace(/^http:\/\//i, "https://");
-        }
-
-        const res = await fetch(
-          cursor || `https://swapi.py4e.com/api/people/?search=${filterText}`,
-          {
-            signal,
-          },
-        );
-        const json = await res.json();
-
-        return {
-          items: json.results,
-          cursor: json.next,
-        };
-      },
-    });
-
-    return (
-      <ComboBox
-        allowsEmptyCollection
-        className="w-[256px]"
-        inputValue={list.filterText}
-        onInputChange={list.setFilterText}
-      >
-        <Label>Pick a Character</Label>
-        <ComboBox.InputGroup>
-          <Input placeholder="Star Wars characters..." />
-          <ComboBox.Trigger />
-        </ComboBox.InputGroup>
-        <ComboBox.Popover>
-          <ListBox renderEmptyState={() => <EmptyState />}>
-            <Collection items={list.items}>
-              {(item) => (
-                <ListBox.Item id={item.name} textValue={item.name}>
-                  {item.name}
-                  <ListBox.ItemIndicator />
-                </ListBox.Item>
-              )}
-            </Collection>
-            <ListBoxLoadMoreItem
-              isLoading={list.loadingState === "loadingMore"}
-              onLoadMore={list.loadMore}
-            >
-              <div className="flex items-center justify-center gap-2 py-2">
-                <Spinner size="sm" />
-                <span className="muted text-sm">Loading more...</span>
-              </div>
-            </ListBoxLoadMoreItem>
-          </ListBox>
-        </ComboBox.Popover>
-      </ComboBox>
-    );
-  },
-};
+// LOCAL CHANGE: AsynchronousLoading removed — it fetched swapi.py4e.com (see heroui/NOTICE.md).
 
 export const CustomFiltering: Story = {
   render: () => {

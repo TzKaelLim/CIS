@@ -2,11 +2,9 @@ import type {Key} from "@heroui/react";
 import type {Meta, StoryObj} from "@storybook/react";
 
 import {Icon} from "@iconify/react";
-import {useAsyncList} from "@react-stately/data";
 import React, {useState} from "react";
 import {useFilter} from "react-aria-components/Autocomplete";
 import {ListLayout, Virtualizer} from "react-aria-components/Virtualizer";
-import {cn} from "tailwind-variants";
 
 import {Avatar, AvatarFallback, AvatarImage} from "../avatar";
 import {Button} from "../button";
@@ -19,7 +17,6 @@ import {Label} from "../label";
 import {ListBox} from "../list-box";
 import {SearchField} from "../search-field";
 import {Separator} from "../separator";
-import {Spinner} from "../spinner";
 import {Surface} from "../surface";
 import {Tag} from "../tag";
 import {TagGroup} from "../tag-group";
@@ -1101,80 +1098,7 @@ export const ControlledOpenState: Story = {
   },
 };
 
-interface Pokemon {
-  name: string;
-}
-
-export const AsynchronousFiltering: Story = {
-  render: () => {
-    const list = useAsyncList<Pokemon>({
-      async load({filterText, signal}) {
-        const res = await fetch(`https://swapi.py4e.com/api/people/?search=${filterText}`, {
-          signal,
-        });
-
-        const json = await res.json();
-
-        return {
-          items: json.results,
-        };
-      },
-    });
-
-    return (
-      <Autocomplete
-        allowsEmptyCollection
-        className="w-[256px]"
-        placeholder="Search..."
-        selectionMode="single"
-      >
-        <Label>Search a Star Wars characters</Label>
-        <Autocomplete.Trigger>
-          <Autocomplete.Value />
-          <Autocomplete.ClearButton />
-          <Autocomplete.Indicator />
-        </Autocomplete.Trigger>
-        <Autocomplete.Popover>
-          <Autocomplete.Filter inputValue={list.filterText} onInputChange={list.setFilterText}>
-            <SearchField
-              autoFocus
-              aria-label="Search characters"
-              className="sticky top-0 z-10"
-              name="search"
-              variant="secondary"
-            >
-              <SearchField.Group>
-                <SearchField.SearchIcon />
-                <SearchField.Input placeholder="Search characters..." />
-                <Spinner
-                  size="sm"
-                  className={cn("absolute end-2 top-1/2 -translate-y-1/2", {
-                    "pointer-events-none opacity-0": !list.isLoading,
-                  })}
-                />
-                <SearchField.ClearButton
-                  className={cn({"pointer-events-none opacity-0": !!list.isLoading})}
-                />
-              </SearchField.Group>
-            </SearchField>
-            <ListBox
-              className="max-h-[420px] overflow-y-auto"
-              items={list.items}
-              renderEmptyState={() => <EmptyState>No results found</EmptyState>}
-            >
-              {(item: Pokemon) => (
-                <ListBox.Item id={item.name} textValue={item.name}>
-                  {item.name}
-                  <ListBox.ItemIndicator />
-                </ListBox.Item>
-              )}
-            </ListBox>
-          </Autocomplete.Filter>
-        </Autocomplete.Popover>
-      </Autocomplete>
-    );
-  },
-};
+// LOCAL CHANGE: AsynchronousFiltering removed — it fetched swapi.py4e.com (see heroui/NOTICE.md).
 
 interface User {
   email: string;

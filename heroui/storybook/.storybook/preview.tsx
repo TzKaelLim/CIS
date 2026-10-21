@@ -2,13 +2,11 @@ import type {Preview} from "@storybook/react";
 
 import {withInternationalization} from "./addons/i18n/decorator";
 import {i18nGlobalType} from "./addons/i18n/preview";
-import {DEFAULT_REACT_SCAN} from "./addons/react-scan/constants";
-import {withReactScan} from "./addons/react-scan/decorator";
-import {REACT_SCAN_GLOBAL_TYPE_ID, reactScanGlobalType} from "./addons/react-scan/preview";
 import {withReduceMotion} from "./addons/reduce-motion/decorator";
 import {reduceMotionGlobalType} from "./addons/reduce-motion/preview";
 import {withReactStrictMode} from "./addons/strict-mode/decorator";
 import {strictModeGlobalType} from "./addons/strict-mode/preview";
+import {DEFAULT_THEME, THEME_GLOBAL_TYPE_ID} from "./addons/theme/constants";
 import {withTheme} from "./addons/theme/decorator";
 import {themeGlobalType} from "./addons/theme/preview";
 import {DocsContainer} from "./components/docs-container";
@@ -39,7 +37,6 @@ const decorators: Preview["decorators"] = [
   withTheme,
   withInternationalization,
   withReduceMotion,
-  withReactScan,
 ];
 
 const globalTypes = {
@@ -47,15 +44,17 @@ const globalTypes = {
   ...themeGlobalType,
   ...reduceMotionGlobalType,
   ...strictModeGlobalType,
-  ...reactScanGlobalType,
 };
 
 const preview: Preview = {
   decorators,
   parameters,
   globalTypes,
+  // LOCAL CHANGE: react-scan removed (it forced itself on in production and loaded
+  // /react-scan/* from an absolute path); the initial global is now the theme, so the
+  // gallery opens in the Tzu Chi theme.
   initialGlobals: {
-    [REACT_SCAN_GLOBAL_TYPE_ID]: DEFAULT_REACT_SCAN,
+    [THEME_GLOBAL_TYPE_ID]: DEFAULT_THEME,
   },
   tags: ["autodocs"],
 };

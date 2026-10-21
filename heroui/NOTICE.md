@@ -129,30 +129,47 @@ custom `"<name>-dark"` theme neither inherited the dark defaults nor triggered
   `dark` theme as well.
 - **Changed** `storybook/.storybook/addons/theme/decorator.tsx` — also exports
   `updatePreviewTheme` for the docs container.
-- **Changed** `storybook/.storybook/welcome.mdx` — the primary button's forced
-  `text-white!` became `text-accent-foreground!` (white was ~1.8:1 on the light-blue
-  `tzuchi-dark` accent); the hard-coded `/logo-dark.svg` became the `currentColor`
-  `<HeroUILogo>` so it is visible on every theme.
+- **Changed** `storybook/.storybook/welcome.mdx` — rewritten as the Tzu Chi gallery's
+  welcome page (what the gallery is, the default theme, the licence and this notice). The
+  links to heroui.com, GitHub and Discord, the HeroUI logo and the build date are gone.
 - **Changed** `storybook/.storybook/globals.css` — `revert-layer` for the Tzu Chi
   themes, so upstream's unlayered `--background` / `--foreground` / `--font-sans`
   overrides stop beating the (layered) theme.
+- **Changed** `storybook/.storybook/addons/theme/constants.ts`, `storybook/.storybook/preview.tsx`
+  — the Tzu Chi themes come first in the Theme toolbar and the gallery opens in `tzuchi`
+  (`initialGlobals` sets the theme).
+- **Removed** `storybook/.storybook/addons/react-scan/`, the `react-scan` dependency, its
+  decorator and toolbar item in `preview.tsx`, its `<script>` in `preview-head.html` and the
+  `staticDirs` of `main.ts` — React Scan forced itself on in production builds and loaded
+  from an absolute path.
+- **Changed** `storybook/.storybook/preview-head.html`, `storybook/.storybook/globals.css` — no
+  Google Fonts: the Inter `<link>`s are gone and the font stacks start with the system font,
+  so the gallery makes no third-party font requests.
+- **Changed** `storybook/.storybook/styles/theme.ts` — the manager's `brandTitle` is the text
+  「慈濟元件樣品室」 instead of HeroUI's logo image (an absolute `/logo-*.svg` path).
+- **Removed** `storybook/public/` — HeroUI's logos and favicon; Storybook shows its built-in
+  favicon.
 - **Changed** `storybook/styles/globals.css` — imports `@tzuchi/tokens/tokens.css`
   and the theme.
-- **Changed** `storybook/package.json` — adds the `@tzuchi/tokens` workspace dependency.
+- **Changed** `storybook/package.json` — adds the `@tzuchi/tokens` workspace dependency;
+  `vite` 7.3.7 (GHSA-587h-7wmj-h5pm, GHSA-r825-w8mm-5pxw); no `react-scan`.
 
-**Tokens** — `packages/tokens/src/` in this worktree was synced from the main
-checkout's uncommitted work (11 new component token files, `feedback.warning` /
-`feedback.info`, amber primitives), which the overrides and the `--warning` mapping
-depend on. Reconcile with `main` when that work is committed there.
+**Stories**
 
-Two semantic tokens were then **added here and exist nowhere else yet** — carry them
-over to `main` with the rest: `color.neutral.surface` (gray.100 / dark gray.900) and
-`color.neutral.surface-hover` (gray.200 / dark gray.800), in
-`src/semantic/color.tokens.json` and `src/themes/dark/color.tokens.json`. They are the
-neutral twin of `color.brand.surface` / `-hover` and feed HeroUI's `--default` /
-`--default-hover` (tertiary and ghost buttons, the `secondary` field variants, tab and
-slider tracks, tags, kbd …). The values are a proposal backed by contrast numbers
-(`gap-audit/neutral-token-impact.md`), not a Figma decision — designers should confirm.
+- **Removed** `AsynchronousFiltering` from `react/src/components/autocomplete/autocomplete.stories.tsx`
+  and `AsynchronousLoading` from `react/src/components/combo-box/combo-box.stories.tsx` (both
+  fetched swapi.py4e.com) and from `react/src/components/select/select.stories.tsx` (fetched
+  pokeapi.co): they sent what a reader typed to a third-party API. The imports only they used
+  went with them.
+
+**Tokens** — the theme reads these `@tzuchi/tokens` values (`packages/tokens/src/`): the
+component token files, `feedback.warning` / `feedback.info`, the amber primitives, and two
+neutral semantic tokens, `color.neutral.surface` (gray.100 / dark gray.900) and
+`color.neutral.surface-hover` (gray.200 / dark gray.800), in `src/semantic/color.tokens.json`
+and `src/themes/dark/color.tokens.json`. The two neutral tokens are the twin of
+`color.brand.surface` / `-hover` and feed HeroUI's `--default` / `--default-hover` (tertiary
+and ghost buttons, the `secondary` field variants, tab and slider tracks, tags, kbd …); the
+contrast numbers behind their values are in `gap-audit/neutral-token-impact.md`.
 The generator also sets a few values in the dark theme only, where no semantic token has
 the right pair (each documented at `DARK_EXTRA` in `generate.mjs`): `--segment` (gray.800),
 the three status foregrounds `--danger/-success/-warning-foreground` (gray.980 — text.on-brand

@@ -1,131 +1,20 @@
 import {Meta} from "@storybook/addon-docs/blocks";
-import {buttonVariants} from "@heroui/react";
 
-import {HeroUILogo} from "./components/heroui-logo";
+{/* LOCAL CHANGE: rewritten as the Tzu Chi gallery's welcome page. Upstream's page linked to
+    heroui.com, GitHub and Discord, showed the HeroUI logo and a build date. */}
 
 <Meta title="Welcome" />
 
 <br />
 
-# Welcome 👋🏼
-
-<br />
-
-## HeroUI Version 3 - Design system
+# 慈濟元件樣品室
 
 <div className="max-w-xl text-base! text-foreground! [&>p]:text-base [&>p]:text-foreground">
-  Here you can find the guidelines, components APIs and examples to help you build your next project
-  with HeroUI version 3.
-</div>
-
-<div className="flex flex-col gap-8">
-  <div className="flex flex-row justify-start items-center mt-8 gap-4">
-    <a
-      href="https://heroui.com"
-      target="_blank"
-      className={buttonVariants({
-        variant: "primary",
-      })}
-    >
-      {/* LOCAL CHANGE: was a forced text-white!. The force is still needed (Storybook's
-          docs typography otherwise recolours the label), but it now follows the theme:
-          white upstream, blue-900 on the light-blue tzuchi-dark accent. */}
-      <span className="[&>p]:text-accent-foreground! [&>p]:font-semibold!">
-       Website
-      </span>
-      <svg
-        aria-hidden="true"
-        className="flex stroke-current text-accent-foreground! self-center"
-        fill="none"
-        height="1em"
-        shapeRendering="geometricPrecision"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="1.5"
-        viewBox="0 0 24 24"
-        width="1em"
-      >
-        <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
-        <path d="M15 3h6v6" />
-        <path d="M10 14L21 3" />
-      </svg>
-    </a>
-    <a
-      href="https://github.com/heroui-inc/heroui"
-      target="_blank"
-      className={buttonVariants({
-        variant: "secondary",
-        className: "[&>p]:font-semibold!",
-      })}
-    >
-      Github
-      <svg
-        aria-hidden="true"
-        className="flex stroke-current self-center"
-        fill="none"
-        height="1em"
-        shapeRendering="geometricPrecision"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="1.5"
-        viewBox="0 0 24 24"
-        width="1em"
-      >
-        <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
-        <path d="M15 3h6v6" />
-        <path d="M10 14L21 3" />
-      </svg>
-    </a>
-    <a
-      href="https://discord.gg/9b6yyZKmH4"
-      target="_blank"
-      className={buttonVariants({
-        variant: "secondary",
-        className: "[&>p]:font-semibold!",
-      })}
-    >
-      Discord
-      <svg
-        aria-hidden="true"
-        className="flex stroke-current self-center"
-        fill="none"
-        height="1em"
-        shapeRendering="geometricPrecision"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="1.5"
-        viewBox="0 0 24 24"
-        width="1em"
-      >
-        <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
-        <path d="M15 3h6v6" />
-        <path d="M10 14L21 3" />
-      </svg>
-    </a>
-  </div>
-
-  <div className="flex items-center gap-2">
-    {/* LOCAL CHANGE: was a hard-coded /logo-dark.svg (#18181B), invisible on any
-        dark theme. This one is drawn in currentColor, so it follows every theme. */}
-    <HeroUILogo className="text-foreground" height={38} width={120} />
-  </div>
+  以 HeroUI v3 為基礎、套用慈濟 design tokens 的元件展示；預設是「慈濟 Tzu Chi」主題，可在工具列的 Theme 切換。
 </div>
 
 <br />
 
-export const currentDate = new Date();
-
-export const isoDate = currentDate.toISOString().split("T")[0];
-
-export const formattedDate = currentDate.toLocaleDateString("en-US", {
-  month: "short",
-  day: "numeric",
-  year: "numeric",
-});
-
-<div className="[&>p]:text-default-400 block text-xs">
-  Last updated on <time dateTime={isoDate}>{formattedDate}</time>
+<div className="max-w-xl text-sm! text-muted! [&>p]:text-sm [&>p]:text-muted">
+  包含 HeroUI（Apache-2.0）的修改版本，授權全文與修改清單見 <a href="./LICENSE" target="_blank" rel="noopener">LICENSE</a>、<a href="./NOTICE.md" target="_blank" rel="noopener">NOTICE.md</a>。
 </div>

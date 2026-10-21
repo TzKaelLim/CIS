@@ -1,7 +1,6 @@
 import type {StorybookConfig} from "@storybook/react-vite";
 
 import {readFileSync as fsReadFileSync} from "fs";
-import {createRequire} from "module";
 import {dirname, join as pathJoin} from "path";
 import {fileURLToPath} from "url";
 
@@ -9,8 +8,6 @@ import {sync as globSync} from "glob";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const require = createRequire(import.meta.url);
-const reactScanDist = pathJoin(dirname(require.resolve("react-scan/package.json")), "dist");
 
 export const getStories = () => {
   const __STORYBOOK_READY_ONLY__ = process.env.STORYBOOK_READY_ONLY === "true";
@@ -40,13 +37,9 @@ const config: StorybookConfig = {
     name: "@storybook/react-vite",
     options: {},
   },
-  staticDirs: [
-    pathJoin(__dirname, "../public"),
-    {
-      from: reactScanDist,
-      to: "/react-scan",
-    },
-  ],
+  // LOCAL CHANGE: no staticDirs. HeroUI's logos and favicon (public/) and the react-scan
+  // bundle are gone, so the gallery has no absolute /… asset paths and can live under a
+  // sub-path; Storybook falls back to its built-in favicon.
   stories: [
     "./welcome.mdx",
     "./stories/colors.stories.tsx",
