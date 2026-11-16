@@ -5,11 +5,11 @@ description: tc-card — 卡片容器，elevated / outlined 兩種變體，支�
 
 import Demo from '../../../components/Demo.astro';
 import PropsTable from '../../../components/PropsTable.astro';
-import CurrentSiteNote from '../../../components/handbook/CurrentSiteNote.astro';
+import SiteLook from '../../../components/handbook/SiteLook.astro';
 import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
 import PreviewTile from '../../../components/handbook/PreviewTile.astro';
 import DoDont from '../../../components/handbook/DoDont.astro';
-import { LinkButton } from '@astrojs/starlight/components';
+import StorybookNote from '../../../components/handbook/StorybookNote.astro';
 
 <ComponentMeta id="card" />
 
@@ -62,13 +62,15 @@ import { LinkButton } from '@astrojs/starlight/components';
 
 ## 在目前網站主題下的樣子
 
-<CurrentSiteNote />
+<SiteLook />
 
 卡片還沒有各網站的對照範例；上方的大預覽會跟著頁首的「網站主題」和「色彩模式」一起變。
 
 ## 給工程師
 
-以下是給工程師的安裝與 API 說明，設計、企劃和廠商可以略過。
+以下是給工程師的安裝與 API 說明，美編（設計）、網站的編輯和廠商可以略過。
+
+<StorybookNote tag="tc-card" />
 
 `<tc-card>` 是卡片容器，提供 media／headline／內文／footer 插槽，以及 elevated 與 outlined 兩種變體。互動時提升陰影（elevation）。用 `width` 屬性控制寬度（CSS 長度）。下方為**可互動的真實元件**（圖片以色塊代替）：
 
@@ -85,12 +87,6 @@ import { LinkButton } from '@astrojs/starlight/components';
     <p style="margin:0;color:var(--tc-color-text-muted)">2022-03-21 ｜ TCnews 慈善新聞網</p>
   </tc-card>
 </Demo>
-
-<LinkButton href="/storybook/?path=/docs/components-card--docs" variant="secondary" icon="external">
-  在 Storybook 開啟
-</LinkButton>
-
-Storybook 是工程師逐一檢查元件各種狀態的工具網站，目前只有預設網站主題（慈濟入口網）的淺色和深色。它只在正式上線的手冊才開得了；在自己的電腦上預覽手冊時，按鈕會顯示找不到頁面（詳見[開始使用](/docs/#給工程師)）。
 
 ### 純 HTML
 

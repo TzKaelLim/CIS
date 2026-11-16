@@ -8,8 +8,8 @@ import PropsTable from '../../../components/PropsTable.astro';
 import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
 import PreviewTile from '../../../components/handbook/PreviewTile.astro';
 import DoDont from '../../../components/handbook/DoDont.astro';
-import CurrentSiteNote from '../../../components/handbook/CurrentSiteNote.astro';
-import { LinkButton } from '@astrojs/starlight/components';
+import StorybookNote from '../../../components/handbook/StorybookNote.astro';
+import SiteLook from '../../../components/handbook/SiteLook.astro';
 
 <ComponentMeta id="container" />
 
@@ -64,19 +64,15 @@ import { LinkButton } from '@astrojs/starlight/components';
 
 ## 在目前網站主題下的樣子
 
-<CurrentSiteNote />
+<SiteLook />
 
 版心容器的寬度和內距目前所有網站都一樣；上方預覽裡的色塊會跟著頁首的「網站主題」和「色彩模式」一起變。
 
 ## 給工程師
 
-以下是給工程師的安裝與 API 說明，設計、企劃和廠商可以略過。
+以下是給工程師的安裝與 API 說明，美編（設計）、網站的編輯和廠商可以略過。
 
-<LinkButton href="/storybook/?path=/docs/components-container--docs" variant="secondary" icon="external">
-  在 Storybook 開啟
-</LinkButton>
-
-Storybook 是工程師逐一檢查元件各種狀態的工具網站，目前只有預設網站主題（慈濟入口網）的淺色和深色。它只在正式上線的手冊才開得了；在自己的電腦上預覽手冊時，按鈕會顯示找不到頁面（詳見[開始使用](/docs/#給工程師)）。
+<StorybookNote tag="tc-container" />
 
 `<tc-container>` 是版心（layout）容器：將內容約束在最大寬度內、水平置中，並提供隨視窗增長的左右內距（gutter）。`size` 對應設計系統的斷點寬度（`--tc-container-sm/md/lg/xl/full`），分別為 375 / 768 / 1024 / 1280 / 1920px。下方為**可互動的真實元件**（虛線框示意版心邊界）：
 

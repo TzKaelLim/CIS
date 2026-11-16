@@ -8,7 +8,8 @@ import PropsTable from '../../../components/PropsTable.astro';
 import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
 import PreviewTile from '../../../components/handbook/PreviewTile.astro';
 import DoDont from '../../../components/handbook/DoDont.astro';
-import CurrentSiteNote from '../../../components/handbook/CurrentSiteNote.astro';
+import StorybookNote from '../../../components/handbook/StorybookNote.astro';
+import SiteLook from '../../../components/handbook/SiteLook.astro';
 
 <ComponentMeta id="navbar" />
 
@@ -78,13 +79,15 @@ import CurrentSiteNote from '../../../components/handbook/CurrentSiteNote.astro'
 
 ## 在目前網站主題下的樣子
 
-<CurrentSiteNote />
+<SiteLook />
 
 上方的大預覽會跟著頁首的「網站主題」和「色彩模式」一起變。
 
 ## 給工程師
 
-以下是給工程師的安裝與 API 說明，設計、企劃和廠商可以略過。
+以下是給工程師的安裝與 API 說明，美編（設計）、網站的編輯和廠商可以略過。
+
+<StorybookNote tag="tc-navbar" />
 
 `<tc-navbar>` 是響應式的網站頂部列／站台 header：`brand` 插槽放標誌或站名（inline-start），預設插槽放主要導覽項目（桌機水平排列），`actions` 插槽放搜尋／語言／登入等操作（inline-end）。於平板斷點（`--tc-breakpoint-tablet` = 768px）以下，導覽會收合為漢堡選單，點擊後以垂直抽屜呈現。下方為**可互動的真實元件**：
 
@@ -100,8 +103,6 @@ import CurrentSiteNote from '../../../components/handbook/CurrentSiteNote.astro'
     </tc-icon-button>
   </tc-navbar>
 </Demo>
-
-Storybook 目前只有 HeroUI 的元件，還沒有 `<tc-navbar>` 的頁面。
 
 ### 變體（variant）
 

@@ -8,7 +8,8 @@ import PropsTable from '../../../components/PropsTable.astro';
 import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
 import PreviewTile from '../../../components/handbook/PreviewTile.astro';
 import DoDont from '../../../components/handbook/DoDont.astro';
-import CurrentSiteNote from '../../../components/handbook/CurrentSiteNote.astro';
+import StorybookNote from '../../../components/handbook/StorybookNote.astro';
+import SiteLook from '../../../components/handbook/SiteLook.astro';
 
 <ComponentMeta id="pagination" />
 
@@ -52,7 +53,7 @@ import CurrentSiteNote from '../../../components/handbook/CurrentSiteNote.astro'
     { kind: 'dont', text: '只有一頁內容時，不要顯示分頁。' },
     {
       kind: 'dont',
-      text: '不要用分頁切換不同主題的內容，例如「慈善」「醫療」；那是頁籤或連結的工作。',
+      text: '不要用分頁切換不同類別的內容，例如「慈善」「醫療」；那是頁籤或連結的工作。',
     },
     {
       kind: 'dont',
@@ -63,13 +64,15 @@ import CurrentSiteNote from '../../../components/handbook/CurrentSiteNote.astro'
 
 ## 在目前網站主題下的樣子
 
-<CurrentSiteNote />
+<SiteLook />
 
 上方的大預覽會跟著頁首的「網站主題」和「色彩模式」一起變。
 
 ## 給工程師
 
-以下是給工程師的安裝與 API 說明，設計、企劃和廠商可以略過。
+以下是給工程師的安裝與 API 說明，美編（設計）、網站的編輯和廠商可以略過。
+
+<StorybookNote tag="tc-pagination" />
 
 `<tc-pagination>` 提供分頁導覽：上一頁、頁碼、下一頁。目前頁碼以品牌主色凸顯並標記 `aria-current="page"`，頁數過多時以省略號收合。下方為**可互動的真實元件**：
 
@@ -83,8 +86,6 @@ import CurrentSiteNote from '../../../components/handbook/CurrentSiteNote.astro'
   <tc-pagination total="20" page="10"></tc-pagination>
   <tc-pagination total="20" page="10" sibling-count="2"></tc-pagination>
 </Demo>
-
-Storybook 目前只有 HeroUI 的元件。它的 Pagination 是另一個元件，不是 `<tc-pagination>`，所以這裡不放連結。
 
 ### 純 HTML
 

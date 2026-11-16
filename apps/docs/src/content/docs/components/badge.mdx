@@ -5,11 +5,11 @@ description: tc-badge — 小型標籤 / 狀態 / 數量徽章，支援多種色
 
 import Demo from '../../../components/Demo.astro';
 import PropsTable from '../../../components/PropsTable.astro';
-import CurrentSiteNote from '../../../components/handbook/CurrentSiteNote.astro';
+import SiteLook from '../../../components/handbook/SiteLook.astro';
 import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
 import PreviewTile from '../../../components/handbook/PreviewTile.astro';
 import DoDont from '../../../components/handbook/DoDont.astro';
-import { LinkButton } from '@astrojs/starlight/components';
+import StorybookNote from '../../../components/handbook/StorybookNote.astro';
 
 <ComponentMeta id="badge" />
 
@@ -67,13 +67,15 @@ import { LinkButton } from '@astrojs/starlight/components';
 
 ## 在目前網站主題下的樣子
 
-<CurrentSiteNote />
+<SiteLook />
 
 徽章還沒有各網站的對照範例；上方的大預覽會跟著頁首的「網站主題」和「色彩模式」一起變。
 
 ## 給工程師
 
-以下是給工程師的安裝與 API 說明，設計、企劃和廠商可以略過。
+以下是給工程師的安裝與 API 說明，美編（設計）、網站的編輯和廠商可以略過。
+
+<StorybookNote tag="tc-badge" />
 
 `<tc-badge>` 是小型、非互動的徽章，用於標示標籤、狀態或數量。比 `tc-chip` 更小且不可點擊。支援六種色調（`neutral`、`brand`、`success`、`error`、`warning`、`info`）、三種變體（`soft`、`filled`、`outline`）、兩種尺寸（`md` / `sm`），並可加上前置狀態圓點與膠囊形外觀。下方為**真實元件**：
 
@@ -83,12 +85,6 @@ import { LinkButton } from '@astrojs/starlight/components';
   <tc-badge tone="success" dot>上線</tc-badge>
   <tc-badge tone="error">錯誤</tc-badge>
 </Demo>
-
-<LinkButton href="/storybook/?path=/docs/components-badge--docs" variant="secondary" icon="external">
-  在 Storybook 開啟
-</LinkButton>
-
-Storybook 是工程師逐一檢查元件各種狀態的工具網站，目前只有預設網站主題（慈濟入口網）的淺色和深色。它只在正式上線的手冊才開得了；在自己的電腦上預覽手冊時，按鈕會顯示找不到頁面（詳見[開始使用](/docs/#給工程師)）。
 
 ### 純 HTML
 

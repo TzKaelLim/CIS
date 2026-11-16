@@ -8,7 +8,8 @@ import PropsTable from '../../../components/PropsTable.astro';
 import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
 import PreviewTile from '../../../components/handbook/PreviewTile.astro';
 import DoDont from '../../../components/handbook/DoDont.astro';
-import CurrentSiteNote from '../../../components/handbook/CurrentSiteNote.astro';
+import StorybookNote from '../../../components/handbook/StorybookNote.astro';
+import SiteLook from '../../../components/handbook/SiteLook.astro';
 
 <ComponentMeta id="dropdown" />
 
@@ -55,13 +56,15 @@ import CurrentSiteNote from '../../../components/handbook/CurrentSiteNote.astro'
 
 ## 在目前網站主題下的樣子
 
-<CurrentSiteNote />
+<SiteLook />
 
 上方的大預覽會跟著頁首的「網站主題」和「色彩模式」一起變；這個元件還沒有淺色、深色並排的範例。
 
 ## 給工程師
 
 以下是給工程師的安裝與 API 說明，美編（設計）、網站的編輯和廠商可以略過。
+
+<StorybookNote tag="tc-dropdown" />
 
 `<tc-dropdown>` 是單選的 outlined 下拉選單（combobox / listbox）。選項可由 `options` property（物件陣列）或 `options` 屬性（JSON 字串）提供，因此純 HTML 與 React 皆可使用。下方為**可互動的真實元件**：
 

@@ -8,7 +8,8 @@ import PropsTable from '../../../components/PropsTable.astro';
 import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
 import PreviewTile from '../../../components/handbook/PreviewTile.astro';
 import DoDont from '../../../components/handbook/DoDont.astro';
-import CurrentSiteNote from '../../../components/handbook/CurrentSiteNote.astro';
+import StorybookNote from '../../../components/handbook/StorybookNote.astro';
+import SiteLook from '../../../components/handbook/SiteLook.astro';
 
 <ComponentMeta id="radio" />
 
@@ -56,13 +57,15 @@ import CurrentSiteNote from '../../../components/handbook/CurrentSiteNote.astro'
 
 ## 在目前網站主題下的樣子
 
-<CurrentSiteNote />
+<SiteLook />
 
 上方的大預覽會跟著頁首的「網站主題」和「色彩模式」一起變；這個元件還沒有淺色、深色並排的範例。
 
 ## 給工程師
 
 以下是給工程師的安裝與 API 說明，美編（設計）、網站的編輯和廠商可以略過。
+
+<StorybookNote tag="tc-radio" />
 
 `<tc-radio>` 是 24×24 的單選圓鈕，提供外圈 ring 與選取時填滿的內點，並支援 form-associated 表單提交。同 `name` 的 `<tc-radio>` 互斥，僅能選取一個。下方為**可互動的真實元件**：
 

@@ -5,11 +5,11 @@ description: tc-article-card — 文稿卡片，涵蓋焦點／一般／互動�
 
 import Demo from '../../../components/Demo.astro';
 import PropsTable from '../../../components/PropsTable.astro';
-import CurrentSiteNote from '../../../components/handbook/CurrentSiteNote.astro';
+import SiteLook from '../../../components/handbook/SiteLook.astro';
 import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
 import PreviewTile from '../../../components/handbook/PreviewTile.astro';
 import DoDont from '../../../components/handbook/DoDont.astro';
-import { LinkButton } from '@astrojs/starlight/components';
+import StorybookNote from '../../../components/handbook/StorybookNote.astro';
 
 <ComponentMeta id="article-card" />
 
@@ -67,13 +67,15 @@ import { LinkButton } from '@astrojs/starlight/components';
 
 ## 在目前網站主題下的樣子
 
-<CurrentSiteNote />
+<SiteLook />
 
 文章卡片還沒有各網站的對照範例；上方的大預覽會跟著頁首的「網站主題」和「色彩模式」一起變。
 
 ## 給工程師
 
-以下是給工程師的安裝與 API 說明，設計、企劃和廠商可以略過。
+以下是給工程師的安裝與 API 說明，美編（設計）、網站的編輯和廠商可以略過。
+
+<StorybookNote tag="tc-article-card" />
 
 `<tc-article-card>` 是文稿型內容卡片，以 `orientation`（vertical／horizontal）、`featured`（焦點放大）與插槽組合涵蓋焦點文稿、一般文稿、互動式文稿、公告、影片、志工早會與週報等版式。提供 media／badge／headline／excerpt／meta／actions 插槽，支援影片播放遮罩（`video`）、可互動（`interactive`）與整張卡片連結（`href`，stretched link）模式。下方為**可互動的真實元件**（圖片以色塊代替）：
 
@@ -86,12 +88,6 @@ import { LinkButton } from '@astrojs/starlight/components';
     <span slot="meta">2022-03-21 ｜ TCnews 慈善新聞網</span>
   </tc-article-card>
 </Demo>
-
-<LinkButton href="/storybook/?path=/docs/components-articlecard--docs" variant="secondary" icon="external">
-  在 Storybook 開啟
-</LinkButton>
-
-Storybook 是工程師逐一檢查元件各種狀態的工具網站，目前只有預設網站主題（慈濟入口網）的淺色和深色。它只在正式上線的手冊才開得了；在自己的電腦上預覽手冊時，按鈕會顯示找不到頁面（詳見[開始使用](/docs/#給工程師)）。
 
 ### 純 HTML
 
