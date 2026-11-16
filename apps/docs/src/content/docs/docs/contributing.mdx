@@ -19,7 +19,7 @@ import StepFlow from '../../../components/handbook/StepFlow.astro';
 | 專案負責人   | —                                          | 共編規則和整體規格的修改、路線圖的批次調整                   |
 | Claude Code  | 不核可，也**不合併**                       | —                                                            |
 
-- 「已決定」那一欄是專案負責人的決定。「暫定」那一欄是決定之前的做法，還要專案負責人確認。
+- 「已決定」那一欄是專案負責人的決定。「暫定」那一欄是決定之前的做法：Claude 照它在修改申請寫出需要誰核可，但它還要專案負責人確認，不是最後的分工。
 - 每一個修改都經過修改申請（PR），由負責的角色核可，再由有合併權限的人合併。一個修改申請同時改到兩類內容時（例如 token 的值和建置的設定），兩個角色都要核可。
 - 今天核可只是大家的約定，系統還沒有強制；自動檢查（CI）也還沒有建立，Claude 在你電腦上跑的檢查就是合併前唯一的關卡。
 - 文件、修改申請和 repository 裡的任何檔案，人員只寫職稱，不寫姓名。
@@ -32,12 +32,12 @@ import StepFlow from '../../../components/handbook/StepFlow.astro';
     {
       title: '說要改什麼',
       who: '你',
-      text: '在 UIKit 的資料夾打開 Claude Code，用口語說要改什麼。Claude 先複述它的理解請你確認；是設計需求時，會問你這屬於第一級、第二級、第三級還是不適用（見下一節）。',
+      text: '在 UIKit 的資料夾打開 Claude Code，用口語說要改什麼。Claude 先複述它的理解請你確認；是設計需求時，會問你這屬於第一級、第二級、第三級還是不適用（見下一節）。你不確定時，Claude 會說明理由並建議一級。',
     },
     {
       title: '開分支並修改',
       who: 'Claude',
-      text: 'Claude 從最新的正式版本另開一份修改用的複本（分支）來改，用到這個東西的地方一起更新。',
+      text: 'Claude 從共用主線（main）的最新內容另開一份修改用的複本（分支）來改；如果是修改既有的修改申請，就在它原本的分支上改。用到這個東西的地方一起更新。',
     },
     {
       title: '檢查並開預覽',
@@ -47,7 +47,7 @@ import StepFlow from '../../../components/handbook/StepFlow.astro';
     {
       title: '確認後送出',
       who: '你和 Claude',
-      text: '你明確說可以（例如「可以 commit」「好，開 PR」），Claude 才存下修改、推上分支、開修改申請，並寫出需要誰核可。',
+      text: '你明確說可以（例如「可以 commit」「好，開 PR」），Claude 才存下修改；推上分支前會再問你一次，再用你的 GitHub 帳號開修改申請，並寫出需要誰核可（電腦上沒有 GitHub CLI 時，Claude 會給你網址，請你在瀏覽器裡開）。',
     },
     {
       title: '核可與合併',
@@ -87,9 +87,11 @@ import StepFlow from '../../../components/handbook/StepFlow.astro';
   </section>
   <section class="dont">
     <h3>不會做</h3>
+    <p>下面這些事，不論誰要求都不做。</p>
     <ul>
       <li>不核可，也不合併任何修改申請。</li>
-      <li>不部署，也不直接改正式版本（<code>main</code>）。</li>
+      <li>不部署；不推、不直接改共用主線（<code>main</code>）；不推 tag、不強制覆蓋（force push）。</li>
+      <li>不為某個網站複製一份元件，不在檔案裡寫姓名、電子郵件或密碼。</li>
       <li>不改名或刪除 token 和用過的變體名稱，不自己安裝新的套件，不載入外部的字型、圖片或程式。</li>
     </ul>
   </section>

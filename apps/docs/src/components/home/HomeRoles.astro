@@ -1,16 +1,17 @@
 ---
-// 首頁的「三種角色怎麼參與」：只寫職稱和各自做的事，一人一行。
+// 首頁的「誰參與修改」：只寫職稱和各自做的事，一人一行。
 // 內容和 /docs/contributing/ 的「誰做什麼」一致。
 const ROLES = [
   { role: '美編（設計）', does: '決定顏色等設計數值的名稱和值，以及手冊的設計內容；這類修改由美編（設計）核可。' },
   { role: '工程', does: '負責建置、自動檢查和工具，讓每一次修改都先通過檢查；這類修改由工程核可。' },
   { role: '廠商', does: '用同一套流程透過 Claude Code 提出修改，能改哪些部分、由誰核可，由專案負責人另訂。' },
+  { role: '專案負責人', does: '決定共編規則和整體規格的修改，以及路線圖的批次調整。' },
 ];
 ---
 
 <section class="tc-roles not-content" aria-labelledby="tc-roles-title">
   <div class="head">
-    <h2 id="tc-roles-title">三種角色怎麼參與</h2>
+    <h2 id="tc-roles-title">誰參與修改</h2>
     <a href="/docs/contributing/">看完整的修改流程 →</a>
   </div>
   <ul>
@@ -66,7 +67,7 @@ const ROLES = [
   }
   @container (min-width: 40rem) {
     ul {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
   li {

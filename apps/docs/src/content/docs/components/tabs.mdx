@@ -1,6 +1,6 @@
 ---
 title: 頁籤
-description: tc-tabs / tc-tab — 頁籤導覽，web / mobile 兩種版面，支援鍵盤瀏覽。
+description: 在同一頁的幾組內容之間切換。
 ---
 
 import Demo from '../../../components/Demo.astro';
@@ -28,7 +28,7 @@ import SiteLook from '../../../components/handbook/SiteLook.astro';
 
 ## 用法
 
-頁籤讓讀者在同一個地方切換幾組同一層級的內容，例如「總覽」「最新消息」，不用離開這一頁，一次只看一組。它有兩種版面：寬版（web，預設）的頁籤依文字長短排成一列；窄版（mobile）的頁籤平分整列的寬度，適合手機上的少數幾個頁籤。頁籤元件只有上面這一排頁籤，下面要換成哪一組內容，由網站自己處理。要前往另一個頁面請用「導覽列」或「連結」；同一份列表分成很多頁時請用「分頁」。
+頁籤讓讀者在同一個地方切換幾組同一層級的內容，例如「總覽」「最新消息」，不用離開這一頁，一次只看一組。它有兩種版面：寬版（web，預設）的頁籤依文字長短排成一列；窄版（mobile）的頁籤平分整列的寬度，適合手機上的少數幾個頁籤。頁籤元件只有上面這一排頁籤，下面要換成哪一組內容，由網站自己處理。要前往另一個頁面請用「導覽列」或「連結」；同一份列表分成很多頁時請用「分頁」；依分類篩選同一份列表（例如只看「慈善」的消息）請用「膠囊標籤」，頁籤用在切換不同的內容區塊。
 
 ## 組成
 
@@ -114,7 +114,7 @@ import SiteLook from '../../../components/handbook/SiteLook.astro';
 </tc-tabs>
 ```
 
-切換時會派發 `tc-tab-change` 事件（`composed`、`bubbles`），`detail.value` 為新選取的值：
+切換時會發出 `tc-tab-change` 事件（`composed`、`bubbles`），`detail.value` 為新選取的值：
 
 ```js
 document.querySelector('tc-tabs').addEventListener('tc-tab-change', (e) => {

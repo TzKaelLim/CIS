@@ -1,6 +1,6 @@
 ---
 title: 導覽列
-description: tc-navbar — 響應式網站頂部導覽列；桌機水平導覽，行動裝置收合為漢堡選單抽屜。
+description: 網站最上方的一列：網站名稱、主要選單和搜尋。
 ---
 
 import Demo from '../../../components/Demo.astro';
@@ -70,10 +70,7 @@ import SiteLook from '../../../components/handbook/SiteLook.astro';
       kind: 'dont',
       text: '不要把變體名稱 light 當成淺色模式。它是預設的底色，在深色模式下也會跟著變深。',
     },
-    {
-      kind: 'dont',
-      text: '不要自己改導覽列的底色或文字色。顏色由網站主題決定，換網站時才會一致。',
-    },
+    { kind: 'dont', text: '不要把登入、語言這些操作放進主要選單；放在右邊的操作區。' },
   ]}
 />
 
@@ -132,7 +129,7 @@ import SiteLook from '../../../components/handbook/SiteLook.astro';
 
 ### 行動抽屜（open）
 
-768px 以下會出現漢堡按鈕；點擊切換 `open` 屬性並派發 `tc-menu-toggle`。導覽改以垂直抽屜呈現於列下方。按 `Escape` 或點擊列外區域皆會關閉抽屜。
+768px 以下會出現漢堡按鈕；點擊切換 `open` 屬性並發出 `tc-menu-toggle`。導覽改以垂直抽屜呈現於列下方。按 `Escape` 或點擊列外區域皆會關閉抽屜。
 
 ```html
 <tc-navbar open>

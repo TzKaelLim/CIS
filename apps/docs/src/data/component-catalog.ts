@@ -158,7 +158,7 @@ export const COMPONENTS: readonly ComponentEntry[] = [
     category: 'content',
     用途: '把圖片、標題和動作收成一塊，方便並排瀏覽。',
     preview: {
-      html: `<tc-card variant="outlined" width="300px">${PLACEHOLDER_MEDIA('media')}<span slot="headline">專案名稱</span><p style="margin:0;color:var(--tc-color-text-muted)">2026-03-21 ｜ 慈善新聞</p></tc-card>`,
+      html: `<tc-card variant="outlined" width="300px">${PLACEHOLDER_MEDIA('media')}<span slot="headline">歲末冬令發放</span><p style="margin:0;color:var(--tc-color-text-muted)">募款至 12 月 31 日</p></tc-card>`,
       scale: 0.5,
     },
   },
@@ -169,7 +169,7 @@ export const COMPONENTS: readonly ComponentEntry[] = [
     category: 'content',
     用途: '新聞、文章列表中的一則，含分類、標題與摘要。',
     preview: {
-      html: `<tc-article-card width="320px">${PLACEHOLDER_MEDIA('media')}<tc-chip slot="badge">慈善</tc-chip><span slot="headline">志工寒冬送暖，關懷獨居長者</span><span slot="meta">2026-03-21 ｜ 慈善新聞</span></tc-article-card>`,
+      html: `<tc-article-card width="320px">${PLACEHOLDER_MEDIA('media')}<tc-badge slot="badge" tone="brand">慈善</tc-badge><span slot="headline">志工寒冬送暖，關懷獨居長者</span><span slot="meta">2026-03-21 ｜ 慈善新聞</span></tc-article-card>`,
       scale: 0.45,
     },
   },
@@ -254,7 +254,7 @@ export const COMPONENTS: readonly ComponentEntry[] = [
     category: 'navigation',
     用途: '電子書閱讀畫面最上方：返回、書名與閱讀工具。',
     preview: {
-      html: '<tc-ebook-toolbar book-title="書籍名稱" style="inline-size:100%"><tc-icon-button label="搜尋"><tc-icon name="search"></tc-icon></tc-icon-button><tc-icon-button label="書籤"><tc-icon name="check"></tc-icon></tc-icon-button><tc-icon-button label="選單"><tc-icon name="menu"></tc-icon></tc-icon-button></tc-ebook-toolbar>',
+      html: '<tc-ebook-toolbar book-title="書籍名稱" style="inline-size:100%"><tc-icon-button label="搜尋"><tc-icon name="search"></tc-icon></tc-icon-button><tc-icon-button label="選單"><tc-icon name="menu"></tc-icon></tc-icon-button></tc-ebook-toolbar>',
       scale: 0.45,
     },
   },
@@ -298,7 +298,7 @@ export const COMPONENTS: readonly ComponentEntry[] = [
   {
     id: 'theme-toggle',
     中文名: '色彩模式切換',
-    英文名: 'Theme Toggle',
+    英文名: 'Color Mode Toggle',
     category: 'other',
     用途: '讓讀者切換淺色或深色。',
     preview: {

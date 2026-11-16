@@ -1,6 +1,6 @@
 ---
 title: 輸入框
-description: tc-input — form-associated 文字輸入欄位，支援 label、helper / error 訊息與驗證。
+description: 讓讀者輸入一行文字，例如姓名、信箱。
 ---
 
 import Demo from '../../../components/Demo.astro';
@@ -49,7 +49,6 @@ import SiteLook from '../../../components/handbook/SiteLook.astro';
     { kind: 'do', text: '必填的欄位標題後面會出現紅色星號；在表單開頭寫一次「標示 * 的欄位必填」，讓讀者知道星號的意思。' },
     { kind: 'do', text: '框的寬度配合要填的內容：電話、郵遞區號可以短一點，地址、電子郵件長一點。' },
     { kind: 'dont', text: '只給讀者看、不能修改的資料不要用停用的輸入框；停用的框顏色很淡，不容易看清楚。請用唯讀，或直接寫成一般文字。' },
-    { kind: 'dont', text: '不要自己改框線的顏色或圓角。顏色由網站主題決定，換網站時才會一致。' },
   ]}
 />
 
@@ -128,4 +127,4 @@ import { TcInput } from '@tzuchi/react';
 - 內含原生 `<input>`，`label` 透過 `for` / `id` 與輸入框關聯。
 - `delegatesFocus` 讓點擊 `label` 自動聚焦輸入框。
 - `helper-text` / `error-text` 透過 `aria-describedby` 關聯；`invalid` 時設定 `aria-invalid="true"`。
-- `disabled` 透過停用內部原生控件實作（非 `pointer-events:none`）。
+- `disabled` 透過停用內部的原生控制項實作（非 `pointer-events:none`）。

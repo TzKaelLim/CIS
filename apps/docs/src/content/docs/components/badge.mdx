@@ -1,6 +1,6 @@
 ---
 title: 徽章
-description: tc-badge — 小型標籤 / 狀態 / 數量徽章，支援多種色調、變體與尺寸。
+description: 標示狀態、分類或數量的小標記。
 ---
 
 import Demo from '../../../components/Demo.astro';
@@ -61,7 +61,6 @@ import StorybookNote from '../../../components/handbook/StorybookNote.astro';
     { kind: 'do', text: '意思要寫在文字裡，不能只靠顏色或圓點表達；分不出顏色的讀者也要看得懂。目前警告（warning）、資訊（info）和品牌（brand）都是藍色系，只看顏色分不出來。' },
     { kind: 'dont', text: '不要用徽章當按鈕或連結。它不能點，也不能用鍵盤選到；要讓讀者點選或篩選，請用「膠囊標籤」。' },
     { kind: 'dont', text: '狀態色調的文字不要只寫色調本身的名稱。例如錯誤色調只寫「錯誤」，螢幕閱讀器會唸成「錯誤：錯誤」；改寫成發生了什麼，例如「已截止」「上傳失敗」。' },
-    { kind: 'dont', text: '不要自己改徽章的顏色或圓角。顏色由網站主題決定，換網站時才會一致。' },
   ]}
 />
 
@@ -160,4 +159,4 @@ import { TcBadge } from '@tzuchi/react';
 - 徽章預設為 `role="presentation"`（純裝飾）。若徽章承載狀態語意，作者可自行加上 `role="status"`。
 - 狀態色調（`success` / `error` / `warning` / `info`）會附帶視覺隱藏文字，向螢幕報讀器說明狀態。
 - 狀態圓點為純裝飾（`aria-hidden`），不依賴顏色傳達意義——色調搭配文字與隱藏標籤共同表意。
-- 徽章為非互動元件，不接收焦點、不派發事件。
+- 徽章為非互動元件，不接收焦點、不發出事件。

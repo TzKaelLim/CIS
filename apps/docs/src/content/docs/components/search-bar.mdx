@@ -1,6 +1,6 @@
 ---
 title: 搜尋列
-description: tc-search-bar — 外框搜尋列，含可選前置分類選擇器與後置搜尋鈕。
+description: 讓讀者輸入關鍵字搜尋網站內容。
 ---
 
 import Demo from '../../../components/Demo.astro';
@@ -53,7 +53,6 @@ import SiteLook from '../../../components/handbook/SiteLook.astro';
     { kind: 'do', text: '把搜尋列放在讀者習慣找的位置，例如頁首或搜尋結果頁的上方，整個網站保持一致。' },
     { kind: 'dont', text: '不要在搜尋列旁邊再放一個「搜尋」按鈕；搜尋列已經有自己的放大鏡按鈕。' },
     { kind: 'dont', text: '不要用搜尋列讓讀者填姓名、電話這類資料；請用「輸入框」。' },
-    { kind: 'dont', text: '不要自己改外框的顏色或圓角。顏色由網站主題決定，換網站時才會一致。' },
   ]}
 />
 
@@ -97,7 +96,7 @@ import { TcSearchBar } from '@tzuchi/react';
 
 ### 含分類選擇器
 
-加上 `with-category` 會在前端顯示分類選擇器，選項以 `categories`（物件陣列 property 或 JSON 字串屬性）提供。切換分類會派發 `tc-category-change`：
+加上 `with-category` 會在前端顯示分類選擇器，選項以 `categories`（物件陣列 property 或 JSON 字串屬性）提供。切換分類會發出 `tc-category-change`：
 
 <Demo>
   <tc-search-bar
@@ -109,9 +108,9 @@ import { TcSearchBar } from '@tzuchi/react';
 
 ### 事件
 
-- 輸入時派發 `tc-input`，`detail: { value }`。
-- 按下 `Enter` 或點擊搜尋鈕派發 `tc-search`，`detail: { value, category }`。
-- 切換分類派發 `tc-category-change`，`detail: { category }`。
+- 輸入時發出 `tc-input`，`detail: { value }`。
+- 按下 `Enter` 或點擊搜尋鈕發出 `tc-search`，`detail: { value, category }`。
+- 切換分類發出 `tc-category-change`，`detail: { category }`。
 
 所有事件皆 `composed` 且 `bubbles`。
 
@@ -123,7 +122,7 @@ import { TcSearchBar } from '@tzuchi/react';
 
 ### 無障礙（Accessibility）
 
-- 外框為 `<form role="search">`，組成自己的提交流程（非 form-associated）。
+- 外框為 `<form role="search">`，組成自己的送出流程（非 form-associated）。
 - 文字輸入框以 `aria-label`（預設取 `placeholder`）提供無障礙名稱。
 - 搜尋鈕 `aria-label="搜尋"`，分類選擇器 `aria-label="搜尋分類"`。
 - `:focus-within` 焦點環使用 `border.focus` 與柔光環，內部控制項 `:focus-visible` 使用 `--tc-focus-ring-*` token。

@@ -10,6 +10,8 @@ const NEWS = [
   { tag: '醫療', title: '偏鄉義診車開進山區，一天服務兩百位鄉親', date: '2026-11-08', tone: 'tone-b' },
   { tag: '教育', title: '弱勢學童課輔班開課，大學生志工陪伴學習', date: '2026-11-03', tone: 'tone-c' },
 ];
+// 依分類篩選同一份列表用膠囊標籤（見元件頁「膠囊標籤」）。
+const FILTERS = ['全部', '慈善', '醫療', '教育'];
 const EVENTS = [
   { title: '歲末祝福感恩會', date: '12 月 20 日・花蓮' },
   { title: '環保站開放參訪日', date: '12 月 6 日・台北' },
@@ -56,18 +58,15 @@ const EVENTS = [
           <h2 class="tpl-h2">最新消息</h2>
           <tc-link href="#">看全部消息</tc-link>
         </div>
-        <tc-tabs value="all" class="tabs">
-          <tc-tab value="all">全部</tc-tab>
-          <tc-tab value="charity">慈善</tc-tab>
-          <tc-tab value="medical">醫療</tc-tab>
-          <tc-tab value="education">教育</tc-tab>
-        </tc-tabs>
+        <div class="tpl-row filters">
+          {FILTERS.map((label, i) => <tc-chip selected={i === 0}>{label}</tc-chip>)}
+        </div>
         <div class="tpl-grid-3">
           {
             NEWS.map((item) => (
               <tc-article-card>
                 <div slot="media" class:list={['tpl-photo', item.tone]} aria-hidden="true" />
-                <tc-chip slot="badge">{item.tag}</tc-chip>
+                <tc-badge slot="badge" tone="brand">{item.tag}</tc-badge>
                 <span slot="headline">{item.title}</span>
                 <span slot="meta">{item.date}</span>
               </tc-article-card>
@@ -135,8 +134,7 @@ const EVENTS = [
     justify-content: center;
     font-size: 14px;
   }
-  .tabs {
-    display: block;
+  .filters {
     margin-block-end: 24px;
   }
   @container tpl (max-width: 720px) {

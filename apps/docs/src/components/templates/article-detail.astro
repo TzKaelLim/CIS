@@ -53,7 +53,7 @@ const RELATED = [
       <div class="tpl-row actions">
         <tc-button variant="filled">我要捐款</tc-button>
         <tc-button variant="outlined">報名當志工</tc-button>
-        <tc-link href="#">分享這篇文章</tc-link>
+        <tc-button variant="tonal">分享這篇文章</tc-button>
       </div>
     </div>
   </article>
@@ -69,7 +69,7 @@ const RELATED = [
           RELATED.map((item) => (
             <tc-article-card>
               <div slot="media" class:list={['tpl-photo', item.tone]} aria-hidden="true" />
-              <tc-chip slot="badge">{item.tag}</tc-chip>
+              <tc-badge slot="badge" tone="brand">{item.tag}</tc-badge>
               <span slot="headline">{item.title}</span>
               <span slot="meta">{item.date}</span>
             </tc-article-card>

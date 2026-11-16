@@ -1,6 +1,6 @@
 ---
 title: 膠囊標籤
-description: tc-chip — 膠囊形標籤籌碼，支援前置圖示、可切換選取與可移除。
+description: 可以點選、切換或移除的小標籤，常用在篩選。
 ---
 
 import Demo from '../../../components/Demo.astro';
@@ -52,7 +52,6 @@ import SiteLook from '../../../components/handbook/SiteLook.astro';
     { kind: 'do', text: '有 × 的標籤用在讀者自己加上的條件，例如搜尋結果上方列出的篩選條件。按下 × 之後要由網站把它拿掉，請和工程確認。' },
     { kind: 'dont', text: '不要把只用來看、不能點的分類標示做成膠囊標籤；請用「徽章」。膠囊標籤看起來可以點，讀者會去點它。' },
     { kind: 'dont', text: '不要用膠囊標籤做送出、前往下一步這類動作；請用「按鈕」。' },
-    { kind: 'dont', text: '不要自己改標籤的顏色或圓角。顏色由網站主題決定，換網站時才會一致。' },
   ]}
 />
 
@@ -68,7 +67,7 @@ import SiteLook from '../../../components/handbook/SiteLook.astro';
 
 <StorybookNote tag="tc-chip" />
 
-`<tc-chip>` 是膠囊形的 tonal 標籤籌碼，採用品牌淺底（brand surface）配品牌主色文字（brand primary）。可作為動作型（assist）或篩選型（filter）標籤，支援前置圖示、可切換選取與可移除。下方為**可互動的真實元件**：
+`<tc-chip>` 是膠囊形的 tonal 標籤，採用品牌淺底（brand surface）配品牌主色文字（brand primary）。可作為動作型（assist）或篩選型（filter）標籤，支援前置圖示、可切換選取與可移除。下方為**可互動的真實元件**：
 
 <Demo>
   <tc-chip>連結</tc-chip>
@@ -109,7 +108,7 @@ import { TcChip } from '@tzuchi/react';
 
 ### 可移除
 
-`removable` 會在尾端顯示關閉鈕。點擊關閉鈕或於籌碼上按 `Delete` / `Backspace` 會派發 `tc-remove`，且**不會**切換選取狀態：
+`removable` 會在尾端顯示關閉鈕。點擊關閉鈕或於膠囊標籤上按 `Delete` / `Backspace` 會發出 `tc-remove`，且**不會**切換選取狀態：
 
 <Demo>
   <tc-chip
@@ -126,7 +125,7 @@ import { TcChip } from '@tzuchi/react';
 
 ### 無障礙（Accessibility）
 
-- 籌碼本體為 `role="button"`，可切換 `selected` 時以 `aria-pressed` 反映狀態。
-- 鍵盤：`Enter` / `Space` 切換選取；`removable` 時 `Delete` / `Backspace` 派發 `tc-remove`。
+- 膠囊標籤本體為 `role="button"`，可切換 `selected` 時以 `aria-pressed` 反映狀態。
+- 鍵盤：`Enter` / `Space` 切換選取；`removable` 時 `Delete` / `Backspace` 發出 `tc-remove`。
 - `:focus-visible` 焦點環使用 `--tc-focus-ring-*` token。
 - `disabled` 以 `aria-disabled` 標示並移出 Tab 順序（非 `pointer-events:none`）。

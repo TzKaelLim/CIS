@@ -1,6 +1,6 @@
 ---
 title: 分頁
-description: tc-pagination — 分頁導覽，頁碼按鈕與上一頁／下一頁控制，頁數過多時以省略號收合。
+description: 內容分成很多頁時，切換第幾頁。
 ---
 
 import Demo from '../../../components/Demo.astro';
@@ -53,11 +53,7 @@ import SiteLook from '../../../components/handbook/SiteLook.astro';
     { kind: 'dont', text: '只有一頁內容時，不要顯示分頁。' },
     {
       kind: 'dont',
-      text: '不要用分頁切換不同類別的內容，例如「慈善」「醫療」；那是頁籤或連結的工作。',
-    },
-    {
-      kind: 'dont',
-      text: '不要自己改目前頁碼的顏色或按鈕的圓角。顏色由網站主題決定，換網站時才會一致。',
+      text: '不要用分頁切換不同類別的內容，例如「慈善」「醫療」；依分類篩選同一份列表請用「膠囊標籤」。',
     },
   ]}
 />
@@ -113,7 +109,7 @@ import { TcPagination } from '@tzuchi/react';
 
 | 事件名稱         | detail            | 說明                       |
 | ---------------- | ----------------- | -------------------------- |
-| `tc-page-change` | `{ page: number }` | 頁碼改變時派發（會冒泡）。 |
+| `tc-page-change` | `{ page: number }` | 頁碼改變時發出（會冒泡）。 |
 
 ### API
 

@@ -38,8 +38,8 @@ const [firstTemplate, ...otherTemplates] = TEMPLATES;
         <tc-chip>醫療</tc-chip>
       </div>
       <div class="row">
-        <tc-button variant="outlined">取消</tc-button>
         <tc-button variant="filled">送出</tc-button>
+        <tc-button variant="outlined">取消</tc-button>
       </div>
       <tc-search-bar placeholder="搜尋"></tc-search-bar>
     </div>
@@ -66,7 +66,7 @@ const [firstTemplate, ...otherTemplates] = TEMPLATES;
   <article class="card theme">
     <div class="text">
       <h3>網站主題</h3>
-      <p>一套 UIKit，每個網站一個網站主題，目前有 {SITE_THEMES.length} 個。網站主題只換顏色，元件和版面都不用改。</p>
+      <p>一套 UIKit，每個網站一個網站主題，目前有 {SITE_THEMES.length} 個。網站主題只換顏色、圓角、陰影、字級、間距這類外觀數值，元件和版面都不用重做。</p>
       <a href="/themes/">前往<span class="sr-only">網站主題</span> →</a>
     </div>
     <div class="preview theme-preview" inert>
@@ -95,7 +95,7 @@ const [firstTemplate, ...otherTemplates] = TEMPLATES;
   <article class="card claude">
     <div class="text">
       <h3>透過 Claude Code 共編</h3>
-      <p>不會寫程式也能改：用平常說話的方式告訴 Claude 要改什麼。看過預覽、確認之後才會送出修改申請，由核可人看過再合併。</p>
+      <p>不會寫程式也能改：用平常說話的方式告訴 Claude 要改什麼。看過預覽、確認之後才會送出修改申請，由負責的角色核可，再由有合併權限的人合併。</p>
       <a href="/docs/contributing/">前往<span class="sr-only">如何參與修改</span> →</a>
     </div>
     <div class="preview claude-preview">
@@ -120,7 +120,7 @@ const [firstTemplate, ...otherTemplates] = TEMPLATES;
         </li>
       </ol>
       <div class="chat" aria-hidden="true">
-        <span class="bubble">把環保網的主色調深一點，給我看預覽。</span>
+        <span class="bubble">把次要文字的顏色調深一點，給我看預覽。</span>
         <span class="result" inert><tc-button variant="filled">送出</tc-button></span>
       </div>
     </div>

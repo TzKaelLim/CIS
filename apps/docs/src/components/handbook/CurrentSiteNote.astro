@@ -12,7 +12,7 @@ const { showAllLink = true } = Astro.props;
 ---
 
 <p class="current-site-note not-content">
-  <span class="text">目前顯示：<strong>{SITE_THEMES.map((site) => <SiteOnly site={site.id} as="span">{siteLabel(site)}</SiteOnly>)}</strong>。在頁首的『網站主題』可切換。</span>
+  <span class="text">目前顯示：<strong>{SITE_THEMES.map((site) => <SiteOnly site={site.id} as="span">{siteLabel(site)}</SiteOnly>)}</strong>。在頁首的「網站主題」可以切換。</span>
   {showAllLink && <a href="/themes/">查看所有網站主題</a>}
 </p>
 

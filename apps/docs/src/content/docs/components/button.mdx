@@ -1,6 +1,6 @@
 ---
 title: 按鈕
-description: tc-button — 主要按鈕，filled / outlined / tonal 三種變體。
+description: 送出、確認、下一步等最主要的動作。
 ---
 
 import PropsTable from '../../../components/PropsTable.astro';
@@ -25,7 +25,7 @@ import { Badge } from '@astrojs/starlight/components';
 
 ## 用法
 
-按鈕讓讀者做一件事，例如送出表單、確認報名、前往下一步。一個畫面裡最重要的動作用實心按鈕，其他動作用外框或淡底按鈕，讀者一眼就知道該先按哪一個；如果只是帶讀者到另一個頁面，請改用「連結」。
+按鈕讓讀者做一件事，例如送出表單、確認報名、前往下一步。每個區塊裡最重要的動作用實心按鈕，其他動作用外框或淡底按鈕，讀者一眼就知道該先按哪一個；如果只是帶讀者去讀另一頁的內容，請改用「連結」。
 
 ## 組成
 
@@ -39,14 +39,18 @@ import { Badge } from '@astrojs/starlight/components';
 
 ## 該做與不該做
 
+:::caution[草稿]
+這一節是草稿，待美編（設計）確認。
+:::
+
 <DoDont
   rows={[
-    { kind: 'do', text: '每個畫面只放一個實心按鈕，留給最重要的動作；其他動作用外框或淡底按鈕。' },
+    { kind: 'do', text: '每一個區塊（例如頁首、主視覺、表單）只放一個實心按鈕，留給那裡最重要的動作；其他動作用外框或淡底按鈕。' },
     { kind: 'do', text: '按鈕文字寫出動作本身，例如「送出報名」「立即捐款」，讓讀者不用猜按下去會怎樣。' },
-    { kind: 'do', text: '同一組按鈕的順序在整個網站保持一致，例如「取消」永遠在「送出」的左邊。' },
+    { kind: 'do', text: '同一組按鈕的順序在整個網站保持一致，例如「送出」永遠在「取消」的左邊。' },
     { kind: 'dont', text: '不要只寫「確定」「點這裡」這類看不出動作的文字。' },
-    { kind: 'dont', text: '不要用按鈕帶讀者到另一個頁面；單純換頁請用「連結」。' },
-    { kind: 'dont', text: '不要自己改按鈕的顏色或圓角。顏色由網站主題決定，換網站時才會一致。' },
+    { kind: 'dont', text: '不要用按鈕帶讀者去讀另一頁的內容（例如「看全部消息」）；那是連結的工作。報名、捐款這類主要行動，就算會換頁，也用按鈕。' },
+    { kind: 'dont', text: '不要把兩件事放進同一個按鈕，例如「送出並分享」；一個按鈕只做一件事。' },
   ]}
 />
 
@@ -54,7 +58,7 @@ import { Badge } from '@astrojs/starlight/components';
 
 <SiteLook />
 
-上方的大預覽會跟著頁首的「網站主題」和「色彩模式」一起變。下面把目前選的網站主題的淺色和深色並排，方便比較；元件只有一份，每個網站只換顏色。
+上方的大預覽會跟著頁首的「網站主題」和「色彩模式」一起變。下面把目前選的網站主題的淺色和深色並排，方便比較；元件只有一份，每個網站只換外觀的數值。
 
 <PerSite>
   {(site) => (
@@ -75,7 +79,7 @@ import { Badge } from '@astrojs/starlight/components';
 
 <StorybookNote tag="tc-button" />
 
-`<tc-button>` 是主要按鈕，提供三種變體與 form-associated 表單提交。頁面最上方的大預覽就是**可互動的真實元件**。
+`<tc-button>` 是主要按鈕，提供三種變體與 form-associated 表單送出。頁面最上方的大預覽就是**可互動的真實元件**。
 
 ### 純 HTML
 
@@ -96,14 +100,14 @@ import { TcButton } from '@tzuchi/react';
 
 ### 表單
 
-`type="submit"` 時，`tc-button` 透過 Form-Associated Custom Elements（ElementInternals）提交所屬 `<form>`：
+`type="submit"` 時，`tc-button` 透過 Form-Associated Custom Elements（ElementInternals）送出所屬 `<form>`：
 
 <Demo>
   <form
-    onsubmit="event.preventDefault(); this.querySelector('output').textContent='✅ 已提交';"
+    onsubmit="event.preventDefault(); this.querySelector('output').textContent='✅ 已送出';"
     style="display:flex; gap:.75rem; align-items:center;"
   >
-    <tc-button type="submit" variant="filled">提交表單</tc-button>
+    <tc-button type="submit" variant="filled">送出表單</tc-button>
     <output></output>
   </form>
 </Demo>
@@ -118,4 +122,4 @@ import { TcButton } from '@tzuchi/react';
 
 - 內含原生 `<button>`，支援鍵盤 Enter / Space。
 - `:focus-visible` 焦點環使用 `--tc-focus-ring-*` token。
-- `disabled` 透過停用內部原生控件實作（非 `pointer-events:none`）。
+- `disabled` 透過停用內部的原生控制項實作（非 `pointer-events:none`）。

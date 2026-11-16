@@ -41,7 +41,7 @@ const mutedFails = checks.some((c) => c.說明.includes('次要文字') && !c.�
     <LinkButton href={`?${SITE_URL_PARAM}=${site.id}`} variant="secondary" icon="right-arrow">
       在整份手冊套用這個網站主題
     </LinkButton>
-    <span class="apply-note">手冊其他頁的色票與元件範例會換成{site.簡稱}的樣子；之後也可以在頁首的『網站主題』改回來。</span>
+    <span class="apply-note">手冊其他頁的色票與元件範例會換成{site.簡稱}的樣子；之後也可以在頁首的「網站主題」改回來。</span>
   </div>
 </div>
 
@@ -117,11 +117,11 @@ const mutedFails = checks.some((c) => c.說明.includes('次要文字') && !c.�
   {
     site.isDefault ? (
       <li>
-        <strong>共同編輯者（設計、行政）：</strong>{site.簡稱}是預設網站主題，改它的顏色，所有沒有自己網站主題的網站都會一起變。要改請跟 Claude 說：「預設網站主題的主色改成…」，Claude 會先列出會受影響的網站給你確認。
+        <strong>美編（設計）、廠商：</strong>{site.簡稱}是預設網站主題。改它的顏色，所有網站沒有自己改過的地方都會一起變。跟 Claude 說要改什麼，Claude 會先列出用到這個顏色的檔案和頁面，請你確認。
       </li>
     ) : (
       <li>
-        <strong>共同編輯者（設計、行政）：</strong>直接跟 Claude 說：「{site.簡稱}的主色改成…」。改完後這一頁會跟著更新，你可以在這裡確認效果。
+        <strong>美編（設計）、廠商：</strong>網站主題的正式檔案還沒有實作。想改{site.簡稱}的顏色時，跟 Claude 說要改什麼，Claude 會先停下來，請工程決定做法（見<a href="/docs/contributing/">如何參與修改</a>）。
       </li>
     )
   }
@@ -192,7 +192,7 @@ const mutedFails = checks.some((c) => c.說明.includes('次要文字') && !c.�
     white-space: nowrap;
   }
   .ratio.fail {
-    color: var(--sl-color-red);
+    color: var(--sl-color-red-high);
   }
   .demo-note {
     padding: 0.6rem 0.85rem;

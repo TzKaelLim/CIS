@@ -7,11 +7,11 @@
 // 示意網站主題不是核定的網站主題：它的名稱、顏色和做法都還待核定，不可以當成正式值引用。
 // 網站主題要用哪個 HTML 屬性也還沒決定（Q4）；手冊用的 data-site 只是提案。
 //
-// 每個網站一筆 SiteTheme。預設主題（慈濟入口網）的值在建置時直接從真正的 token
+// 每個網站一筆 SiteTheme。預設網站主題（慈濟入口網）的值在建置時直接從真正的 token
 // 原始檔（primitive + 淺色語意 + 深色覆寫）解析成色碼；其他網站只寫「要改哪些語意色」，
-// 其餘全部沿用預設主題。新增第三個網站 = 在 SITE_THEMES 裡多加一筆 defineSite(...)。
+// 其餘全部沿用預設網站主題。新增第三個網站 = 在 SITE_THEMES 裡多加一筆 defineSite(...)。
 //
-// 這裡不修改 packages/tokens：示範主題需要的額外綠色階寫在 DEMO_PRIMITIVES，
+// 這裡不修改 packages/tokens：示意網站主題需要的額外綠色階寫在 DEMO_PRIMITIVES，
 // 只存在這個檔案裡，標明為示意值（非正式）。
 import primitiveJson from '../../../../packages/tokens/src/primitive/color.tokens.json';
 import lightJson from '../../../../packages/tokens/src/semantic/color.tokens.json';
@@ -43,15 +43,15 @@ export interface SiteTheme {
   說明: string;
   /** 一句話介紹，用在總覽頁的網站主題卡片上。 */
   摘要: string;
-  /** 哪些網站或單位使用這個主題。 */
+  /** 哪些網站或單位使用這個網站主題。 */
   使用對象: string;
-  /** true = 示範用的假設主題，顏色不是正式值。 */
+  /** true = 示範用的假設的網站主題，顏色不是正式值。 */
   isDemo: boolean;
-  /** 只有預設主題為 true。 */
+  /** 只有預設網站主題為 true。 */
   isDefault: boolean;
   light: SemanticMap;
   dark: SemanticMap;
-  /** 與預設主題解析後色碼不同的 token（淺色、深色分開列）。 */
+  /** 與預設網站主題解析後色碼不同的 token（淺色、深色分開列）。 */
   diff: readonly TokenDiff[];
   /** 改過的 token（淺色、深色合併、不重複），順序依照原始檔。 */
   changed: readonly TokenName[];
@@ -105,7 +105,7 @@ function flatten(tree: JsonTree, prefix = '', out: Record<string, string> = {}) 
 const REAL_PRIMITIVES = flatten(primitiveJson as JsonTree);
 
 /**
- * 示意值（非正式）：環保網示範主題要用的綠色階。正式 primitive 只有 green.600 與
+ * 示意值（非正式）：環保網示意網站主題要用的綠色階。正式 primitive 只有 green.600 與
  * green.400，所以其他色階暫時定義在這裡；它們不會進入 packages/tokens。
  */
 export const DEMO_PRIMITIVES: Readonly<Record<string, string>> = {
@@ -173,7 +173,7 @@ interface SiteInput {
   摘要: string;
   使用對象: string;
   isDemo: boolean;
-  /** 只寫要改的語意 token；值是 `{color.…}` 參照或色碼。省略 = 沿用預設主題。 */
+  /** 只寫要改的語意 token；值是 `{color.…}` 參照或色碼。省略 = 沿用預設網站主題。 */
   overrides?: Partial<Record<Mode, Record<TokenName, string>>>;
 }
 
@@ -264,7 +264,7 @@ export const SITE_THEMES: readonly SiteTheme[] = [
         'brand.surface': '{color.green.900}',
         'brand.surface-hover': '{color.green.700}',
         'border.focus': '{color.green.300}',
-        // 深色模式的「主色上的文字」在預設主題是深藍，換成深綠才和綠色主色搭配。
+        // 深色模式的「主色上的文字」在預設網站主題是深藍，換成深綠才和綠色主色搭配。
         'text.on-brand': '{color.green.900}',
       },
     },
@@ -281,7 +281,7 @@ for (const [i, site] of SITE_THEMES.entries()) {
 
 export const DEFAULT_SITE: SiteTheme = SITE_THEMES.find((s) => s.isDefault) ?? SITE_THEMES[0];
 
-/** 選單、卡片用的名稱；示意主題加註「（示意）」。 */
+/** 選單、卡片用的名稱；示意網站主題加註「（示意）」。 */
 export const siteLabel = (site: SiteTheme): string =>
   site.isDemo ? `${site.名稱}（示意）` : site.名稱;
 
@@ -352,7 +352,7 @@ export function contrastChecks(site: SiteTheme): ContrastCheck[] {
   const pairs: [string, TokenName, TokenName][] = [
     ['主色按鈕上的文字', 'text.on-brand', 'brand.primary'],
     ['背景上的主色文字', 'brand.primary', 'surface.default'],
-    // 次要文字是所有網站共用的正式 token，不是主題造成的；照實列出，避免讓人以為整頁都合格。
+    // 次要文字是所有網站共用的正式 token，不是網站主題造成的；照實列出，避免讓人以為整頁都合格。
     ['背景上的次要文字（所有網站共用）', 'text.muted', 'surface.default'],
   ];
   return MODES.flatMap((mode) =>

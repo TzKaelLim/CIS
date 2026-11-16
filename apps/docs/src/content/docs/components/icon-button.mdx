@@ -1,6 +1,6 @@
 ---
 title: 圖示按鈕
-description: tc-icon-button — 圓形圖示按鈕，tonal / filled 兩種變體，48 / 64px 兩種尺寸。
+description: 只有圖示、沒有文字的圓形按鈕，例如返回、展開。
 ---
 
 import Demo from '../../../components/Demo.astro';
@@ -58,7 +58,6 @@ import SiteLook from '../../../components/handbook/SiteLook.astro';
     { kind: 'do', text: '同一排的圖示按鈕用同一個大小；需要特別強調的那一個才用實心，其他用淡底。' },
     { kind: 'dont', text: '不要把畫面上最重要的動作（例如送出、立即捐款）只做成圖示按鈕；請用有文字的「按鈕」。' },
     { kind: 'dont', text: '不要在一個圖示按鈕裡放兩個圖示或加上文字。圓形裡只放得下一個圖示，需要文字時請用「按鈕」。' },
-    { kind: 'dont', text: '不要自己改按鈕的形狀、大小或顏色。顏色由網站主題決定，換網站時才會一致。' },
   ]}
 />
 
@@ -129,4 +128,4 @@ import { TcIconButton } from '@tzuchi/react';
 - `label` 為必填，會套用至內部原生 `<button>` 的 `aria-label`，供螢幕報讀器辨識。
 - 內含原生 `<button>`，支援鍵盤 Enter / Space。
 - `:focus-visible` 焦點環使用 `--tc-focus-ring-*` token。
-- `disabled` 透過停用內部原生控件實作（非 `pointer-events:none`）。
+- `disabled` 透過停用內部的原生控制項實作（非 `pointer-events:none`）。

@@ -128,3 +128,11 @@ mobile-starlight-toc a {
 .sidebar-content .sl-badge {
   line-height: 1;
 }
+
+/* 手機的選單按鈕：按鈕放大成 40px 後，圖示（1em）跟著放大到 20px，並放在圓形正中間。 */
+starlight-menu-button button {
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  font-size: 1.25rem;
+}

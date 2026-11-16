@@ -1,6 +1,6 @@
 ---
 title: 頁尾
-description: tc-footer / tc-footer-column — 網站頁尾，含品牌區、社群連結、響應式連結群組與版權列；行動裝置上群組可手風琴收合。
+description: 網站最下方：聯絡資訊、分類連結與版權聲明。
 ---
 
 import Demo from '../../../components/Demo.astro';
@@ -13,7 +13,7 @@ import SiteLook from '../../../components/handbook/SiteLook.astro';
 
 <ComponentMeta id="footer" />
 
-<PreviewTile size="hero" scale={0.6} interactive>
+<PreviewTile size="hero" scale={0.8} interactive>
   <tc-footer copyright="Copyright © Tzu Chi Foundation." style="inline-size:100%">
     <a
       slot="social"
@@ -150,7 +150,7 @@ import SiteLook from '../../../components/handbook/SiteLook.astro';
     </a>
     <div slot="brand">
       <strong style="display:block;font-size:18px;margin-bottom:8px">花蓮本會</strong>
-      <p style="margin:0 0 12px;color:#616161">花蓮縣花蓮市國強里 11 鄰中央路三段 703 號<br />03 856 6779</p>
+      <p style="margin:0 0 12px;color:#616161">花蓮縣花蓮市國強里 11 鄰中央路三段 703 號<br />0000-000-000（示意）</p>
       <tc-button variant="filled">聯絡我們</tc-button>
     </div>
     <tc-footer-column label="公益慈善">
@@ -205,7 +205,7 @@ import SiteLook from '../../../components/handbook/SiteLook.astro';
 
 <tc-footer copyright="Copyright © 2020 Tzu Chi Foundation.">
   <a slot="social" href="https://facebook.com" aria-label="Facebook">FB</a>
-  <div slot="brand">花蓮本會 · 03 856 6779</div>
+  <div slot="brand">花蓮本會 · 0000-000-000（示意）</div>
 
   <tc-footer-column label="公益慈善">
     <tc-link variant="subtle" href="/relief">國際賑災</tc-link>
@@ -246,6 +246,6 @@ import { TcFooter, TcFooterColumn } from '@tzuchi/react';
 
 - 頁尾容器為 `<footer role="contentinfo">`。
 - 每個 `<tc-footer-column>` 為 `role="group"`：桌機標題以 `<h3>` 靜態呈現、連結恆顯示；行動裝置（`<=768px`）標題改為按鈕，帶 `aria-expanded`／`aria-controls`，連結容器為 `role="region"` 並以 `aria-labelledby` 連結標題。
-- 切換手風琴時 `<tc-footer-column>` 派發 `tc-toggle`，`detail.open` 為新狀態。
-- 內建「回到頂部」按鈕帶 `aria-label`，點擊派發 `tc-back-to-top` 並平滑捲動至頁首；亦可改用 `back-to-top` 插槽提供自訂控件。
+- 切換手風琴時 `<tc-footer-column>` 發出 `tc-toggle`，`detail.open` 為新狀態。
+- 內建「回到頂部」按鈕帶 `aria-label`，點擊發出 `tc-back-to-top` 並平滑捲動至頁首；亦可改用 `back-to-top` 插槽提供自訂控制項。
 - `:focus-visible` 焦點環使用 `--tc-focus-ring-*` token。

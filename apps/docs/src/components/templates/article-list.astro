@@ -70,7 +70,7 @@ const POPULAR = [
               <li>
                 <tc-article-card orientation="horizontal">
                   <div slot="media" class:list={['tpl-photo', item.tone]} aria-hidden="true" />
-                  <tc-chip slot="badge">{item.tag}</tc-chip>
+                  <tc-badge slot="badge" tone="brand">{item.tag}</tc-badge>
                   <span slot="headline">{item.title}</span>
                   <span slot="excerpt">{item.excerpt}</span>
                   <span slot="meta">{item.date}</span>

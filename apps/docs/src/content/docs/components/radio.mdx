@@ -1,6 +1,6 @@
 ---
 title: 單選鈕
-description: tc-radio — 單選圓鈕，form-associated，同名群組互斥。
+description: 在幾個互斥的選項中選一個。
 ---
 
 import Demo from '../../../components/Demo.astro';
@@ -51,7 +51,6 @@ import SiteLook from '../../../components/handbook/SiteLook.astro';
     { kind: 'do', text: '選項文字一句話說清楚，例如「每月定期捐款」；需要補充說明時，寫在整組的下方。' },
     { kind: 'dont', text: '不要只放一個單選鈕。單選鈕選了之後就不能再取消，讀者會沒辦法改回來。' },
     { kind: 'dont', text: '讀者可以同時選好幾個時，不要用單選鈕。' },
-    { kind: 'dont', text: '不要自己改圓鈕的顏色或大小。顏色由網站主題決定，換網站時才會一致。' },
   ]}
 />
 
@@ -67,7 +66,7 @@ import SiteLook from '../../../components/handbook/SiteLook.astro';
 
 <StorybookNote tag="tc-radio" />
 
-`<tc-radio>` 是 24×24 的單選圓鈕，提供外圈 ring 與選取時填滿的內點，並支援 form-associated 表單提交。同 `name` 的 `<tc-radio>` 互斥，僅能選取一個。下方為**可互動的真實元件**：
+`<tc-radio>` 是 24×24 的單選圓鈕，提供外圈 ring 與選取時填滿的內點，並支援 form-associated 表單送出。同 `name` 的 `<tc-radio>` 互斥，僅能選取一個。下方為**可互動的真實元件**：
 
 <Demo>
   <div style="display:flex; flex-direction:column; gap:.5rem;">
@@ -98,7 +97,7 @@ import { TcRadio } from '@tzuchi/react';
 
 ### 群組與表單
 
-同名的 `<tc-radio>` 互斥，選取後其它選項自動取消。`tc-radio` 透過 Form-Associated Custom Elements（ElementInternals）以 `name` / `value` 參與所屬 `<form>` 提交；未選取時不貢獻任何值。加上 `required` 時，群組未選取即為無效。
+同名的 `<tc-radio>` 互斥，選取後其它選項自動取消。`tc-radio` 透過 Form-Associated Custom Elements（ElementInternals）以 `name` / `value` 參與所屬 `<form>` 送出；未選取時不貢獻任何值。加上 `required` 時，群組未選取即為無效。
 
 <Demo>
   <form
@@ -108,7 +107,7 @@ import { TcRadio } from '@tzuchi/react';
     <tc-radio name="size" value="s" required>小</tc-radio>
     <tc-radio name="size" value="m">中</tc-radio>
     <tc-radio name="size" value="l">大</tc-radio>
-    <button type="submit">提交</button>
+    <button type="submit">送出</button>
     <output></output>
   </form>
 </Demo>
@@ -125,4 +124,4 @@ import { TcRadio } from '@tzuchi/react';
 - 鍵盤 Space / Enter 選取；方向鍵在同名群組內移動並選取。
 - Roving tabindex：群組內僅選取項（或第一個可用項）進入 Tab 順序。
 - 焦點環使用 `--tc-focus-ring-*` token。
-- `disabled` 透過停用內部原生控件實作（非 `pointer-events:none`），且不可聚焦。
+- `disabled` 透過停用內部的原生控制項實作（非 `pointer-events:none`），且不可聚焦。

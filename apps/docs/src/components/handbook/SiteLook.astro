@@ -3,42 +3,115 @@
 // 先是「目前顯示：<網站名>」那一行，再寫出目前這個網站的預設變體，以及和預設網站不同的地方。
 // 每個網站各畫一份，只顯示頁首選的那一個（SiteOnly），所以網站再多，頁面也只有一份內容。
 //
-// 和預設網站不同的地方由 src/data/site-themes.ts 算出來（只有語意色）；各網站的預設變體要等
-// 網站設定檔（R-D-24，提案，尚未實作），在那之前每個網站都用元件本身的預設變體。
+// 和預設網站不同的地方由 src/data/site-themes.ts 算出來（只有語意色），而且只列出這個元件
+// 真的用到的語意色：元件 token（packages/tokens/src/component/<id>.tokens.json）一路參照到的
+// 語意色，加上元件樣式（packages/components/src/<id>/*.styles.ts）直接讀的 --tc-color-* 變數。
+// 各網站的預設變體要等網站設定檔（R-D-24，提案，尚未實作），在那之前每個網站都用元件本身的預設變體。
 import CurrentSiteNote from './CurrentSiteNote.astro';
 import SiteOnly from './SiteOnly.astro';
-import { DEFAULT_SITE, SITE_THEMES, sitePageUrl, tokenLabel } from '../../data/site-themes';
+import {
+  DEFAULT_SITE,
+  SEMANTIC_TOKENS,
+  SITE_THEMES,
+  sitePageUrl,
+  tokenLabel,
+  varName,
+  type TokenName,
+} from '../../data/site-themes';
+
+type JsonTree = { [key: string]: unknown };
+
+const tokenFiles = import.meta.glob<JsonTree>('../../../../../packages/tokens/src/**/*.tokens.json', {
+  eager: true,
+  import: 'default',
+});
+const styleFiles = import.meta.glob<string>('../../../../../packages/components/src/*/*.styles.ts', {
+  eager: true,
+  query: '?raw',
+  import: 'default',
+});
+
+/** 把巢狀的 DTCG token 樹攤平成「路徑 → $value」。 */
+function flatten(tree: JsonTree, prefix: string, out: Map<string, string>): void {
+  for (const [key, node] of Object.entries(tree)) {
+    if (key.startsWith('$') || node === null || typeof node !== 'object') continue;
+    const value = (node as { $value?: unknown }).$value;
+    if (typeof value === 'string') out.set(`${prefix}${key}`, value);
+    else flatten(node as JsonTree, `${prefix}${key}.`, out);
+  }
+}
+
+// 淺色的檔案在前、深色覆寫在後都沒關係：這裡只看「參照到哪些名稱」，深色的參照也一起算。
+const refsByPath = new Map<string, string[]>();
+for (const tree of Object.values(tokenFiles)) {
+  const flat = new Map<string, string>();
+  flatten(tree, '', flat);
+  for (const [path, value] of flat) {
+    const refs = [...value.matchAll(/\{([^}]+)\}/g)].map((m) => m[1]);
+    refsByPath.set(path, [...(refsByPath.get(path) ?? []), ...refs]);
+  }
+}
+
+/** 這個元件用到的語意色（去掉 `color.` 前綴的名稱，例如 `brand.primary`）。 */
+function semanticColorsOf(componentId: string): Set<TokenName> {
+  const semantic = new Set(SEMANTIC_TOKENS);
+  const used = new Set<TokenName>();
+  const seen = new Set<string>();
+  const stack = [...refsByPath.keys()].filter((path) => path.startsWith(`${componentId}.`));
+  while (stack.length > 0) {
+    const path = stack.pop() as string;
+    if (seen.has(path)) continue;
+    seen.add(path);
+    const name = path.replace(/^color\./, '');
+    if (path.startsWith('color.') && semantic.has(name)) used.add(name);
+    stack.push(...(refsByPath.get(path) ?? []));
+  }
+  for (const [file, source] of Object.entries(styleFiles)) {
+    if (!file.includes(`/components/src/${componentId}/`)) continue;
+    for (const token of SEMANTIC_TOKENS) {
+      if (new RegExp(`${varName(token)}(?![a-z0-9-])`).test(source)) used.add(token);
+    }
+  }
+  return used;
+}
+
+const componentId = Astro.url.pathname.match(/\/components\/([^/]+)\/?$/)?.[1] ?? '';
+const used = semanticColorsOf(componentId);
 ---
 
 <CurrentSiteNote />
 
 {
-  SITE_THEMES.map((site) => (
-    <SiteOnly site={site.id}>
-      <ul class="site-look">
-        <li>
-          <strong>預設變體：</strong>
-          {site.isDefault
-            ? '用元件本身的預設變體。'
-            : `和${DEFAULT_SITE.名稱}一樣，用元件本身的預設變體（各網站自己的預設變體要等網站設定檔，還沒有實作）。`}
-        </li>
-        <li>
-          <strong>和預設網站不同的地方：</strong>
-          {site.isDefault ? (
-            '沒有。這就是預設網站主題，其他網站沒有特別指定的地方都沿用它。'
-          ) : site.changed.length === 0 ? (
-            '沒有，全部沿用預設網站主題。'
-          ) : (
-            <>
-              只有顏色：{site.changed.map(tokenLabel).join('、')}
-              {site.isDemo && '（示意值，非正式）'}。用到這些顏色的部分會變，其餘和預設網站一樣。
-              <a href={sitePageUrl(site)}>看完整的顏色對照</a>
-            </>
-          )}
-        </li>
-      </ul>
-    </SiteOnly>
-  ))
+  SITE_THEMES.map((site) => {
+    const changed = site.changed.filter((token) => used.has(token));
+    return (
+      <SiteOnly site={site.id}>
+        <ul class="site-look">
+          <li>
+            <strong>預設變體：</strong>
+            {site.isDefault
+              ? '用元件本身的預設變體。'
+              : `和${DEFAULT_SITE.名稱}一樣，用元件本身的預設變體（各網站自己的預設變體要等網站設定檔，還沒有實作）。`}
+          </li>
+          <li>
+            <strong>和預設網站不同的地方：</strong>
+            {site.isDefault ? (
+              '沒有。這就是預設網站主題，其他網站沒有特別指定的地方都沿用它。'
+            ) : used.size === 0 ? (
+              '沒有。這個元件本身沒有顏色，網站主題不會改變它。'
+            ) : changed.length === 0 ? (
+              '沒有。這個元件用到的顏色都沿用預設網站主題。'
+            ) : (
+              <>
+                {site.isDemo && '（以下都是示意值）'}只有這個元件用到的顏色：{changed.map(tokenLabel).join('、')}。其餘和預設網站一樣。
+                <a href={sitePageUrl(site)}>看完整的顏色對照</a>
+              </>
+            )}
+          </li>
+        </ul>
+      </SiteOnly>
+    );
+  })
 }
 
 <style>

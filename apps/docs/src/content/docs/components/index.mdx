@@ -6,17 +6,13 @@ hero:
   title: 瀏覽元件庫
   tagline: 每張卡片都是真正的元件，顏色跟著頁首選的網站主題。
   actions:
-    - text: 在 Storybook 開啟
-      link: /storybook/
-      icon: external
-      variant: primary
     - text: 查看網站主題
       link: /themes/
-      variant: secondary
+      variant: primary
 ---
 
 import ComponentGallery from '../../../components/handbook/ComponentGallery.astro';
 
-<p class="tc-hero-note">Storybook 目前只收錄 HeroUI 的元件，還沒有這裡的 <code>tc-*</code> 元件。手冊和 Storybook 是分開的網站，在本機預覽手冊時這個連結會找不到頁面，請另外用 <code>pnpm run heroui:storybook</code> 開啟。</p>
+<p class="tc-hero-note">元件的顏色、圓角和陰影由網站主題決定。網頁上不要另外改；需要不同時，跟 Claude 說，照<a href="/docs/contributing/">三級判斷</a>處理。給工程師看的元件展示（Storybook）還沒有這裡的元件，各元件頁最後的「給工程師」一段有說明。</p>
 
 <ComponentGallery />

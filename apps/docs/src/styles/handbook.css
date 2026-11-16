@@ -220,8 +220,14 @@
 .tc-dos h3 {
   margin: 0 0 0.5rem;
   color: var(--sl-color-white);
-  font-size: var(--hb-text-h4);
+  font-size: var(--hb-text-h3);
   line-height: var(--hb-line-height-headings);
+}
+.tc-dos p {
+  margin: 0 0 0.5rem;
+  color: var(--sl-color-gray-2);
+  font-size: var(--hb-text-body);
+  line-height: var(--hb-line-height);
 }
 .tc-dos ul {
   display: grid;
@@ -286,4 +292,9 @@ mobile-starlight-toggle button:focus-visible,
   color: var(--sl-color-gray-3);
   font-size: var(--hb-text-body);
   text-align: center;
+}
+
+/* API 表格：第一欄的屬性名稱不要從中間折斷。 */
+.sl-markdown-content table td:first-child code {
+  white-space: nowrap;
 }

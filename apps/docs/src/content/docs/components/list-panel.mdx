@@ -1,6 +1,6 @@
 ---
 title: 清單面板
-description: tc-list-panel — 彩色標題列加上垂直分隔清單的標題面板，首頁側欄「內部觀點：領航慈濟」樣式。
+description: 有色彩標題列的條列清單，常放在首頁側欄。
 ---
 
 import Demo from '../../../components/Demo.astro';
@@ -13,7 +13,7 @@ import StorybookNote from '../../../components/handbook/StorybookNote.astro';
 
 <ComponentMeta id="list-panel" />
 
-<PreviewTile size="hero" scale={0.55}>
+<PreviewTile size="hero">
   <tc-list-panel label="最新消息" width="260px">
     <article>
       <strong style="color:var(--tc-color-text-default)">慈濟志工關懷行動</strong>
@@ -60,7 +60,6 @@ import StorybookNote from '../../../components/handbook/StorybookNote.astro';
     { kind: 'do', text: '一個頁面上，主要的面板用品牌主色的標題列，次要的面板用淡色標題列，讀者一眼分得出輕重。' },
     { kind: 'dont', text: '不要在清單面板裡放大圖或長摘要；每一則需要圖片和摘要時，改用「文章卡片」。' },
     { kind: 'dont', text: '不要讓標題列空白。沒有標題的面板，讀者和螢幕閱讀器都不知道這一區在講什麼。' },
-    { kind: 'dont', text: '不要自己改標題列的顏色。顏色由網站主題決定，換網站時才會一致。' },
   ]}
 />
 
@@ -81,7 +80,7 @@ import StorybookNote from '../../../components/handbook/StorybookNote.astro';
 <Demo>
   <tc-list-panel label="內部觀點：領航慈濟" width="360px">
     <article>
-      <h3 style="margin:0 0 4px;font-weight:700;color:var(--tc-color-text-default)">目前做的事情原因與做法做法</h3>
+      <h3 style="margin:0 0 4px;font-weight:700;color:var(--tc-color-text-default)">目前做的事情原因與做法</h3>
       <p style="margin:0 0 4px;color:var(--tc-color-text-muted)">2023-06-15</p>
       <p style="margin:0;display:flex;justify-content:space-between;color:var(--tc-color-text-muted)">
         <span>執行長</span>
