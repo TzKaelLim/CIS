@@ -37,16 +37,16 @@
 
 GitHub repository：`https://github.com/TzKaelLim/CIS`（公開）。`origin` 不是這個網址時，Claude 不推分支，先問工程（R-S-44）。
 
-| 目錄                                                                        | 內容                                                                                                                                                     |
-| --------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `packages/tokens`                                                           | **tokens 的唯一來源**。`src/**/*.tokens.json`（DTCG 格式）由 Style Dictionary（`build.mjs`）產生 `dist/tokens.css` 等檔案；`check.mjs` 檢查產物          |
-| `heroui/`                                                                   | vendored 的 HeroUI v3 原始碼和慈濟主題（`heroui/styles/themes/tzuchi`，`variables.css` 由 `generate.mjs` 從 tokens 產生）。修改規則見 `heroui/NOTICE.md` |
-| `heroui/storybook`                                                          | 給工程師看的元件展示頁（Storybook）                                                                                                                      |
-| `apps/docs`                                                                 | 給一般讀者看的手冊（Astro Starlight）。新版手冊的目標見 `docs/rules/04-handbook-rules.md`                                                                |
-| `docs/rules`                                                                | 共編規則（上面已匯入）                                                                                                                                   |
-| `scripts/ci`                                                                | 舊的自架 GitLab CI 用的腳本                                                                                                                              |
-| `scripts/dev`                                                               | 本機預覽的啟動腳本（只綁 127.0.0.1）                                                                                                                     |
-| `packages/components`、`packages/react`、`apps/storybook`、`apps/demo-html` | 舊的 Lit Web Components，**已凍結，不修改**；root 的 `build`、`test` 不包含它們                                                                          |
+| 目錄                                                                        | 內容                                                                                                                                                                                                                             |
+| --------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `packages/tokens`                                                           | **tokens 的唯一來源**。`src/**/*.tokens.json`（DTCG 格式）由 Style Dictionary（`build.mjs`）產生 `dist/tokens.css` 等檔案；`check.mjs` 檢查產物                                                                                  |
+| `heroui/`                                                                   | vendored 的 HeroUI v3 原始碼和慈濟主題（`heroui/styles/themes/tzuchi`，`variables.css` 由 `generate.mjs` 從 tokens 產生）。修改規則見 `heroui/NOTICE.md`                                                                         |
+| `heroui/storybook`                                                          | 給工程師看的元件展示頁（Storybook）                                                                                                                                                                                              |
+| `apps/docs`                                                                 | 給一般讀者看的手冊（Astro Starlight）：首頁、文件、元件、範本、網站主題五個區域，頁首有網站主題和色彩模式選單。手冊的資料在 `src/data/`，手冊用的元件在 `src/components/handbook/`；做到哪裡見 `docs/rules/04-handbook-rules.md` |
+| `docs/rules`                                                                | 共編規則（上面已匯入）                                                                                                                                                                                                           |
+| `scripts/ci`                                                                | 舊的自架 GitLab CI 用的腳本                                                                                                                                                                                                      |
+| `scripts/dev`                                                               | 本機預覽的啟動腳本（只綁 127.0.0.1）                                                                                                                                                                                             |
+| `packages/components`、`packages/react`、`apps/storybook`、`apps/demo-html` | 舊的 Lit Web Components，**已凍結，不修改**；root 的 `build`、`test` 不包含它們                                                                                                                                                  |
 
 常用指令（在 repository 根目錄執行）：
 
@@ -58,7 +58,7 @@ pnpm run heroui:theme              # 從 tokens 重新產生慈濟主題的 vari
 pnpm run heroui:storybook          # Storybook http://127.0.0.1:6007
 pnpm run docs:dev                  # 手冊 http://127.0.0.1:4321
 pnpm run heroui:storybook:build    # 建置 Storybook
-node scripts/dev/astro.mjs build   # 建置手冊（關掉遙測）；先建 Lit 元件，見 R-S-11
+pnpm run docs:build                # 建置 tokens 和手冊（經過 astro.mjs，關掉遙測）；第一次先建 Lit 元件，見 R-S-11
 pnpm run test:scripts              # scripts/ 的 node:test 測試
 pnpm lint                          # eslint 和 prettier --check
 ```

@@ -28,8 +28,8 @@
 - **大家都透過 Claude Code 改**：美編（設計）、工程、廠商都用口語告訴 Claude Code 要改什麼，沒有人手改 JSON。一次修改五個步驟，最後一定是開 PR、由負責的角色核可、由人合併。Claude Code 不合併、不部署、不推 `main`、不推 tag（S-10 到 S-20）。
 - **網站之間的差異分三級處理**：只有 CSS 值不同 → 網站主題；內容相同、排列不同 → 同一個元件的變體；資料或行為不同 → 新元件。不可以為某個網站複製一份元件（S-50 到 S-55）。
 - **「網站主題」和「色彩模式」是兩件事**：網站主題是「哪個網站」，色彩模式是「淺色或深色」，兩者可以自由組合。「主題」這個詞只用來指網站（S-40）。
-- **今天已經有的**：預設網站（慈濟入口網）的淺色與深色 tokens、HeroUI 的慈濟主題（68 個元件覆寫檔）、Storybook、舊版手冊、本機預覽腳本、14 天的套件版本冷卻期。
-- **今天還沒有的**：網站設定檔（`sites/<id>/`）、改名保護、新的手冊（五個區域、網站主題選單；目前只有本機原型）、我們自己的元件套件、GitHub Actions 的 CI、部署目標。這些在本文都標成〔目標〕或〔提案〕。
+- **今天已經有的**：預設網站（慈濟入口網）的淺色與深色 tokens、HeroUI 的慈濟主題（68 個元件覆寫檔）、Storybook、新版手冊（五個區域、頁首的網站主題和色彩模式選單；元件頁介紹的仍是凍結的 Lit 元件）、本機預覽腳本、14 天的套件版本冷卻期。
+- **今天還沒有的**：網站設定檔（`sites/<id>/`；手冊裡的慈濟環保網只是示意）、改名保護、我們自己的元件套件、GitHub Actions 的 CI、部署目標。這些在本文都標成〔目標〕或〔提案〕。
 - **元件缺口**：和 Astryx 的 116 個元件家族比對，HeroUI 部分對應 24 項、完全沒有 49 項，共 73 項。部分對應的「優化」，沒有的「新增」；內容網站大多用不到的也收進來，但放在待辦清單（S-70 到 S-74）。
 - **要專案負責人回答的**在第 13 節，每一項都附了建議。
 
@@ -179,12 +179,13 @@ Claude Code 的工作是修改檔案、在本機跑檢查和預覽、commit、�
   pnpm --filter @tzuchi/tokens test
   pnpm run heroui:theme
   pnpm run test:scripts
+  pnpm run docs:build
   pnpm lint
   # git add 之後（比的是已加入的版本，重新產生後不應再變）：
   pnpm run heroui:theme && git diff --exit-code -- heroui/styles/themes/tzuchi/variables.css
   ```
 
-  改到 `heroui/` 時加跑 `pnpm run heroui:storybook:build`；改到手冊或 tokens 時加跑手冊的建置（先 `pnpm --filter @tzuchi/components build`，因為今天的手冊頁還載入凍結的 Lit 元件；再 `node scripts/dev/astro.mjs build`；細節見 R-S-11）。不要跑 `@heroui/react`、`@heroui/styles`、`@heroui/storybook` 的 `lint`（一定會因缺少套件而失敗，見 `heroui/NOTICE.md` 的「Known state inherited from upstream」），改跑它們的 `typecheck`。
+  改到 `heroui/` 時加跑 `pnpm run heroui:storybook:build`；`pnpm run docs:build` 先建 tokens 再建手冊（經過 `scripts/dev/astro.mjs`）；第一次建手冊前先 `pnpm --filter @tzuchi/components build`，因為今天的手冊頁還載入凍結的 Lit 元件（細節見 R-S-11）。不要跑 `@heroui/react`、`@heroui/styles`、`@heroui/storybook` 的 `lint`（一定會因缺少套件而失敗，見 `heroui/NOTICE.md` 的「Known state inherited from upstream」），改跑它們的 `typecheck`。
 - S-17　Claude 告訴共編者要看哪幾頁時，同時說要切到哪個網站主題、哪個色彩模式。改到網站主題或色彩相關的值時，淺色和深色都要看。〔現行（規則）：R-S-13〕
 - S-18　共編者沒確認，Claude 不 commit、不推分支。推之前 Claude Code 會再問一次，共編者確認後才允許。〔現行〕
 - S-19　commit 訊息用英文 conventional commits（例如 `feat(tokens): …`）；commit 訊息和 PR 標題不用 `publish` 這個字（`.claude/settings.json` 的規則會擋下整個指令）。〔現行〕
@@ -276,7 +277,7 @@ packages/tokens/src/sites/<id>/
 | `packages/tokens/dist/tokens.css` | `data-theme="dark"`、`data-theme="light"`，沒設時跟隨作業系統 | 只有色彩模式，沒有網站 |
 | HeroUI 慈濟主題 `variables.css` | `data-theme="tzuchi"`、`data-theme="tzuchi-dark"` | 把網站和色彩模式併在一個值裡；不跟隨作業系統 |
 | Storybook 的工具列 | 一個 Theme 選單：慈濟、慈濟 Dark、Light、Dark | 把色彩模式叫 Theme；還混著 HeroUI 原廠的兩種外觀 |
-| 手冊 `apps/docs` | Starlight 自己的淺色／深色切換；「Theming（主題與深色模式）」頁把淺色、深色稱為「兩套主題」 | 用詞違反 S-40 |
+| 手冊 `apps/docs` | 色彩模式用 Starlight 的 `data-theme="light"`／`"dark"`；網站主題用 `data-site="<id>"`（照 Q4 的建議，只是提案）；兩個都設在 `<html>` | 網站主題的屬性名稱還沒決定（Q4）；今天只有預設網站主題是正式的，另一個（環保網）是示意 |
 
 ---
 
@@ -383,17 +384,17 @@ packages/tokens/src/sites/<id>/
 
 ### 9.1 現況（事實）
 
-- `apps/docs` 是 Astro 5.18.2 + Starlight 0.34.8。側欄只有 Foundations 和 Components 兩組，共 3 個基礎頁和 22 個元件頁。
-- 元件頁介紹的是凍結的 Lit `tc-*` 元件，首頁還寫著「以 Lit Web Components 為單一來源」，這已經不是事實。
-- 手冊全域載入 `tokens.css`，沒有網站主題選單，也沒有色彩模式選單（只有 Starlight 自己的淺色／深色切換）。
-- 5 個元件頁的範例圖片從第三方網站（picsum.photos）載入，違反 S-98。
-- 新版手冊（五個區域、網站主題選單）目前只是本機原型，不在 repo 裡。
+- `apps/docs` 是 Astro 5.18.2 + Starlight 0.34.8。手冊分成首頁、文件、元件、範本、網站主題五個區域：3 個基礎頁、22 個元件頁、4 個範本頁和 2 個網站主題頁。
+- 頁首有「網站主題」選單（`apps/docs/src/components/handbook/SiteSelect.astro`）和 Starlight 的色彩模式選單。網站主題的資料在 `apps/docs/src/data/site-themes.ts`：只有預設網站主題（慈濟入口網）是正式的，慈濟環保網是示意（顏色寫在手冊裡，不在 `packages/tokens`）。
+- 元件頁照第 9.5 節的六段排列，但介紹的仍是凍結的 Lit `tc-*` 元件；Storybook 還沒有這些元件的頁面。
+- 手冊頁面不載入第三方資源（`scripts/docs/handbook.test.mjs` 檢查原始檔）。
+- `pnpm run docs:build` 建置 tokens 和手冊；它是推之前的檢查之一（S-16）。
 
-所以本節的規定，除了標〔現行〕的，都是新手冊實作時必須做到的目標。
+本節的規定標了各自的狀態；標〔部分〕或〔目標〕的，修改手冊時仍然必須做到。
 
 ### 9.2 五個區域
 
-- S-75　手冊分五個區域：**首頁**、**文件**、**元件**、**範本**、**網站主題**。頁首有這五個區域的導覽；側欄只顯示目前所在區域的頁面。〔目標〕
+- S-75　手冊分五個區域：**首頁**、**文件**、**元件**、**範本**、**網站主題**。頁首有這五個區域的導覽；側欄只顯示目前所在區域的頁面。〔現行〕
 
 | 區域 | 內容 |
 | --- | --- |
@@ -405,19 +406,19 @@ packages/tokens/src/sites/<id>/
 
 ### 9.3 頁首的選單
 
-- S-76　頁首有「網站主題」選單和「色彩模式」選單。〔目標〕
-- S-77　「網站主題」選單列出所有網站，預設是慈濟入口網；「色彩模式」選單有淺色和深色。兩個選單互相獨立。〔目標〕
-- S-78　選單的用詞照第 2 節：選單叫「網站主題」和「色彩模式」，不叫「Theme」或「主題」。〔目標〕
+- S-76　頁首有「網站主題」選單和「色彩模式」選單。〔現行〕
+- S-77　「網站主題」選單列出所有網站，預設是慈濟入口網；「色彩模式」選單有淺色和深色。兩個選單互相獨立。〔現行；色彩模式選單另有「自動」（跟隨系統），要不要保留待決定 Q12〕
+- S-78　選單的用詞照第 2 節：選單叫「網站主題」和「色彩模式」，不叫「Theme」或「主題」。〔現行〕
 
 ### 9.4 一次只看一個網站
 
-- S-79　每一頁都只顯示頁首選定的那一個網站主題。〔目標〕
-- S-80　假設未來有 10 到 20 個網站主題：內容不可以排成每個網站一個分頁、一欄或一個框。要看別的網站，就在頁首切換。〔目標〕
-- S-81　「網站主題」區域的總覽可以列出所有網站（清單或表格，一個網站一列），每個網站各有自己的一頁；這是目錄，不是並排比較。〔目標〕
+- S-79　每一頁都只顯示頁首選定的那一個網站主題。〔現行〕
+- S-80　假設未來有 10 到 20 個網站主題：內容不可以排成每個網站一個分頁、一欄或一個框。要看別的網站，就在頁首切換。〔現行〕
+- S-81　「網站主題」區域的總覽可以列出所有網站（清單或表格，一個網站一列），每個網站各有自己的一頁；這是目錄，不是並排比較。〔現行〕
 
 ### 9.5 元件頁的結構
 
-- S-82　給一般讀者的元件頁，依序有這六段：〔目標〕
+- S-82　給一般讀者的元件頁，依序有這六段：〔部分：22 個元件頁都有這六段；第 5 段的預設變體要等網站設定檔，淺色、深色並排的範例只有按鈕頁有；第 6 段沒有 Storybook 連結，因為 Storybook 還沒有這些元件的頁面〕
   1. **預覽**：真的元件，不是截圖，用目前選定的網站主題和色彩模式顯示。
   2. **用法**：什麼時候用、什麼時候不用。
   3. **組成**：元件由哪些部分組成。
@@ -427,7 +428,7 @@ packages/tokens/src/sites/<id>/
 
 ### 9.6 字級
 
-- S-83　手冊的字級用以下這組精簡的刻度：〔目標〕
+- S-83　手冊的字級用以下這組精簡的刻度：〔現行：`apps/docs/src/styles/type-scale.css`〕
 
 | 用途 | 字級 | 行高 |
 | --- | --- | --- |
@@ -445,9 +446,9 @@ packages/tokens/src/sites/<id>/
 
 ### 9.7 內容規則
 
-- S-84　手冊對外公開，只放設計內容。共編流程、電腦準備放在 repo 的 `CONTRIBUTING.md`。〔現行〕
+- S-84　手冊對外公開，只放設計內容。共編流程、電腦準備放在 repo 的 `CONTRIBUTING.md`。〔部分：電腦準備只在 `CONTRIBUTING.md`；手冊的「如何參與修改」頁有角色、五個步驟和三級判斷的摘要，要不要保留這一頁待專案負責人決定〕
 - S-85　手冊顯示的色票和數值由 tokens 產生（S-5），淺色和深色的值都要看得到。〔目標〕
-- S-86　手冊頁面不發出任何第三方請求（S-98）；範例圖片放在 repo 裡。〔部分〕
+- S-86　手冊頁面不發出任何第三方請求（S-98）；範例圖片放在 repo 裡。〔現行〕
 - S-87　手冊的本機預覽只用 `pnpm run docs:dev`（127.0.0.1:4321）。〔現行〕
 
 ---
@@ -523,7 +524,7 @@ packages/tokens/src/sites/<id>/
 | 規定 | 狀態 | 證明或缺什麼 |
 | --- | --- | --- |
 | S-1 一套 kit | 尚未實作 | 今天只有預設網站；沒有其他網站，也沒有防止複製的檢查 |
-| S-2 固定用詞 | 部分 | 規則：`docs/rules/02-design-rules.md` R-D-01 到 R-D-03；但 `apps/docs/src/content/docs/foundations/theming.mdx` 把淺色／深色叫「兩套主題」，Storybook 工具列叫 Theme；舊的 `.gitlab/` 範本和 `.gitlab-ci.yml` 用 MR |
+| S-2 固定用詞 | 部分 | 規則：`docs/rules/02-design-rules.md` R-D-01 到 R-D-03；手冊照這套用詞（`apps/docs/src/content/docs/docs/glossary.mdx`）；但 Storybook 工具列叫 Theme；舊的 `.gitlab/` 範本和 `.gitlab-ci.yml` 用 MR |
 | S-3 單向資料流 | 已實作 | `packages/tokens/build.mjs`、`heroui/styles/themes/tzuchi/generate.mjs` |
 | S-4 variables.css 不手改 | 已實作 | `generate.mjs`；SOP R-S-10、R-S-11 和步驟 4 的同步檢查；`.gitlab-ci.yml` 的 build job |
 | S-5 手冊與 Storybook 不手抄值 | 部分 | Storybook 讀 `tokens.css` 和產生的 HeroUI 慈濟主題；手冊的 `ColorSwatches.astro` 等元件讀原始 JSON 自己組變數名，不是讀 tokens 的產物 |
@@ -536,7 +537,7 @@ packages/tokens/src/sites/<id>/
 | S-13 分支名稱 | 已實作（規則） | SOP R-S-08 |
 | S-14、S-51 問第幾級並寫進 PR | 已實作（規則） | `docs/rules/02-design-rules.md` R-D-30 和第 7 節的問題；PR 範本的「屬於哪一級」 |
 | S-15 一起更新用到的地方 | 已實作（規則） | SOP R-S-09、R-S-45 |
-| S-16 推之前的檢查 | 已實作 | SOP R-S-11；`packages/tokens/check.mjs`；`scripts/dev/lib.test.mjs` |
+| S-16 推之前的檢查 | 已實作 | SOP R-S-11；`packages/tokens/check.mjs`；`scripts/dev/lib.test.mjs`；`scripts/docs/handbook.test.mjs`；root `package.json` 的 `docs:build` |
 | S-17 說明要看的網站主題與色彩模式 | 已實作（規則） | SOP R-S-13；PR 範本的「請看哪幾頁」 |
 | S-18 確認後才 commit、推之前再問 | 已實作 | SOP R-S-14；`.claude/settings.json` 的 `ask: git push*` |
 | S-19 commit 訊息 | 已實作 | SOP R-S-15；`.claude/settings.json` 的 `Bash(* publish*)` |
@@ -561,7 +562,7 @@ packages/tokens/src/sites/<id>/
 | S-43 只設在 `<html>` | 已實作（規則） | R-D-16；`heroui/styles/themes/tzuchi/index.css` 的說明 |
 | S-44 屬性名稱 | 尚未實作 | 待決定（Q4） |
 | S-45 每個網站產生主題變數 | 尚未實作 | `generate.mjs` 只產生 `tzuchi`、`tzuchi-dark` |
-| S-46 一次一個網站主題 | 尚未實作 | — |
+| S-46 一次一個網站主題 | 部分 | 手冊一次只顯示頁首選的那一個網站主題（`apps/docs/src/components/handbook/SiteOnly.astro`、`apps/docs/src/data/site-selection.ts`）；網站本身還沒有網站主題 |
 | S-47 LOCAL CHANGE | 已實作 | `heroui/NOTICE.md` 的修改清單 |
 | S-48 外觀用覆寫檔 | 已實作 | `heroui/styles/themes/tzuchi/components/index.css`（68 個覆寫檔） |
 | S-49 Lit 凍結 | 已實作 | SOP R-S-30；root `package.json` 的 `build`、`test` 只跑 `@tzuchi/tokens` |
@@ -576,10 +577,10 @@ packages/tokens/src/sites/<id>/
 | S-64 到 S-66 元件放哪裡 | 尚未實作 | 沒有 `packages/ui` |
 | S-67 到 S-69 優化、新增、完成條件 | 尚未實作 | — |
 | S-70 到 S-74 路線圖 | 已實作 | `docs/component-roadmap.md`、`docs/component-roadmap.json`（73 列；兩檔一致只靠人工檢查） |
-| S-75 到 S-83 手冊結構、選單、元件頁、字級 | 尚未實作 | `apps/docs/astro.config.mjs` 只有 Foundations、Components 兩組；新手冊只有本機原型 |
-| S-84 手冊只放設計內容 | 已實作 | 共編流程在 `CONTRIBUTING.md` |
+| S-75 到 S-83 手冊結構、選單、元件頁、字級 | 部分 | 五個區域：`apps/docs/astro.config.mjs`、`apps/docs/src/data/sections.ts`、`apps/docs/src/route-data.ts`；選單：`apps/docs/src/components/starlight/ThemeSelect.astro`、`apps/docs/src/components/handbook/SiteSelect.astro`；元件頁的六段：`scripts/docs/handbook.test.mjs` 檢查標題順序；字級：`apps/docs/src/styles/type-scale.css`。缺：元件頁的預設變體（沒有網站設定檔）、Storybook 的對應頁；網站主題的屬性 `data-site` 是提案（Q4） |
+| S-84 手冊只放設計內容 | 部分 | 電腦準備和完整的共編流程在 `CONTRIBUTING.md` 和 `docs/rules/`；手冊的 `apps/docs/src/content/docs/docs/contributing.mdx` 是流程的摘要，要不要保留待專案負責人決定 |
 | S-85 色票由 tokens 產生 | 部分 | `apps/docs/src/components/ColorSwatches.astro`、`ThemeSwatches.astro` 讀原始 JSON |
-| S-86 手冊零第三方請求 | 部分 | SOP R-S-27、R-H-15 有規則；但 5 個元件頁從 picsum.photos 載入圖片（例如 `apps/docs/src/content/docs/components/card.mdx`） |
+| S-86 手冊零第三方請求 | 已實作 | 範例圖片改成色塊；`scripts/docs/handbook.test.mjs` 擋下 `apps/docs/src` 裡允許清單以外的外部網址；建置後的 `apps/docs/dist` 沒有外部請求（人工檢查） |
 | S-87 手冊預覽 | 已實作 | `scripts/dev/docs.mjs` |
 | S-88 Storybook 預覽 | 已實作 | `scripts/dev/storybook.mjs` |
 | S-89 兩個選單 | 尚未實作 | `constants.ts` 只有一個 Theme 選單 |
@@ -591,7 +592,7 @@ packages/tokens/src/sites/<id>/
 | S-95 lockfile | 已實作 | `.gitlab-ci.yml` 用 `--frozen-lockfile`；`pnpm-workspace.yaml` 的說明 |
 | S-96 安裝腳本白名單 | 已實作 | `pnpm-workspace.yaml` 的 `onlyBuiltDependencies` |
 | S-97 不自行安裝相依套件 | 已實作（規則） | SOP R-S-26 |
-| S-98 不發第三方請求 | 部分 | 見 S-86、S-91 |
+| S-98 不發第三方請求 | 部分 | 手冊已做到（S-86）；Storybook 還沒有（S-91） |
 | S-99 關掉遙測 | 已實作 | `scripts/dev/astro.mjs`、`docs.mjs`、`storybook.mjs`；`heroui/storybook/.storybook/main.ts` |
 | S-100、S-101 127.0.0.1、不換埠 | 已實作 | `scripts/dev/lib.mjs`（`HOST`、`checkPortFree`、`launch`） |
 | S-102 只用 PID 停程序 | 已實作 | SOP R-S-12；`.claude/settings.json` 擋 `pkill`、`killall` |

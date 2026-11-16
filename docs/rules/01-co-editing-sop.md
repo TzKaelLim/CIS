@@ -82,12 +82,13 @@ Claude 必須：
    pnpm --filter @tzuchi/tokens test
    pnpm run heroui:theme
    pnpm run test:scripts
+   pnpm run docs:build
    pnpm lint
    ```
 
    - `pnpm run heroui:theme` 之後，用 `git diff -- heroui/styles/themes/tzuchi/variables.css` 確認：改了 token 時，它的變化只來自這次的 token 修改；沒改 token 時，它沒有變化。「重新產生後不再變」的檢查在步驟 4 的 `git add` 之後做。
    - 改到 `heroui/` 時，加跑 `pnpm run heroui:storybook:build`，以及改到的套件的 `typecheck`（例如 `pnpm --filter @heroui/react typecheck`）。
-   - 改到 `apps/docs`、`packages/tokens`，或升級手冊用的套件時，加跑手冊的建置：先 `pnpm --filter @tzuchi/components build`（今天的手冊頁還載入凍結的 Lit 元件，沒有它的建置產物，手冊建不起來；這只是建置，不修改它。這個建置會重新排列並改寫 `packages/components/custom-elements.json`，建完用 `git restore packages/components/custom-elements.json` 只還原這一個檔案，不把它加進 commit），再 `node scripts/dev/astro.mjs build`（經過啟動腳本，關掉遙測）；不直接跑 `pnpm --filter @tzuchi/docs build`。
+   - `pnpm run docs:build` 先建 tokens，再經過 `scripts/dev/astro.mjs` 建置手冊（關掉遙測）；不直接跑 `pnpm --filter @tzuchi/docs build`。手冊頁還載入凍結的 Lit 元件，所以電腦上第一次建置手冊前（或 `packages/components/dist/` 不存在時），先跑一次 `pnpm --filter @tzuchi/components build`：這只是建置，不修改它。這個建置會重新排列並改寫 `packages/components/custom-elements.json`，建完用 `git restore packages/components/custom-elements.json` 只還原這一個檔案，不把它加進 commit。
    - 不跑 `@heroui/react`、`@heroui/styles`、`@heroui/storybook` 的 `lint`：它們的 ESLint 設定缺少套件，一定會以 `ERR_MODULE_NOT_FOUND` 失敗（`heroui/NOTICE.md` 的「Known state inherited from upstream」）。也不自行補裝那些套件。
    - 有失敗就先修好；修不好就向共編者說明原因。不推檢查失敗的分支。
    - GitHub Actions 的 CI 還沒有建立，這些本機檢查就是今天唯一的關卡。

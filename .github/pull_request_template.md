@@ -24,9 +24,9 @@
 - [ ] `pnpm --filter @tzuchi/tokens test`
 - [ ] `pnpm run heroui:theme`；`git add` 之後重跑，`variables.css` 沒有再變（`git diff --exit-code`）
 - [ ] `pnpm run test:scripts`
+- [ ] `pnpm run docs:build`（手冊的建置）
 - [ ] `pnpm lint`
 - [ ] 改到 `heroui/`：`pnpm run heroui:storybook:build`，以及改到的套件的 `typecheck`
-- [ ] 改到手冊或 tokens：`pnpm --filter @tzuchi/components build` 後 `node scripts/dev/astro.mjs build`
 - [ ] 改到顏色：淺色和深色都看過；這次改到的文字和背景的對比：
 - [ ] `git diff --cached` 看過：沒有姓名、電子郵件、主機名稱、本機路徑、金鑰，也沒有新的外部網址
 
