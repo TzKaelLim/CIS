@@ -1,0 +1,112 @@
+---
+// 只有範本本身的畫面頁：/templates/frame/<id>/。
+//
+// 這不是 Starlight 的頁面：沒有手冊的頁首、側欄和搜尋，只有範本。範本總覽頁的縮圖和預覽對話框
+// 用 iframe 載入它，iframe 有多寬，這一頁的「視窗」就有多寬，所以 <tc-navbar>、<tc-footer>
+// 這些依視窗寬度換版面的元件，會照預覽選的寬度（桌機／平板／手機）排版。
+//
+// - 網站主題和色彩模式：第一次繪製前依網址的 ?site=…&mode=… 設好 <html data-site> 和
+//   <html data-theme>；網址沒有時，讀手冊記住的選擇（同一個網域的 localStorage，只讀不寫），
+//   再沒有就用預設網站和作業系統的色彩模式。之後跟著上一層手冊頁面用 postMessage 送來的值變
+//   （src/scripts/template-frame-messages.ts）。
+// - ?view=thumb：縮圖用，不顯示捲軸。
+// - 不給搜尋引擎收錄（noindex），也不在手冊的搜尋索引裡（不是 Starlight 頁面，沒有
+//   data-pagefind-body，另外整頁標 data-pagefind-ignore）。
+// - 沒有 JavaScript 時，範本總覽頁的卡片直接連到這一頁，讀者仍然看得到範本（預設網站、淺色）。
+import '@tzuchi/tokens/tokens.css';
+import 'virtual:tc-site-theme-vars.css';
+import TemplateView from '../../../components/handbook/TemplateView.astro';
+import { TEMPLATES, getTemplate } from '../../../data/template-catalog';
+import { DEFAULT_SITE, SITE_THEMES } from '../../../data/site-themes';
+import { SITE_STORAGE_KEY, SITE_URL_PARAM } from '../../../data/site-selection';
+
+export function getStaticPaths() {
+  return TEMPLATES.map((entry) => ({ params: { id: entry.id } }));
+}
+
+const entry = getTemplate(Astro.params.id ?? '');
+const siteIds = SITE_THEMES.map((s) => s.id);
+const config = JSON.stringify({
+  ids: siteIds,
+  fallback: DEFAULT_SITE.id,
+  siteKey: SITE_STORAGE_KEY,
+  // Starlight 存色彩模式的 key（ColorModeToggle.astro 也寫它）。
+  modeKey: 'starlight-theme',
+  siteParam: SITE_URL_PARAM,
+  modeParam: 'mode',
+});
+// 第一次繪製前執行，所以不能等打包的 script；只讀網址和 localStorage，不寫任何東西。
+const initScript = `(function(c){var d=document.documentElement,q;try{q=new URLSearchParams(location.search)}catch(e){q=new URLSearchParams('')}var site=q.get(c.siteParam),mode=q.get(c.modeParam);if(c.ids.indexOf(site)<0){site=null;try{var s=localStorage.getItem(c.siteKey);if(c.ids.indexOf(s)>=0)site=s}catch(e){}}if(site===null)site=c.fallback;if(mode!=='light'&&mode!=='dark'){mode=null;try{var m=localStorage.getItem(c.modeKey);if(m==='light'||m==='dark')mode=m}catch(e){}if(mode===null)mode=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}d.setAttribute('data-site',site);d.setAttribute('data-theme',mode);if(q.get('view')==='thumb')d.setAttribute('data-view','thumb')})(${config});`;
+---
+
+<!doctype html>
+<html lang="zh-TW" data-site={DEFAULT_SITE.id} data-theme="light" data-site-ids={siteIds.join(',')}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>{`${entry.名稱}（範本示意）｜慈濟 CIS UIKit`}</title>
+    <script is:inline set:html={initScript} />
+  </head>
+  <body data-pagefind-ignore="all">
+    <TemplateView id={entry.id} />
+  </body>
+</html>
+
+<script>
+  import {
+    FRAME_ESCAPE,
+    FRAME_READY,
+    isFrameLook,
+  } from '../../../scripts/template-frame-messages';
+
+  const root = document.documentElement;
+  const siteIds = (root.dataset.siteIds ?? '').split(',').filter((id) => id !== '');
+  const embedded = window.parent !== window;
+
+  // 上一層手冊頁面送來新的網站主題或色彩模式：只接受同一個網域、來自上一層視窗的訊息。
+  window.addEventListener('message', (event) => {
+    if (event.origin !== location.origin || event.source !== window.parent) return;
+    if (!isFrameLook(event.data)) return;
+    if (siteIds.includes(event.data.site)) root.dataset.site = event.data.site;
+    root.dataset.theme = event.data.mode;
+  });
+
+  if (embedded) {
+    // 焦點在範本裡時，Esc 送不到上一層的對話框，所以轉告上一層。
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') window.parent.postMessage({ type: FRAME_ESCAPE }, location.origin);
+    });
+    window.parent.postMessage({ type: FRAME_READY }, location.origin);
+  }
+
+  // 範本裡的連結都是 href="#"（示意），點了不要跳回頁面頂端。
+  document.addEventListener('click', (event) => {
+    const anchor = event
+      .composedPath()
+      .find((node): node is HTMLAnchorElement => node instanceof HTMLAnchorElement);
+    if (anchor && anchor.getAttribute('href') === '#') event.preventDefault();
+  });
+</script>
+
+<style is:global>
+  html,
+  body {
+    margin: 0;
+    background-color: var(--tc-color-surface-default);
+  }
+  html[data-theme='dark'] {
+    color-scheme: dark;
+  }
+  html[data-theme='light'] {
+    color-scheme: light;
+  }
+  /* 縮圖只露出頁面最上面的部分，不顯示捲軸。 */
+  html[data-view='thumb'] {
+    overflow: hidden;
+  }
+  /* Astro 的開發工具列只在本機預覽出現；範本畫面裡不要它。 */
+  astro-dev-toolbar {
+    display: none !important;
+  }
+</style>

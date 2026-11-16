@@ -10,7 +10,7 @@ import { SITE_THEME_VARS_MODULE, siteThemeVarsCss } from './src/data/site-theme-
 // 手冊的五個區域（首頁、文件、元件、範本、網站主題）與元件目錄。
 import { getSection } from './src/data/sections.ts';
 import { COMPONENTS, componentSidebarItems } from './src/data/component-catalog.ts';
-import { TEMPLATES, templateSidebarItems } from './src/data/template-catalog.ts';
+import { TEMPLATES } from './src/data/template-catalog.ts';
 
 const DATA_FILES = [
   'site-themes.ts',
@@ -70,7 +70,8 @@ if (missingInCatalog.length > 0 || missingPages.length > 0) {
   );
 }
 
-// 範本目錄和範本元件也必須一一對應：/templates/<id>/ 頁面依目錄產生，畫面來自 <id>.astro。
+// 範本目錄和範本元件也必須一一對應：畫面頁 /templates/frame/<id>/ 和舊網址的轉址頁
+// /templates/<id>/ 都依目錄產生，畫面來自 <id>.astro。
 const templateFiles = readdirSync(new URL('./src/components/templates/', import.meta.url))
   .filter((file) => file.endsWith('.astro'))
   .map((file) => file.replace(/\.astro$/, ''));
@@ -120,6 +121,7 @@ export default defineConfig({
       // 在第一次繪製前套用記住的網站主題，並載入「只顯示目前網站」的規則。
       head: siteHeadTags(),
       // 最上層的每個群組是一個區域，名稱要和 src/data/sections.ts 的 label 相同。
+      // 「範本」區域沒有側欄（只有一頁總覽，預覽在對話框裡打開），所以這裡沒有它的群組。
       sidebar: [
         {
           label: getSection('docs').label,
@@ -131,7 +133,6 @@ export default defineConfig({
           ],
         },
         { label: getSection('components').label, items: componentSidebarItems() },
-        { label: getSection('templates').label, items: templateSidebarItems() },
         // 總覽在前，各網站收在可展開的子群組裡，網站再多側欄也不會被塞滿。
         {
           label: getSection('themes').label,

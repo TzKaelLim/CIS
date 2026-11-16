@@ -2,8 +2,9 @@
 //
 // - 側欄：astro.config.mjs 的最上層群組就是各個區域；這裡只留下目前區域的內容，攤平成一層。
 // - 上一頁／下一頁：只連到同一個區域的頁面；元件、範本、網站主題的總覽頁不放。
-// - 首頁和網站主題總覽：桌機版不顯示側欄，也沒有右側的「本頁內容」。手機版的選單（同樣是側欄）
-//   仍然保留，裡面有區域導覽和偏好設定。網站主題總覽自己有一欄網站清單，所以不需要側欄。
+// - 首頁、範本和網站主題總覽：桌機版不顯示側欄，也沒有右側的「本頁內容」。手機版的選單（同樣是側欄）
+//   仍然保留，裡面有區域導覽和偏好設定。網站主題總覽自己有一欄網站清單，範本區域只有總覽一頁
+//   （每個範本在對話框裡預覽），所以都不需要側欄。
 import { defineRouteMiddleware } from '@astrojs/starlight/route-data';
 import { getSection, isSectionHome, sectionForPath } from './data/sections';
 
@@ -40,7 +41,10 @@ export const onRequest = defineRouteMiddleware((context) => {
     route.pagination.next = undefined;
   }
 
-  const isWide = section.id === 'home' || isSectionHome(getSection('themes'), context.url.pathname);
+  const isWide =
+    section.id === 'home' ||
+    section.id === 'templates' ||
+    isSectionHome(getSection('themes'), context.url.pathname);
   if (isWide) {
     // 寬版的入口頁，不需要右側的「本頁內容」。
     route.toc = undefined;

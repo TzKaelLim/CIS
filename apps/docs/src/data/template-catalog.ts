@@ -1,8 +1,10 @@
-// 範本目錄。範本總覽頁（/templates/）的卡片、側欄「範本」的清單、
-// 每個範本的頁面（/templates/<id>/）和首頁的範本預覽都由這份資料產生。
+// 範本目錄。範本總覽頁（/templates/）的卡片和預覽對話框、只有範本的畫面頁
+// （/templates/frame/<id>/，縮圖和預覽用 iframe 載入它）、舊網址的轉址頁（/templates/<id>/）
+// 和首頁的範本預覽都由這份資料產生。
 //
 // 新增一個範本 = 在 TEMPLATES 加一筆，並在 src/components/templates/ 放一個 <id>.astro
-// （用真正的 <tc-*> 元件組成的整頁畫面）。astro.config.mjs 會檢查兩邊一致。
+// （用真正的 <tc-*> 元件組成的整頁畫面）。astro.config.mjs 和 scripts/docs/handbook.test.mjs
+// 會檢查兩邊一致。
 //
 // 範本裡不要放外部圖片或網址；需要照片的地方用 CSS 漸層色塊代替。
 import { COMPONENTS } from './component-catalog';
@@ -32,6 +34,22 @@ export interface TemplateEntry {
   /** 這個範本用到的元件，填元件目錄（component-catalog.ts）的 id。 */
   使用的元件: readonly string[];
 }
+
+/** 畫面頁網址裡的固定段落：/templates/frame/<id>/。 */
+export const FRAME_SEGMENT = 'frame';
+
+/** 範本總覽頁上打開預覽的網址參數：/templates/?t=<id>。 */
+export const TEMPLATE_PREVIEW_PARAM = 't';
+
+/** 預覽對話框的三種寬度（px）。畫面頁在 iframe 裡用這個寬度排版，所以導覽列、頁尾會換成那個寬度的版面。 */
+export const PREVIEW_WIDTHS = [
+  { id: 'desktop', 名稱: '桌機', px: 1280 },
+  { id: 'tablet', 名稱: '平板', px: 768 },
+  { id: 'phone', 名稱: '手機', px: 390 },
+] as const;
+
+/** 縮圖用多寬排版（px）：縮圖一律是桌機版面，再整塊縮小。 */
+export const THUMB_LAYOUT_WIDTH = 1280;
 
 export const TEMPLATES: readonly TemplateEntry[] = [
   {
@@ -99,6 +117,10 @@ for (const [i, entry] of TEMPLATES.entries()) {
     throw new Error(`範本目錄的 id 重複：${entry.id}`);
   if (!/^[a-z][a-z0-9-]{0,47}$/.test(entry.id))
     throw new Error(`範本 id「${entry.id}」只能用小寫英數和連字號`);
+  if (entry.id === FRAME_SEGMENT)
+    throw new Error(
+      `範本 id 不可以是「${FRAME_SEGMENT}」：/templates/${FRAME_SEGMENT}/ 是畫面頁的網址`,
+    );
   if (!TEMPLATE_CATEGORIES.some((c) => c.id === entry.分類))
     throw new Error(`範本 ${entry.id} 的分類 ${entry.分類} 不存在`);
   for (const id of entry.使用的元件) {
@@ -107,7 +129,13 @@ for (const [i, entry] of TEMPLATES.entries()) {
   }
 }
 
-export const templateUrl = (entry: TemplateEntry): string => `/templates/${entry.id}/`;
+/** 範本的網址：範本總覽頁，並直接打開這個範本的預覽。 */
+export const templateUrl = (entry: TemplateEntry): string =>
+  `/templates/?${TEMPLATE_PREVIEW_PARAM}=${entry.id}`;
+
+/** 只有範本本身的畫面頁（沒有手冊的頁首和側欄），縮圖和預覽對話框用 iframe 載入它。 */
+export const templateFrameUrl = (entry: TemplateEntry): string =>
+  `/templates/${FRAME_SEGMENT}/${entry.id}/`;
 
 export function getTemplate(id: string): TemplateEntry {
   const entry = TEMPLATES.find((t) => t.id === id);
@@ -124,11 +152,3 @@ export function getTemplateCategory(id: TemplateCategoryId): TemplateCategory {
 /** 有範本的分類（篩選標籤只列這些），順序照 TEMPLATE_CATEGORIES。 */
 export const usedTemplateCategories = (): TemplateCategory[] =>
   TEMPLATE_CATEGORIES.filter((c) => TEMPLATES.some((t) => t.分類 === c.id));
-
-/** 側欄「範本」的項目：總覽在前，接著每個範本一項。 */
-export function templateSidebarItems(): { label: string; link: string }[] {
-  return [
-    { label: '總覽', link: '/templates/' },
-    ...TEMPLATES.map((t) => ({ label: t.名稱, link: templateUrl(t) })),
-  ];
-}

@@ -146,3 +146,92 @@ test('the URL check ignores code fences and example domains but catches the rest
     '1: https://fonts.googleapis.com/css2',
   ]);
 });
+
+/**
+ * Template ids and the components each template uses, read from the source of
+ * template-catalog.ts (it imports component-catalog without an extension, so Node
+ * cannot load it directly).
+ */
+function readTemplateCatalog() {
+  const text = readFileSync(join(docs, 'src/data/template-catalog.ts'), 'utf8');
+  const start = text.indexOf('export const TEMPLATES');
+  const block = text.slice(start, text.indexOf('\n];', start));
+  return [...block.matchAll(/\n {4}id: '([^']+)',[\s\S]*?使用的元件: \[([^\]]*)\]/g)].map((m) => ({
+    id: m[1],
+    components: [...m[2].matchAll(/'([^']+)'/g)].map((c) => c[1]),
+  }));
+}
+
+test('the templates catalog, the template components and the template routes agree', async () => {
+  const templates = readTemplateCatalog();
+  const ids = templates.map((t) => t.id).sort();
+  assert.ok(ids.length > 0, 'no templates found in template-catalog.ts');
+  assert.equal(new Set(ids).size, ids.length, 'the templates catalog lists a template twice');
+  assert.ok(!ids.includes('frame'), '"frame" is the path of the frame pages, not a template id');
+  const files = readdirSync(join(docs, 'src/components/templates'))
+    .filter((file) => file.endsWith('.astro'))
+    .map((file) => file.replace(/\.astro$/, ''))
+    .sort();
+  assert.deepEqual(ids, files, 'template-catalog.ts and src/components/templates/*.astro disagree');
+
+  const { COMPONENTS } = await import(join(docs, 'src/data/component-catalog.ts'));
+  const componentIds = new Set(COMPONENTS.map((c) => c.id));
+  for (const t of templates) {
+    for (const id of t.components) {
+      assert.ok(
+        componentIds.has(id),
+        `template ${t.id} uses ${id}, which is not in the component catalog`,
+      );
+    }
+  }
+
+  // The template area has exactly two routes, and both are generated from the catalog:
+  // the frame page that thumbnails and the preview dialog load, and the old address
+  // that forwards to /templates/?t=<id>. Neither is a Starlight page.
+  const routesDir = join(docs, 'src/pages/templates');
+  const routes = [...walk(routesDir)].map((p) => relative(routesDir, p)).sort();
+  assert.deepEqual(routes, ['[id].astro', 'frame/[id].astro']);
+  const frame = readFileSync(join(routesDir, 'frame/[id].astro'), 'utf8');
+  const forward = readFileSync(join(routesDir, '[id].astro'), 'utf8');
+  for (const [name, text] of [
+    ['frame/[id].astro', frame],
+    ['[id].astro', forward],
+  ]) {
+    assert.match(
+      text,
+      /getStaticPaths\(\) \{\s*return TEMPLATES\.map\(/,
+      `${name}: not generated from TEMPLATES`,
+    );
+    assert.match(text, /<meta name="robots" content="noindex/, `${name}: missing noindex`);
+    assert.doesNotMatch(text, /StarlightPage/, `${name}: must not be a Starlight page`);
+  }
+  assert.match(
+    frame,
+    /data-pagefind-ignore="all"/,
+    'the frame page must stay out of the search index',
+  );
+  assert.match(forward, /http-equiv="refresh"/, 'the old address must forward');
+  assert.match(forward, /templateUrl\(entry\)/, 'the old address must forward to templateUrl()');
+  const catalog = readFileSync(join(docs, 'src/data/template-catalog.ts'), 'utf8');
+  assert.match(
+    catalog,
+    /templateUrl = [^;]*`\/templates\/\?\$\{TEMPLATE_PREVIEW_PARAM\}=\$\{entry\.id\}`/,
+  );
+  assert.match(
+    catalog,
+    /templateFrameUrl = [^;]*`\/templates\/\$\{FRAME_SEGMENT\}\/\$\{entry\.id\}\/`/,
+  );
+});
+
+test('no handbook source links to an old per-template page', () => {
+  const ids = new Set(readTemplateCatalog().map((t) => t.id));
+  const problems = [];
+  for (const path of walk(join(docs, 'src'))) {
+    for (const [index, line] of readFileSync(path, 'utf8').split('\n').entries()) {
+      for (const match of line.matchAll(/\/templates\/([a-z][a-z0-9-]*)\//g)) {
+        if (ids.has(match[1])) problems.push(`${relative(root, path)}:${index + 1}: ${match[0]}`);
+      }
+    }
+  }
+  assert.deepEqual(problems, [], 'link to /templates/?t=<id> (templateUrl) instead');
+});

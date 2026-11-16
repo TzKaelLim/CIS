@@ -52,12 +52,12 @@ const [firstTemplate, ...otherTemplates] = TEMPLATES;
       <a href="/templates/">前往<span class="sr-only">範本</span> →</a>
     </div>
     <div class="templates-preview">
-      {firstTemplate && <TemplateThumb id={firstTemplate.id} scale={0.27} ratio="fill" class="main-thumb" />}
+      {firstTemplate && <TemplateThumb id={firstTemplate.id} ratio="fill" class="main-thumb" />}
       <div class="pair">
         {
           otherTemplates
             .slice(0, 2)
-            .map((t) => <TemplateThumb id={t.id} scale={0.14} ratio="3 / 4" />)
+            .map((t) => <TemplateThumb id={t.id} ratio="3 / 4" />)
         }
       </div>
     </div>
