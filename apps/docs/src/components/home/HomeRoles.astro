@@ -1,0 +1,90 @@
+---
+// 首頁的「三種角色怎麼參與」：只寫職稱和各自做的事，一人一行。
+// 內容和 /docs/contributing/ 的「誰做什麼」一致。
+const ROLES = [
+  { role: '美編', does: '決定顏色等設計數值的名稱和值，以及手冊的設計說明；這類修改由美編核可。' },
+  { role: '工程', does: '負責建置、自動檢查和工具，讓修改能順利上線；這類修改由工程核可。' },
+  { role: '廠商', does: '用同一套流程透過 Claude Code 提出修改，能改哪些部分另外約定；修改一樣要經過核可。' },
+];
+---
+
+<section class="tc-roles not-content" aria-labelledby="tc-roles-title">
+  <div class="head">
+    <h2 id="tc-roles-title">三種角色怎麼參與</h2>
+    <a href="/docs/contributing/">看完整的修改流程 →</a>
+  </div>
+  <ul>
+    {
+      ROLES.map(({ role, does }) => (
+        <li>
+          <h3>{role}</h3>
+          <p>{does}</p>
+        </li>
+      ))
+    }
+  </ul>
+</section>
+
+<style>
+  .tc-roles {
+    container-type: inline-size;
+    margin-block: 3rem 1rem;
+    padding-block-start: 2rem;
+    border-block-start: 1px solid var(--sl-color-hairline);
+  }
+  .head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 1.5rem;
+    margin-block-end: 1.25rem;
+  }
+  h2 {
+    margin: 0;
+    color: var(--sl-color-white);
+    font-size: var(--hb-text-h2);
+    line-height: var(--hb-line-height-headings);
+    font-weight: 600;
+  }
+  .head a {
+    color: var(--sl-color-text-accent);
+    font-size: var(--hb-text-ui);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .head a:hover {
+    text-decoration: underline;
+  }
+  ul {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  @container (min-width: 40rem) {
+    ul {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  li {
+    padding: 1.125rem 1.25rem;
+    border: 1px solid var(--sl-color-hairline-light);
+    border-radius: 14px;
+  }
+  h3 {
+    margin: 0 0 0.4rem;
+    color: var(--sl-color-white);
+    font-size: var(--hb-text-h3);
+    line-height: var(--hb-line-height-headings);
+    font-weight: 600;
+  }
+  p {
+    margin: 0;
+    color: var(--sl-color-gray-2);
+    font-size: var(--hb-text-body);
+    line-height: var(--hb-line-height);
+  }
+</style>

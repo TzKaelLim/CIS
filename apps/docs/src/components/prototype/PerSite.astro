@@ -1,0 +1,24 @@
+---
+// 設計示範：「每個網站畫一份、只顯示目前選擇的那份」的包裝。頁面作者只寫一次內容：
+//
+//   <PerSite>{(site) => <ButtonSamples siteId={site.id} />}</PerSite>
+//
+// 子內容是一個函式，會對 SITE_THEMES 的每個網站各呼叫一次。
+import SiteOnly from './SiteOnly.astro';
+import { SITE_THEMES } from '../../prototype/site-themes';
+
+interface Props {
+  as?: 'div' | 'span';
+}
+
+const { as } = Astro.props;
+const parts = await Promise.all(SITE_THEMES.map((site) => Astro.slots.render('default', [site])));
+---
+
+{
+  SITE_THEMES.map((site, i) => (
+    <SiteOnly site={site.id} as={as}>
+      <Fragment set:html={parts[i]} />
+    </SiteOnly>
+  ))
+}

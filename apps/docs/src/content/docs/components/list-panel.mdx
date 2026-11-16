@@ -1,10 +1,17 @@
 ---
-title: ListPanel
+title: 清單面板
 description: tc-list-panel — 彩色標題列加上垂直分隔清單的標題面板，首頁側欄「內部觀點：領航慈濟」樣式。
 ---
 
 import Demo from '../../../components/Demo.astro';
 import PropsTable from '../../../components/PropsTable.astro';
+import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
+
+<ComponentMeta id="list-panel" />
+
+:::note[整理中]
+這一頁目前是給工程師的技術說明。給設計、企劃和廠商看的版面（用法、組成、該做與不該做）之後會補上，可以先看[按鈕](/components/button/)那一頁的樣子。
+:::
 
 `<tc-list-panel>` 是標題面板：上方為彩色標題列（`brand` 變體為品牌主色底、白字），下方為由預設插槽提供的垂直清單，項目間自動加上細分隔線。標題以 `label` 屬性設定，或用 `header` 插槽覆寫。用 `width` 屬性控制寬度（CSS 長度）。下方為**可互動的真實元件**（圖片為 Lorem Picsum 假圖）：
 
@@ -51,11 +58,7 @@ import PropsTable from '../../../components/PropsTable.astro';
 <Demo>
   <tc-list-panel width="360px">
     <h2 slot="header" style="margin:0;display:flex;align-items:center;gap:8px">
-      <img
-        src="https://picsum.photos/seed/tzuchi-lp/32/32"
-        alt=""
-        style="width:24px;height:24px;border-radius:50%"
-      />
+      <div aria-hidden="true" style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--tc-color-brand-surface-hover),var(--tc-color-brand-surface))"></div>
       內部觀點：領航慈濟
     </h2>
     <article>

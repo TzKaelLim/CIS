@@ -1,0 +1,56 @@
+---
+title: 網站主題
+description: 一套 UIKit、每個網站一個網站主題——所有網站主題的清單，以及目前選擇的網站主題長什麼樣子。
+tableOfContents: false
+---
+
+import { Aside } from '@astrojs/starlight/components';
+import LayerDiagram from '../../../components/prototype/LayerDiagram.astro';
+import ThemeBrowser from '../../../components/prototype/ThemeBrowser.astro';
+import PerSite from '../../../components/prototype/PerSite.astro';
+import ThemeDiff from '../../../components/prototype/ThemeDiff.astro';
+import { DEFAULT_SITE, SITE_THEMES } from '../../../prototype/site-themes';
+
+:::caution[示意內容]
+這一區是示意，用來討論「多個網站共用一套 UIKit」會長什麼樣子。標「示意」的網站主題，顏色不是正式的值，網站名稱與做法也都還待核定。
+:::
+
+**先講結論**：所有慈濟網站共用一套 UIKit，按鈕、卡片、版面都只有一份；每個網站另有一個自己的「網站主題」。網站主題只換顏色等外觀數值，元件本身不用改。
+
+<ThemeBrowser />
+
+## 用詞
+
+- **網站主題**＝「哪一個網站」：慈濟入口網、慈濟環保網…。
+- **色彩模式**＝淺色／深色。
+- 兩者可以自由組合：每個網站主題都有淺色和深色。頁首的兩個選單分別切換，你的選擇會被記住；手冊本身（頁首、側欄、文字）的外觀不會跟著變。
+
+<LayerDiagram />
+
+## 和預設網站主題的差異
+
+<PerSite>
+  {(site) =>
+    site.isDefault ? (
+      <p>在頁首選擇另一個網站主題，這裡會列出它和預設網站主題的差異。</p>
+    ) : (
+      <>
+        <p>
+          只列出{site.名稱}和預設網站主題（{DEFAULT_SITE.名稱}）不同的顏色；沒列出的全部沿用預設網站主題。
+        </p>
+        <ThemeDiff siteId={site.id} targetLabel={`目前選擇（${site.名稱}）`} />
+      </>
+    )
+  }
+</PerSite>
+
+## 什麼情況不要開新的網站主題
+
+:::note[改用變體或新版本]
+
+- **同一個元件要有不同外觀**（例如圓角按鈕和方角按鈕、橫式和直式卡片）→ 做成元件的**變體**。變體所有網站都能用，跟是哪個網站無關。
+- **舊設計要整個換掉，而且新舊不能直接互換**（例如新版卡片的欄位和舊版不同）→ 出元件的新**版本**（只有 v1、v2 這樣的版本號）。版本是所有網站一起升級，不會每個網站各一份。
+
+:::
+
+網站主題只管一件事：每個「顏色用途」（主色、文字、背景…）在這個網站用哪個顏色。形狀、大小、版面都不歸網站主題管。

@@ -1,0 +1,109 @@
+---
+// 設計示範：三層示意圖（基礎共用 → 網站主題每個網站一份 → 元件共用）。
+// 網站名稱排成會自動換行的小標籤，網站再多也只是多幾行。
+import { SITE_THEMES } from '../../prototype/site-themes';
+---
+
+<div class="layers not-content" role="img" aria-label="三層示意：基礎共用，網站主題每個網站一份，元件共用">
+  <div class="layer shared">
+    <div class="title">基礎 Foundations <span class="who">所有網站共用一份</span></div>
+    <div class="desc">色票、字級、間距、圓角。像一盒顏料：每個網站拿到的是同一盒。</div>
+  </div>
+  <div class="arrow" aria-hidden="true">↓ 從顏料裡挑色</div>
+  <div class="layer per-site">
+    <div class="title">網站主題 Site themes <span class="who">每個網站一份</span></div>
+    <div class="desc">只決定「主色、文字、背景、邊框…」各用哪個顏色。每個網站主題都有淺色、深色兩組（色彩模式）。</div>
+    <div class="sites">
+      {
+        SITE_THEMES.map((site) => (
+          <span class="site">
+            <span class="sw" style={`background:${site.light['brand.primary']}`} />
+            <span class="sw" style={`background:${site.dark['brand.primary']}`} />
+            {site.名稱}
+            {site.isDemo && <span class="demo">示意</span>}
+          </span>
+        ))
+      }
+    </div>
+  </div>
+  <div class="arrow" aria-hidden="true">↓ 元件照網站主題上色</div>
+  <div class="layer shared">
+    <div class="title">元件 Components <span class="who">所有網站共用一份</span></div>
+    <div class="desc">按鈕、卡片、導覽列…只做一次。換網站時元件不用改，顏色自動跟著網站主題。</div>
+  </div>
+</div>
+
+<style>
+  .layers {
+    display: grid;
+    gap: 0.35rem;
+    margin-block: 1.25rem;
+    max-inline-size: 40rem;
+  }
+  .layer {
+    padding: 0.75rem 1rem;
+    border-radius: 0.6rem;
+    border: 1px solid var(--sl-color-gray-5);
+    background: var(--sl-color-gray-7, var(--sl-color-black));
+  }
+  .layer.per-site {
+    border: 2px solid var(--sl-color-accent);
+    background: var(--sl-color-accent-low);
+  }
+  .title {
+    font-weight: 700;
+    color: var(--sl-color-white);
+  }
+  .who {
+    margin-inline-start: 0.4rem;
+    font-size: var(--hb-text-label);
+    font-weight: 500;
+    padding: 0.05rem 0.5rem;
+    border-radius: 999px;
+    background: var(--sl-color-gray-6);
+    color: var(--sl-color-gray-2);
+  }
+  .per-site .who {
+    background: var(--sl-color-accent);
+    color: var(--sl-color-black);
+  }
+  .desc {
+    margin-block-start: 0.25rem;
+    font-size: var(--hb-text-body);
+    color: var(--sl-color-gray-2);
+  }
+  .sites {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-block-start: 0.6rem;
+  }
+  .site {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    border: 1px solid var(--sl-color-gray-5);
+    background: var(--sl-color-bg);
+    font-size: var(--hb-text-label);
+  }
+  .sw {
+    inline-size: 0.8rem;
+    block-size: 0.8rem;
+    border-radius: 50%;
+    border: 1px solid rgba(127, 127, 127, 0.55);
+  }
+  .demo {
+    font-size: var(--hb-text-label);
+    padding: 0 0.35rem;
+    border-radius: 999px;
+    border: 1px dashed var(--sl-color-gray-3);
+    color: var(--sl-color-gray-2);
+  }
+  .arrow {
+    padding-inline-start: 1.25rem;
+    font-size: var(--hb-text-label);
+    color: var(--sl-color-gray-3);
+  }
+</style>

@@ -1,0 +1,93 @@
+---
+// 設計示範：一個網站主題的全部語意色（淺色、深色）。和預設主題不同的列會標出來。
+import ColorChip from './ColorChip.astro';
+import { SEMANTIC_TOKENS, getSite, tokenLabel, varName } from '../../prototype/site-themes';
+
+interface Props {
+  siteId: string;
+}
+
+const site = getSite(Astro.props.siteId);
+const changed = new Set(site.diff.map((d) => d.token));
+---
+
+<div class="table-wrap not-content">
+  <table class="colors">
+    <thead>
+      <tr>
+        <th scope="col">用途</th>
+        <th scope="col">變數名稱（工程用）</th>
+        <th scope="col">淺色</th>
+        <th scope="col">深色</th>
+      </tr>
+    </thead>
+    <tbody>
+      {
+        SEMANTIC_TOKENS.map((token) => (
+          <tr class:list={{ changed: changed.has(token) }}>
+            <th scope="row">
+              {tokenLabel(token)}
+              {changed.has(token) && <span class="tag">這個網站改過</span>}
+            </th>
+            <td>
+              <code>{varName(token)}</code>
+            </td>
+            <td>
+              <ColorChip hex={site.light[token]} />
+            </td>
+            <td>
+              <ColorChip hex={site.dark[token]} />
+            </td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</div>
+
+<style>
+  .table-wrap {
+    overflow-x: auto;
+    margin-block: 1rem;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.5rem;
+  }
+  .colors {
+    border-collapse: collapse;
+    inline-size: 100%;
+    min-inline-size: 600px;
+    font-size: var(--hb-text-body);
+  }
+  th,
+  td {
+    padding: 0.4rem 0.65rem;
+    text-align: start;
+    border-block-end: 1px solid var(--sl-color-gray-6);
+    vertical-align: middle;
+  }
+  thead th {
+    background: var(--sl-color-gray-6);
+    font-weight: 600;
+  }
+  tbody th {
+    font-weight: 500;
+  }
+  code {
+    font-size: var(--hb-text-code);
+    background: none;
+    padding: 0;
+    color: var(--sl-color-gray-2);
+  }
+  tr.changed {
+    background: var(--sl-color-accent-low);
+  }
+  .tag {
+    display: inline-block;
+    margin-inline-start: 0.4rem;
+    font-size: var(--hb-text-label);
+    padding: 0.05rem 0.4rem;
+    border-radius: 999px;
+    border: 1px solid var(--sl-color-accent);
+    color: var(--sl-color-accent-high);
+  }
+</style>

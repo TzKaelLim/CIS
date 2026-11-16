@@ -1,21 +1,84 @@
 ---
-title: Button
+title: 按鈕
 description: tc-button — 主要按鈕，filled / outlined / tonal 三種變體。
 ---
 
-import Demo from '../../../components/Demo.astro';
 import PropsTable from '../../../components/PropsTable.astro';
+import Demo from '../../../components/Demo.astro';
+import PerSite from '../../../components/prototype/PerSite.astro';
+import CurrentSiteNote from '../../../components/prototype/CurrentSiteNote.astro';
+import ButtonSamples from '../../../components/prototype/ButtonSamples.astro';
+import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
+import PreviewTile from '../../../components/handbook/PreviewTile.astro';
+import DoDont from '../../../components/handbook/DoDont.astro';
+import { Badge, LinkButton } from '@astrojs/starlight/components';
 
-`<tc-button>` 是主要按鈕，提供三種變體與 form-associated 表單提交。下方為**可互動的真實元件**：
+<ComponentMeta id="button" />
 
-<Demo>
+<PreviewTile size="hero" interactive>
   <tc-button variant="filled">送出</tc-button>
   <tc-button variant="outlined">取消</tc-button>
   <tc-button variant="tonal">更多</tc-button>
   <tc-button disabled>停用</tc-button>
-</Demo>
+</PreviewTile>
 
 ## 用法
+
+按鈕讓讀者做一件事，例如送出表單、確認報名、前往下一步。一個畫面裡最重要的動作用實心按鈕，其他動作用外框或淡底按鈕，讀者一眼就知道該先按哪一個；如果只是帶讀者到另一個頁面，請改用「連結」。
+
+## 組成
+
+| 部位     | 說明                                                                                     |
+| -------- | ---------------------------------------------------------------------------------------- |
+| 容器     | 按鈕的底色和外框。實心按鈕用主色，外框按鈕只有邊框，淡底按鈕用淡淡的品牌底色。           |
+| 文字     | 必填。寫出按下去會發生什麼，例如「送出」「立即捐款」。螢幕閱讀器也會唸這段文字。         |
+| 前後圖示 | 可省略。放在文字前面或後面的小圖示，用來補充文字，不能取代文字。                         |
+| 焦點框   | 用鍵盤選到按鈕時出現的外框，讓不用滑鼠的人知道目前在哪裡。顏色跟著網站主題。             |
+| 停用狀態 | 暫時不能按時變淡。最好在旁邊寫出為什麼不能按，以及怎麼樣才能按。                         |
+
+## 該做與不該做
+
+<DoDont
+  rows={[
+    { kind: 'do', text: '每個畫面只放一個實心按鈕，留給最重要的動作；其他動作用外框或淡底按鈕。' },
+    { kind: 'do', text: '按鈕文字寫出動作本身，例如「送出報名」「立即捐款」，讓讀者不用猜按下去會怎樣。' },
+    { kind: 'do', text: '同一組按鈕的順序在整個網站保持一致，例如「取消」永遠在「送出」的左邊。' },
+    { kind: 'dont', text: '不要只寫「確定」「點這裡」這類看不出動作的文字。' },
+    { kind: 'dont', text: '不要用按鈕帶讀者到另一個頁面；單純換頁請用「連結」。' },
+    { kind: 'dont', text: '不要自己改按鈕的顏色或圓角。顏色由網站主題決定，換網站時才會一致。' },
+  ]}
+/>
+
+## 在目前網站主題下的樣子
+
+<CurrentSiteNote />
+
+上方的大預覽會跟著頁首的「網站主題」和「色彩模式」一起變。下面把目前選的網站主題的淺色和深色並排，方便比較；元件只有一份，每個網站只換顏色。
+
+<PerSite>
+  {(site) => (
+    <>
+      {site.isDemo && (
+        <p>
+          <Badge text="示意" variant="caution" /> {site.名稱}的顏色是示意值，網站名稱與做法都還待核定。
+        </p>
+      )}
+      <ButtonSamples siteId={site.id} />
+    </>
+  )}
+</PerSite>
+
+## 給工程師
+
+以下是給工程師的安裝與 API 說明，設計、企劃和廠商可以略過。
+
+`<tc-button>` 是主要按鈕，提供三種變體與 form-associated 表單提交。頁面最上方的大預覽就是**可互動的真實元件**。
+
+<LinkButton href="/storybook/?path=/docs/components-button--docs" variant="secondary" icon="external">
+  在 Storybook 開啟
+</LinkButton>
+
+Storybook 是工程師逐一檢查元件各種狀態的工具網站，目前只有預設網站主題（慈濟入口網）的淺色和深色。它只在正式上線的手冊才開得了；在自己的電腦上預覽手冊時，按鈕會顯示找不到頁面（詳見[開始使用](/docs/#給工程師)）。
 
 ### 純 HTML
 
@@ -34,7 +97,7 @@ import { TcButton } from '@tzuchi/react';
 <TcButton variant="filled" onClick={handleSubmit}>送出</TcButton>;
 ```
 
-## 表單
+### 表單
 
 `type="submit"` 時，`tc-button` 透過 Form-Associated Custom Elements（ElementInternals）提交所屬 `<form>`：
 
@@ -48,13 +111,13 @@ import { TcButton } from '@tzuchi/react';
   </form>
 </Demo>
 
-## API
+### API
 
 下表自 Custom Elements Manifest 自動產生：
 
 <PropsTable tag="tc-button" />
 
-## 無障礙（Accessibility）
+### 無障礙
 
 - 內含原生 `<button>`，支援鍵盤 Enter / Space。
 - `:focus-visible` 焦點環使用 `--tc-focus-ring-*` token。

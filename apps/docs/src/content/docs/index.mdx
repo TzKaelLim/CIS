@@ -1,18 +1,25 @@
 ---
 title: 慈濟 CIS UIKit
-description: 慈濟 CIS 設計系統手冊 — Foundations、元件與用法。
+description: 一套設計規則和元件，給每一個慈濟網站使用。
+hero:
+  title: 慈濟 CIS UIKit
+  tagline: 一套設計規則和元件，讓每一個慈濟網站都用同樣的方式做出來。
+  actions:
+    - text: 開始使用
+      link: /docs/
+      icon: right-arrow
+      variant: primary
+    - text: 瀏覽元件
+      link: /components/
+      variant: secondary
 ---
 
-歡迎使用 **慈濟 CIS UIKit** 設計系統手冊。
+import HomeHeroStrip from '../../components/home/HomeHeroStrip.astro';
+import HomeBento from '../../components/home/HomeBento.astro';
+import HomeRoles from '../../components/home/HomeRoles.astro';
 
-這套設計系統以 **Lit Web Components** 為單一來源，可在 **純 HTML** 與 **React**（以及未來其他框架）共用，底層由一份 **Design Tokens** 驅動。本手冊與程式碼同源：
+<HomeHeroStrip />
 
-- **Foundations** 直接從 design tokens 渲染，永遠不會與發佈的 token 失準。
-- **Components** 頁面內嵌的是**真正可互動的元件**（不是截圖），與 production 載入同一份 CDN bundle。
-- **API 表格**從 Custom Elements Manifest 自動產生，與 React wrapper、Storybook 同源。
+<HomeBento />
 
-從左側 **Foundations** 與 **Components** 開始瀏覽。
-
-:::note
-本手冊目前涵蓋 Milestone 1a（tokens + Button）。後續元件（Input、Card、Tabs…）將陸續加入。
-:::
+<HomeRoles />

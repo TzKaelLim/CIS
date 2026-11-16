@@ -1,14 +1,29 @@
 ---
-title: Theming（主題與深色模式）
-description: 深色模式如何運作——只覆寫語意色 token，元件透過 var() cascade 自動換色；含啟用方式、深色色票對照與擴充指引。
+title: 色彩模式（淺色／深色）
+description: 色彩模式（淺色／深色）怎麼運作：深色只重新指定語意色，所有元件就會跟著變；含目前網站主題的色票、啟用方式與擴充指引。
+sidebar:
+  label: 色彩模式
+  order: 3
 ---
 
 import Demo from '../../../components/Demo.astro';
 import ThemeSwatches from '../../../components/ThemeSwatches.astro';
+import PerSite from '../../../components/prototype/PerSite.astro';
+import CurrentSiteNote from '../../../components/prototype/CurrentSiteNote.astro';
+import ThemeColorTable from '../../../components/prototype/ThemeColorTable.astro';
 
-設計系統內建**淺色（預設）**與**深色**兩套主題。核心原則：**只有語意層（semantic）會換色**。
-primitive 純色票不可變，元件只引用語意 / 元件層 token，因此深色模式只需在一個 selector 內
-重新對應約 15 個語意色變數，整個元件庫就會透過 `var()` cascade 自動跟隨——**包含 Shadow DOM 內部**。
+UIKit 內建**淺色（預設）**與**深色**兩種色彩模式。原則是：**只有語意色會換**。
+基礎色票（所有網站共用）不會變；元件只使用語意色和元件 token。所以淺色和深色只需要重新指定約 15 個語意色，所有元件就會自動跟著變。
+
+「色彩模式」和「網站主題」是兩回事：網站主題決定是哪一個網站（慈濟入口網、慈濟環保網…），色彩模式決定淺色或深色，兩者可以自由組合。詳見[網站主題總覽](/themes/)。
+
+## 目前網站主題的色彩（淺色／深色）
+
+<CurrentSiteNote />
+
+下表跟著頁首的「網站主題」選單變。每一列是一個顏色用途（語意色），左邊是淺色模式用的顏色，右邊是深色模式用的顏色。標「這個網站改過」的列，是這個網站主題和預設網站主題不同的地方；標「示意」的網站主題，顏色不是正式的值。
+
+<PerSite>{(site) => <ThemeColorTable siteId={site.id} />}</PerSite>
 
 ## 啟用方式
 
@@ -38,12 +53,14 @@ primitive 純色票不可變，元件只引用語意 / 元件層 token，因此�
 </Demo>
 
 :::tip
-按右上角手冊主題鈕（或上方切換鈕），本頁所有範例會即時切換深淺。
+按頁首的淺色／深色選單（或上方切換鈕），本頁所有可互動範例會即時切換色彩模式。
 :::
 
-## 運作原理：三層 cascade
+## 運作原理：三層怎麼接起來
 
-以 filled 按鈕為例，深色模式下三層自動級聯：
+這裡的三層是：基礎色票 → 語意色 → 元件 token。網站主題和色彩模式改的都是中間那一層。
+
+以實心（filled）按鈕為例，深色模式下三層一路接下去（給工程師：這是 CSS 變數的 `var()` 串接，Shadow DOM 裡面也一樣）：
 
 ```text
 --tc-button-filled-bg  →  var(--tc-color-brand-primary)
@@ -51,15 +68,15 @@ primitive 純色票不可變，元件只引用語意 / 元件層 token，因此�
 --tc-color-blue-300  →  #A9C2EA
 ```
 
-元件 CSS 完全不需修改——它引用的語意變數在深色 selector 內被重新指向不同的 primitive。
+元件本身完全不用改：它用的語意色在深色模式下改指向另一個基礎色。
 
 ## 深色色票對照
 
-下表直接從 token 原始檔渲染（primitive + 淺色語意 + 深色 overlay），所有對比度皆符合 WCAG 2.1 AA：
+下表直接從設計數值（token）的原始檔產生（基礎色票＋淺色語意色＋深色覆寫），對比都符合無障礙標準 WCAG 2.1 的 AA 級（一般文字的對比值至少 4.5 : 1，才算容易閱讀）：
 
 <ThemeSwatches />
 
-### 關鍵設計決策
+### 關鍵設計決策（給工程師／進階）
 
 - **品牌色反轉（Material-3 tonal）**：`brand.primary` 由深靛藍 `#1B2D58` **提亮**為 `#A9C2EA`
   以在深色面上可讀（9.39:1）。連帶地 `text.on-brand` 由白色**翻轉**為深靛藍 `#1B2D58`
@@ -74,4 +91,4 @@ primitive 純色票不可變，元件只引用語意 / 元件層 token，因此�
 
 引用語意色（`--tc-color-surface-default`、`--tc-color-text-default`、`--tc-color-brand-primary`…）
 而非 primitive 或寫死色碼，元件即自動支援深色。**勿**將 `color-mix(... , white)` 寫死白色作為底色，
-請改用 `var(--tc-color-surface-default)`，使色調隨主題調整。
+請改用 `var(--tc-color-surface-default)`，使色調隨色彩模式調整。

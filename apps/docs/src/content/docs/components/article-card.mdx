@@ -1,21 +1,23 @@
 ---
-title: ArticleCard
+title: 文章卡片
 description: tc-article-card — 文稿卡片，涵蓋焦點／一般／互動式／公告／影片／志工早會／週報等版式，支援 vertical／horizontal 方向與整張卡片連結。
 ---
 
 import Demo from '../../../components/Demo.astro';
 import PropsTable from '../../../components/PropsTable.astro';
+import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
+
+<ComponentMeta id="article-card" />
+
+:::note[整理中]
+這一頁目前是給工程師的技術說明。給設計、企劃和廠商看的版面（用法、組成、該做與不該做）之後會補上，可以先看[按鈕](/components/button/)那一頁的樣子。
+:::
 
 `<tc-article-card>` 是文稿型內容卡片，以 `orientation`（vertical／horizontal）、`featured`（焦點放大）與插槽組合涵蓋焦點文稿、一般文稿、互動式文稿、公告、影片、志工早會與週報等版式。提供 media／badge／headline／excerpt／meta／actions 插槽，支援影片播放遮罩（`video`）、可互動（`interactive`）與整張卡片連結（`href`，stretched link）模式。下方為**可互動的真實元件**（圖片為 Lorem Picsum 假圖）：
 
 <Demo>
   <tc-article-card width="360px">
-    <img
-      slot="media"
-      src="https://picsum.photos/seed/article1/720/420"
-      alt="示意圖片"
-      style="display:block;width:100%;aspect-ratio:16/10;object-fit:cover"
-    />
+    <div slot="media" role="img" aria-label="示意圖片（色塊代替照片）" style="display:block;width:100%;aspect-ratio:16/10;background:linear-gradient(135deg,var(--tc-color-brand-surface-hover),var(--tc-color-brand-surface))"></div>
     <tc-chip slot="badge">慈善</tc-chip>
     <span slot="headline">慈濟志工於寒冬中送暖，關懷獨居長者與弱勢家庭</span>
     <p slot="excerpt">志工們走入社區，為長者送上熱食與生活物資，並協助清掃居家環境，傳遞關懷與溫暖。</p>
@@ -29,12 +31,7 @@ import PropsTable from '../../../components/PropsTable.astro';
 
 <Demo>
   <tc-article-card featured width="480px">
-    <img
-      slot="media"
-      src="https://picsum.photos/seed/article-featured/960/540"
-      alt="示意圖片"
-      style="display:block;width:100%;aspect-ratio:16/9;object-fit:cover"
-    />
+    <div slot="media" role="img" aria-label="示意圖片（色塊代替照片）" style="display:block;width:100%;aspect-ratio:16/9;background:linear-gradient(135deg,var(--tc-color-brand-surface-hover),var(--tc-color-brand-surface))"></div>
     <tc-chip slot="badge">焦點文稿</tc-chip>
     <span slot="headline">焦點報導：跨越國界的人道援助行動</span>
     <p slot="excerpt">在多個國家展開的援助計畫，集結志工與在地夥伴的力量，將關懷送達最需要的地方。</p>
@@ -48,12 +45,7 @@ import PropsTable from '../../../components/PropsTable.astro';
 
 <Demo>
   <tc-article-card orientation="horizontal" style="max-width:560px">
-    <img
-      slot="media"
-      src="https://picsum.photos/seed/article-h/480/360"
-      alt="示意圖片"
-      style="display:block;width:100%;height:100%;object-fit:cover"
-    />
+    <div slot="media" role="img" aria-label="示意圖片（色塊代替照片）" style="display:block;width:100%;height:100%;background:linear-gradient(135deg,var(--tc-color-brand-surface-hover),var(--tc-color-brand-surface))"></div>
     <tc-chip slot="badge">週報</tc-chip>
     <span slot="headline">本週志業簡報：各據點服務成果彙整</span>
     <p slot="excerpt">彙整本週各服務據點的活動與成果，並摘要下週重點行程。</p>
@@ -67,12 +59,7 @@ import PropsTable from '../../../components/PropsTable.astro';
 
 <Demo>
   <tc-article-card video href="#video" width="360px">
-    <img
-      slot="media"
-      src="https://picsum.photos/seed/article-video/720/420"
-      alt="影片縮圖"
-      style="display:block;width:100%;aspect-ratio:16/10;object-fit:cover"
-    />
+    <div slot="media" role="img" aria-label="影片縮圖（色塊代替照片）" style="display:block;width:100%;aspect-ratio:16/10;background:linear-gradient(135deg,var(--tc-color-brand-surface-hover),var(--tc-color-brand-surface))"></div>
     <tc-chip slot="badge">影片</tc-chip>
     <span slot="headline">紀實影片：志工早會現場直擊</span>
     <span slot="meta">2022-03-21 ｜ 03:24</span>
@@ -85,12 +72,7 @@ import PropsTable from '../../../components/PropsTable.astro';
 
 <Demo>
   <tc-article-card href="#article" width="360px">
-    <img
-      slot="media"
-      src="https://picsum.photos/seed/article-actions/720/420"
-      alt="示意圖片"
-      style="display:block;width:100%;aspect-ratio:16/10;object-fit:cover"
-    />
+    <div slot="media" role="img" aria-label="示意圖片（色塊代替照片）" style="display:block;width:100%;aspect-ratio:16/10;background:linear-gradient(135deg,var(--tc-color-brand-surface-hover),var(--tc-color-brand-surface))"></div>
     <tc-chip slot="badge">互動式文稿</tc-chip>
     <span slot="headline">點整張卡片即可前往，動作區仍可獨立點擊</span>
     <span slot="meta">2022-03-21</span>

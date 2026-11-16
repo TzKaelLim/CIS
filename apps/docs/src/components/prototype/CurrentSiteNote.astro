@@ -1,0 +1,39 @@
+---
+// 設計示範：「目前顯示：<網站名>」那一行，放在跟著網站主題變的內容上方。
+import SiteOnly from './SiteOnly.astro';
+import { SITE_THEMES, siteLabel } from '../../prototype/site-themes';
+
+interface Props {
+  /** 是否加上「查看所有網站主題」連結。 */
+  showAllLink?: boolean;
+}
+
+const { showAllLink = true } = Astro.props;
+---
+
+<p class="current-site-note not-content">
+  <span class="text">目前顯示：<strong>{SITE_THEMES.map((site) => <SiteOnly site={site.id} as="span">{siteLabel(site)}</SiteOnly>)}</strong>。在頁首的『網站主題』可切換。</span>
+  {showAllLink && <a href="/themes/">查看所有網站主題</a>}
+</p>
+
+<style>
+  .current-site-note {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 1rem;
+    margin-block: 1rem;
+    padding: 0.55rem 0.85rem;
+    border: 1px solid var(--sl-color-gray-5);
+    border-inline-start: 3px solid var(--sl-color-accent);
+    border-radius: 0.4rem;
+    font-size: var(--hb-text-body);
+    color: var(--sl-color-gray-2);
+  }
+  strong {
+    color: var(--sl-color-white);
+  }
+  a {
+    color: var(--sl-color-text-accent);
+  }
+</style>

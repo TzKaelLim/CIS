@@ -1,0 +1,121 @@
+---
+// 取代 Starlight 的頁首：網站名稱（回首頁）、區域導覽（文件／元件／範本／網站主題）、
+// 搜尋、「網站主題」與色彩模式選單，以及 Storybook 連結。
+// 手機寬度只留網站名稱和搜尋；區域導覽與選單都移到手機選單（見 Sidebar.astro）。
+import config from 'virtual:starlight/user-config';
+import Search from 'virtual:starlight/components/Search';
+import SiteTitle from 'virtual:starlight/components/SiteTitle';
+import ThemeSelect from 'virtual:starlight/components/ThemeSelect';
+import SectionNav from '../handbook/SectionNav.astro';
+import StorybookLink from '../handbook/StorybookLink.astro';
+
+/** 和 Starlight 原本的頁首一樣：有 Pagefind 或自訂搜尋時才顯示搜尋。 */
+const shouldRenderSearch =
+  config.pagefind || config.components.Search !== '@astrojs/starlight/components/Search.astro';
+---
+
+<div class="tc-header">
+  <div class="title-wrapper sl-flex">
+    <SiteTitle />
+  </div>
+  <div class="sections sl-hidden md:sl-flex print:hidden">
+    <SectionNav />
+  </div>
+  <div class="end sl-flex print:hidden">
+    {shouldRenderSearch && <Search />}
+    <div class="prefs sl-hidden md:sl-flex">
+      <ThemeSelect />
+      <div class="storybook">
+        <StorybookLink />
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .tc-header {
+    display: flex;
+    align-items: center;
+    gap: var(--sl-nav-gap);
+    block-size: 100%;
+  }
+  .title-wrapper {
+    /* 標題太長時不要蓋住搜尋和選單按鈕。 */
+    overflow: clip;
+    padding: 0.25rem;
+    margin: -0.25rem;
+    min-inline-size: 0;
+    flex: 0 1 auto;
+  }
+  .tc-header :global(.site-title) {
+    font-size: var(--hb-text-site-title);
+    color: var(--sl-color-white);
+    letter-spacing: 0.01em;
+  }
+  .sections {
+    flex: 1 1 auto;
+    justify-content: center;
+    min-inline-size: 0;
+  }
+  .end {
+    align-items: center;
+    gap: 0.75rem;
+    margin-inline-start: auto;
+    min-inline-size: 0;
+  }
+  .prefs {
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  /* 中等寬度：搜尋只留放大鏡、網站主題選單不顯示文字標籤（螢幕閱讀器仍唸得到）、
+     Storybook 只在元件頁和元件總覽出現。 */
+  @media (min-width: 50rem) {
+    .tc-header :global(button[data-open-modal]) {
+      inline-size: 2.5rem;
+      justify-content: center;
+      padding: 0;
+      border-radius: 999px;
+    }
+    .tc-header :global(button[data-open-modal] > span),
+    .tc-header :global(button[data-open-modal] > kbd) {
+      display: none !important;
+    }
+    .tc-header :global(tc-site-select .label-text) {
+      position: absolute;
+      inline-size: 1px;
+      block-size: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+    .tc-header :global(tc-site-select select) {
+      inline-size: 11rem;
+    }
+    .storybook {
+      display: none;
+    }
+  }
+  @media (min-width: 80rem) {
+    .tc-header :global(button[data-open-modal]) {
+      inline-size: 11rem;
+      justify-content: flex-start;
+      padding-inline: 0.75rem 0.5rem;
+    }
+    .tc-header :global(button[data-open-modal] > span) {
+      display: block !important;
+    }
+    .tc-header :global(tc-site-select .label-text) {
+      position: static;
+      inline-size: auto;
+      block-size: auto;
+      clip-path: none;
+    }
+    .tc-header :global(tc-site-select select) {
+      inline-size: 11rem;
+    }
+    .storybook {
+      display: block;
+    }
+  }
+</style>

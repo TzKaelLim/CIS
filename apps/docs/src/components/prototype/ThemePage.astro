@@ -1,0 +1,203 @@
+---
+// 設計示範：網站主題頁的共用版型（入口網、環保網都用這一個）。
+import { Badge, LinkButton } from '@astrojs/starlight/components';
+import ThemeGallery from './ThemeGallery.astro';
+import ThemeColorTable from './ThemeColorTable.astro';
+import ThemeDiff from './ThemeDiff.astro';
+import ColorChip from './ColorChip.astro';
+import {
+  DEFAULT_SITE,
+  MODE_LABEL,
+  contrastChecks,
+  getSite,
+} from '../../prototype/site-themes';
+import { SITE_URL_PARAM } from '../../prototype/site-selection';
+
+interface Props {
+  siteId: string;
+}
+
+const site = getSite(Astro.props.siteId);
+const checks = contrastChecks(site);
+const mutedFails = checks.some((c) => c.說明.includes('次要文字') && !c.通過);
+---
+
+<div class="theme-header not-content">
+  <div class="name">
+    <span class="title">{site.名稱}</span>
+    {
+      site.isDefault ? (
+        <Badge text="預設" variant="note" />
+      ) : site.isDemo ? (
+        <Badge text="示意" variant="caution" />
+      ) : (
+        <Badge text="網站主題" variant="default" />
+      )
+    }
+  </div>
+  <p class="desc">{site.說明}</p>
+  <p class="who"><strong>誰在用：</strong>{site.使用對象}</p>
+  <div class="apply">
+    <LinkButton href={`?${SITE_URL_PARAM}=${site.id}`} variant="secondary" icon="right-arrow">
+      在整份手冊套用這個網站主題
+    </LinkButton>
+    <span class="apply-note">手冊其他頁的色票與元件範例會換成{site.簡稱}的樣子；之後也可以在頁首的『網站主題』改回來。</span>
+  </div>
+</div>
+
+<h2 id="samples">淺色與深色</h2>
+<p>同一個迷你網頁，用這個網站主題的淺色、深色各畫一次。</p>
+<ThemeGallery siteId={site.id} />
+
+<h2 id="contrast">易讀性檢查</h2>
+<p>
+  文字和底色的「對比值」越高越好讀。一般大小的文字要 <strong>4.5 : 1</strong> 以上（WCAG 無障礙標準 AA 級）。「主色」的兩項和網站主題有關；「次要文字」是所有網站共用的正式顏色{mutedFails ? '，目前未達標，要另外處理；這不是網站主題造成的。' : '，不受網站主題影響。'}
+</p>
+<div class="table-wrap not-content">
+  <table class="checks">
+    <thead>
+      <tr>
+        <th scope="col">檢查項目</th>
+        <th scope="col">模式</th>
+        <th scope="col">文字</th>
+        <th scope="col">底色</th>
+        <th scope="col">對比值</th>
+      </tr>
+    </thead>
+    <tbody>
+      {
+        checks.map((c) => (
+          <tr>
+            <th scope="row">{c.說明}</th>
+            <td>{MODE_LABEL[c.mode]}</td>
+            <td>
+              <ColorChip hex={c.前景} />
+            </td>
+            <td>
+              <ColorChip hex={c.背景} />
+            </td>
+            <td class:list={['ratio', { fail: !c.通過 }]}>
+              {c.ratio.toFixed(2)} : 1 {c.通過 ? '通過' : '未達 4.5'}
+            </td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</div>
+
+<h2 id="colors">全部語意色</h2>
+<p>
+  「語意色」是依用途命名的顏色（例如「主色」「次要文字」），元件只認這些名字。網站主題做的事，就是決定每個名字在這個網站用哪個顏色。
+</p>
+<ThemeColorTable siteId={site.id} />
+
+{
+  !site.isDefault && (
+    <>
+      <h2 id="diff">和預設網站主題的差異</h2>
+      <p>
+        只列出和預設網站主題（{DEFAULT_SITE.名稱}）不同的顏色；沒列出的全部沿用預設網站主題。{site.isDemo && `${site.簡稱}的顏色是示意值（非正式）。`}
+      </p>
+      <ThemeDiff siteId={site.id} />
+      {site.示意色.length > 0 && (
+        <p class="demo-note">
+          <strong>注意：</strong>{site.簡稱}用到的這幾個顏色（{site.示意色.join('、')}）目前<strong>不在基礎色票裡</strong>，是這個示意網站主題暫時自訂的值。若決定採用，要先把它們加進基礎色票（所有網站共用的那盒顏料），網站主題再從裡面挑；網站主題本身不新增顏色。
+        </p>
+      )}
+    </>
+  )
+}
+
+<h2 id="usage">如何使用</h2>
+<ul>
+  <li>
+    <strong>工程師：</strong><Badge text="提案" variant="caution" /> 在網頁最外層的 <code>&lt;html&gt;</code> 加上 <code>data-site="{site.id}"</code>，元件就會換成這個網站的顏色；色彩模式（淺色／深色）沿用現有的 <code>data-theme="light"</code>／<code>"dark"</code>（不寫時跟著訪客的裝置設定）。兩者可以自由組合，例如 <code>&lt;html data-site="{site.id}" data-theme="dark"&gt;</code> 就是{site.簡稱}的深色。屬性名稱是工程細節，還沒定案。
+  </li>
+  {
+    site.isDefault ? (
+      <li>
+        <strong>共同編輯者（設計、行政）：</strong>{site.簡稱}是預設網站主題，改它的顏色，所有沒有自己網站主題的網站都會一起變。要改請跟 Claude 說：「預設網站主題的主色改成…」，Claude 會先列出會受影響的網站給你確認。
+      </li>
+    ) : (
+      <li>
+        <strong>共同編輯者（設計、行政）：</strong>直接跟 Claude 說：「{site.簡稱}的主色改成…」。改完後這一頁會跟著更新，你可以在這裡確認效果。
+      </li>
+    )
+  }
+</ul>
+
+<style>
+  .theme-header {
+    padding: 1rem 1.15rem;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.6rem;
+    margin-block: 1rem 1.5rem;
+  }
+  .name {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+  .title {
+    font-size: var(--hb-text-category);
+    font-weight: 700;
+    color: var(--sl-color-white);
+  }
+  .apply {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    margin-block-start: 0.85rem;
+  }
+  .apply-note {
+    font-size: var(--hb-text-label);
+    color: var(--sl-color-gray-3);
+  }
+  .desc,
+  .who {
+    margin: 0.5rem 0 0;
+    color: var(--sl-color-gray-2);
+  }
+  .table-wrap {
+    overflow-x: auto;
+    margin-block: 1rem;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.5rem;
+  }
+  .checks {
+    border-collapse: collapse;
+    inline-size: 100%;
+    min-inline-size: 560px;
+    font-size: var(--hb-text-body);
+  }
+  .checks th,
+  .checks td {
+    padding: 0.4rem 0.65rem;
+    text-align: start;
+    border-block-end: 1px solid var(--sl-color-gray-6);
+    vertical-align: middle;
+  }
+  .checks thead th {
+    background: var(--sl-color-gray-6);
+    font-weight: 600;
+  }
+  .checks tbody th {
+    font-weight: 500;
+  }
+  .ratio {
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .ratio.fail {
+    color: var(--sl-color-red);
+  }
+  .demo-note {
+    padding: 0.6rem 0.85rem;
+    border-inline-start: 3px solid var(--sl-color-orange);
+    background: var(--sl-color-orange-low);
+    border-radius: 0.3rem;
+  }
+</style>

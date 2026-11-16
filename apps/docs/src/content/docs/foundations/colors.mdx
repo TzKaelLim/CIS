@@ -1,18 +1,21 @@
 ---
-title: Colors
-description: 慈濟 CIS 設計系統的色彩 primitive 與語意色。
+title: 色彩
+description: 慈濟 CIS UIKit 的基礎色票與語意色。
+sidebar:
+  label: 色彩
+  order: 1
 ---
 
 import ColorSwatches from '../../../components/ColorSwatches.astro';
 
-色彩採三層模型：**Primitive**（純色票）→ **Semantic**（語意別名）→ **Component**（元件級）。
-元件只引用 semantic / component 層，因此換主題只需覆寫 semantic 變數，無需改元件。
+色彩分三層：**基礎色票**（所有網站共用的一盒顏色）→ **語意色**（依用途命名，例如「主色」）→ **元件 token**（每個元件自己的顏色名稱）。
+元件只使用語意色和元件 token，因此換網站主題時，只需要重新指定語意色，不用改元件。
 
-下列色票直接從 `@tzuchi/tokens` 的 DTCG 原始檔渲染：
+下列色票直接從設計數值（token）的原始檔（`@tzuchi/tokens`）產生：
 
 <ColorSwatches />
 
 ## 主色（Brand）
 
 `color.blue.900`（`#1B2D58`）為主要品牌色，對應 Figma「Primary」。語意層 `color.brand.primary` 指向它，
-filled 按鈕底色 `button.filled.bg` 再指向 `color.brand.primary` —— 形成 `var()` 串接，主題化即可級聯。
+filled 按鈕底色 `button.filled.bg` 再指向 `color.brand.primary` —— 形成 `var()` 串接；換網站主題或色彩模式時，顏色會一路跟著換。

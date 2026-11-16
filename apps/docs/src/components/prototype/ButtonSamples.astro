@@ -1,0 +1,78 @@
+---
+// 設計示範：一個網站主題下的按鈕（filled / outlined / tonal），淺色、深色並排。
+// 配色照 button.tokens.json：filled = 主色底＋主色上的文字；outlined = 主色框線與文字；
+// tonal = 品牌底色＋主色文字。
+import SampleFrame from './SampleFrame.astro';
+import { MODES, getSite } from '../../prototype/site-themes';
+
+interface Props {
+  siteId: string;
+}
+
+const site = getSite(Astro.props.siteId);
+---
+
+<div class="button-samples not-content">
+  {
+    MODES.map((mode) => (
+      <SampleFrame siteId={site.id} mode={mode}>
+        <div class="row">
+          <span class="btn filled">送出</span>
+          <span class="btn outlined">取消</span>
+          <span class="btn tonal">更多</span>
+        </div>
+        <div class="names" aria-hidden="true">
+          <span>實心 filled</span>
+          <span>外框 outlined</span>
+          <span>淡底 tonal</span>
+        </div>
+      </SampleFrame>
+    ))
+  }
+</div>
+
+<style>
+  .button-samples {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
+    gap: 1rem;
+  }
+  .row,
+  .names {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    padding: 1rem 0.85rem 0.25rem;
+    background: var(--p-surface);
+    justify-items: center;
+  }
+  .names {
+    padding: 0.2rem 0.85rem 0.8rem;
+    font-size: var(--hb-text-label);
+    color: var(--p-text-muted);
+    text-align: center;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.4rem 0.9rem;
+    border-radius: 0.4rem;
+    font-weight: 600;
+    font-size: var(--hb-sample-text);
+    border: 1.5px solid transparent;
+    white-space: nowrap;
+  }
+  .filled {
+    background: var(--p-brand);
+    color: var(--p-on-brand);
+  }
+  .outlined {
+    border-color: var(--p-brand);
+    color: var(--p-brand);
+  }
+  .tonal {
+    background: var(--p-brand-surface);
+    color: var(--p-brand);
+  }
+</style>
