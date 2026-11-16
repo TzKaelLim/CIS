@@ -3,7 +3,10 @@
 //
 // - 內容可以從 slot 放進來，或用 html 傳一段 HTML（元件目錄的卡片預覽）。
 // - scale < 1 時，內容先用「預覽格寬度 ÷ scale」的寬度排版，再整塊縮小放回來，
-//   所以導覽列、頁尾這類很寬的元件也不會超出預覽格；超出高度的部分會被裁掉。
+//   所以導覽列、頁尾這類很寬的元件也不會超出預覽格。
+// - card（元件總覽的卡片）的高度固定，超出高度的部分會被裁掉。
+// - hero（元件頁上方的大預覽）至少有固定的高度，內容比較高時預覽格會跟著長高，
+//   不會被裁掉（例如手機寬度下排成一欄的頁尾）。縮小用 CSS zoom，排版的高度才會跟著縮小。
 // - interactive={false}（預設）時整塊設為 inert：不能點、不能用鍵盤選到，
 //   也不會被螢幕閱讀器唸出來（卡片的名稱另外寫在連結上）。
 // - 底色和文字色用 --tc-* token，所以預覽會跟著頁首的網站主題和色彩模式一起變。
@@ -42,8 +45,21 @@ if (!(scale > 0 && scale <= 1)) throw new Error(`PreviewTile 的 scale 要在 0 
     color: var(--tc-color-text-default);
   }
   .tc-preview-tile.hero {
+    display: flex;
+    align-items: center;
     aspect-ratio: auto;
     min-block-size: clamp(14rem, 34vw, 22rem);
+  }
+  /* hero 的內容在一般排版裡，預覽格的高度跟著內容；zoom 縮小時排版的寬度會變成
+     「預覽格寬度 ÷ scale」，高度也一起縮小，所以不必再算寬度或位移。 */
+  .tc-preview-tile.hero .stage {
+    position: relative;
+    inset: auto;
+    flex: 1 1 auto;
+    inline-size: auto;
+    min-inline-size: 0;
+    transform: none;
+    zoom: var(--tc-preview-scale);
   }
   .stage {
     position: absolute;
