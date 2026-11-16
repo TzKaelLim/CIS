@@ -1,0 +1,27 @@
+---
+// 依範本 id 畫出 src/components/templates/<id>.astro。範本元件用 import.meta.glob 找，
+// 所以新增範本只要放一個新檔案、在 template-catalog.ts 加一筆，這裡不用改。
+import type { AstroComponentFactory } from 'astro/runtime/server/index.js';
+
+interface Props {
+  id: string;
+}
+
+const modules = import.meta.glob<{ default: AstroComponentFactory }>('../templates/*.astro', {
+  eager: true,
+});
+const byId = new Map(
+  Object.entries(modules).map(([path, mod]) => [
+    path.slice(path.lastIndexOf('/') + 1).replace(/\.astro$/, ''),
+    mod.default,
+  ]),
+);
+const Template = byId.get(Astro.props.id);
+if (!Template) throw new Error(`找不到範本元件 src/components/templates/${Astro.props.id}.astro`);
+---
+
+<Template />
+
+<script>
+  import '@tzuchi/components';
+</script>

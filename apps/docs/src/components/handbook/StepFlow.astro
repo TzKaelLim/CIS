@@ -1,0 +1,125 @@
+---
+// 編號的流程圖：一排（窄螢幕時一列）有編號的步驟，步驟之間有箭頭。
+// 用有序清單寫成，螢幕閱讀器會照順序唸「第 1 步…」。
+interface Step {
+  title: string;
+  /** 一兩句說明。 */
+  text: string;
+  /** 誰做這一步，例如「你」「Claude」。 */
+  who?: string;
+}
+
+interface Props {
+  steps: Step[];
+  label: string;
+}
+
+const { steps, label } = Astro.props;
+---
+
+<div class="tc-step-flow not-content">
+  <ol aria-label={label}>
+    {
+      steps.map((step, i) => (
+        <li>
+          <span class="num" aria-hidden="true">
+            {i + 1}
+          </span>
+          <div class="body">
+            <p class="title">
+              <span class="sr-only">第 {i + 1} 步：</span>
+              {step.title}
+            </p>
+            {step.who && <p class="who">{step.who}</p>}
+            <p class="text">{step.text}</p>
+          </div>
+        </li>
+      ))
+    }
+  </ol>
+</div>
+
+<style>
+  .tc-step-flow {
+    container-type: inline-size;
+    margin-block: 1.5rem;
+  }
+  ol {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  li {
+    position: relative;
+    display: flex;
+    gap: 0.9rem;
+    padding: 1rem 1.1rem;
+    border: 1px solid var(--sl-color-hairline-light);
+    border-radius: 14px;
+    background-color: var(--tc-handbook-panel);
+  }
+  /* 窄的時候：步驟之間的向下箭頭。 */
+  li + li::before {
+    content: '↓';
+    position: absolute;
+    inset-block-start: -1.2rem;
+    inset-inline-start: 1.85rem;
+    color: var(--sl-color-gray-3);
+    font-size: 0.9rem;
+    line-height: 1.2rem;
+  }
+  .num {
+    display: grid;
+    flex: 0 0 auto;
+    place-items: center;
+    inline-size: 2rem;
+    block-size: 2rem;
+    border-radius: 999px;
+    background-color: var(--sl-color-accent-high);
+    color: var(--sl-color-black);
+    font-weight: 700;
+    font-size: var(--sl-text-sm);
+  }
+  .body {
+    display: grid;
+    gap: 0.2rem;
+    min-inline-size: 0;
+  }
+  .title {
+    margin: 0;
+    color: var(--sl-color-white);
+    font-weight: 600;
+  }
+  .who {
+    margin: 0;
+    color: var(--sl-color-text-accent);
+    font-size: var(--sl-text-xs);
+    font-weight: 600;
+  }
+  .text {
+    margin: 0;
+    color: var(--sl-color-gray-2);
+    font-size: var(--sl-text-sm);
+    line-height: 1.6;
+  }
+
+  /* 寬的時候：一排五格，步驟之間的向右箭頭。 */
+  @container (min-width: 46rem) {
+    ol {
+      grid-template-columns: repeat(var(--steps, 5), minmax(0, 1fr));
+      gap: 1.25rem;
+    }
+    li {
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    li + li::before {
+      content: '→';
+      inset-block-start: 1.4rem;
+      inset-inline-start: -1.05rem;
+    }
+  }
+</style>

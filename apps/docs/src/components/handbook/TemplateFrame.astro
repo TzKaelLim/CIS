@@ -1,0 +1,91 @@
+---
+// 範本的大預覽：一個像瀏覽器視窗的外框，裡面是原尺寸的整頁範本（真正的 <tc-*> 元件）。
+// 範本的欄數依外框寬度決定，所以手機上看到的就是範本在手機寬度的樣子。
+//
+// - interactive（預設 true）：可以點頁籤、按鈕；範本裡的 href="#" 連結不會跳走。
+// - 外框（標題列）用手冊的 --sl-* 顏色；裡面的範本用 --tc-* token，跟著網站主題和色彩模式變。
+import TemplateView from './TemplateView.astro';
+import { getTemplate } from '../../prototype/template-catalog';
+
+interface Props {
+  id: string;
+  interactive?: boolean;
+  /** 標題列上的文字，預設「範本預覽：<名稱>」。 */
+  label?: string;
+  class?: string;
+}
+
+const { id, interactive = true, label, class: className } = Astro.props;
+const entry = getTemplate(id);
+const title = label ?? `範本預覽：${entry.名稱}`;
+---
+
+<tc-template-frame class:list={['tc-template-frame', 'not-content', className]}>
+  <figure role="group" aria-label={title}>
+    <figcaption class="bar">
+      <span class="dots" aria-hidden="true"><span></span><span></span><span></span></span>
+      <span class="title">{title}</span>
+    </figcaption>
+    <div class="viewport" inert={!interactive}>
+      <TemplateView id={id} />
+    </div>
+  </figure>
+</tc-template-frame>
+
+<script>
+  // 範本裡的連結都是 href="#"（示意），點了不要跳回頁面頂端。
+  class TcTemplateFrame extends HTMLElement {
+    connectedCallback() {
+      this.addEventListener('click', (event) => {
+        const anchor = event
+          .composedPath()
+          .find((node): node is HTMLAnchorElement => node instanceof HTMLAnchorElement);
+        if (anchor && anchor.getAttribute('href') === '#') event.preventDefault();
+      });
+    }
+  }
+  if (!customElements.get('tc-template-frame')) {
+    customElements.define('tc-template-frame', TcTemplateFrame);
+  }
+</script>
+
+<style>
+  .tc-template-frame {
+    display: block;
+  }
+  figure {
+    margin: 0;
+    overflow: hidden;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 16px;
+    background-color: var(--tc-color-surface-default);
+  }
+  .bar {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.55rem 0.9rem;
+    border-block-end: 1px solid var(--sl-color-gray-5);
+    background-color: var(--sl-color-gray-6);
+    color: var(--sl-color-gray-2);
+    font-size: var(--sl-text-xs);
+  }
+  .dots {
+    display: inline-flex;
+    gap: 0.35rem;
+  }
+  .dots span {
+    inline-size: 0.6rem;
+    block-size: 0.6rem;
+    border-radius: 999px;
+    background-color: var(--sl-color-gray-4);
+  }
+  .title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .viewport[inert] {
+    user-select: none;
+  }
+</style>

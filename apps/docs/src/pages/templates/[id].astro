@@ -1,0 +1,121 @@
+---
+// 每個範本一頁：/templates/<id>/。內容全部來自 src/prototype/template-catalog.ts 和
+// src/components/templates/<id>.astro，新增範本不必新增這種頁面。
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { Aside } from '@astrojs/starlight/components';
+import TemplateFrame from '../../components/handbook/TemplateFrame.astro';
+import CurrentSiteNote from '../../components/prototype/CurrentSiteNote.astro';
+import {
+  TEMPLATES,
+  getTemplateCategory,
+  type TemplateEntry,
+} from '../../prototype/template-catalog';
+import { componentUrl, getComponent } from '../../prototype/component-catalog';
+
+export function getStaticPaths() {
+  return TEMPLATES.map((entry) => ({ params: { id: entry.id }, props: { entry } }));
+}
+
+interface Props {
+  entry: TemplateEntry;
+}
+
+const { entry } = Astro.props;
+const category = getTemplateCategory(entry.分類);
+const components = entry.使用的元件.map((id) => getComponent(id));
+---
+
+<StarlightPage
+  frontmatter={{
+    title: entry.名稱,
+    description: entry.說明,
+    tableOfContents: false,
+  }}
+>
+  <p class="tc-template-meta not-content">
+    <a href={`/templates/?category=${category.id}`}>{category.名稱}</a>
+    <span aria-hidden="true">·</span>
+    <span>範本</span>
+  </p>
+
+  <p>{entry.說明}</p>
+
+  <Aside type="caution" title="示意">
+    這是用 UIKit 真正的元件組成的示意頁面，文字、日期和地址都是假的，照片用色塊代替。做新網頁時可以照這個排法，再換上自己的內容。
+  </Aside>
+
+  <CurrentSiteNote />
+
+  <TemplateFrame id={entry.id} />
+
+  <p class="tc-template-follow">
+    這個範本會跟著頁首的「網站主題」和淺色／深色（色彩模式）一起變色；換一個網站主題，整頁的主色、品牌底色和焦點框都會換成那個網站的顏色，排法不變。
+  </p>
+
+  <h2 id="components-used">使用的元件</h2>
+  <p>這一頁用到 {components.length} 個元件，點名稱看每個元件的用法：</p>
+  <ul class="tc-template-components not-content">
+    {
+      components.map((c) => (
+        <li>
+          <a href={componentUrl(c)}>
+            <span class="name">{c.中文名}</span>
+            <span class="en" lang="en">
+              {c.英文名}
+            </span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</StarlightPage>
+
+<style>
+  .tc-template-meta {
+    display: flex;
+    gap: 0.5rem;
+    margin: -0.5rem 0 0;
+    color: var(--sl-color-gray-3);
+    font-size: var(--sl-text-sm);
+  }
+  .tc-template-meta a {
+    color: var(--sl-color-text-accent);
+  }
+  .tc-template-follow {
+    color: var(--sl-color-gray-2);
+    font-size: var(--sl-text-sm);
+  }
+  .tc-template-components {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 12rem), 1fr));
+    gap: 0.6rem;
+    margin: 1rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .tc-template-components a {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    padding: 0.7rem 0.9rem;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 12px;
+    color: var(--sl-color-white);
+    text-decoration: none;
+  }
+  .tc-template-components a:hover {
+    border-color: var(--sl-color-gray-3);
+    background-color: var(--sl-color-gray-6);
+  }
+  .tc-template-components a:focus-visible {
+    outline: 2px solid var(--sl-color-accent);
+    outline-offset: 2px;
+  }
+  .name {
+    font-weight: 600;
+  }
+  .en {
+    color: var(--sl-color-gray-3);
+    font-size: var(--sl-text-xs);
+  }
+</style>

@@ -1,11 +1,17 @@
 ---
 title: 範本
-description: 用 UIKit 元件組好的整頁範例。
+description: 用 UIKit 元件組好的整頁版面，做新網頁時可以直接照著排，再換上自己的內容。
 tableOfContents: false
+hero:
+  title: 範本
+  tagline: 用 UIKit 的元件組好的整頁版面，做新網頁時從這裡開始，再換上自己的內容。
 ---
 
-範本是用 UIKit 元件組好的整頁範例，例如活動頁、新聞列表頁、捐款頁。做新網頁時可以從範本開始，再換上自己的內容。
+import { Aside } from '@astrojs/starlight/components';
+import TemplateGallery from '../../../components/handbook/TemplateGallery.astro';
 
-:::note[整理中]
-範本還在整理，完成後會放在這一區。在那之前，可以先到[元件](/components/)看每個元件的樣子和用法。
-:::
+<TemplateGallery />
+
+<Aside type="caution" title="示意">
+  這些範本是用真正的元件組成的示意頁面：文字和日期是假的，照片用色塊代替。每張縮圖都會跟著頁首選的「網站主題」和淺色／深色一起變色。
+</Aside>

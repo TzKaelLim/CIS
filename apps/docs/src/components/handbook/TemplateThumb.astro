@@ -1,0 +1,51 @@
+---
+// 範本的縮圖：把整頁範本先用「縮圖寬度 ÷ scale」的寬度排好，再整塊縮小放進圓角格子，
+// 只露出頁面最上面的部分（像網站截圖），超出的部分裁掉。
+// 縮圖是 inert：不能點、不能用鍵盤選到，也不會被螢幕閱讀器唸出來（名稱另外寫在連結上）。
+// 範本只用 --tc-* token，所以縮圖會跟著頁首的網站主題和色彩模式變。
+import TemplateView from './TemplateView.astro';
+
+interface Props {
+  id: string;
+  /** 縮小比例（0–1），預設 0.28：約 340px 寬的縮圖對應 1200px 寬的頁面。 */
+  scale?: number;
+  /** 縮圖的長寬比，預設 4 / 3。 */
+  ratio?: string;
+  class?: string;
+}
+
+const { id, scale = 0.28, ratio = '4 / 3', class: className } = Astro.props;
+if (!(scale > 0 && scale <= 1)) throw new Error(`TemplateThumb 的 scale 要在 0 和 1 之間：${scale}`);
+---
+
+<div
+  class:list={['tc-template-thumb', 'not-content', className]}
+  style={`--tc-thumb-scale:${scale};aspect-ratio:${ratio}`}
+>
+  <div class="stage" inert>
+    <TemplateView id={id} />
+  </div>
+</div>
+
+<style>
+  .tc-template-thumb {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--tc-handbook-tile-border, var(--sl-color-gray-6));
+    border-radius: var(--tc-handbook-radius, 14px);
+    background-color: var(--tc-color-surface-default);
+  }
+  .stage {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    inline-size: calc(100% / var(--tc-thumb-scale));
+    transform-origin: 0 0;
+    transform: scale(var(--tc-thumb-scale));
+    pointer-events: none;
+    user-select: none;
+  }
+  :global([dir='rtl']) .stage {
+    transform-origin: 100% 0;
+  }
+</style>

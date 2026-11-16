@@ -1,0 +1,199 @@
+---
+// 範本總覽頁的內容：分類篩選標籤，加上範本卡片格線（縮小的真範本 + 名稱 + 分類）。
+//
+// 篩選標籤需要 JavaScript，所以預設隱藏，script 執行後才顯示；沒有 JavaScript 時全部範本都會顯示。
+// 網址 ?category=<分類 id> 會直接選好那一類（範本頁上的分類連結用它）。
+import TemplateThumb from './TemplateThumb.astro';
+import {
+  TEMPLATES,
+  getTemplateCategory,
+  templateUrl,
+  usedTemplateCategories,
+} from '../../prototype/template-catalog';
+
+const categories = usedTemplateCategories();
+---
+
+<tc-template-gallery class="tc-template-gallery not-content">
+  <div class="filters" role="group" aria-label="依分類篩選範本" hidden>
+    <button type="button" class="chip" data-filter="" aria-pressed="true">全部</button>
+    {
+      categories.map((c) => (
+        <button type="button" class="chip" data-filter={c.id} aria-pressed="false">
+          {c.名稱}
+        </button>
+      ))
+    }
+  </div>
+  <p class="status" role="status">目前有 {TEMPLATES.length} 個範本。</p>
+  <ul class="grid">
+    {
+      TEMPLATES.map((entry) => (
+        <li data-category={entry.分類}>
+          <article class="card">
+            <TemplateThumb id={entry.id} />
+            <h2>
+              <a href={templateUrl(entry)}>{entry.名稱}</a>
+            </h2>
+            <p class="category">{getTemplateCategory(entry.分類).名稱}</p>
+          </article>
+        </li>
+      ))
+    }
+  </ul>
+</tc-template-gallery>
+
+<script>
+  class TcTemplateGallery extends HTMLElement {
+    connectedCallback() {
+      const group = this.querySelector<HTMLElement>('.filters');
+      const status = this.querySelector<HTMLElement>('.status');
+      const chips = [...this.querySelectorAll<HTMLButtonElement>('button[data-filter]')];
+      const items = [...this.querySelectorAll<HTMLElement>('li[data-category]')];
+      if (!group || !status) return;
+
+      const apply = (filter: string, announce: boolean) => {
+        let shown = 0;
+        for (const item of items) {
+          const visible = filter === '' || item.dataset.category === filter;
+          item.hidden = !visible;
+          if (visible) shown += 1;
+        }
+        for (const chip of chips) {
+          chip.setAttribute('aria-pressed', String(chip.dataset.filter === filter));
+        }
+        const chip = chips.find((c) => c.dataset.filter === filter);
+        const label = filter === '' ? '全部' : (chip?.textContent?.trim() ?? '');
+        if (announce || filter !== '') status.textContent = `${label}：${shown} 個範本。`;
+      };
+
+      for (const chip of chips) {
+        chip.addEventListener('click', () => apply(chip.dataset.filter ?? '', true));
+      }
+
+      let initial = '';
+      try {
+        initial = new URLSearchParams(location.search).get('category') ?? '';
+      } catch {
+        initial = '';
+      }
+      if (!chips.some((c) => c.dataset.filter === initial)) initial = '';
+      apply(initial, false);
+      group.hidden = false;
+    }
+  }
+  if (!customElements.get('tc-template-gallery')) {
+    customElements.define('tc-template-gallery', TcTemplateGallery);
+  }
+</script>
+
+<style>
+  .tc-template-gallery {
+    display: flex;
+    flex-direction: column;
+    container-type: inline-size;
+  }
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.4rem;
+    margin-block-end: 0.75rem;
+  }
+  .filters[hidden] {
+    display: none;
+  }
+  .chip {
+    padding: 0.4rem 1rem;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    background: none;
+    color: var(--sl-color-gray-2);
+    font: inherit;
+    font-size: var(--sl-text-sm);
+    line-height: 1.4;
+    cursor: pointer;
+  }
+  .chip:hover {
+    color: var(--sl-color-white);
+    background-color: var(--sl-color-gray-6);
+  }
+  .chip[aria-pressed='true'] {
+    border-color: var(--sl-color-gray-5);
+    background-color: var(--sl-color-gray-6);
+    color: var(--sl-color-white);
+    font-weight: 600;
+  }
+  .chip:focus-visible {
+    outline: 2px solid var(--sl-color-accent);
+    outline-offset: 2px;
+  }
+  .status {
+    margin: 0 0 1.75rem;
+    color: var(--sl-color-gray-3);
+    font-size: var(--sl-text-sm);
+    text-align: center;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .grid > li[hidden] {
+    display: none;
+  }
+  @container (min-width: 32rem) {
+    .grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @container (min-width: 52rem) {
+    .grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  .card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+  .card :global(.tc-template-thumb) {
+    margin-block-end: 0.6rem;
+    transition: border-color 0.15s ease;
+  }
+  .card:hover :global(.tc-template-thumb) {
+    border-color: var(--sl-color-gray-4);
+  }
+  h2 {
+    margin: 0;
+    font-size: var(--sl-text-base);
+    font-weight: 600;
+    line-height: 1.4;
+  }
+  a {
+    color: var(--sl-color-white);
+    text-decoration: none;
+  }
+  a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--tc-handbook-radius, 14px);
+  }
+  a:focus-visible {
+    outline: none;
+  }
+  a:focus-visible::after {
+    outline: 2px solid var(--sl-color-accent);
+    outline-offset: 4px;
+  }
+  .category {
+    margin: 0;
+    color: var(--sl-color-gray-3);
+    font-size: var(--sl-text-sm);
+  }
+</style>

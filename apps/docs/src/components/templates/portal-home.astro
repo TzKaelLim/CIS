@@ -1,0 +1,149 @@
+---
+// 範本：入口首頁。網站的第一頁：大標題、搜尋、最新消息和活動訊息。
+// 全部用真正的 <tc-*> 元件；照片是 .tpl-photo 漸層色塊（見 src/styles/templates.css）。
+import '../../styles/templates.css';
+import SiteNavbar from '../template-parts/SiteNavbar.astro';
+import SiteFooter from '../template-parts/SiteFooter.astro';
+
+const NEWS = [
+  { tag: '慈善', title: '寒冬送暖，志工走入社區關懷獨居長者', date: '2026-11-12', tone: '' },
+  { tag: '醫療', title: '偏鄉義診車開進山區，一天服務兩百位鄉親', date: '2026-11-08', tone: 'tone-b' },
+  { tag: '教育', title: '弱勢學童課輔班開課，大學生志工陪伴學習', date: '2026-11-03', tone: 'tone-c' },
+];
+const EVENTS = [
+  { title: '歲末祝福感恩會', date: '12 月 20 日・花蓮' },
+  { title: '環保站開放參訪日', date: '12 月 6 日・台北' },
+  { title: '社區健康講座', date: '11 月 29 日・台中' },
+  { title: '骨髓捐贈驗血活動', date: '11 月 23 日・高雄' },
+];
+---
+
+<div class="tpl portal-home">
+  <SiteNavbar />
+
+  <section class="hero">
+    <div class="tpl-container hero-inner">
+      <div class="hero-copy">
+        <p class="tpl-eyebrow">慈悲喜捨・人間菩薩</p>
+        <h1 class="tpl-h1">用愛點亮<br />每一個角落</h1>
+        <p class="lead">從急難救助到社區關懷，邀請您一起投入，讓善的力量傳得更遠。</p>
+        <div class="tpl-row">
+          <tc-button variant="filled">成為志工</tc-button>
+          <tc-button variant="outlined">認識慈濟</tc-button>
+        </div>
+      </div>
+      <div class="tpl-photo hero-photo" aria-hidden="true"></div>
+    </div>
+  </section>
+
+  <section class="tpl-section search-band">
+    <div class="tpl-container search-inner">
+      <tc-search-bar placeholder="搜尋新聞、活動或服務"></tc-search-bar>
+      <div class="tpl-row hot">
+        <span class="tpl-muted">熱門：</span>
+        <tc-chip>急難救助</tc-chip>
+        <tc-chip>環保</tc-chip>
+        <tc-chip>義診</tc-chip>
+        <tc-chip>志工招募</tc-chip>
+      </div>
+    </div>
+  </section>
+
+  <section class="tpl-section">
+    <div class="tpl-container tpl-with-aside">
+      <div>
+        <div class="tpl-section-head">
+          <h2 class="tpl-h2">最新消息</h2>
+          <tc-link href="#">看全部消息</tc-link>
+        </div>
+        <tc-tabs value="all" class="tabs">
+          <tc-tab value="all">全部</tc-tab>
+          <tc-tab value="charity">慈善</tc-tab>
+          <tc-tab value="medical">醫療</tc-tab>
+          <tc-tab value="education">教育</tc-tab>
+        </tc-tabs>
+        <div class="tpl-grid-3">
+          {
+            NEWS.map((item) => (
+              <tc-article-card>
+                <div slot="media" class:list={['tpl-photo', item.tone]} aria-hidden="true" />
+                <tc-chip slot="badge">{item.tag}</tc-chip>
+                <span slot="headline">{item.title}</span>
+                <span slot="meta">{item.date}</span>
+              </tc-article-card>
+            ))
+          }
+        </div>
+      </div>
+      <tc-list-panel label="活動訊息">
+        {
+          EVENTS.map((event) => (
+            <article class="tpl-list-item">
+              <strong>{event.title}</strong>
+              <span>{event.date}</span>
+            </article>
+          ))
+        }
+      </tc-list-panel>
+    </div>
+  </section>
+
+  <SiteFooter />
+</div>
+
+<style>
+  .hero {
+    background: var(--tc-color-brand-surface);
+  }
+  .hero-inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    gap: 48px;
+    align-items: center;
+    padding-block: 56px;
+  }
+  .hero-copy {
+    display: grid;
+    gap: 20px;
+    justify-items: start;
+  }
+  .hero .tpl-h1 {
+    color: var(--tc-color-brand-primary);
+  }
+  .lead {
+    max-inline-size: 28em;
+    color: var(--tc-color-text-default);
+    font-size: 18px;
+  }
+  .hero-photo {
+    aspect-ratio: 4 / 3;
+    border-radius: 20px;
+  }
+  .search-band {
+    padding-block: 32px;
+    border-block-end: 1px solid var(--tc-color-border-default);
+  }
+  .search-inner {
+    display: grid;
+    gap: 16px;
+    justify-items: center;
+  }
+  .search-inner tc-search-bar {
+    inline-size: min(100%, 640px);
+  }
+  .hot {
+    justify-content: center;
+    font-size: 14px;
+  }
+  .tabs {
+    display: block;
+    margin-block-end: 24px;
+  }
+  @container tpl (max-width: 720px) {
+    .hero-inner {
+      grid-template-columns: 1fr;
+      gap: 28px;
+      padding-block: 32px;
+    }
+  }
+</style>

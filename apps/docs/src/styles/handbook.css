@@ -34,6 +34,8 @@
   --tc-handbook-radius: 14px;
   --tc-handbook-tile: var(--tc-color-surface-default);
   --tc-handbook-tile-border: var(--sl-color-gray-6);
+  /* 首頁、網站主題頁的大面板（比頁面背景亮一階的中性灰，不跟網站主題變）。 */
+  --tc-handbook-panel: #1f1f22;
 }
 
 /* 淺色 */
@@ -60,6 +62,7 @@
 
   --tc-handbook-tile: var(--tc-color-surface-subtle);
   --tc-handbook-tile-border: var(--sl-color-gray-6);
+  --tc-handbook-panel: #f6f6f7;
 }
 
 /* ── 版面 ─────────────────────────────────────────────────────────────── */
@@ -158,4 +161,83 @@
 }
 .sl-markdown-content :is(th, td):last-child:not(:where(.not-content *)) {
   padding-inline-end: 1rem;
+}
+
+/* 「如何參與修改」頁：「你可以這樣跟 Claude 說」與「會做／不會做」兩組方塊。 */
+.tc-say,
+.tc-dos {
+  display: grid;
+  gap: 1rem;
+  margin-block: 1.25rem;
+}
+@media (min-width: 50rem) {
+  .tc-say section {
+    display: grid;
+    grid-template-columns: 4.5rem minmax(0, 1fr);
+    gap: 0 1rem;
+  }
+  .tc-say h3 {
+    margin: 0.5rem 0 0;
+  }
+}
+@media (min-width: 60rem) {
+  .tc-dos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.tc-say section,
+.tc-dos section {
+  padding: 1.1rem 1.25rem;
+  border: 1px solid var(--sl-color-hairline-light);
+  border-radius: 14px;
+  background-color: var(--tc-handbook-panel);
+}
+.tc-say h3,
+.tc-dos h3 {
+  margin: 0 0 0.6rem;
+  color: var(--sl-color-white);
+  font-size: var(--sl-text-base);
+}
+.tc-say ul,
+.tc-dos ul {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.tc-say li {
+  padding: 0.55rem 0.8rem;
+  border: 1px solid var(--sl-color-hairline-light);
+  border-radius: 10px;
+  background-color: var(--sl-color-black);
+  color: var(--sl-color-gray-2);
+  font-size: var(--sl-text-sm);
+  line-height: 1.6;
+}
+.tc-dos li {
+  position: relative;
+  padding-inline-start: 1.5rem;
+  color: var(--sl-color-gray-2);
+  font-size: var(--sl-text-sm);
+  line-height: 1.6;
+}
+.tc-dos li::before {
+  position: absolute;
+  inset-inline-start: 0;
+  font-weight: 700;
+}
+.tc-dos .do li::before {
+  content: '✓';
+  color: #7fd18b;
+}
+.tc-dos .dont li::before {
+  content: '✕';
+  color: #f28b82;
+}
+:root[data-theme='light'] .tc-dos .do li::before {
+  color: #2e7d32;
+}
+:root[data-theme='light'] .tc-dos .dont li::before {
+  color: #c62828;
 }

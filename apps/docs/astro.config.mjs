@@ -10,6 +10,7 @@ import { SITE_THEME_VARS_MODULE, siteThemeVarsCss } from './src/prototype/site-t
 // 手冊的五個區域（首頁、文件、元件、範本、網站主題）與元件目錄。
 import { getSection } from './src/prototype/sections.ts';
 import { COMPONENTS, componentSidebarItems } from './src/prototype/component-catalog.ts';
+import { TEMPLATES, templateSidebarItems } from './src/prototype/template-catalog.ts';
 
 const PROTOTYPE_FILES = [
   'site-themes.ts',
@@ -17,6 +18,7 @@ const PROTOTYPE_FILES = [
   'site-theme-vars.ts',
   'sections.ts',
   'component-catalog.ts',
+  'template-catalog.ts',
 ];
 
 /** 改了網站主題、區域或元件目錄的資料時重新載入設定，側欄和 <head> 才會跟著更新。 */
@@ -68,6 +70,21 @@ if (missingInCatalog.length > 0 || missingPages.length > 0) {
   );
 }
 
+// 範本目錄和範本元件也必須一一對應：/templates/<id>/ 頁面依目錄產生，畫面來自 <id>.astro。
+const templateFiles = readdirSync(new URL('./src/components/templates/', import.meta.url))
+  .filter((file) => file.endsWith('.astro'))
+  .map((file) => file.replace(/\.astro$/, ''));
+const templateIds = TEMPLATES.map((t) => t.id);
+const templatesWithoutFile = templateIds.filter((id) => !templateFiles.includes(id));
+const filesWithoutTemplate = templateFiles.filter((id) => !templateIds.includes(id));
+if (templatesWithoutFile.length > 0 || filesWithoutTemplate.length > 0) {
+  throw new Error(
+    `範本目錄（src/prototype/template-catalog.ts）和範本元件（src/components/templates/）不一致。` +
+      ` 沒有元件檔的範本：${templatesWithoutFile.join('、') || '無'}；` +
+      ` 沒有目錄資料的元件檔：${filesWithoutTemplate.join('、') || '無'}`,
+  );
+}
+
 // https://starlight.astro.build/
 export default defineConfig({
   vite: { plugins: [siteThemeVarsPlugin] },
@@ -75,7 +92,7 @@ export default defineConfig({
     watchPrototypeData,
     starlight({
       title: '慈濟 CIS UIKit',
-      description: '慈濟 CIS 設計系統手冊 — Foundations、元件、用法',
+      description: '一套設計規則和元件，給每一個慈濟網站使用。',
       // 介面文字（搜尋、色彩模式選單、上一頁／下一頁）用繁體中文。
       defaultLocale: 'root',
       locales: { root: { label: '繁體中文', lang: 'zh-TW' } },
@@ -103,15 +120,14 @@ export default defineConfig({
         {
           label: getSection('docs').label,
           items: [
-            { label: '總覽', link: '/docs/' },
-            { label: '基礎', autogenerate: { directory: 'foundations' } },
+            { label: '開始使用', link: '/docs/' },
+            { label: '如何參與修改', link: '/docs/contributing/' },
+            { label: '用詞', link: '/docs/glossary/' },
+            { label: '基礎 Foundations', autogenerate: { directory: 'foundations' } },
           ],
         },
         { label: getSection('components').label, items: componentSidebarItems() },
-        {
-          label: getSection('templates').label,
-          items: [{ label: '總覽', link: '/templates/' }],
-        },
+        { label: getSection('templates').label, items: templateSidebarItems() },
         // 設計示範（prototype）：總覽在前，各網站收在可展開的子群組裡，網站再多側欄也不會被塞滿。
         {
           label: getSection('themes').label,

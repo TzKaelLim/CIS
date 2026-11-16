@@ -1,15 +1,13 @@
 ---
-title: 網站主題總覽
+title: 網站主題
 description: 一套 UIKit、每個網站一個網站主題——所有網站主題的清單，以及目前選擇的網站主題長什麼樣子。
 tableOfContents: false
 ---
 
 import { Aside } from '@astrojs/starlight/components';
 import LayerDiagram from '../../../components/prototype/LayerDiagram.astro';
-import SiteCards from '../../../components/prototype/SiteCards.astro';
+import ThemeBrowser from '../../../components/prototype/ThemeBrowser.astro';
 import PerSite from '../../../components/prototype/PerSite.astro';
-import CurrentSiteNote from '../../../components/prototype/CurrentSiteNote.astro';
-import ThemeGallery from '../../../components/prototype/ThemeGallery.astro';
 import ThemeDiff from '../../../components/prototype/ThemeDiff.astro';
 import { DEFAULT_SITE, SITE_THEMES } from '../../../prototype/site-themes';
 
@@ -19,33 +17,15 @@ import { DEFAULT_SITE, SITE_THEMES } from '../../../prototype/site-themes';
 
 **先講結論**：所有慈濟網站共用一套 UIKit，按鈕、卡片、版面都只有一份；每個網站另有一個自己的「網站主題」。網站主題只換顏色等外觀數值，元件本身不用改。
 
-:::note[用詞]
+<ThemeBrowser />
 
-- **主題**＝網站主題，指「哪一個網站」：慈濟入口網、慈濟環保網…。
+## 用詞
+
+- **網站主題**＝「哪一個網站」：慈濟入口網、慈濟環保網…。
 - **色彩模式**＝淺色／深色。
-- 兩者可以自由組合：每個網站主題都有淺色和深色。
-
-:::
+- 兩者可以自由組合：每個網站主題都有淺色和深色。頁首的兩個選單分別切換，你的選擇會被記住；手冊本身（頁首、側欄、文字）的外觀不會跟著變。
 
 <LayerDiagram />
-
-## 這個選單是什麼
-
-頁首有一個「網站主題」選單。選了之後，手冊各頁的色票與元件範例會換成該網站的樣子；淺色、深色（色彩模式）由旁邊的選單另外切換。手冊本身的外觀不會變，選擇會被記住。
-
-## 所有網站主題
-
-目前有 {SITE_THEMES.length} 個網站主題。按「查看」看該網站的完整說明；按「套用到手冊」，整份手冊就改成顯示那個網站的樣子。
-
-<SiteCards />
-
-## 目前網站主題的樣子
-
-<CurrentSiteNote showAllLink={false} />
-
-同一個迷你網頁（頁首、按鈕、連結、文章卡片、成功訊息），左邊淺色、右邊深色。元件和其他網站完全相同，只是顏色換成這個網站主題。
-
-<PerSite>{(site) => <ThemeGallery siteId={site.id} />}</PerSite>
 
 ## 和預設主題的差異
 

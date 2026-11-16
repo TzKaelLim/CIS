@@ -1,0 +1,41 @@
+---
+// 範本共用的網站頁尾：用真正的 <tc-footer> 和 <tc-footer-column>。
+const COLUMNS: { label: string; links: string[] }[] = [
+  { label: '慈善志業', links: ['國際賑災', '社區關懷', '環保推廣'] },
+  { label: '醫療志業', links: ['慈濟醫院', '義診服務', '骨髓捐贈'] },
+  { label: '教育志業', links: ['慈濟大學', '慈大附中', '社會教育'] },
+];
+---
+
+<tc-footer copyright="Copyright © 慈濟基金會（範本示意）">
+  <div slot="brand" class="footer-brand">
+    <span class="tpl-brand">
+      <span class="tpl-brand-mark" aria-hidden="true">慈</span>
+      慈濟基金會
+    </span>
+    <p class="tpl-muted">花蓮縣新城鄉（示意地址）<br />服務專線 0000-000-000</p>
+    <tc-button variant="outlined">聯絡我們</tc-button>
+  </div>
+  {
+    COLUMNS.map((column) => (
+      <tc-footer-column label={column.label}>
+        {column.links.map((link) => (
+          <tc-link variant="subtle" href="#">
+            {link}
+          </tc-link>
+        ))}
+      </tc-footer-column>
+    ))
+  }
+</tc-footer>
+
+<style>
+  .footer-brand {
+    display: grid;
+    gap: 12px;
+    justify-items: start;
+  }
+  .footer-brand p {
+    font-size: 14px;
+  }
+</style>
