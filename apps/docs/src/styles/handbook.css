@@ -200,58 +200,35 @@
   padding-inline-end: 1rem;
 }
 
-/* 「如何參與修改」頁：「你可以這樣跟 Claude 說」與「會做／不會做」兩組方塊。 */
-.tc-say,
+/* 「如何參與修改」頁：「會做／不會做」兩組方塊。 */
 .tc-dos {
   display: grid;
   gap: 1rem;
   margin-block: 1.25rem;
-}
-@media (min-width: 50rem) {
-  .tc-say section {
-    display: grid;
-    grid-template-columns: 4.5rem minmax(0, 1fr);
-    gap: 0 1rem;
-  }
-  .tc-say h3 {
-    margin: 0.5rem 0 0;
-  }
 }
 @media (min-width: 60rem) {
   .tc-dos {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
-.tc-say section,
 .tc-dos section {
   padding: 1rem 1.125rem;
   border: 1px solid var(--sl-color-hairline-light);
   border-radius: 14px;
   background-color: var(--tc-handbook-panel);
 }
-.tc-say h3,
 .tc-dos h3 {
   margin: 0 0 0.5rem;
   color: var(--sl-color-white);
   font-size: var(--hb-text-h4);
   line-height: var(--hb-line-height-headings);
 }
-.tc-say ul,
 .tc-dos ul {
   display: grid;
   gap: 0.5rem;
   margin: 0;
   padding: 0;
   list-style: none;
-}
-.tc-say li {
-  padding: 0.55rem 0.8rem;
-  border: 1px solid var(--sl-color-hairline-light);
-  border-radius: 10px;
-  background-color: var(--sl-color-black);
-  color: var(--sl-color-gray-2);
-  font-size: var(--hb-text-body);
-  line-height: var(--hb-line-height);
 }
 .tc-dos li {
   position: relative;
