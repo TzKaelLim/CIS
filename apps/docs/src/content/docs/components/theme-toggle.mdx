@@ -1,10 +1,17 @@
 ---
-title: ThemeToggle
+title: 色彩模式切換
 description: tc-theme-toggle — 淺色／深色色彩模式切換鈕，切換 <html data-theme> 並記憶選擇，所有元件透過 token cascade 自動跟隨。
 ---
 
 import Demo from '../../../components/Demo.astro';
 import PropsTable from '../../../components/PropsTable.astro';
+import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
+
+<ComponentMeta id="theme-toggle" />
+
+:::note[整理中]
+這一頁目前是給工程師的技術說明。給設計、企劃和廠商看的版面（用法、組成、該做與不該做）之後會補上，可以先看[按鈕](/components/button/)那一頁的樣子。
+:::
 
 `<tc-theme-toggle>` 切換 `<html>` 的 `data-theme` 屬性。深色色票由 `@tzuchi/tokens` 的
 `[data-theme="dark"]` 區塊提供，元件僅引用語意色 token，因此整個元件庫會透過 CSS 變數

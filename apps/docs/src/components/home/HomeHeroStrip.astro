@@ -6,10 +6,10 @@
 
 <div class="tc-home-strip not-content" inert aria-hidden="true">
   <div class="piece">
-    <tc-button variant="filled">我要捐款</tc-button>
-    <tc-button variant="outlined">了解更多</tc-button>
+    <tc-button variant="filled">送出</tc-button>
+    <tc-button variant="outlined">取消</tc-button>
   </div>
-  <div class="piece">
+  <div class="piece chips">
     <tc-chip selected>全部</tc-chip>
     <tc-chip>慈善</tc-chip>
     <tc-chip>環保</tc-chip>
@@ -48,6 +48,10 @@
     color: var(--tc-color-text-default);
     font-family: var(--tc-font-family-base);
   }
+  /* 膠囊標籤原尺寸比按鈕大，縮小一點讓幾塊看起來一樣大。 */
+  .chips tc-chip {
+    zoom: 0.85;
+  }
   .wide tc-search-bar {
     inline-size: 15rem;
   }
@@ -76,5 +80,8 @@
     margin-inline: auto;
     font-size: clamp(var(--sl-text-lg), 1rem + 0.6vw, var(--sl-text-2xl));
     color: var(--sl-color-gray-2);
+    text-wrap: balance;
+    /* 中文不在詞中間斷行，只在標點後換行（例如「，」）。 */
+    word-break: keep-all;
   }
 </style>

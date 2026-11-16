@@ -1,10 +1,17 @@
 ---
-title: Container
+title: 版心容器
 description: tc-container — 響應式、水平置中的最大寬度版心容器，依 size 套用斷點寬度，gutter 提供隨視窗增長的左右內距。
 ---
 
 import Demo from '../../../components/Demo.astro';
 import PropsTable from '../../../components/PropsTable.astro';
+import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
+
+<ComponentMeta id="container" />
+
+:::note[整理中]
+這一頁目前是給工程師的技術說明。給設計、企劃和廠商看的版面（用法、組成、該做與不該做）之後會補上，可以先看[按鈕](/components/button/)那一頁的樣子。
+:::
 
 `<tc-container>` 是版心（layout）容器：將內容約束在最大寬度內、水平置中，並提供隨視窗增長的左右內距（gutter）。`size` 對應設計系統的斷點寬度（`--tc-container-sm/md/lg/xl/full`），分別為 375 / 768 / 1024 / 1280 / 1920px。下方為**可互動的真實元件**（虛線框示意版心邊界）：
 

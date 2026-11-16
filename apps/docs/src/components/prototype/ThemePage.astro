@@ -95,14 +95,14 @@ const mutedFails = checks.some((c) => c.說明.includes('次要文字') && !c.�
 {
   !site.isDefault && (
     <>
-      <h2 id="diff">與預設主題的差異</h2>
+      <h2 id="diff">和預設網站主題的差異</h2>
       <p>
-        只列出和預設主題（{DEFAULT_SITE.名稱}）不同的顏色；沒列出的全部沿用預設主題。{site.isDemo && `${site.簡稱}的顏色是示意值（非正式），只為了示範效果。`}
+        只列出和預設網站主題（{DEFAULT_SITE.名稱}）不同的顏色；沒列出的全部沿用預設網站主題。{site.isDemo && `${site.簡稱}的顏色是示意值（非正式）。`}
       </p>
       <ThemeDiff siteId={site.id} />
       {site.示意色.length > 0 && (
         <p class="demo-note">
-          <strong>注意：</strong>{site.簡稱}用到的這幾個顏色（{site.示意色.join('、')}）目前<strong>不在基礎色票裡</strong>，是這個示範暫時自訂的示意值。若決定採用，要先把它們加進基礎色票（所有網站共用的那盒顏料），網站主題再從裡面挑；網站主題本身不新增顏色。
+          <strong>注意：</strong>{site.簡稱}用到的這幾個顏色（{site.示意色.join('、')}）目前<strong>不在基礎色票裡</strong>，是這個示意網站主題暫時自訂的值。若決定採用，要先把它們加進基礎色票（所有網站共用的那盒顏料），網站主題再從裡面挑；網站主題本身不新增顏色。
         </p>
       )}
     </>
@@ -117,7 +117,7 @@ const mutedFails = checks.some((c) => c.說明.includes('次要文字') && !c.�
   {
     site.isDefault ? (
       <li>
-        <strong>共同編輯者（設計、行政）：</strong>{site.簡稱}是預設主題，改它的顏色，所有沒有自己網站主題的網站都會一起變。要改請跟 Claude 說：「預設主題的主色改成…」，Claude 會先列出會受影響的網站給你確認。
+        <strong>共同編輯者（設計、行政）：</strong>{site.簡稱}是預設網站主題，改它的顏色，所有沒有自己網站主題的網站都會一起變。要改請跟 Claude 說：「預設網站主題的主色改成…」，Claude 會先列出會受影響的網站給你確認。
       </li>
     ) : (
       <li>

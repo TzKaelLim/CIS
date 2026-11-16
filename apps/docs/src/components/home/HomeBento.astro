@@ -52,7 +52,7 @@ const [firstTemplate, ...otherTemplates] = TEMPLATES;
       <a href="/templates/">前往<span class="sr-only">範本</span> →</a>
     </div>
     <div class="templates-preview">
-      {firstTemplate && <TemplateThumb id={firstTemplate.id} scale={0.27} ratio="16 / 11" />}
+      {firstTemplate && <TemplateThumb id={firstTemplate.id} scale={0.27} ratio="fill" class="main-thumb" />}
       <div class="pair">
         {
           otherTemplates
@@ -74,7 +74,7 @@ const [firstTemplate, ...otherTemplates] = TEMPLATES;
         目前顯示：{SITE_THEMES.map((s) => <SiteOnly site={s.id} as="span">{siteLabel(s)}</SiteOnly>)}
       </p>
       <div class="row">
-        <tc-button variant="filled">我要捐款</tc-button>
+        <tc-button variant="filled">了解更多</tc-button>
         <tc-link href="#">活動訊息</tc-link>
       </div>
       <ul class="dots">
@@ -95,7 +95,7 @@ const [firstTemplate, ...otherTemplates] = TEMPLATES;
   <article class="card claude">
     <div class="text">
       <h3>透過 Claude Code 共編</h3>
-      <p>不會寫程式也能改：用平常說話的方式告訴 Claude 要改什麼。看過預覽、確認之後才會送出，由核可人看過再合併。</p>
+      <p>不會寫程式也能改：用平常說話的方式告訴 Claude 要改什麼。看過預覽、確認之後才會送出修改申請，由核可人看過再合併。</p>
       <a href="/docs/contributing/">前往<span class="sr-only">如何參與修改</span> →</a>
     </div>
     <div class="preview claude-preview">
@@ -271,14 +271,29 @@ const [firstTemplate, ...otherTemplates] = TEMPLATES;
     align-items: center;
     gap: 0.5rem;
   }
+  /* 膠囊標籤原尺寸比徽章和按鈕大，縮小一點。 */
+  .components-preview tc-chip {
+    zoom: 0.85;
+  }
   .components-preview tc-search-bar {
     inline-size: 100%;
   }
 
+  /* 範本卡片：大縮圖填滿說明文字下方剩下的高度（卡片佔兩列時不會留一大塊空白）。 */
   .templates-preview {
+    flex: 1 1 auto;
     display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
     gap: 0.75rem;
-    margin-block-start: auto;
+  }
+  .templates-preview :global(.main-thumb) {
+    aspect-ratio: 16 / 11;
+  }
+  @container (min-width: 60rem) {
+    .templates-preview :global(.main-thumb) {
+      aspect-ratio: auto;
+      min-block-size: 12rem;
+    }
   }
   .pair {
     display: grid;

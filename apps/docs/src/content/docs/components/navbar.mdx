@@ -1,10 +1,17 @@
 ---
-title: Navbar
+title: 導覽列
 description: tc-navbar — 響應式網站頂部導覽列；桌機水平導覽，行動裝置收合為漢堡選單抽屜。
 ---
 
 import Demo from '../../../components/Demo.astro';
 import PropsTable from '../../../components/PropsTable.astro';
+import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
+
+<ComponentMeta id="navbar" />
+
+:::note[整理中]
+這一頁目前是給工程師的技術說明。給設計、企劃和廠商看的版面（用法、組成、該做與不該做）之後會補上，可以先看[按鈕](/components/button/)那一頁的樣子。
+:::
 
 `<tc-navbar>` 是響應式的網站頂部列／站台 header：`brand` 插槽放標誌或站名（inline-start），預設插槽放主要導覽項目（桌機水平排列），`actions` 插槽放搜尋／語言／登入等操作（inline-end）。於平板斷點（`--tc-breakpoint-tablet` = 768px）以下，導覽會收合為漢堡選單，點擊後以垂直抽屜呈現。下方為**可互動的真實元件**：
 

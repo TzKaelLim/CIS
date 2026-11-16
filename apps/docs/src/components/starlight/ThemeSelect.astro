@@ -7,7 +7,11 @@ import SiteSelect from '../prototype/SiteSelect.astro';
 
 <div class="site-and-mode">
   <SiteSelect />
-  <Default />
+  <div class="mode">
+    {/* 手機選單裡和「網站主題」一樣有看得到的標籤；選單本身已有給螢幕閱讀器的標籤，所以這裡 aria-hidden。 */}
+    <span class="mode-label" aria-hidden="true">色彩模式</span>
+    <Default />
+  </div>
 </div>
 
 <style>
@@ -18,11 +22,25 @@ import SiteSelect from '../prototype/SiteSelect.astro';
     gap: 0.25rem 1rem;
     min-inline-size: 0;
   }
-  /* 手機選單：網站主題選單自己一行，名稱比較不會被截斷。 */
+  .mode {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .mode-label {
+    display: none;
+    color: var(--sl-color-gray-1);
+    font-size: var(--sl-text-sm);
+    white-space: nowrap;
+  }
+  /* 手機選單：網站主題選單自己一行，名稱比較不會被截斷；色彩模式也顯示文字標籤。 */
   @media (max-width: 49.99rem) {
     .site-and-mode {
       flex: 1 1 100%;
       padding-block: 0.5rem;
+    }
+    .mode-label {
+      display: inline;
     }
   }
 </style>

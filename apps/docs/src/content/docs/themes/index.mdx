@@ -11,8 +11,8 @@ import PerSite from '../../../components/prototype/PerSite.astro';
 import ThemeDiff from '../../../components/prototype/ThemeDiff.astro';
 import { DEFAULT_SITE, SITE_THEMES } from '../../../prototype/site-themes';
 
-:::caution[設計示範（prototype）]
-這一區是設計示範，用來討論「多個網站共用一套 UIKit」會長什麼樣子。環保網的顏色是示意值，網站名稱與做法都還待核定。
+:::caution[示意內容]
+這一區是示意，用來討論「多個網站共用一套 UIKit」會長什麼樣子。標「示意」的網站主題，顏色不是正式的值，網站名稱與做法也都還待核定。
 :::
 
 **先講結論**：所有慈濟網站共用一套 UIKit，按鈕、卡片、版面都只有一份；每個網站另有一個自己的「網站主題」。網站主題只換顏色等外觀數值，元件本身不用改。
@@ -27,16 +27,16 @@ import { DEFAULT_SITE, SITE_THEMES } from '../../../prototype/site-themes';
 
 <LayerDiagram />
 
-## 和預設主題的差異
+## 和預設網站主題的差異
 
 <PerSite>
   {(site) =>
     site.isDefault ? (
-      <p>在頁首選擇另一個網站主題，這裡會列出它和預設主題的差異。</p>
+      <p>在頁首選擇另一個網站主題，這裡會列出它和預設網站主題的差異。</p>
     ) : (
       <>
         <p>
-          只列出{site.名稱}和預設主題（{DEFAULT_SITE.名稱}）不同的顏色；沒列出的全部沿用預設主題。
+          只列出{site.名稱}和預設網站主題（{DEFAULT_SITE.名稱}）不同的顏色；沒列出的全部沿用預設網站主題。
         </p>
         <ThemeDiff siteId={site.id} targetLabel={`目前選擇（${site.名稱}）`} />
       </>
@@ -44,9 +44,9 @@ import { DEFAULT_SITE, SITE_THEMES } from '../../../prototype/site-themes';
   }
 </PerSite>
 
-## 什麼不是主題
+## 什麼情況不要開新的網站主題
 
-:::note[這些情況不要開新的網站主題]
+:::note[改用變體或新版本]
 
 - **同一個元件要有不同外觀**（例如圓角按鈕和方角按鈕、橫式和直式卡片）→ 做成元件的**變體**。變體所有網站都能用，跟是哪個網站無關。
 - **舊設計要整個換掉，而且新舊不能直接互換**（例如新版卡片的欄位和舊版不同）→ 出元件的新**版本**（只有 v1、v2 這樣的版本號）。版本是所有網站一起升級，不會每個網站各一份。

@@ -1,22 +1,29 @@
 ---
-title: BookCard
+title: 書籍卡片
 description: tc-book-card — 以封面圖為主的直式書籍卡片，支援直式／方形封面、可互動與連結模式。
 ---
 
 import Demo from '../../../components/Demo.astro';
 import PropsTable from '../../../components/PropsTable.astro';
+import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
+
+<ComponentMeta id="book-card" />
+
+:::note[整理中]
+這一頁目前是給工程師的技術說明。給設計、企劃和廠商看的版面（用法、組成、該做與不該做）之後會補上，可以先看[按鈕](/components/button/)那一頁的樣子。
+:::
 
 `<tc-book-card>` 是以封面圖為主的直式卡片，適用於書籍封面與「證嚴上人 每日一叮嚀」。封面圖在上、下方為標題（粗體品牌色）／副標（淡色）與 footer 動作區。封面依 `ratio`（`portrait` 直式 3/4 或 `square` 方形）裁切並貼齊頂部圓角。下方為**可互動的真實元件**（圖片為 Lorem Picsum 假圖）：
 
 <Demo>
   <tc-book-card ratio="portrait" width="240px">
-    <img slot="cover" src="https://picsum.photos/seed/tzuchibook1/300/400" alt="書籍封面" />
+    <div slot="cover" role="img" aria-label="書籍封面（色塊代替照片）" style="display:block;width:100%;height:100%;background:linear-gradient(135deg,var(--tc-color-brand-surface-hover),var(--tc-color-brand-surface))"></div>
     <span slot="title">證嚴上人 每日一叮嚀</span>
     <span slot="subtitle">世間祥和在於心……</span>
     <tc-link slot="footer" href="#more">更多</tc-link>
   </tc-book-card>
   <tc-book-card ratio="square" width="240px">
-    <img slot="cover" src="https://picsum.photos/seed/tzuchibook2/400/400" alt="書籍封面" />
+    <div slot="cover" role="img" aria-label="書籍封面（色塊代替照片）" style="display:block;width:100%;height:100%;background:linear-gradient(135deg,var(--tc-color-brand-surface-hover),var(--tc-color-brand-surface))"></div>
     <span slot="title">靜思語選輯（建議標題在 15 字以內）</span>
     <span slot="subtitle">心寬念純，福慧雙修……</span>
     <tc-link slot="footer" href="#more">更多</tc-link>
@@ -29,7 +36,7 @@ import PropsTable from '../../../components/PropsTable.astro';
 
 <Demo>
   <tc-book-card ratio="square" width="240px">
-    <img slot="cover" src="https://picsum.photos/seed/tzuchibook3/400/400" alt="書籍封面" />
+    <div slot="cover" role="img" aria-label="書籍封面（色塊代替照片）" style="display:block;width:100%;height:100%;background:linear-gradient(135deg,var(--tc-color-brand-surface-hover),var(--tc-color-brand-surface))"></div>
     <span slot="title">方形封面</span>
     <span slot="subtitle">適用相片或方形書影</span>
   </tc-book-card>
@@ -73,7 +80,7 @@ import { TcBookCard } from '@tzuchi/react';
 
 <Demo>
   <tc-book-card href="#book" style="max-width:240px">
-    <img slot="cover" src="https://picsum.photos/seed/tzuchibook4/300/400" alt="書籍封面" />
+    <div slot="cover" role="img" aria-label="書籍封面（色塊代替照片）" style="display:block;width:100%;height:100%;background:linear-gradient(135deg,var(--tc-color-brand-surface-hover),var(--tc-color-brand-surface))"></div>
     <span slot="title">點整張卡片即可前往</span>
     <span slot="subtitle">footer 連結仍可獨立點擊</span>
     <tc-link slot="footer" href="#more">更多</tc-link>

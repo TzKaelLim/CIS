@@ -241,3 +241,34 @@
 :root[data-theme='light'] .tc-dos .dont li::before {
   color: #c62828;
 }
+
+/* ── 焦點框 ───────────────────────────────────────────────────────────── */
+
+/* 頁首和頁面裡的連結、按鈕、選單用同一組焦點框（Starlight 預設是瀏覽器的細藍框）。 */
+.site-title:focus-visible,
+site-search button:focus-visible,
+starlight-theme-select select:focus-visible,
+.sl-link-button:focus-visible,
+.pagination-links a:focus-visible,
+mobile-starlight-toggle button:focus-visible,
+.sl-markdown-content a:not(:where(.not-content *)):focus-visible {
+  outline: 2px solid var(--sl-color-accent);
+  outline-offset: 2px;
+}
+
+/* Starlight 的表格是 display:block（窄螢幕可以左右捲動），所以表格常比外框窄。
+   寬螢幕上，欄位不多的文章表格撐滿內容寬度；欄位多的（例如 API 表）維持原樣。 */
+@media (min-width: 50rem) {
+  .sl-markdown-content table:not(:where(.not-content *)):not(:has(th:nth-child(4))) {
+    display: table;
+    inline-size: 100%;
+  }
+}
+
+/* hero 下方的一行補充說明（例如元件總覽的 Storybook 說明）。 */
+.sl-markdown-content .tc-hero-note {
+  margin-block: -0.5rem 2rem;
+  color: var(--sl-color-gray-3);
+  font-size: var(--sl-text-sm);
+  text-align: center;
+}

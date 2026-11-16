@@ -1,10 +1,17 @@
 ---
-title: EbookToolbar
+title: 電子書工具列
 description: tc-ebook-toolbar — 電子書閱讀器上排功能列（慈濟書庫）：返回鍵、置中書名與尾端工具列。
 ---
 
 import Demo from '../../../components/Demo.astro';
 import PropsTable from '../../../components/PropsTable.astro';
+import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
+
+<ComponentMeta id="ebook-toolbar" />
+
+:::note[整理中]
+這一頁目前是給工程師的技術說明。給設計、企劃和廠商看的版面（用法、組成、該做與不該做）之後會補上，可以先看[按鈕](/components/button/)那一頁的樣子。
+:::
 
 `<tc-ebook-toolbar>` 是電子書閱讀器的上排功能列（慈濟書庫）。版面為三段式：內建**返回鍵**（inline-start）、**書籍名稱**（桌機置中）、以及尾端**工具列**（inline-end，由使用者以預設插槽放入 `<tc-icon-button>`，例如搜尋／書籤／語音／筆記／個人）。於平板斷點（`--tc-breakpoint-tablet` = 768px）以下，書名會由置中改為靠左貼近返回鍵。點擊返回鍵會派發 `tc-back` 事件。下方為**可互動的真實元件**：
 

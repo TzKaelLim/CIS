@@ -1,10 +1,17 @@
 ---
-title: Grid
+title: 格線
 description: tc-grid — 響應式 CSS Grid 版面容器，支援固定欄數與 auto-fit/minmax 自動填滿兩種模式。
 ---
 
 import Demo from '../../../components/Demo.astro';
 import PropsTable from '../../../components/PropsTable.astro';
+import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
+
+<ComponentMeta id="grid" />
+
+:::note[整理中]
+這一頁目前是給工程師的技術說明。給設計、企劃和廠商看的版面（用法、組成、該做與不該做）之後會補上，可以先看[按鈕](/components/button/)那一頁的樣子。
+:::
 
 `<tc-grid>` 是 layout 原語：以單一預設插槽包裹直接子元素，套用 CSS Grid。預設為**固定欄數**模式（`columns`，預設 12），於平板斷點（768px）以下收合為 `mobile-columns`（預設 1）欄以利閱讀。設定 `min-col-width` 後改用 **auto-fit/minmax** 自動填滿模式（此時 `columns` 不生效）。下方為**可互動的真實元件**：
 

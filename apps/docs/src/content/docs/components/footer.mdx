@@ -1,23 +1,30 @@
 ---
-title: Footer
+title: 頁尾
 description: tc-footer / tc-footer-column — 網站頁尾，含品牌區、社群連結、響應式連結群組與版權列；行動裝置上群組可手風琴收合。
 ---
 
 import Demo from '../../../components/Demo.astro';
 import PropsTable from '../../../components/PropsTable.astro';
+import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
+
+<ComponentMeta id="footer" />
+
+:::note[整理中]
+這一頁目前是給工程師的技術說明。給設計、企劃和廠商看的版面（用法、組成、該做與不該做）之後會補上，可以先看[按鈕](/components/button/)那一頁的樣子。
+:::
 
 `<tc-footer>` 是網站頁尾容器：上方彩色內容區（品牌資訊、社群連結、一組 `<tc-footer-column>` 連結群組、回到頂部）加上底部版權列。連結群組以 CSS grid `auto-fit`／`minmax` 排列（桌機約 4-6 欄、平板 2 欄、行動 1 欄）；在 `<=768px` 時每個 `<tc-footer-column>` 變為可收合的手風琴。提供 `light`（淺色）與 `brand`（深色品牌）兩種變體。下方為**可互動的真實元件**（社群圖示為 Lorem Picsum 假圖）：
 
 <Demo>
   <tc-footer copyright="Copyright © 2020 Open Source Matters. 版權所有, Copyright, Tzu Chi Foundation.">
     <a slot="social" href="#" aria-label="Facebook" style="display:inline-flex;width:32px;height:32px;border-radius:6px;overflow:hidden">
-      <img src="https://picsum.photos/seed/fb/32/32" alt="" style="width:100%;height:100%;object-fit:cover" />
+      <div aria-hidden="true" style="width:100%;height:100%;background:linear-gradient(135deg,var(--tc-color-brand-surface-hover),var(--tc-color-brand-surface))"></div>
     </a>
     <a slot="social" href="#" aria-label="Instagram" style="display:inline-flex;width:32px;height:32px;border-radius:6px;overflow:hidden">
-      <img src="https://picsum.photos/seed/ig/32/32" alt="" style="width:100%;height:100%;object-fit:cover" />
+      <div aria-hidden="true" style="width:100%;height:100%;background:linear-gradient(135deg,var(--tc-color-brand-surface-hover),var(--tc-color-brand-surface))"></div>
     </a>
     <a slot="social" href="#" aria-label="YouTube" style="display:inline-flex;width:32px;height:32px;border-radius:6px;overflow:hidden">
-      <img src="https://picsum.photos/seed/yt/32/32" alt="" style="width:100%;height:100%;object-fit:cover" />
+      <div aria-hidden="true" style="width:100%;height:100%;background:linear-gradient(135deg,var(--tc-color-brand-surface-hover),var(--tc-color-brand-surface))"></div>
     </a>
     <div slot="brand">
       <strong style="display:block;font-size:18px;margin-bottom:8px">花蓮本會</strong>

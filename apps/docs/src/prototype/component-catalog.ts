@@ -102,7 +102,7 @@ export const COMPONENTS: readonly ComponentEntry[] = [
     用途: '可以點選、切換或移除的小標籤，常用在篩選。',
     preview: {
       html: '<tc-chip>全部</tc-chip><tc-chip selected>慈善</tc-chip><tc-chip>醫療</tc-chip><tc-chip removable>教育</tc-chip>',
-      scale: 0.85,
+      scale: 0.75,
     },
   },
   // ── 表單 ────────────────────────────────────────────────────────────
@@ -243,8 +243,8 @@ export const COMPONENTS: readonly ComponentEntry[] = [
     category: 'navigation',
     用途: '網站最下方：聯絡資訊、分類連結與版權聲明。',
     preview: {
-      html: '<tc-footer copyright="Copyright © Tzu Chi Foundation." style="inline-size:100%"><div slot="brand"><strong style="display:block;font-size:18px;margin-bottom:8px">花蓮本會</strong><tc-button variant="filled">聯絡我們</tc-button></div><tc-footer-column label="公益慈善"><tc-link variant="subtle" href="#">國際賑災</tc-link><tc-link variant="subtle" href="#">環保推廣</tc-link></tc-footer-column><tc-footer-column label="醫療志業"><tc-link variant="subtle" href="#">慈濟醫院</tc-link><tc-link variant="subtle" href="#">骨髓中心</tc-link></tc-footer-column><tc-footer-column label="教育志業"><tc-link variant="subtle" href="#">慈濟大學</tc-link><tc-link variant="subtle" href="#">慈大附中</tc-link></tc-footer-column></tc-footer>',
-      scale: 0.36,
+      html: '<tc-footer copyright="Copyright © Tzu Chi Foundation." style="inline-size:100%"><div slot="brand"><strong style="display:block;font-size:18px;margin-bottom:8px">花蓮本會</strong><tc-button variant="filled">聯絡我們</tc-button></div><tc-footer-column label="公益慈善"><tc-link variant="subtle" href="#">國際賑災</tc-link><tc-link variant="subtle" href="#">環保推廣</tc-link></tc-footer-column><tc-footer-column label="醫療志業"><tc-link variant="subtle" href="#">慈濟醫院</tc-link><tc-link variant="subtle" href="#">骨髓中心</tc-link></tc-footer-column></tc-footer>',
+      scale: 0.5,
     },
   },
   {
@@ -292,6 +292,7 @@ export const COMPONENTS: readonly ComponentEntry[] = [
     用途: '小圖形，搭配文字或按鈕使用，顏色跟著文字。',
     preview: {
       html: '<div style="display:flex;gap:20px;font-size:28px;color:var(--tc-color-text-default)"><tc-icon name="search" size="lg"></tc-icon><tc-icon name="menu" size="lg"></tc-icon><tc-icon name="calendar" size="lg"></tc-icon><tc-icon name="mail" size="lg"></tc-icon><tc-icon name="check" size="lg"></tc-icon></div>',
+      scale: 0.8,
     },
   },
   {

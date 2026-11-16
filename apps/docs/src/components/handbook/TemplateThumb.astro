@@ -9,7 +9,7 @@ interface Props {
   id: string;
   /** 縮小比例（0–1），預設 0.28：約 340px 寬的縮圖對應 1200px 寬的頁面。 */
   scale?: number;
-  /** 縮圖的長寬比，預設 4 / 3。 */
+  /** 縮圖的長寬比，預設 4 / 3。'fill' = 不設長寬比，高度由外層決定（例如填滿卡片剩下的空間）。 */
   ratio?: string;
   class?: string;
 }
@@ -20,7 +20,7 @@ if (!(scale > 0 && scale <= 1)) throw new Error(`TemplateThumb 的 scale 要在 
 
 <div
   class:list={['tc-template-thumb', 'not-content', className]}
-  style={`--tc-thumb-scale:${scale};aspect-ratio:${ratio}`}
+  style={`--tc-thumb-scale:${scale}${ratio === 'fill' ? '' : `;aspect-ratio:${ratio}`}`}
 >
   <div class="stage" inert>
     <TemplateView id={id} />

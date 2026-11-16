@@ -41,6 +41,11 @@ const swatches = flatten(primitive.color as Record<string, unknown>, 'color');
     gap: 0.75rem;
     margin-block: 1rem;
   }
+  /* Starlight 的文章樣式會在第二個以後的項目加上邊距，色塊會高低不齊。 */
+  .swatch,
+  .swatch > * {
+    margin: 0;
+  }
   .swatch {
     display: flex;
     flex-direction: column;

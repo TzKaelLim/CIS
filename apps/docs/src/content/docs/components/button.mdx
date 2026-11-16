@@ -11,7 +11,7 @@ import ButtonSamples from '../../../components/prototype/ButtonSamples.astro';
 import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
 import PreviewTile from '../../../components/handbook/PreviewTile.astro';
 import DoDont from '../../../components/handbook/DoDont.astro';
-import { LinkButton } from '@astrojs/starlight/components';
+import { Badge, LinkButton } from '@astrojs/starlight/components';
 
 <ComponentMeta id="button" />
 
@@ -24,13 +24,13 @@ import { LinkButton } from '@astrojs/starlight/components';
 
 ## 用法
 
-按鈕讓讀者做一件事，例如送出表單、確認報名、前往下一步。一個畫面裡最重要的動作用實心按鈕，其他動作用外框或淡色按鈕，讀者一眼就知道該先按哪一個；如果只是帶讀者到另一個頁面，請改用「連結」。
+按鈕讓讀者做一件事，例如送出表單、確認報名、前往下一步。一個畫面裡最重要的動作用實心按鈕，其他動作用外框或淡底按鈕，讀者一眼就知道該先按哪一個；如果只是帶讀者到另一個頁面，請改用「連結」。
 
 ## 組成
 
 | 部位     | 說明                                                                                     |
 | -------- | ---------------------------------------------------------------------------------------- |
-| 容器     | 按鈕的底色和外框。實心按鈕用主色，外框按鈕只有邊框，淡色按鈕用淡淡的品牌底色。           |
+| 容器     | 按鈕的底色和外框。實心按鈕用主色，外框按鈕只有邊框，淡底按鈕用淡淡的品牌底色。           |
 | 文字     | 必填。寫出按下去會發生什麼，例如「送出」「立即捐款」。螢幕閱讀器也會唸這段文字。         |
 | 前後圖示 | 可省略。放在文字前面或後面的小圖示，用來補充文字，不能取代文字。                         |
 | 焦點框   | 用鍵盤選到按鈕時出現的外框，讓不用滑鼠的人知道目前在哪裡。顏色跟著網站主題。             |
@@ -40,7 +40,7 @@ import { LinkButton } from '@astrojs/starlight/components';
 
 <DoDont
   rows={[
-    { kind: 'do', text: '每個畫面只放一個實心按鈕，留給最重要的動作；其他動作用外框或淡色按鈕。' },
+    { kind: 'do', text: '每個畫面只放一個實心按鈕，留給最重要的動作；其他動作用外框或淡底按鈕。' },
     { kind: 'do', text: '按鈕文字寫出動作本身，例如「送出報名」「立即捐款」，讓讀者不用猜按下去會怎樣。' },
     { kind: 'do', text: '同一組按鈕的順序在整個網站保持一致，例如「取消」永遠在「送出」的左邊。' },
     { kind: 'dont', text: '不要只寫「確定」「點這裡」這類看不出動作的文字。' },
@@ -51,17 +51,26 @@ import { LinkButton } from '@astrojs/starlight/components';
 
 ## 在目前網站主題下的樣子
 
-:::caution[設計示範（prototype）]
-這一段是設計示範：同一個按鈕在目前選擇的網站主題下的顏色。環保網的顏色是示意值，網站名稱與做法都還待核定。
-:::
-
 <CurrentSiteNote />
 
-頁面最上方的大預覽是真正的元件，會跟著頁首選的網站主題和淺色／深色選單一起變。下面是固定配色的示意圖，把目前網站主題的淺色和深色並排，方便比較：左邊淺色、右邊深色。元件只有一份，每個網站只換顏色。
+上方的大預覽會跟著頁首的「網站主題」和「色彩模式」一起變。下面把目前選的網站主題的淺色和深色並排，方便比較；元件只有一份，每個網站只換顏色。
 
-<PerSite>{(site) => <ButtonSamples siteId={site.id} />}</PerSite>
+<PerSite>
+  {(site) => (
+    <>
+      {site.isDemo && (
+        <p>
+          <Badge text="示意" variant="caution" /> {site.名稱}的顏色是示意值，網站名稱與做法都還待核定。
+        </p>
+      )}
+      <ButtonSamples siteId={site.id} />
+    </>
+  )}
+</PerSite>
 
 ## 給工程師
+
+以下是給工程師的安裝與 API 說明，設計、企劃和廠商可以略過。
 
 `<tc-button>` 是主要按鈕，提供三種變體與 form-associated 表單提交。頁面最上方的大預覽就是**可互動的真實元件**。
 
@@ -69,7 +78,7 @@ import { LinkButton } from '@astrojs/starlight/components';
   在 Storybook 開啟
 </LinkButton>
 
-Storybook 是工程師逐一檢視元件各種狀態的工具網站，目前只有預設主題（入口網）的淺色和深色。它還沒有和這本手冊放在同一個網址上線，所以現在點了會找不到頁面；上線位置確定後會更新這個連結。頁首的「Storybook」按鈕也是同樣的情況。
+Storybook 是工程師逐一檢查元件各種狀態的工具網站，目前只有預設網站主題（慈濟入口網）的淺色和深色。它只在正式上線的手冊才開得了；在自己的電腦上預覽手冊時，按鈕會顯示找不到頁面（詳見[開始使用](/docs/#給工程師)）。
 
 ### 純 HTML
 
@@ -108,7 +117,7 @@ import { TcButton } from '@tzuchi/react';
 
 <PropsTable tag="tc-button" />
 
-### 無障礙（Accessibility）
+### 無障礙
 
 - 內含原生 `<button>`，支援鍵盤 Enter / Space。
 - `:focus-visible` 焦點環使用 `--tc-focus-ring-*` token。

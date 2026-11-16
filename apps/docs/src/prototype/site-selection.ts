@@ -26,7 +26,8 @@ export function selectedSiteSelectors(target: (id: string) => string): string[] 
 /**
  * 全站共用的顯示規則：
  * - `.site-only[data-site-only="id"]`：只在選了這個網站時顯示（SiteOnly.astro、PerSite.astro 用）。
- * - `[data-site-card="id"]`：選了這個網站時加上強調外框（總覽頁的網站卡片用）。
+ * - `[data-site-card="id"]`：選了這個網站時加上左側色條和淡品牌底色（總覽頁的網站卡片用）。
+ *   刻意不用外框，才不會和鍵盤焦點框混在一起。
  */
 export function siteSelectionCss(): string {
   const shown = selectedSiteSelectors((id) => `.site-only[data-site-only="${id}"]`);
@@ -35,7 +36,7 @@ export function siteSelectionCss(): string {
     '.site-only{display:none}',
     // revert：div 回到 block、span 回到 inline，前後段落的間距照 Starlight 原本的規則。
     `${shown.join(',')}{display:revert}`,
-    `${current.join(',')}{border-color:var(--sl-color-accent);box-shadow:0 0 0 1px var(--sl-color-accent)}`,
+    `${current.join(',')}{border-color:var(--sl-color-accent);box-shadow:inset 4px 0 0 var(--sl-color-accent);background-color:var(--sl-color-accent-low)}`,
   ].join('\n');
 }
 
