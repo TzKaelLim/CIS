@@ -18,8 +18,8 @@
 
 ## Source lines
 
-- Tzu Chi: `/Users/kaellim/Desktop/Personal/CISwebsite/packages/components/src/radio/tc-radio.styles.ts` (`styles`), `/Users/kaellim/Desktop/Personal/CISwebsite/packages/tokens/src/component/radio.tokens.json`, resolved in `/Users/kaellim/Desktop/Personal/CISwebsite-heroui-spike/packages/tokens/dist/tokens.css`
-- HeroUI: `/Users/kaellim/Desktop/Personal/CISwebsite-heroui-spike/heroui/styles/components/radio.css`, `…/radio-group.css`, `…/styles/utilities/index.css`, `…/styles/themes/shared/theme.css`, `…/styles/themes/tzuchi/variables.css`
+- Tzu Chi: `packages/components/src/radio/tc-radio.styles.ts` (`styles`), `packages/tokens/src/component/radio.tokens.json`, resolved in `packages/tokens/dist/tokens.css`
+- HeroUI: `heroui/styles/components/radio.css`, `…/radio-group.css`, `…/styles/utilities/index.css`, `…/styles/themes/shared/theme.css`, `…/styles/themes/tzuchi/variables.css`
 
 ## Gap table
 

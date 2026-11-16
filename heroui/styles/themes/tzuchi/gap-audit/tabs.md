@@ -1,7 +1,7 @@
 # tabs — Tzu Chi vs HeroUI gap report
 
 **Component:** `tc-tabs` / `tc-tab` ↔ HeroUI `tabs`
-**Override CSS:** `/private/tmp/claude-501/-Users-kaellim-Desktop-Personal-CISwebsite/1c74be25-055e-47fb-a92f-f47cfe608bb0/scratchpad/atoms/css/tabs.css`
+**Override CSS:** `tabs.css` (a scratch copy at the time; the result lives in `heroui/styles/themes/tzuchi/components/tabs.css`)
 **Closeness:** minor gaps — the structures line up (HeroUI's `secondary` variant *is* the
 tc underline tab: flat container, 1px bottom divider, 2px accent line indicator, and the
 divider/indicator colours already resolve to the right tc tokens through `--border` /

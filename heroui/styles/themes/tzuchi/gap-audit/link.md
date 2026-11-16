@@ -6,7 +6,7 @@ colour shade, underline colour. Everything else already lands on the same value
 because the generated Tzu Chi theme variables (`--focus`, `--disabled-opacity`,
 `--ring-offset-width`, `--font-sans`, `--cursor-disabled`) already feed HeroUI's base.
 
-Override written to `/private/tmp/claude-501/-Users-kaellim-Desktop-Personal-CISwebsite/1c74be25-055e-47fb-a92f-f47cfe608bb0/scratchpad/atoms/css/link.css`.
+Override written to `link.css` (a scratch copy at the time; the result lives in `heroui/styles/themes/tzuchi/components/link.css`).
 
 ## Variant / structure mapping
 
@@ -23,10 +23,10 @@ Class names are confirmed literal: `heroui/styles/src/components/link/link.style
 
 ## Gap table
 
-Paths are abbreviated: **tc-s** = `/Users/kaellim/Desktop/Personal/CISwebsite/packages/components/src/link/tc-link.styles.ts`,
-**tc-t** = `/Users/kaellim/Desktop/Personal/CISwebsite/packages/tokens/src/component/link.tokens.json`,
-**tok** = `/Users/kaellim/Desktop/Personal/CISwebsite-heroui-spike/packages/tokens/dist/tokens.css`,
-**h-css** = `/Users/kaellim/Desktop/Personal/CISwebsite-heroui-spike/heroui/styles/components/link.css`,
+Paths are abbreviated: **tc-s** = `packages/components/src/link/tc-link.styles.ts`,
+**tc-t** = `packages/tokens/src/component/link.tokens.json`,
+**tok** = `packages/tokens/dist/tokens.css`,
+**h-css** = `heroui/styles/components/link.css`,
 **h-util** = `…/heroui/styles/utilities/index.css`,
 **h-theme** = `…/heroui/styles/themes/shared/theme.css`,
 **h-def** = `…/heroui/styles/themes/default/variables.css`,

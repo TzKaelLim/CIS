@@ -1,7 +1,7 @@
 # Unit `fields-b` — DateField · TimeField · DateInputGroup · InputOTP · ColorField · ColorInputGroup
 
 Targets in brief order. Three shipped files, three "no file needed".
-All paths are relative to `/Users/kaellim/Desktop/Personal/CISwebsite-heroui-spike/heroui/`.
+All paths are relative to `heroui/`.
 Resolved values are for `[data-theme="tzuchi"]` / `[data-theme="tzuchi-dark"]`; where the two
 modes differ, both are given.
 

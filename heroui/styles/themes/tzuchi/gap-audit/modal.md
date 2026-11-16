@@ -1,6 +1,6 @@
 # modal — Tzu Chi ↔ HeroUI gap inventory
 
-**Override file:** `/private/tmp/claude-501/-Users-kaellim-Desktop-Personal-CISwebsite/1c74be25-055e-47fb-a92f-f47cfe608bb0/scratchpad/atoms/css/modal.css`
+**Override file:** `modal.css` (a scratch copy at the time; the result lives in `heroui/styles/themes/tzuchi/components/modal.css`)
 **Destination:** `heroui/styles/themes/tzuchi/components/modal.css`
 **Closeness:** minor gaps — the box model is already Tzu Chi's (24px padding, same optical close-button centre, matching heading size and footer gap). What differs is the corner, the elevation, the two type ramps, the inter-region rhythm and the close button's resting fill.
 
@@ -8,8 +8,8 @@
 
 | side | files |
 |---|---|
-| Tzu Chi | `/Users/kaellim/Desktop/Personal/CISwebsite/packages/components/src/modal/tc-modal.styles.ts`, `tc-modal.ts`, `/Users/kaellim/Desktop/Personal/CISwebsite/packages/tokens/src/component/modal.tokens.json` |
-| resolved tokens | `/Users/kaellim/Desktop/Personal/CISwebsite-heroui-spike/packages/tokens/dist/tokens.css` |
+| Tzu Chi | `packages/components/src/modal/tc-modal.styles.ts`, `tc-modal.ts`, `packages/tokens/src/component/modal.tokens.json` |
+| resolved tokens | `packages/tokens/dist/tokens.css` |
 | HeroUI | `heroui/styles/components/modal.css`, `heroui/styles/components/close-button.css`, `heroui/react/src/components/modal/modal.tsx`, `heroui/styles/src/components/modal/modal.styles.ts`, `heroui/styles/themes/{default,shared,tzuchi}/…` |
 
 ## Variant mapping

@@ -1,7 +1,8 @@
-# Maintaining the vendored HeroUI (internal)
+# Maintaining the vendored HeroUI
 
-Notes for the people who maintain `heroui/`. Unlike `heroui/NOTICE.md`, which the CI
-copies into the public component gallery, this file is never published.
+Notes for the people who maintain `heroui/`. Unlike `heroui/NOTICE.md`, this file is
+not shipped with the Storybook build. The repository itself is public, so this file
+is public too: write nothing here that cannot be public.
 
 The licence, the import record and the list of local modifications stay in
 `heroui/NOTICE.md`; every edit to an upstream file still carries a `LOCAL CHANGE`

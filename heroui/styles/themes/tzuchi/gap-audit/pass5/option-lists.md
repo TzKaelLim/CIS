@@ -1,7 +1,7 @@
 # Pass 5 — fix unit "option-lists"
 
 Files replaced (full copies, ready to drop over
-`/Users/kaellim/Desktop/Personal/CISwebsite-heroui-spike/heroui/styles/themes/tzuchi/components/`):
+`heroui/styles/themes/tzuchi/components/`):
 
 | file | at |
 |---|---|

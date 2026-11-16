@@ -3,7 +3,7 @@
 - 日期：2026-11-16
 - 狀態：草稿，待專案負責人審閱
 - 範圍：本 repository 的全部內容（design tokens、HeroUI 與慈濟主題、手冊、Storybook、共編流程）
-- 依據：專案負責人 2026-11-16 的決定，以及本 repository 在 commit `2f88f353` 的檔案。兩者不一致時，以專案負責人的決定為準，並在第 14 節列出現有檔案要改的地方。
+- 依據：專案負責人 2026-11-16 的決定，以及本 repository 在 commit `2f88f353` 的檔案，加上和本文同一批的修改（`CLAUDE.md`、`CONTRIBUTING.md`、`docs/rules/`、PR 範本等）。兩者不一致時，以專案負責人的決定為準，並在第 14 節列出現有檔案要改的地方。第 12 節的現況對照表反映這一批修改合併之後的狀態。
 - 引用方式：本文每一條規定都有編號（S-1、S-2……）。SOP 規則文件和 PR 說明引用規定時，寫編號即可。
 
 ### 標記的意思
@@ -72,7 +72,9 @@
 | 待辦清單 | 決定要做、但不排進目前批次的項目 | — |
 | 網站設定檔 | 一個網站的名稱和各元件預設變體（提案，第 6.5 節） | — |
 | 手冊 | 給一般讀者看的設計手冊，Astro + Starlight，在 `apps/docs` | — |
-| Storybook | 給工程師看的元件展示，在 `heroui/storybook`。repo 裡也叫「元件樣品室」 | — |
+| Storybook | 給工程師看的元件展示，在 `heroui/storybook`。也叫「元件展示頁」 | — |
+| 慈濟主題 | HeroUI 裡預設網站主題的實作，程式名 `tzuchi`（淺色）／`tzuchi-dark`（深色），在 `heroui/styles/themes/tzuchi/`。它把網站和色彩模式併在一個名稱裡（第 7 節） | 這是「主題」一詞唯一允許的程式名例外；文件裡寫「HeroUI 慈濟主題」 |
+| 主題變數 | HeroUI 的 CSS 變數（例如 `--accent`、`--surface`），由慈濟主題設定值 | 不是網站主題 |
 | 唯一來源 | `packages/tokens/src/**/*.tokens.json`。其他地方的值都由它產生 | — |
 | `LOCAL CHANGE` | 對 `heroui/` 裡 HeroUI 原始檔的修改。每一處都要加註解，並列入 `heroui/NOTICE.md` | — |
 | PR | GitHub 的 pull request：一次修改的審查與合併單位 | 不再說 MR |
@@ -119,7 +121,7 @@
 ```
 
 - S-1　慈濟 CIS UIKit 是一套，給所有慈濟網站共用。不為單一網站另做一套 kit，也不在 repo 裡為某個網站複製一份元件。〔目標〕
-- S-3　資料只往一個方向流：tokens 原始檔 → 產物 → 主題、元件、手冊、Storybook。下游不回頭改上游；要改值就改 tokens 原始檔。〔現行〕
+- S-3　資料只往一個方向流：tokens 原始檔 → 產物 → HeroUI 慈濟主題、元件、手冊、Storybook。下游不回頭改上游；要改值就改 tokens 原始檔。〔現行〕
 - S-4　`heroui/styles/themes/tzuchi/variables.css` 是產生的檔案，不手改。改完 tokens 要重新產生，並確認它和 tokens 同步。〔現行〕
 - S-5　手冊和 Storybook 顯示的值都由 tokens 產生，不在頁面裡手抄色碼或數值。〔部分〕
 
@@ -134,22 +136,24 @@
 
 ## 4. 角色與核可
 
-| 角色 | 負責 | 核可什麼 |
+| 角色 | 核可什麼（已決定） | 核可什麼（暫定，待決定 Q2） |
 | --- | --- | --- |
-| 美編（設計） | token 的名稱和值、命名規則、手冊的設計內容、元件的外觀 | token 名稱與值、命名規則、手冊的設計內容 |
-| 工程 | 建置、CI、工具、元件程式碼、依賴套件 | 建置、CI、工具 |
-| 廠商 | 用同一套流程參與共編；分工由專案負責人另訂 | 無（除非專案負責人另外指定） |
-| 專案負責人 | 本文第 13 節的決定、角色分工、誰有合併權限 | 規格本身的修改 |
-| Claude Code | 修改檔案、在本機跑檢查和預覽、commit、推功能分支、開 PR | 不核可、不合併 |
+| 美編（設計） | token 的名稱和值、命名規則、手冊的設計內容 | 元件的視覺設計和外觀 |
+| 工程 | 建置、CI、工具 | 元件程式碼、相依套件、`heroui/` 原始檔的修改 |
+| 廠商 | — | 用同一套流程參與共編；要不要核可、核可什麼，由專案負責人另訂 |
+| 專案負責人 | — | 規則（`docs/rules/`）和本文的修改、路線圖的批次調整；本文第 13 節的決定、誰有合併權限 |
+| Claude Code | 不核可、不合併 | — |
+
+Claude Code 的工作是修改檔案、在本機跑檢查和預覽、commit、推功能分支、開 PR。「暫定」那一欄是決定之前的做法，同一張表也在 `docs/rules/01-co-editing-sop.md` 第 1 節。
 
 - S-6　文件、PR 和 repo 裡的任何檔案，只寫角色（美編（設計）、工程、廠商、專案負責人），不寫個人姓名。〔目標〕
-- S-7　token 的名稱與值、命名規則、手冊的設計內容，由美編（設計）核可。〔部分〕
-- S-8　建置、CI 和工具的修改，由工程核可。〔部分〕
-- S-9　一個 PR 同時改到兩類內容時，兩個角色都要核可。誰核可元件程式碼、要不要用 CODEOWNERS 強制，待決定（第 13 節 Q2）。〔提案，尚未實作〕
+- S-7　token 的名稱與值、命名規則、手冊的設計內容，由美編（設計）核可。〔部分：只是約定，沒有機器強制〕
+- S-8　建置、CI 和工具的修改，由工程核可。〔部分：只是約定，沒有機器強制〕
+- S-9　一個 PR 同時改到兩類內容時，兩個角色都要核可。上表「暫定」那一欄（元件外觀、元件程式碼、相依套件、`heroui/`、規則、路線圖批次）和要不要用 CODEOWNERS 強制，待決定（第 13 節 Q2）。〔部分：Claude 在 PR 說明寫出需要的角色；沒有 CODEOWNERS〕
 - S-10　每個修改都經過 PR。`main` 受保護：只能經由 PR 修改，只能用 merge commit 合併（關閉 squash 和 rebase 合併），由人按合併。〔目標〕
 - S-11　Claude Code 不合併 PR、不部署、不推 `main`、不推 tag。〔部分〕
 
-說明：本 repository 今天的遠端仍是自架 GitLab，流程用詞是 MR（`CLAUDE.md`、`CONTRIBUTING.md`、`.gitlab/merge_request_templates/Default.md`）。依專案負責人的決定，repository 的家改成公開的 GitHub repository；上面的保護設定要在 GitHub 上設好，才算完成。
+說明：本 repository 今天的遠端仍是自架 GitLab；只有舊的 `.gitlab/merge_request_templates/Default.md` 和 `.gitlab-ci.yml` 還用 MR 的流程。依專案負責人的決定，repository 的家改成公開的 GitHub repository；上面的保護設定要在 GitHub 上設好，才算完成。GitHub repository 建好、網址寫進 `CLAUDE.md` 之前，Claude 只在本機 commit，不推分支（`docs/rules/01-co-editing-sop.md` R-S-44）。
 
 ---
 
@@ -158,7 +162,7 @@
 一次修改有五個步驟：
 
 1. **說要改什麼**：共編者在 repo 目錄開 Claude Code，用口語說要改什麼。例如「把次要文字色調深一點」「環保網的按鈕圓角要更圓」「卡片要有一種『精選』樣式」。
-2. **Claude 修改**：Claude 從最新的 `main` 開一條新分支，修改，並一起更新所有用到它的地方（主題、手冊、Storybook）。
+2. **Claude 修改**：Claude 從最新的 `main` 開一條新分支，修改，並一起更新所有用到它的地方（HeroUI 慈濟主題、手冊、Storybook）。
 3. **Claude 檢查並開預覽**：Claude 跑檢查，開本機預覽，告訴共編者要看哪幾頁、切到哪個網站主題和色彩模式。
 4. **確認後開 PR**：共編者確認後，Claude commit、推分支、開 PR。PR 用白話寫：改了什麼、哪些畫面會變、要看哪幾頁。
 5. **核可與合併**：負責的角色核可，由人合併。
@@ -166,24 +170,26 @@
 規定：
 
 - S-12　開始修改前，Claude 先抓遠端最新的 `main`，從它開新分支；不在 `main` 上修改，也不沿用別人的分支。〔現行〕
-- S-13　分支名稱用「類別/簡短英文說明」：`tokens/<題目>`（tokens）、`docs/<題目>`（手冊、文件、路線圖；規則本身用 `docs/rules-<題目>`）、`components/<題目>`（元件）、`theme/<網站 id>-<題目>`（某個網站的網站主題）、`build/<題目>`（建置與工具，工程同意後才開）。「題目」指這次修改的題目，不是網站主題。舊的 `CLAUDE.md` 只定了 `tokens/<主題>` 和 `docs/<主題>`，其中「主題」指的是題目，和第 2 節的用詞衝突；`docs/rules/01-co-editing-sop.md` 的 R-S-08 已改正。〔提案，尚未實作〕
-- S-14　設計需求（外觀、排列、新功能）在動手前，Claude 先問共編者這是第幾級（第 8.2 節），並把答案和理由寫進 PR 說明。〔目標〕
+- S-13　分支名稱用「類別/英文簡稱」：`tokens/<簡稱>`（tokens）、`docs/<簡稱>`（手冊、文件、路線圖；規則本身用 `docs/rules-<簡稱>`）、`components/<簡稱>`（元件）、`theme/<網站 id>-<簡稱>`（某個網站的網站主題）、`build/<簡稱>`（建置與工具，工程同意後才開）；看別人的 PR 用 `review/<PR 編號>`，不推。「簡稱」是這次修改的英文簡稱，不是網站主題。〔現行（規則）：`docs/rules/01-co-editing-sop.md` R-S-08〕
+- S-14　設計需求（外觀、排列、新功能）在動手前，Claude 先問共編者這是第幾級（第 8.2 節），並把答案和理由寫進 PR 說明。〔現行（規則）：R-D-30、PR 範本〕
 - S-15　Claude 修改時一起更新所有用到它的地方；任何一處沒改到而會壞掉，就不算完成。〔現行〕
 - S-16　推分支前，Claude 必須跑完並通過下列檢查；有失敗就先修好，或向共編者說明原因，不推失敗的分支。〔現行〕
 
   ```sh
   pnpm --filter @tzuchi/tokens test
-  pnpm run heroui:theme && git diff --exit-code -- heroui/styles/themes/tzuchi/variables.css
+  pnpm run heroui:theme
   pnpm run test:scripts
   pnpm lint
+  # git add 之後（比的是已加入的版本，重新產生後不應再變）：
+  pnpm run heroui:theme && git diff --exit-code -- heroui/styles/themes/tzuchi/variables.css
   ```
 
-  改到 `heroui/` 時加跑 `pnpm run heroui:storybook:build`。不要跑 `@heroui/react`、`@heroui/styles`、`@heroui/storybook` 的 `lint`（一定會因缺少套件而失敗，見 `heroui/NOTICE.md` 的「Known state inherited from upstream」），改跑它們的 `typecheck`。
-- S-17　Claude 告訴共編者要看哪幾頁時，同時說要切到哪個網站主題、哪個色彩模式。改到網站主題或色彩相關的值時，淺色和深色都要看。〔目標〕
+  改到 `heroui/` 時加跑 `pnpm run heroui:storybook:build`；改到手冊或 tokens 時加跑手冊的建置（先 `pnpm --filter @tzuchi/components build`，因為今天的手冊頁還載入凍結的 Lit 元件；再 `node scripts/dev/astro.mjs build`；細節見 R-S-11）。不要跑 `@heroui/react`、`@heroui/styles`、`@heroui/storybook` 的 `lint`（一定會因缺少套件而失敗，見 `heroui/NOTICE.md` 的「Known state inherited from upstream」），改跑它們的 `typecheck`。
+- S-17　Claude 告訴共編者要看哪幾頁時，同時說要切到哪個網站主題、哪個色彩模式。改到網站主題或色彩相關的值時，淺色和深色都要看。〔現行（規則）：R-S-13〕
 - S-18　共編者沒確認，Claude 不 commit、不推分支。推之前 Claude Code 會再問一次，共編者確認後才允許。〔現行〕
 - S-19　commit 訊息用英文 conventional commits（例如 `feat(tokens): …`）；commit 訊息和 PR 標題不用 `publish` 這個字（`.claude/settings.json` 的規則會擋下整個指令）。〔現行〕
-- S-20　PR 說明用白話，固定五段：「改了什麼」「哪些畫面會變」「請看哪幾頁（含網站主題與色彩模式）」「屬於哪一級（第一級／第二級／第三級／不適用）、為什麼」「檢查結果」。預覽截圖只給共編者在自己電腦上看，不附在 PR 上。PR 範本從 `.gitlab/` 改放到 GitHub 的位置（`.github/pull_request_template.md`），和本文同一批提出。〔提案，尚未實作〕
-- S-21　Claude 用共編者自己的帳號推分支和開 PR。開 PR 的工具（例如 GitHub CLI `gh`）要不要在每台電腦安裝，由工程決定。〔提案，待工程確認〕
+- S-20　PR 說明用白話，固定五段：「改了什麼」「哪些畫面會變」「請看哪幾頁（含網站主題與色彩模式）」「屬於哪一級（第一級／第二級／第三級／不適用）、為什麼」「檢查結果」。預覽截圖只給共編者在自己電腦上看，不附在 PR 上（能不能附只截頁面內容的截圖，待決定 Q11）。PR 範本在 `.github/pull_request_template.md`。核可人在自己電腦上用 Claude Code 開 PR 的預覽（`docs/rules/01-co-editing-sop.md` R-S-43）。〔現行（規則）〕
+- S-21　Claude 用共編者自己的帳號推分支和開 PR〔現行（規則）〕。開 PR 的工具（例如 GitHub CLI `gh`）要不要在每台電腦安裝，由工程決定〔提案，待工程確認〕。
 - S-22　CI 還沒有。GitHub Actions 的 CI 建好之前，S-16 的本機檢查就是唯一的關卡；CI 建好後，CI 沒通過的 PR 不能合併。〔目標〕
 - S-23　`drill/*` 分支只在本機演練用，不推。〔現行〕
 
@@ -246,7 +252,7 @@ packages/tokens/src/sites/<id>/
 
 - S-34　網站主題的檔案只寫和預設不同的值；沒寫到的，一律退回預設。〔提案，尚未實作〕
 - S-35　網站主題只能覆寫已經存在的 token 名稱，不能新增名稱。建置時發現不存在的名稱，就失敗。〔提案，尚未實作〕
-- S-36　網站主題先覆寫語意色；只有某個元件仍然需要不同時，才覆寫那個元件的元件 token。網站主題不覆寫基礎 Foundations。〔提案，尚未實作〕
+- S-36　網站主題先覆寫語意色；只有某個元件仍然需要不同時，才覆寫那個元件的元件 token。網站主題不覆寫基礎 Foundations。〔目標：順序是專案負責人的決定；檔案的位置是提案，尚未實作〕
 - S-37　網站主題的值也用參照指向基礎 Foundations。需要一個基礎裡沒有的顏色或數值時，先把它加進基礎（S-24，由美編（設計）核可），再在網站主題裡指向它。〔提案，尚未實作〕
 - S-38　網站在淺色模式改了一個顏色，就必須在 `theme.dark.json` 寫出這個顏色在深色模式的值，由機器檢查兩邊的名稱一致。否則深色模式會退回預設網站的顏色。〔提案，尚未實作〕
 - S-39　`<id>` 用小寫英文和連字號（例如 `eco`、`annual-report`），定了就不改，因為網站的程式碼會用它。〔提案，尚未實作〕
@@ -295,7 +301,7 @@ packages/tokens/src/sites/<id>/
 | 第三級 | 資料或行為不同，也就是別的網站沒有的東西 | 年報網的「年度數據比較」 | 新元件：通用的直接進 kit；綁定單一網站業務的，留在那個網站自己的專案，等第二個網站也需要時再移進 kit |
 
 - S-50　設計需求依第一級、第二級、第三級的順序判斷，能用低一級解決就不用高一級。〔目標〕
-- S-51　Claude 必須問共編者這個需求是第幾級，並把結論寫進 PR 說明（S-14）。共編者不確定時，Claude 依上表說明理由並建議一級，由共編者決定。〔目標〕
+- S-51　Claude 必須問共編者這個需求是第幾級，並把結論寫進 PR 說明（S-14）。共編者不確定時，Claude 依上表說明理由並建議一級，由共編者決定。〔現行（規則）：R-D-30〕
 - S-52　不可以為某個網站複製一份元件（例如「環保網的按鈕」）。需要不同，就用第一級或第二級；真的是新東西，才是第三級。〔目標〕
 - S-53　某個網站不用某個元件時，什麼都不用做：不必為它寫網站主題，也不必設預設變體。〔目標〕
 - S-54　第三級的新元件，通用的（第二個網站可能也會用）直接進 kit；只屬於一個網站業務的，留在那個網站的專案裡，不進 kit。等第二個網站需要時，再移進 kit，移進時依 kit 的規則（變體、token、手冊）整理。〔目標〕
@@ -306,7 +312,7 @@ packages/tokens/src/sites/<id>/
 - S-56　變體依用途命名，不依外觀命名：叫「精選」，不叫「大紅框」。程式裡的值用英文（例如 `featured`），手冊和介面顯示中文名。〔目標〕
 - S-57　變體名稱一旦被使用，就不改名、不刪除，只能新增。網站和頁面編輯器會把變體名稱存在頁面資料裡。〔現行〕
 - S-58　HeroUI 元件既有的 `tv` variant 名稱（例如 Button 的 `primary`、`secondary`、`outline`）照 S-57 不改名、不移除；它們依外觀命名是 HeroUI 原本的設計，保留不動。我們新增的變體才依 S-56 命名。〔現行〕
-- S-59　每個選項大約保持 4 到 5 個值以內；超過的話，多半其實是另一個元件，要回到第 8.2 節重新判斷。〔目標〕
+- S-59　我們新增的每個選項保持 4 到 5 個值以內；超過 5 個值時，Claude 停下來請美編（設計）確認是不是其實是另一個元件（回到第 8.2 節重新判斷）。〔目標〕
 - S-60　每個網站可以在網站設定檔指定各元件的預設變體（S-34 到 S-39）。〔提案，尚未實作〕
 
 ### 8.4 版本
@@ -319,7 +325,7 @@ packages/tokens/src/sites/<id>/
 
 `heroui/` 是 vendored 的上游原始碼，不能變成我們自己元件的家。`packages/react` 這個名稱已經被凍結的 Lit React wrapper（`@tzuchi/react`）占用，`packages/components` 也是凍結的 Lit 元件。所以提議：
 
-- S-64　**新增的元件**放在一個新的套件 `packages/ui`（套件名稱暫定 `@tzuchi/ui`，`private`）。結構仿照 HeroUI，讓工程一看就懂：〔提案，待工程確認〕
+- S-64　**新增的元件**放在一個新的套件 `packages/ui`（套件名稱暫定 `@tzuchi/ui`，`private`）。結構參考 HeroUI 的元件資料夾慣例，讓工程一看就懂（HeroUI 本身把 React 元件放在 `heroui/react`、樣式放在 `heroui/styles`，分成兩個套件；本提案放在同一個套件）：〔提案，待工程確認〕
 
   ```
   packages/ui/
@@ -335,12 +341,12 @@ packages/tokens/src/sites/<id>/
   - 元件名用 kebab-case 英文；class 名稱加我們自己的前綴（例如 `tc-ui-carousel`），不和 HeroUI 的 class 撞名。
   - 顏色只讀 HeroUI 的主題變數或 `--tzuchi-*` 變數（和 S-48 同一條規則）；和色彩模式無關的值（間距、圓角、字級、動態）可以直接讀 `--tc-*`，並給後備值。
   - 這個元件需要自己的 token 時，加在 `packages/tokens/src/component/<元件名>.tokens.json`，再由 `generate.mjs` 對應成主題變數。
-  - 依賴 `@heroui/react`、`@heroui/styles`、`@tzuchi/tokens` 用 `workspace:*`，新增的外部依賴遵守第 11.1 節。
-  - Storybook 用同一個（`heroui/storybook`）：在 `.storybook/main.ts` 的 stories 加上 `packages/ui` 的路徑。這是 `heroui/` 裡的一處 `LOCAL CHANGE`，要記入 `heroui/NOTICE.md`。
-- S-65　**優化 HeroUI 的元件**，依序選第一個做得到的方法：〔提案，待工程確認〕
-  1. 只是外觀：在慈濟主題的覆寫檔裡改（`heroui/styles/themes/tzuchi/components/`，S-48）。這不是改上游檔案。
-  2. 要加變體、加零件或加行為：在 `packages/ui` 做一個包裝或延伸的元件，裡面組合 HeroUI 的元件（例如用 HeroUI 的 Card 加 RadioGroup 做「可勾選卡片」），用我們自己的名稱匯出。HeroUI 原本的元件和變體保持不動。
-  3. 只有在外面真的做不到時（例如 HeroUI 的錯誤、HeroUI 沒有開放的介面），才在 `heroui/` 裡改，標 `LOCAL CHANGE` 並列入 `heroui/NOTICE.md`；這類 PR 一定要工程核可。
+  - 相依套件 `@heroui/react`、`@heroui/styles`、`@tzuchi/tokens` 用 `workspace:*`，新增的外部套件遵守第 11.1 節。
+  - Storybook 用同一個（`heroui/storybook`），要改兩處，都是 `heroui/` 裡的 `LOCAL CHANGE`，都要記入 `heroui/NOTICE.md`：`.storybook/main.ts` 的 stories 加上 `packages/ui` 的路徑；`heroui/storybook/styles/globals.css` 加上指向 `packages/ui/src` 的 `@source`（今天它只掃 `heroui/react/src/components`），並 `@import` `packages/ui/styles` 的 CSS。
+  - 使用 kit 的網站也要在自己的 Tailwind 設定對 `@tzuchi/ui` 加 `@source`，並載入它的 CSS。
+- S-65　**優化 HeroUI 的元件**（加變體、加零件或加行為）。只調整外觀的不算優化，照 S-48 在慈濟主題的覆寫檔裡改。優化依序選第一個做得到的方法：〔提案，待工程確認〕
+  1. 在 `packages/ui` 做一個包裝或延伸的元件，裡面組合 HeroUI 的元件（例如用 HeroUI 的 Card 加 RadioGroup 做「可勾選卡片」），用我們自己的名稱匯出。HeroUI 原本的元件和變體保持不動。
+  2. 只有在外面真的做不到時（例如 HeroUI 的錯誤、HeroUI 沒有開放的介面），才在 `heroui/` 裡改，標 `LOCAL CHANGE` 並列入 `heroui/NOTICE.md`；這類 PR 一定要工程核可。
 - S-66　理由：`heroui/` 保持接近上游，日後才能照 `heroui/MAINTAINING.md` 的方法比對上游、手動挑選修正；我們的元件集中在一個地方，授權（我們的程式和 Apache-2.0 的 HeroUI）也分得清楚。〔提案，待工程確認〕
 
 ### 8.6 「優化」與「新增」
@@ -351,7 +357,7 @@ packages/tokens/src/sites/<id>/
   1. PR 寫明第幾級（第三級才是新元件）和理由。
   2. 程式放在第 8.5 節的位置；改到 `heroui/` 的地方都有 `LOCAL CHANGE` 和清單記錄。
   3. 顏色只來自主題變數；需要的元件 token 在 `packages/tokens/src/component/` 定義一次。
-  4. 變體依用途命名，每個選項大約 4 到 5 個值以內。
+  4. 變體依用途命名，每個選項 4 到 5 個值以內。
   5. 在預設網站主題和每一個已有的網站主題下，淺色和深色都正常。
   6. 無障礙：文字對比至少 4.5:1、鍵盤可以操作並看得到焦點、互動元素都有可讀的名稱（第 11.4 節）。
   7. 介面文字用繁體中文；不發出任何第三方請求。
@@ -359,7 +365,7 @@ packages/tokens/src/sites/<id>/
   9. 手冊有元件頁，照第 9.5 節的結構。
   10. 第 5 節的檢查全部通過。
   11. 優化的元件另外確認：HeroUI 原本的用法不受影響。
-  12. 外觀由美編（設計）核可，程式由工程核可。
+  12. 照第 4 節核可（暫定：外觀由美編（設計），程式由工程；待決定 Q2）。
 
 ### 8.7 路線圖與待辦清單
 
@@ -368,7 +374,7 @@ packages/tokens/src/sites/<id>/
 - S-70　部分對應的 24 項，做「優化」；完全沒有的 49 項，做「新增」。〔目標〕
 - S-71　內容網站大多用不到的項目（例如聊天、程式碼編輯、圖表、後台工具類）也收進來，但放在待辦清單，不排進目前的批次。〔目標〕
 - S-72　73 項在路線圖裡各佔一列，一項都不能省略；重複的項目（例如舊版匯出的 InfoTip、新舊兩代的 Chart）也各佔一列，並註明和哪一列重複。〔目標〕
-- S-73　每一項動工前，仍要做第 8.2 節的判斷：缺口清單說「完全沒有」，不代表一定要做成元件；能用第一級或第二級解決，或只要排版工具類就夠的，在路線圖裡註明。〔目標〕
+- S-73　每一項動工前，仍要做第 8.2 節的判斷。依專案負責人「沒有就添加」的決定，路線圖上的每一項都做成 kit 的元件；內部可以直接用 Tailwind 工具類別實作的（路線圖第 10 節），做成很薄的一層元件，Tailwind 是實作方式，不是取代元件。某一項想改成「不做元件」，要由專案負責人決定。〔目標〕
 - S-74　路線圖是和本文同一批提出的另一份文件：`docs/component-roadmap.md`（同內容的資料檔 `docs/component-roadmap.json`）。路線圖的排序和批次由專案負責人決定；本文只定分類規則。〔目標〕
 
 ---
@@ -466,10 +472,10 @@ packages/tokens/src/sites/<id>/
 ### 11.1 供應鏈
 
 - S-93　新版本的套件要發布滿 14 天才會被選用（`pnpm-workspace.yaml` 的 `minimumReleaseAge: 20160`）。安全修正不滿 14 天時，用 `minimumReleaseAgeExclude` 指定精確版本，由工程核可並註明 GHSA 編號。〔現行〕
-- S-94　新增的依賴一律寫精確版本（不寫 `^`、`~`）。今天 root、`packages/tokens` 和 `apps/docs` 的 `package.json` 還有 `^` 範圍（實際版本由 `pnpm-lock.yaml` 決定），要逐步改成精確版本。〔部分〕
+- S-94　新增和升級的相依套件一律寫精確版本（不寫 `^`、`~`）。今天 root、`packages/tokens` 和 `apps/docs` 的 `package.json` 還有 `^` 範圍（實際版本由 `pnpm-lock.yaml` 決定），要逐步改成精確版本。〔部分〕
 - S-95　`pnpm-lock.yaml` 是實際版本的依據：CI 和檢查用 `pnpm install --frozen-lockfile`，lockfile 的變更和造成它的 `package.json` 變更放在同一個 commit；審 PR 時要看 lockfile 的 diff。〔現行〕
-- S-96　允許執行安裝腳本的依賴只列在 `onlyBuiltDependencies`，清單保持最小。〔現行〕
-- S-97　Claude Code 不自行安裝新依賴或補裝缺少的套件；需要時先說明理由，由工程決定。〔目標〕
+- S-96　允許執行安裝腳本的相依套件只列在 `onlyBuiltDependencies`，清單保持最小。〔現行〕
+- S-97　Claude Code 不自行安裝新的相依套件或補裝缺少的套件；需要時先說明理由，由工程決定。工程同意後用 `pnpm add`／`pnpm update`，不手改 lockfile。〔現行（規則）：R-S-26〕
 
 說明：頁面編輯器 repository 的舊共編設計記錄，Style Dictionary 4.4.0（本 repo 目前鎖定的版本）有一則 high 等級的安全公告（GHSA-vj5c-m527-mpff），4.x 沒有修正版。本文沒有重新查證；升級列為工程的待辦。
 
@@ -487,7 +493,7 @@ packages/tokens/src/sites/<id>/
 
 ### 11.4 無障礙
 
-- S-104　文字和背景的對比至少 4.5:1（大字至少 3:1）。〔部分〕
+- S-104　文字和背景的對比至少 4.5:1。Claude 算出這次改到的組合的對比，寫進 PR（`docs/rules/02-design-rules.md` R-D-14）。〔部分〕
 - S-105　所有互動元素都能用鍵盤操作，而且看得到焦點。〔部分〕
 - S-106　所有互動元素和表單欄位都有可讀的名稱或標籤；只有圖示的按鈕要有文字標籤給螢幕閱讀器。〔部分〕
 
@@ -512,68 +518,68 @@ packages/tokens/src/sites/<id>/
 
 ## 12. 現況對照表
 
-「證明」欄是可以打開看的檔案。沒有檔案可以證明的，就是尚未實作。
+「證明」欄是可以打開看的檔案。沒有檔案可以證明的，就是尚未實作。本表反映本批修改（本文、路線圖、`docs/rules/`、`CLAUDE.md`、`CONTRIBUTING.md`、PR 範本等）合併之後的狀態；「已實作（規則）」表示規則已經寫下，但沒有機器檢查。
 
 | 規定 | 狀態 | 證明或缺什麼 |
 | --- | --- | --- |
 | S-1 一套 kit | 尚未實作 | 今天只有預設網站；沒有其他網站，也沒有防止複製的檢查 |
-| S-2 固定用詞 | 尚未實作 | `CLAUDE.md` §7、`apps/docs/src/content/docs/foundations/theming.mdx` 把淺色／深色叫主題；`CLAUDE.md`、`CONTRIBUTING.md` 用 MR |
+| S-2 固定用詞 | 部分 | 規則：`docs/rules/02-design-rules.md` R-D-01 到 R-D-03；但 `apps/docs/src/content/docs/foundations/theming.mdx` 把淺色／深色叫「兩套主題」，Storybook 工具列叫 Theme；舊的 `.gitlab/` 範本和 `.gitlab-ci.yml` 用 MR |
 | S-3 單向資料流 | 已實作 | `packages/tokens/build.mjs`、`heroui/styles/themes/tzuchi/generate.mjs` |
-| S-4 variables.css 不手改 | 已實作 | `generate.mjs`；`CLAUDE.md` §4 的同步檢查；`.gitlab-ci.yml` 的 build job |
-| S-5 手冊與 Storybook 不手抄值 | 部分 | Storybook 讀 `tokens.css` 和產生的主題；手冊的 `ColorSwatches.astro` 等元件讀原始 JSON 自己組變數名，不是讀產物清單 |
-| S-6 只寫角色 | 尚未實作 | `CLAUDE.md`、`CONTRIBUTING.md`、`.gitlab/merge_request_templates/Default.md`、`pnpm-workspace.yaml` 有個人姓名 |
-| S-7、S-8 核可分工 | 部分 | `CONTRIBUTING.md` 的角色表（用姓名，且只是約定，沒有機器強制） |
-| S-9 兩類都要核可、CODEOWNERS | 尚未實作 | 沒有 CODEOWNERS |
+| S-4 variables.css 不手改 | 已實作 | `generate.mjs`；SOP R-S-10、R-S-11 和步驟 4 的同步檢查；`.gitlab-ci.yml` 的 build job |
+| S-5 手冊與 Storybook 不手抄值 | 部分 | Storybook 讀 `tokens.css` 和產生的 HeroUI 慈濟主題；手冊的 `ColorSwatches.astro` 等元件讀原始 JSON 自己組變數名，不是讀 tokens 的產物 |
+| S-6 只寫角色 | 部分 | 檔案裡的姓名已在本批改成職稱（`CONTRIBUTING.md`、`.gitlab/merge_request_templates/Default.md`、`pnpm-workspace.yaml`）；**git 歷史裡仍有**姓名、電子郵件和內部主機名稱（待決定 Q10） |
+| S-7、S-8 核可分工 | 部分 | `docs/rules/01-co-editing-sop.md` 第 1 節、`CONTRIBUTING.md` 的角色表；只是約定，沒有機器強制 |
+| S-9 兩類都要核可、CODEOWNERS | 部分 | PR 範本有「需要核可」；沒有 CODEOWNERS |
 | S-10 main 受保護、只用 merge commit | 尚未實作 | repo 還在自架 GitLab；GitHub 的保護設定尚未建立 |
-| S-11 Claude 不合併、不部署、不推 main 和 tag | 部分 | `CLAUDE.md` §2、§3；`.claude/settings.json` 擋 `wrangler`、含 `publish` 的指令，`git push` 要詢問；沒有擋 `git push` 到 `main` 或推 tag 的規則 |
-| S-12 從最新 main 開分支 | 已實作 | `CLAUDE.md` §2 第 1 點 |
-| S-13 分支名稱 | 尚未實作 | `CLAUDE.md` §2 只有 `tokens/<主題>`、`docs/<主題>` |
-| S-14、S-51 問第幾級並寫進 PR | 尚未實作 | 沒有任何檔案提到三級判斷 |
-| S-15 一起更新用到的地方 | 已實作 | `CLAUDE.md` §2 第 2 點 |
-| S-16 推之前的檢查 | 已實作 | `CLAUDE.md` §4；`packages/tokens/check.mjs`；`scripts/dev/lib.test.mjs` |
-| S-17 說明要看的網站主題與色彩模式 | 尚未實作 | — |
-| S-18 確認後才 commit、推之前再問 | 已實作 | `CLAUDE.md` §2 第 4 點；`.claude/settings.json` 的 `ask: git push*` |
-| S-19 commit 訊息 | 已實作 | `CLAUDE.md` §2；`.claude/settings.json` 的 `Bash(* publish*)` |
-| S-20 PR 範本 | 部分 | `.gitlab/merge_request_templates/Default.md`（GitLab、沒有「第幾級」、有姓名） |
-| S-21 用共編者帳號開 PR | 部分 | `CLAUDE.md` §2 用 GitLab 的 `git push -o merge_request.create`；GitHub 的方式未定 |
+| S-11 Claude 不合併、不部署、不推 main 和 tag | 部分 | SOP R-S-20 到 R-S-22；`.claude/settings.json` 擋 `wrangler`、含 `publish` 的指令、`gh pr merge`、`gh pr review --approve`、`gh release`、推到 `main`、推 tag 和 force push，其他 `git push` 要詢問（防止手滑，不是安全邊界）；GitHub 的分支保護尚未設定 |
+| S-12 從最新 main 開分支 | 已實作（規則） | SOP R-S-07 |
+| S-13 分支名稱 | 已實作（規則） | SOP R-S-08 |
+| S-14、S-51 問第幾級並寫進 PR | 已實作（規則） | `docs/rules/02-design-rules.md` R-D-30 和第 7 節的問題；PR 範本的「屬於哪一級」 |
+| S-15 一起更新用到的地方 | 已實作（規則） | SOP R-S-09、R-S-45 |
+| S-16 推之前的檢查 | 已實作 | SOP R-S-11；`packages/tokens/check.mjs`；`scripts/dev/lib.test.mjs` |
+| S-17 說明要看的網站主題與色彩模式 | 已實作（規則） | SOP R-S-13；PR 範本的「請看哪幾頁」 |
+| S-18 確認後才 commit、推之前再問 | 已實作 | SOP R-S-14；`.claude/settings.json` 的 `ask: git push*` |
+| S-19 commit 訊息 | 已實作 | SOP R-S-15；`.claude/settings.json` 的 `Bash(* publish*)` |
+| S-20 PR 範本 | 已實作 | `.github/pull_request_template.md`（舊的 `.gitlab/` 範本留著，不再引用） |
+| S-21 用共編者帳號開 PR | 已實作（規則） | SOP R-S-16（`gh pr create` 或瀏覽器）；GitHub repository 尚未建立，`origin` 仍指向舊的 GitLab（R-S-44） |
 | S-22 CI | 尚未實作 | GitHub Actions 沒有；`.gitlab-ci.yml` 是舊的自架 GitLab 流程，不是今後的做法 |
-| S-23 drill 分支不推 | 已實作 | `CLAUDE.md` §10 |
-| S-24 基礎只新增 | 尚未實作 | 只有口頭規則；`CONTRIBUTING.md` 的範例「把慈濟藍 900 改成 #1A2C56」正是修改基礎值 |
+| S-23 drill 分支不推 | 已實作（規則） | SOP R-S-31 |
+| S-24 基礎只新增 | 已實作（規則） | `docs/rules/02-design-rules.md` R-D-06；沒有機器檢查 |
 | S-25 用參照 | 部分 | 語意色與元件 token 都用參照；深色由 `check.mjs` 檢查；淺色和元件層沒有機器檢查 |
 | S-26 元件 token 只定義一次 | 部分 | `packages/tokens/src/component/` 33 個檔，沒有重複的元件名（2026-11-16 查過）；沒有機器檢查 |
-| S-27 新增、改值照流程 | 已實作 | `CLAUDE.md` §5 |
+| S-27 新增、改值照流程 | 已實作（規則） | R-D-10 |
 | S-28 深色只覆寫語意與陰影 | 已實作 | `packages/tokens/src/themes/dark/`、`style-dictionary.dark.config.mjs`、`check.mjs` |
 | S-29 一份 tokens.css | 已實作 | `packages/tokens/build.mjs` |
 | S-30 命名 | 已實作 | `style-dictionary.config.mjs`（`prefix: 'tc'`）；`check.mjs` 的必備變數 |
-| S-31 不改名、不刪除 | 已實作（規則） | `CLAUDE.md` §5；沒有機器檢查 |
+| S-31 不改名、不刪除 | 已實作（規則） | R-D-09、R-S-23；沒有機器檢查 |
 | S-32 一次套用命名規範 | 尚未實作 | 命名規範尚未提出 |
 | S-33 改名保護 | 尚未實作 | 沒有名稱登記檔，也沒有檢查 |
 | S-34 到 S-39 網站設定檔 | 尚未實作 | 沒有 `packages/tokens/src/sites/` |
-| S-40 主題只指網站 | 尚未實作 | 見 S-2 |
+| S-40 主題只指網站 | 部分 | 見 S-2 |
 | S-41 自由組合 | 尚未實作 | 今天只有 `tzuchi`／`tzuchi-dark` 一組 |
 | S-42 預設是慈濟入口網 | 已實作 | `packages/tokens/src/` 的值；Storybook 預設開在 `tzuchi`（`heroui/storybook/.storybook/addons/theme/constants.ts`） |
-| S-43 只設在 `<html>` | 已實作（規則） | `CLAUDE.md` §7；`heroui/styles/themes/tzuchi/index.css` 的說明 |
+| S-43 只設在 `<html>` | 已實作（規則） | R-D-16；`heroui/styles/themes/tzuchi/index.css` 的說明 |
 | S-44 屬性名稱 | 尚未實作 | 待決定（Q4） |
 | S-45 每個網站產生主題變數 | 尚未實作 | `generate.mjs` 只產生 `tzuchi`、`tzuchi-dark` |
 | S-46 一次一個網站主題 | 尚未實作 | — |
-| S-47 LOCAL CHANGE | 已實作 | `heroui/NOTICE.md` 的修改清單；`CLAUDE.md` §9 |
+| S-47 LOCAL CHANGE | 已實作 | `heroui/NOTICE.md` 的修改清單 |
 | S-48 外觀用覆寫檔 | 已實作 | `heroui/styles/themes/tzuchi/components/index.css`（68 個覆寫檔） |
-| S-49 Lit 凍結 | 已實作 | `CLAUDE.md` 的「凍結的 Lit」；root `package.json` 的 `build`、`test` 只跑 `@tzuchi/tokens` |
-| S-50 到 S-54 三級判斷 | 尚未實作 | — |
+| S-49 Lit 凍結 | 已實作 | SOP R-S-30；root `package.json` 的 `build`、`test` 只跑 `@tzuchi/tokens` |
+| S-50 到 S-54 三級判斷 | 已實作（規則） | `docs/rules/02-design-rules.md` 第 7 節；沒有機器檢查 |
 | S-55 網站專案放哪裡 | 尚未實作 | 待決定（Q1） |
 | S-56 變體依用途命名 | 尚未實作 | 還沒有我們自己新增的變體 |
-| S-57、S-58 變體名稱不改 | 已實作（規則） | `CLAUDE.md` §6（只寫了 HeroUI 的 `tv` variant） |
+| S-57、S-58 變體名稱不改 | 已實作（規則） | R-D-21、R-S-24 |
 | S-59 4 到 5 個值 | 尚未實作 | — |
 | S-60 網站預設變體 | 尚未實作 | 沒有 `site.json` |
 | S-61、S-62 版本 | 尚未實作 | — |
 | S-63 發行號碼未使用 | 已實作 | 所有套件都是 `private`；`@tzuchi/tokens` 是 `0.0.0` |
 | S-64 到 S-66 元件放哪裡 | 尚未實作 | 沒有 `packages/ui` |
 | S-67 到 S-69 優化、新增、完成條件 | 尚未實作 | — |
-| S-70 到 S-74 路線圖 | 部分 | `docs/component-roadmap.md`、`docs/component-roadmap.json`（與本文同一批提出，尚未合併） |
+| S-70 到 S-74 路線圖 | 已實作 | `docs/component-roadmap.md`、`docs/component-roadmap.json`（73 列；兩檔一致只靠人工檢查） |
 | S-75 到 S-83 手冊結構、選單、元件頁、字級 | 尚未實作 | `apps/docs/astro.config.mjs` 只有 Foundations、Components 兩組；新手冊只有本機原型 |
 | S-84 手冊只放設計內容 | 已實作 | 共編流程在 `CONTRIBUTING.md` |
 | S-85 色票由 tokens 產生 | 部分 | `apps/docs/src/components/ColorSwatches.astro`、`ThemeSwatches.astro` 讀原始 JSON |
-| S-86 手冊零第三方請求 | 部分 | `CLAUDE.md` §8 有規則；但 5 個元件頁從 picsum.photos 載入圖片（例如 `apps/docs/src/content/docs/components/card.mdx`） |
+| S-86 手冊零第三方請求 | 部分 | SOP R-S-27、R-H-15 有規則；但 5 個元件頁從 picsum.photos 載入圖片（例如 `apps/docs/src/content/docs/components/card.mdx`） |
 | S-87 手冊預覽 | 已實作 | `scripts/dev/docs.mjs` |
 | S-88 Storybook 預覽 | 已實作 | `scripts/dev/storybook.mjs` |
 | S-89 兩個選單 | 尚未實作 | `constants.ts` 只有一個 Theme 選單 |
@@ -584,17 +590,17 @@ packages/tokens/src/sites/<id>/
 | S-94 精確版本 | 部分 | `heroui/*/package.json` 是精確版本；root、`packages/tokens`、`apps/docs` 有 `^` |
 | S-95 lockfile | 已實作 | `.gitlab-ci.yml` 用 `--frozen-lockfile`；`pnpm-workspace.yaml` 的說明 |
 | S-96 安裝腳本白名單 | 已實作 | `pnpm-workspace.yaml` 的 `onlyBuiltDependencies` |
-| S-97 不自行安裝依賴 | 部分 | `CLAUDE.md` §4 只說不要補裝 HeroUI lint 的套件 |
+| S-97 不自行安裝相依套件 | 已實作（規則） | SOP R-S-26 |
 | S-98 不發第三方請求 | 部分 | 見 S-86、S-91 |
 | S-99 關掉遙測 | 已實作 | `scripts/dev/astro.mjs`、`docs.mjs`、`storybook.mjs`；`heroui/storybook/.storybook/main.ts` |
 | S-100、S-101 127.0.0.1、不換埠 | 已實作 | `scripts/dev/lib.mjs`（`HOST`、`checkPortFree`、`launch`） |
-| S-102 只用 PID 停程序 | 已實作 | `CLAUDE.md` §4；`.claude/settings.json` 擋 `pkill`、`killall` |
-| S-103 不部署、不發布 | 已實作 | `CLAUDE.md` §3；`.claude/settings.json` |
+| S-102 只用 PID 停程序 | 已實作 | SOP R-S-12；`.claude/settings.json` 擋 `pkill`、`killall` |
+| S-103 不部署、不發布 | 已實作 | SOP R-S-21；`.claude/settings.json` |
 | S-104 到 S-106 無障礙 | 部分 | Storybook 有 `@storybook/addon-a11y`；慈濟主題做過焦點與對比的檢查（`heroui/styles/themes/tzuchi/gap-audit/`）；已知對比不足見 `heroui/MAINTAINING.md`；沒有必須通過的自動檢查 |
 | S-107 繁體中文 | 部分 | `CLAUDE.md` 開頭；Storybook 歡迎頁是中文，工具列的 Light、Dark 是英文 |
-| S-108 不放祕密 | 已實作 | `CLAUDE.md` §3；`.gitignore` 排除 `.claude/settings.local.json` |
-| S-109 不寫個人資料 | 尚未實作 | 見 S-6；`CONTRIBUTING.md`、`.gitlab-ci.yml` 有內部主機名稱；`heroui/styles/themes/tzuchi/gap-audit/` 下 13 個報告有本機路徑 |
-| S-110 沒有不公開的檔案 | 尚未實作 | `CLAUDE.md` §9 和 `heroui/MAINTAINING.md` 開頭都說 `MAINTAINING.md`「不公開」 |
+| S-108 不放祕密 | 已實作 | SOP R-S-28；`.gitignore` 排除 `.claude/settings.local.json` |
+| S-109 不寫個人資料 | 部分 | 檔案裡的姓名、內部主機名稱（`.gitlab-ci.yml` 開頭）和 `gap-audit/` 13 個報告的本機路徑已在本批移除；SOP R-S-47 要求 commit 前看 `git diff --cached`；git 歷史仍有（Q10） |
+| S-110 沒有不公開的檔案 | 已實作 | `heroui/MAINTAINING.md` 開頭已改成「不隨 Storybook 提供，但一樣公開」；SOP R-S-28 |
 | S-111 NOTICE 與 MAINTAINING 分工 | 已實作 | `heroui/NOTICE.md`、`heroui/MAINTAINING.md` |
 | S-112 手動挑選上游修正 | 已實作 | `heroui/MAINTAINING.md`「Looking at upstream later」 |
 
@@ -609,14 +615,15 @@ packages/tokens/src/sites/<id>/
 建議：**每個網站各自一個專案**，本 repository 只放共用的 kit 和各網站的網站主題檔（S-34）。理由：kit 是公開的，網站的業務程式和設定不一定能公開；各網站的上線時程不同；第三級中只屬於一個網站的元件本來就留在網站專案裡（S-54）。
 
 **Q2　誰核可？要不要用 CODEOWNERS 強制？**
-建議：**用 CODEOWNERS，加上 GitHub 的「需要 Code Owners 核可」分支保護**，負責人寫 GitHub 的團隊（以角色命名，例如美編團隊、工程團隊），不寫個人帳號。分法：`packages/tokens/src/**`、`apps/docs/src/content/**` → 美編團隊；`package.json`、`pnpm-lock.yaml`、`pnpm-workspace.yaml`、`scripts/**`、CI 設定、`heroui/**`、`packages/ui/**`（若採用）→ 工程團隊。元件的外觀另由美編團隊核可。合併權限只給專案負責人指定的人。GitHub 的公開 repository 可以使用分支保護和 CODEOWNERS。
+已決定的只有兩條：token 名稱與值、命名規則、手冊設計內容由美編（設計）核可；建置、CI、工具由工程核可。第 4 節表格「暫定」那一欄（元件外觀、元件程式碼、相依套件、`heroui/`、規則與本文、路線圖批次）要專案負責人確認。
+建議：**照暫定那一欄定下來**，並**用 CODEOWNERS，加上 GitHub 的「需要 Code Owners 核可」分支保護**，負責人寫 GitHub 的團隊（以角色命名，例如美編團隊、工程團隊），不寫個人帳號。分法：`packages/tokens/src/**`、`apps/docs/src/content/**` → 美編團隊；`package.json`、`pnpm-lock.yaml`、`pnpm-workspace.yaml`、`scripts/**`、CI 設定、`heroui/**`、`packages/ui/**`（若採用）→ 工程團隊。元件的外觀另由美編團隊核可。合併權限只給專案負責人指定的人。GitHub 的公開 repository 可以使用分支保護和 CODEOWNERS。
 
 **Q3　部署到哪裡？**
 建議：**先建 GitHub Actions 的 CI（只做檢查，不部署），部署目標之後再定**。部署時手冊和 Storybook 放在同一個網站（Storybook 在 `/storybook/` 之下），同一個 commit 一起建置，避免一新一舊。部署用的金鑰只給 `main` 的部署工作使用。在那之前只有本機預覽。`.gitlab-ci.yml` 和它的部署流程，等 GitHub 的 CI 建好後移除。
 
 **Q4　程式碼裡網站主題和色彩模式的屬性名稱？**
 今天：`tokens.css` 用 `data-theme="dark"`／`"light"`（沒設時跟隨作業系統）；HeroUI 慈濟主題用 `data-theme="tzuchi"`／`"tzuchi-dark"`，把網站和色彩模式併在一起。
-建議：**網站主題用 `data-site="<id>"`，色彩模式繼續用 `data-theme="light"`／`"dark"`**（沒設時跟隨作業系統），兩個都只設在 `<html>`。理由：`tokens.css` 和 HeroUI 上游都已經把 `data-theme="dark"` 當成深色，改動最少；網站和色彩模式分成兩個屬性，才能自由組合（S-41）。代價：慈濟主題的選擇器、Storybook 工具列和頁面編輯器（tceditor）都要跟著改，工程要先確認 HeroUI 原廠主題的選擇器不會蓋過慈濟主題。
+建議：**網站主題用 `data-site="<id>"`，色彩模式繼續用 `data-theme="light"`／`"dark"`**（沒設時跟隨作業系統），兩個都只設在 `<html>`。理由：`tokens.css` 和 HeroUI 上游都已經把 `data-theme="dark"` 當成深色，改動最少；網站和色彩模式分成兩個屬性，才能自由組合（S-41）。代價：慈濟主題的選擇器、Storybook 工具列和頁面編輯器（tceditor）都要跟著改，工程要先確認 HeroUI 原廠外觀（default 主題）的選擇器不會蓋過慈濟主題。
 
 **Q5　我們自己的元件放在 repo 的哪裡？**
 建議：照第 8.5 節，**新增 `packages/ui`**，優化 HeroUI 元件時依 S-65 的順序，`heroui/` 只在外面做不到時才改。待工程確認。
@@ -635,6 +642,21 @@ S-24 規定基礎只新增、不修改。但如果某個基礎值當初就抄錯
 **Q9　舊版 v1 什麼時候可以移除？**
 建議：照 S-62，**確認沒有網站和頁面資料使用後才移除**；改名保護（S-33）建好後，用同一套「先棄用、後移除」的檢查。
 
+**Q10　git 歷史裡的個人資料怎麼處理？**
+本批已把檔案裡的姓名、內部主機名稱和本機路徑移除，但 git 歷史（舊版的 `CONTRIBUTING.md`、`CLAUDE.md`，以及每一筆 commit 的作者電子郵件）仍然有。直接把這個 repository 推上公開的 GitHub，這些都會公開。
+建議：**從一份清理過的快照開始新的歷史**（一個新的初始 commit，作者用不含個人電子郵件的帳號），舊的歷史只留在內部。這要在推上 GitHub 之前決定。
+
+**Q11　PR 能不能附預覽截圖？**
+今天的規則是不附（S-20）。核可人可以在自己電腦上開預覽（R-S-43），但要先裝好環境。
+建議：**可以附只截頁面內容的截圖**（不含瀏覽器網址列、桌面和其他分頁）；kit 本身的畫面公開沒有問題。
+
+**Q12　色彩模式要不要有「跟隨系統」？**
+今天 `tokens.css` 沒有設定時跟隨作業系統，HeroUI 慈濟主題不跟隨。手冊規則 R-H-03 只寫了淺色和深色。
+建議：**要，而且設為預設**；選單有「跟隨系統」「淺色」「深色」三個選項。
+
+**Q13　廠商用 fork 還是直接推分支？**
+建議：**給廠商寫入權限，搭配 `main` 的保護**（只能經由 PR、由人合併），流程和其他人一樣；由工程決定。
+
 ---
 
 ## 14. 與舊文件的關係
@@ -643,26 +665,23 @@ S-24 規定基礎只新增、不修改。但如果某個基礎值當初就抄錯
 
 | 文件 | 本文取代的部分 | 仍然有效的部分 |
 | --- | --- | --- |
-| `docs/superpowers/specs/2026-06-15-tzuchi-uikit-design-system-design.md` | 以 Lit Web Components 為單一來源的段落（2026-10-21 已加註）；§5.10 主題化（由本文第 6、7 節取代）；§9 Storybook（改為 `heroui/storybook`）；§14 治理中 Changesets 發布、`access: public`、npm 發布、PR 流程的段落（由第 4、5 節取代；套件目前不發布） | §5.1 到 §5.3 對 tokens 格式、三層和命名的說明，作為今天 tokens 的背景 |
+| `docs/superpowers/specs/2026-06-15-tzuchi-uikit-design-system-design.md` | 以 Lit Web Components 為單一來源的段落（2026-10-21 已加註）；§5.10 主題化（舊文件的用語，由本文第 6、7 節取代）；§9 Storybook（改為 `heroui/storybook`）；§14 治理中 Changesets 發布、`access: public`、npm 發布、PR 流程的段落（由第 4、5 節取代；套件目前不發布） | §5.1 到 §5.3 對 tokens 格式、三層和命名的說明，作為今天 tokens 的背景 |
 | `docs/superpowers/plans/2026-06-15-tzuchi-uikit-m1a.md` | 全部（已完成的 Lit 第一階段計畫，只留作紀錄） | — |
 | `docs/superpowers/specs/2026-09-22-gitlab-ci-cloudflare-staging-design.md` | 全部：自架 GitLab 的 CI 和部署不是今後的做法。GitHub Actions 的 CI 尚未建立，部署目標待決定（Q3） | 檔案留作紀錄，等新 CI 建好後再決定是否移除 |
 | 頁面編輯器（tceditor）repository 裡 2026-10-21 的共編機制設計（不在本 repo） | 角色表（改成只寫角色）、MR 與自架 GitLab 的流程、部署設計 | 改名保護的做法（S-33 的來源）；手冊數值從 tokens 產物產生的原則（S-5） |
 
-不受影響、繼續有效的文件：`heroui/NOTICE.md`（授權與修改清單）、`heroui/MAINTAINING.md`（維護筆記）、`heroui/styles/themes/tzuchi/DESIGN-LANGUAGE.md`（元件外觀的細部規則）、`heroui/styles/themes/tzuchi/gap-audit/`（主題稽核紀錄）。
+不受影響、繼續有效的文件：`heroui/NOTICE.md`（授權與修改清單）、`heroui/MAINTAINING.md`（維護筆記）、`heroui/styles/themes/tzuchi/DESIGN-LANGUAGE.md`（元件外觀的細部規則）、`heroui/styles/themes/tzuchi/gap-audit/`（慈濟主題稽核紀錄）。
 
 ### 14.2 現有檔案要改的地方
 
-其中 `CLAUDE.md`、`CONTRIBUTING.md` 和 PR 範本（新增 `.github/pull_request_template.md`，舊的 `.gitlab/` 範本留著但不再引用），和本文、路線圖、`docs/rules/` 在同一批修改裡處理；其餘列出來供後續的 PR 處理：
+下列檔案已經在本批（和本文、路線圖、`docs/rules/` 同一批）處理：`CLAUDE.md`、`CONTRIBUTING.md`、新增的 `.github/pull_request_template.md`、`.gitlab/merge_request_templates/Default.md`（姓名改成職稱；檔案留著，不再引用）、`pnpm-workspace.yaml`（姓名改成「工程」、「審 MR」改成「審 PR」）、`.claude/settings.json`（加上擋下合併、核可、推 `main`、推 tag、force push 的規則）、`heroui/MAINTAINING.md`（開頭改成「不隨 Storybook 提供，但一樣公開」）、`heroui/styles/themes/tzuchi/gap-audit/` 的 13 個報告（移除本機路徑）、`.gitlab-ci.yml` 第一行（移除內部主機名稱）。
+
+**推上公開的 GitHub 之前必須完成**：Q10（git 歷史）。`.gitlab-ci.yml` 還寫著舊 GitLab 的群組編號和部署設定，不是祕密，但和今後的做法無關，建議在 GitHub 的 CI 建好時一起移除。
+
+其餘列出來供後續的 PR 處理：
 
 | 檔案 | 要改什麼 | 依據 |
 | --- | --- | --- |
-| `CLAUDE.md` | MR → PR、GitLab 推送指令 → GitHub；分支名稱的「<主題>」；§7 把 `tzuchi-dark` 稱為主題；§9 說 `MAINTAINING.md` 不公開；加入三級判斷、網站主題、變體與版本的規則；引用 SOP | S-2、S-13、S-14、S-40、S-110 |
-| `CONTRIBUTING.md` | 個人姓名改成角色；移除內部主機名稱；GitLab 帳號 → GitHub；流程改成五個步驟；範例「把慈濟藍 900 改成 #1A2C56」改成不違反 S-24 的例子 | S-6、S-24、S-109 |
-| `.gitlab/merge_request_templates/Default.md` | 改成 GitHub 的 PR 範本，加「屬於第幾級」，核可人改寫角色 | S-20 |
-| `pnpm-workspace.yaml` | 註解裡的個人姓名改成「工程」；「審 MR」改成「審 PR」 | S-6 |
-| `.claude/settings.json` | 加上擋下 `git push` 到 `main`、推 tag、合併 PR 的規則 | S-11 |
-| `heroui/MAINTAINING.md` | 開頭「never published」改成「不隨 Storybook 提供」；本 repo 公開後它也是公開的 | S-110 |
-| `heroui/styles/themes/tzuchi/gap-audit/` 下 13 個報告 | 移除本機路徑 | S-109 |
 | `.gitlab-ci.yml` | GitHub Actions 的 CI 建好後移除；移除前不再修改它的部署流程 | S-22、Q3 |
 | `apps/docs/src/content/docs/index.mdx` | 刪掉「以 Lit Web Components 為單一來源」的說法 | S-3 |
 | `apps/docs/src/content/docs/foundations/theming.mdx` | 「淺色與深色兩套主題」改成「色彩模式」 | S-40 |

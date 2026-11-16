@@ -1,6 +1,6 @@
 # Accordion — Tzu Chi ↔ HeroUI gap inventory
 
-- **Override CSS**: `/private/tmp/claude-501/-Users-kaellim-Desktop-Personal-CISwebsite/1c74be25-055e-47fb-a92f-f47cfe608bb0/scratchpad/atoms/css/accordion.css`
+- **Override CSS**: `accordion.css` (a scratch copy at the time; the result lives in `heroui/styles/themes/tzuchi/components/accordion.css`)
   (destination `heroui/styles/themes/tzuchi/components/accordion.css`)
 - **Closeness**: minor gaps. Structure, separator model, disabled treatment, focus-ring
   width/colour and panel timing already line up; what differs is type scale/weight,
@@ -10,9 +10,9 @@
 
 | side | files |
 |---|---|
-| Tzu Chi | `/Users/kaellim/Desktop/Personal/CISwebsite/packages/components/src/accordion/tc-accordion.styles.ts`, `tc-accordion-item.styles.ts`, `tc-accordion-item.ts`; `/Users/kaellim/Desktop/Personal/CISwebsite/packages/tokens/src/component/accordion.tokens.json` |
-| resolved token values | `/Users/kaellim/Desktop/Personal/CISwebsite-heroui-spike/packages/tokens/dist/tokens.css` |
-| HeroUI | `/Users/kaellim/Desktop/Personal/CISwebsite-heroui-spike/heroui/styles/components/accordion.css`, `heroui/styles/src/components/accordion/accordion.styles.ts`, `heroui/react/src/components/accordion/accordion.tsx`, `heroui/styles/utilities/index.css`, `heroui/styles/themes/shared/theme.css`, `heroui/styles/themes/default/variables.css`, `heroui/styles/themes/tzuchi/variables.css` |
+| Tzu Chi | `packages/components/src/accordion/tc-accordion.styles.ts`, `tc-accordion-item.styles.ts`, `tc-accordion-item.ts`; `packages/tokens/src/component/accordion.tokens.json` |
+| resolved token values | `packages/tokens/dist/tokens.css` |
+| HeroUI | `heroui/styles/components/accordion.css`, `heroui/styles/src/components/accordion/accordion.styles.ts`, `heroui/react/src/components/accordion/accordion.tsx`, `heroui/styles/utilities/index.css`, `heroui/styles/themes/shared/theme.css`, `heroui/styles/themes/default/variables.css`, `heroui/styles/themes/tzuchi/variables.css` |
 
 ## Variant mapping
 

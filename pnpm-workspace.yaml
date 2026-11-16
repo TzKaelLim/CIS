@@ -12,8 +12,8 @@ onlyBuiltDependencies:
   - unrs-resolver
 
 # 新版本要發布滿 14 天（20160 分鐘）才會被選用，防範被植入惡意程式的新版。
-# 只在本機更新 lockfile 時把關；CI 用 --frozen-lockfile 不重新檢查，審 MR 要看 lockfile 的 diff。
-# 安全修正不滿 14 天時，用 minimumReleaseAgeExclude 指定精確版本，由宇軒核可並註明 GHSA 編號。
+# 只在本機更新 lockfile 時把關；CI 和檢查用 --frozen-lockfile 不重新檢查，審 PR 時要看 lockfile 的 diff。
+# 安全修正不滿 14 天時，用 minimumReleaseAgeExclude 指定精確版本，由工程核可並註明 GHSA 編號。
 minimumReleaseAge: 20160
 
 overrides:

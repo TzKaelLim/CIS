@@ -1,6 +1,6 @@
 # dropdown — Tzu Chi ↔ HeroUI gap inventory
 
-**Override file:** `/private/tmp/claude-501/-Users-kaellim-Desktop-Personal-CISwebsite/1c74be25-055e-47fb-a92f-f47cfe608bb0/scratchpad/atoms/css/dropdown.css`
+**Override file:** `dropdown.css` (a scratch copy at the time; the result lives in `heroui/styles/themes/tzuchi/components/dropdown.css`)
 → destined for `heroui/styles/themes/tzuchi/components/dropdown.css`
 
 ## 0. The name collision, resolved

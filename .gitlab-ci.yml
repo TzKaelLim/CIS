@@ -1,4 +1,4 @@
-# 自架 GitLab（tcgitlab.tzuchi-org.tw）的 CI/CD：把 HeroUI Storybook 部署到 Cloudflare Pages。
+# 舊的自架 GitLab 的 CI/CD（不是今後的做法，見 docs/specs/2026-11-16-cis-uikit-overall-spec.md 第 14 節）：把 HeroUI Storybook 部署到 Cloudflare Pages。
 #
 #   build                tokens build + check → scripts/ 的單元測試（test:scripts）→ 確認 variables.css
 #                        與 tokens 同步 → storybook build → grep 產物，擋下呼叫外部 API 的 story →

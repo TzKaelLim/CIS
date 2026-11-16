@@ -10,15 +10,15 @@ HeroUI's is a light popover surface. Everything else (radius, density, type) dif
 
 | side | file |
 |---|---|
-| tc | `/Users/kaellim/Desktop/Personal/CISwebsite/packages/components/src/tooltip/tc-tooltip.styles.ts` |
-| tc | `/Users/kaellim/Desktop/Personal/CISwebsite/packages/components/src/tooltip/tc-tooltip.ts` |
-| tc | `/Users/kaellim/Desktop/Personal/CISwebsite/packages/tokens/src/component/tooltip.tokens.json` |
-| tc (resolved) | `/Users/kaellim/Desktop/Personal/CISwebsite-heroui-spike/packages/tokens/dist/tokens.css` |
-| heroui | `/Users/kaellim/Desktop/Personal/CISwebsite-heroui-spike/heroui/styles/components/tooltip.css` |
-| heroui | `/Users/kaellim/Desktop/Personal/CISwebsite-heroui-spike/heroui/styles/src/components/tooltip/tooltip.styles.ts` |
-| heroui | `/Users/kaellim/Desktop/Personal/CISwebsite-heroui-spike/heroui/react/src/components/tooltip/tooltip.tsx` |
-| heroui | `/Users/kaellim/Desktop/Personal/CISwebsite-heroui-spike/heroui/react/src/components/tooltip/tooltip.stories.tsx` |
-| heroui | `/Users/kaellim/Desktop/Personal/CISwebsite-heroui-spike/heroui/styles/themes/{default,shared,tzuchi}/…` |
+| tc | `packages/components/src/tooltip/tc-tooltip.styles.ts` |
+| tc | `packages/components/src/tooltip/tc-tooltip.ts` |
+| tc | `packages/tokens/src/component/tooltip.tokens.json` |
+| tc (resolved) | `packages/tokens/dist/tokens.css` |
+| heroui | `heroui/styles/components/tooltip.css` |
+| heroui | `heroui/styles/src/components/tooltip/tooltip.styles.ts` |
+| heroui | `heroui/react/src/components/tooltip/tooltip.tsx` |
+| heroui | `heroui/react/src/components/tooltip/tooltip.stories.tsx` |
+| heroui | `heroui/styles/themes/{default,shared,tzuchi}/…` |
 
 ## Structural / variant mapping
 

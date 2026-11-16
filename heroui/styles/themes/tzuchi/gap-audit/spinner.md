@@ -1,7 +1,7 @@
 # Spinner — Tzu Chi ↔ HeroUI gap inventory
 
 **Component**: `tc-spinner` ↔ HeroUI `spinner`
-**Override file**: `/private/tmp/claude-501/-Users-kaellim-Desktop-Personal-CISwebsite/1c74be25-055e-47fb-a92f-f47cfe608bb0/scratchpad/atoms/css/spinner.css`
+**Override file**: `spinner.css` (a scratch copy at the time; the result lives in `heroui/styles/themes/tzuchi/components/spinner.css`)
 **Destination**: `heroui/styles/themes/tzuchi/components/spinner.css`
 **Closeness**: minor gaps — the colour is already an exact match; only the size scale, the missing track ring and a 50 ms duration differ.
 

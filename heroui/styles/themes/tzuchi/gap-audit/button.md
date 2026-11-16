@@ -1,13 +1,13 @@
 # Button — Tzu Chi ↔ HeroUI gap report
 
-- **Tzu Chi source**: `/Users/kaellim/Desktop/Personal/CISwebsite/packages/components/src/button/tc-button.styles.ts`,
-  `tc-button.ts`, `/Users/kaellim/Desktop/Personal/CISwebsite/packages/tokens/src/component/button.tokens.json`
-- **Resolved token values**: `/Users/kaellim/Desktop/Personal/CISwebsite-heroui-spike/packages/tokens/dist/tokens.css`
+- **Tzu Chi source**: `packages/components/src/button/tc-button.styles.ts`,
+  `tc-button.ts`, `packages/tokens/src/component/button.tokens.json`
+- **Resolved token values**: `packages/tokens/dist/tokens.css`
 - **HeroUI source**: `heroui/styles/components/button.css`, `heroui/styles/components/button-group.css`,
   `heroui/styles/src/components/button/button.styles.ts`, `heroui/react/src/components/button/button.tsx`,
   `heroui/styles/utilities/index.css`, `heroui/styles/themes/default/variables.css`,
   `heroui/styles/themes/shared/theme.css`
-- **Override written to**: `/private/tmp/claude-501/-Users-kaellim-Desktop-Personal-CISwebsite/1c74be25-055e-47fb-a92f-f47cfe608bb0/scratchpad/atoms/css/button.css`
+- **Override written to**: `button.css` (a scratch copy at the time; the result lives in `heroui/styles/themes/tzuchi/components/button.css`)
 - **Closeness**: minor gaps. Colours were already right (the theme generator maps
   `brand.primary` / `primary-hover` / `brand.surface` / `surface-hover` / `text.on-brand`
   onto `--accent*`, so `primary` = tc `filled` with no work). What differed was shape,

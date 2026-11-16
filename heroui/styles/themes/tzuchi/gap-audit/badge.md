@@ -33,9 +33,9 @@ radius**. The table below therefore treats tc's 20px / 12px / 4px / 1.3 set as
 
 ## Gap table
 
-`tc` = `/Users/kaellim/Desktop/Personal/CISwebsite/packages/components/src/badge/tc-badge.styles.ts`
-`tok` = `/Users/kaellim/Desktop/Personal/CISwebsite-heroui-spike/packages/tokens/dist/tokens.css`
-`hui` = `/Users/kaellim/Desktop/Personal/CISwebsite-heroui-spike/heroui/styles/components/badge.css`
+`tc` = `packages/components/src/badge/tc-badge.styles.ts`
+`tok` = `packages/tokens/dist/tokens.css`
+`hui` = `heroui/styles/components/badge.css`
 `shd` = `…/heroui/styles/themes/shared/theme.css`
 `tzv` = `…/heroui/styles/themes/tzuchi/variables.css`
 

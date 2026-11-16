@@ -67,7 +67,7 @@ component had two different handle identities across the two modes.
 `--accent-foreground` is blue-900 in the dark theme (`themes/tzuchi/variables.css`), because
 the dark accent is a light blue. The theme's file explicitly deferred to HeroUI here
 (`themes/tzuchi/components/switch.css:110-111`), which contradicts
-`/Users/kaellim/Desktop/Personal/CISwebsite/packages/components/src/switch/tc-switch.styles.ts:29-38`
+`packages/components/src/switch/tc-switch.styles.ts:29-38`
 — "A constant white reads on both track colours, in light AND dark themes, so it intentionally
 does not use a text token", `--tc-switch-thumb-bg: #fff`.
 

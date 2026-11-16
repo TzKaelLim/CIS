@@ -71,7 +71,7 @@ navy `#1b2d58` because the dark accent is a light blue. The theme's own file exp
 this alone — `heroui/styles/themes/tzuchi/components/switch.css:109-110`
 ("Colours (bg-accent-foreground / text-accent) stay HeroUI's") — but that contradicts the
 recorded Figma decision in
-`/Users/kaellim/Desktop/Personal/CISwebsite/packages/components/src/switch/tc-switch.styles.ts:29-38`:
+`packages/components/src/switch/tc-switch.styles.ts:29-38`:
 "The sliding thumb. A constant white reads on both track colours … `--tc-switch-thumb-bg: #fff`".
 It is also worst in `--with-icons`, where the story's `text-blue-600` / `text-red-600` glyphs
 now sit on navy instead of white.

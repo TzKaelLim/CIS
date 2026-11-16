@@ -6,6 +6,8 @@
 
 最後更新：2026-11-16。
 
+「元件庫」「kit」在這份文件裡都指慈濟 CIS UIKit。
+
 ## 1. 怎麼讀這份文件
 
 - **每一列是一個元件**，共 73 列。編號（R-001 到 R-073）固定不變：元件換到別的階段，編號也不改。
@@ -21,11 +23,12 @@
 | 要做的事 | 優化：寫出以哪個 HeroUI 元件為底、要補哪些部分；新增：寫出新元件的範圍 |
 | 理由（判斷） | 為什麼放在這一批，以內容網站（入口網、新聞、電子書、年報、環保網）用不用得到來判斷 |
 | 可參考的既有東西 | HeroUI 現有的零件、凍結的舊 Lit 元件（`tc-*`，只參考不修改）、Tailwind 工具類別 |
-| 元件 token | `packages/tokens/src/component/` 裡已有的檔案，或「待新增」；只用 Tailwind 就夠的寫「不需要（判斷）」 |
+| 元件 token | `packages/tokens/src/component/` 裡已有的檔案，或「待新增」；很薄、只用 Tailwind 實作的寫「不需要（判斷）」 |
 | 狀態 | 未開始、設計中、實作中、已完成；目前全部是「未開始」 |
 
 - **標「判斷」的是人的判斷，不是查證過的事實**：「理由」欄、各列的「階段」，以及「要做的事」裡以「判斷：」開頭的句子都是判斷，可以討論、可以改。「動作」不是判斷，它直接來自比對結果（見第 2 節）。
 - 「重複」：有兩列是同一個元件的另一個名字，保留下來只為了讓清單完整，見第 3 節。
+- 新加的項目從 R-074 往後編，不重用編號；現有的列一列都不刪（`docs/rules/03-component-rules.md` R-C-02）。
 
 ## 2. 原則：接近的就優化、沒有就添加、用不到的也列入但先放待辦
 
@@ -69,7 +72,7 @@
    - 版面與卡片：R-002 Section、R-003 Grid、R-005 LineClamp、R-012 Card。
    - 上面這些都要用到的圖示：R-016 Icon。
 3. 會一起用的放同一批，避免各做一套：Carousel 和 PageControl、TopNav 和 MobileNav、AppShell 和它的零件。
-4. 其中 R-003 Grid、R-004 AspectRatio、R-005 LineClamp 用 Tailwind 就能做到（見第 10 節），工作量主要是把規則定下來、寫進手冊，所以第一批真正要寫程式的元件少於 18 個。
+4. 其中 R-003 Grid、R-004 AspectRatio、R-005 LineClamp 內部可以直接用 Tailwind 實作（見第 10 節），仍然各做成一個很薄的 kit 元件；工作量主要是把規則（比例、欄數、行數）定下來、寫進手冊。
 5. 差一點就進第一批的是 R-029 Overlay（圖上壓字）和 R-022 Stat（年報的數字）：如果第一批的輪播、卡片或年報網需要，可以提前。
 
 ## 5. 狀態怎麼改變、誰來改
@@ -85,23 +88,18 @@
 
 - **新元件的視覺設計一律先由美編（設計）提供，核可之後才開始實作。** 優化項目如果會改變外觀，也一樣。
 - **狀態、階段和內容的修改，都和其他修改一樣，透過 PR 進行，由人請 Claude Code 來改**，沒有人直接手改這兩個檔案。步驟：
-  1. 用口語告訴 Claude Code 要改什麼，例如「R-010 輪播改成設計中」「把 Overlay 提前到第一批」。
+  1. 用口語告訴 Claude Code 要改什麼，例如「R-010 分頁圓點改成設計中」「把 Overlay 提前到第一批」。
   2. Claude Code 從最新的 `main` 開一條新分支，同時改 `component-roadmap.md` 和 `component-roadmap.json`。
   3. Claude Code 在本機跑檢查，告訴你要看哪幾行。
   4. 你確認後，Claude Code commit、推分支，開一個用白話寫的 PR（改了什麼、為什麼）。
   5. 由負責的角色核可，再由人合併。**Claude Code 不合併、不推 `main`。**
 - 「實作中 → 已完成」通常不必另開 PR：在實作這個元件的 PR 裡一起把狀態改成「已完成」，PR 合併時就完成了。
-- 核可：視覺設計、元件 token 的名稱和值、手冊的設計內容由美編核可；程式、建置和工具由工程核可。哪一列放第一批、第二批或待辦，由專案負責人核可（要不要用 CODEOWNERS 強制尚未決定，見第 12 節）。要開始做待辦清單上的一項，先開一個 PR 把那一列移到第一批或第二批（`docs/rules/03-component-rules.md` R-C-04）。
+- 核可（已決定）：元件 token 的名稱和值、命名規則、手冊的設計內容由美編（設計）核可；建置、CI 和工具由工程核可。
+- 核可（暫定，待決定）：元件的視覺設計由美編（設計）核可、元件程式碼由工程核可、哪一列放第一批、第二批或待辦由專案負責人核可。完整的分工表在 `docs/rules/01-co-editing-sop.md` 第 1 節；要不要用 CODEOWNERS 強制，見第 12 節。
+- 要開始做待辦清單上的一項，先開一個 PR 把那一列移到第一批或第二批（`docs/rules/03-component-rules.md` R-C-04）。移動一列時，一起更新第 3 節的數量表、各節標題的項目數和 `.json` 的 `counts`。
 - 目前 GitHub Actions 的 CI 還沒有建好，合併前的檢查是 Claude Code 在本機跑的。
 
-「已完成」的元件要有（判斷，以下是建議的完成條件）：
-
-- 程式和 Storybook 範例（淺色、深色都要看過）。
-- 需要的元件 token，每個 token 只在 `packages/tokens/src/component/` 定義一次。
-- 手冊的元件頁。目標結構是：預覽 → 用法 → 組成 → 該做與不該做 → 在目前網站主題下的樣子 → 「給工程師」（屬性、程式碼、Storybook 連結）。新版手冊目前只是本機的原型，還沒有進 repo；這個結構是正式手冊要達到的目標。
-- 無障礙：文字對比至少 4.5:1、鍵盤可操作且看得到焦點、按鈕和欄位都有標籤。
-- 介面文字（預設標籤、提示）用繁體中文。
-- 不從外部載入任何東西（字型、圖示、腳本、CDN）。
+「已完成」的條件是規則，不是建議：見 `docs/rules/03-component-rules.md` 第 5 節（R-C-30 到 R-C-42）。重點是程式和 Storybook 範例、元件 token 只定義一次、手冊的元件頁、無障礙（對比至少 4.5:1、鍵盤、標籤）、繁體中文介面文字、不從外部載入任何東西。
 
 ## 6. 每個元件動手前要先回答的事
 
@@ -112,11 +110,11 @@
   2. 內容相同、結構或排版不同（例如圖在上或圖在左）：做成同一個元件的「變體 variant」，再由網站設定自己的預設變體。
   3. 資料或行為不同，也就是別的網站沒有的東西：新元件。通用的直接放進元件庫；只屬於某個網站業務的，先留在那個網站自己的專案，等第二個網站也需要時再移進元件庫。
   - 絕不為了某個網站複製一份元件。網站不用某個元件，就什麼都不必做。
-  - 網站主題的檔案（`packages/tokens/src/sites/<id>/`）是**提案，尚未實作**；目前只有預設主題和它的深色模式。
+  - 網站主題的檔案（`packages/tokens/src/sites/<id>/`）是**提案，尚未實作**；目前只有預設網站主題（慈濟入口網）和它的深色模式。
 - **變體 variant 以用途命名**（例如「精選」，不是「大紅框」）。名稱一旦用了就不改名、不刪除，只能新增；每個選項大約 4–5 個值為限，更多通常表示其實是另一個元件。原因：網站和頁面編輯器會把這些名稱存進頁面資料。HeroUI 元件現有的 variant 名稱也一樣不可改。
 - **token 不改名、不刪除**：改名保護（先棄用、後移除，由程式檢查）做好之前，誰都不改 token 名稱、不刪 token；新增 token 和修改值可以。美編的命名規範之後會一次套用。
 - **用詞**：「基礎 Foundations」是所有網站共用的基礎級距（只新增、不修改）；「語意色」；「元件 token」；「網站主題」指哪一個網站（預設是慈濟入口網）；「色彩模式」指淺色／深色，不叫主題；「版本」只用整數（v1、v2），只在不相容的重新設計時才升。
-- **新套件**：版本要發布滿 14 天才採用，且寫精確版本；不加會從外部載入資源的套件。
+- **新套件**：先用 workspace 和 lockfile 裡已有的套件；需要新的外部套件時先問工程，版本要發布滿 14 天，寫精確版本；不加會從外部載入資源的套件（`docs/rules/03-component-rules.md` R-C-20）。
 
 ## 7. 第一批（18 項）
 
@@ -128,9 +126,9 @@
 |---|---|---|---|---|---|---|---|---|
 | R-001 | **AppShell**<br>整頁外框 | 整頁的固定骨架：「跳到主要內容」連結、頁首、主內容區、頁尾，手機版的導覽抽屜。 | 新增 | 新增一個外框元件，把 TopNav（R-006）、MobileNav（R-008）、頁尾和主內容區組在一起；第一個可聚焦的元素是「跳到主要內容」連結。 | 每個慈濟網站（入口網、新聞、電子書、年報、環保網）都要同一套頁面骨架，先做好，其他元件才有地方放。<br>備註：與 Layout（R-019）的五區版面有重疊，設計時一起決定分工。 | HeroUI：Drawer（手機抽屜）、Surface<br>舊 Lit：tc-navbar、tc-footer、tc-container（零件，沒有整合外框）<br>Tailwind：`min-h-dvh`、`grid`、`sticky` | 待新增（零件可沿用 `navbar.tokens.json`、`footer.tokens.json`、`container.tokens.json`） | 未開始 |
 | R-002 | **Section**<br>頁面區段 | 頁面上的一段區塊：背景色、上下分隔線、可分別調整的上下內距。 | 優化 | **優化對象：HeroUI Surface**<br>補上：依 space token 分級的上下內距、上／下分隔線、內容寬度（接 container 的寬度規則）、背景色選項（以用途命名，例如「強調」「淡底」）。 | 首頁、年報、環保網的頁面都是一段一段的區塊堆起來的，每段的間距和底色要一致。<br>備註：查證時由「完全沒有」改判為「部分對應」（Surface 的對應很薄，接近沒有）。 | HeroUI：Surface（只有背景色）、Separator<br>舊 Lit：tc-container（只管寬度與左右內距）<br>Tailwind：`py-*`、`border-t`、`border-b`、`max-w-*` | 待新增（寬度與左右內距可參考 `container.tokens.json`） | 未開始 |
-| R-003 | **Grid**<br>格線版面 | CSS 格線版面，欄數依螢幕寬度調整。 | 新增 | 判斷：多數情況直接用 Tailwind grid 就夠。值得做成小元件的只有兩種固定模式：「固定欄數＋手機欄數」和「依最小欄寬自動排滿」（都是 tc-grid 已有的做法），並把間距綁到 space token。 | 新聞列表、電子書書櫃、卡片牆都靠它排版；先把欄數和間距的規則定下來，各站才會一致。 | 舊 Lit：tc-grid（columns、mobile-columns、min-col-width、gap）<br>Tailwind：`grid`、`grid-cols-*`、`gap-*`、`grid-cols-[repeat(auto-fit,minmax(240px,1fr))]` | `grid.tokens.json` | 未開始 |
-| R-004 | **AspectRatio**<br>固定長寬比 | 固定長寬比的框，內容可裁切、置中。 | 新增 | 判斷：不另做元件，用 Tailwind 就夠。第一批要做的是訂出網站用的幾種比例（建議 16:9 主圖、4:3 卡片圖、1:1 頭像、3:4 書封，由美編確定），寫進手冊，Carousel、Card、Lightbox 都用同一套比例。 | 內容網站的圖片很多，比例不統一畫面會很亂；這件事工作量小，但要先於輪播和卡片定好。 | Tailwind：`aspect-video`、`aspect-square`、`aspect-[4/3]`、`object-cover` | 不需要（判斷）；若美編希望各網站主題能改比例，再新增 | 未開始 |
-| R-005 | **LineClamp**<br>多行截斷 | 文字超過 N 行就以「…」截斷，被截斷時才提供完整文字。 | 優化 | **優化對象：HeroUI Typography**<br>在 HeroUI Typography 的單行截斷（truncate）之外，補上「行數」選項（例如 1、2、3 行）與「被截斷時才顯示完整文字」的提示。判斷：只要截斷的話 Tailwind line-clamp-* 就夠；做成選項的價值是統一各卡片的行數與提示做法。 | 新聞卡片的標題和摘要、書卡的書名都需要截斷，舊 Lit 卡片已經用了 2、3 行截斷。<br>備註：查證時由「完全沒有」改判為「部分對應」。 | HeroUI：Typography（只能截成一行）<br>舊 Lit：tc-article-card（標題 2 行、摘要 3 行）、tc-book-card（1、2 行）<br>Tailwind：`line-clamp-1～line-clamp-6`、`truncate` | 不需要（判斷） | 未開始 |
+| R-003 | **Grid**<br>格線版面 | CSS 格線版面，欄數依螢幕寬度調整。 | 新增 | 新增一個 kit 元件 Grid（很薄的一層，內部用 Tailwind grid 實作）：提供兩種固定模式「固定欄數＋手機欄數」和「依最小欄寬自動排滿」（都是 tc-grid 已有的做法），間距只接受 space token 的級距。 | 新聞清單、電子書書櫃、卡片牆都靠它排版；先把欄數和間距的規則定下來，各站才會一致。 | 舊 Lit：tc-grid（columns、mobile-columns、min-col-width、gap）<br>Tailwind：`grid`、`grid-cols-*`、`gap-*`、`grid-cols-[repeat(auto-fit,minmax(240px,1fr))]` | `grid.tokens.json` | 未開始 |
+| R-004 | **AspectRatio**<br>固定長寬比 | 固定長寬比的框，內容可裁切、置中。 | 新增 | 新增一個 kit 元件 AspectRatio（很薄的一層，內部用 Tailwind aspect-* 實作），只接受網站用的幾種比例（建議 16:9 主圖、4:3 卡片圖、1:1 頭像、3:4 書封，由美編確定），寫進手冊；Carousel、Card、Lightbox 都用它，比例才會一致。 | 內容網站的圖片很多，比例不統一畫面會很亂；這件事工作量小，但要先於輪播和卡片定好。 | Tailwind：`aspect-video`、`aspect-square`、`aspect-[4/3]`、`object-cover` | 不需要（判斷）；若美編希望各網站主題能改比例，再新增 | 未開始 |
+| R-005 | **LineClamp**<br>多行截斷 | 文字超過 N 行就以「…」截斷，被截斷時才提供完整文字。 | 優化 | **優化對象：HeroUI Typography**<br>在 HeroUI Typography 的單行截斷（truncate）之外，補上「行數」選項（例如 1、2、3 行）與「被截斷時才顯示完整文字」的提示。內部用 Tailwind line-clamp-* 實作；做成選項的價值是統一各卡片的行數與提示做法。 | 新聞卡片的標題和摘要、書卡的書名都需要截斷，舊 Lit 卡片已經用了 2、3 行截斷。<br>備註：查證時由「完全沒有」改判為「部分對應」。 | HeroUI：Typography（只能截成一行）<br>舊 Lit：tc-article-card（標題 2 行、摘要 3 行）、tc-book-card（1、2 行）<br>Tailwind：`line-clamp-1～line-clamp-6`、`truncate` | 不需要（判斷） | 未開始 |
 
 ### 導覽 Navigation（5）
 
@@ -147,7 +145,7 @@
 | 編號 | 元件 | 一句說明 | 動作 | 要做的事 | 理由（判斷） | 可參考的既有東西 | 元件 token | 狀態 |
 |---|---|---|---|---|---|---|---|---|
 | R-011 | **Carousel**<br>輪播 | 一排可橫向捲動的項目，有吸附、上一張／下一張按鈕，可循環。 | 新增 | 新增元件：橫向捲動與吸附、上一張／下一張按鈕、搭配 PageControl（R-010）。預設不自動播放（無障礙）；判斷：若網站堅持自動播放，必須有暫停鈕。 | 入口網首頁的主視覺、活動與專題推薦都用輪播，是內容網站最常見的元件之一。 | HeroUI：ScrollShadow（捲動邊緣淡出）、Button<br>Tailwind：`overflow-x-auto`、`snap-x`、`snap-mandatory`、`snap-start` | 待新增 | 未開始 |
-| R-012 | **Card**<br>卡片 | 卡片容器；另有可點擊卡片（ClickableCard）和可勾選卡片（SelectableCard）。 | 優化 | **優化對象：HeroUI Card**<br>在 HeroUI Card 上補「可點擊卡片」：整張卡片是一個連結、滑過時陰影加深、鍵盤焦點外框。「可勾選卡片」併入 SelectableCardGroup（R-038，第二批）。HeroUI Card 現有的變體名稱不改。 | 新聞卡、書卡、活動卡幾乎都是「點整張卡片進入內頁」。 | HeroUI：Card（default、secondary、tertiary、transparent 四種變體）<br>舊 Lit：tc-card（interactive 與 href 兩種可點擊模式）、tc-article-card、tc-book-card | `card.tokens.json`（已有 elevation-hover、focus-ring-color） | 未開始 |
+| R-012 | **Card**<br>卡片 | 卡片容器；另有可點擊卡片（ClickableCard）和可勾選卡片（SelectableCard）。 | 優化 | **優化對象：HeroUI Card**<br>在 HeroUI Card 上補「可點擊卡片」：整張卡片是一個連結、滑鼠移到上面時陰影加深、鍵盤焦點外框。「可勾選卡片」併入 SelectableCardGroup（R-038，第二批）。HeroUI Card 現有的變體名稱不改。 | 新聞卡、書卡、活動卡幾乎都是「點整張卡片進入內頁」。 | HeroUI：Card（default、secondary、tertiary、transparent 四種變體）<br>舊 Lit：tc-card（interactive 與 href 兩種可點擊模式）、tc-article-card、tc-book-card | `card.tokens.json`（已有 elevation-hover、focus-ring-color） | 未開始 |
 
 ### 內容 Content（4）
 
@@ -155,7 +153,7 @@
 |---|---|---|---|---|---|---|---|---|
 | R-013 | **Blockquote**<br>引言 | 引言區塊，可附出處。 | 新增 | 新增元件：引文本身加上出處（人名、書名或場合）；HeroUI 目前只替 typography-prose 內的原生 `<blockquote>` 套文章樣式。 | 新聞與專題文章常引述法語或受訪者的話，需要統一的引言樣式。 | HeroUI：Typography（typography-prose 內的 blockquote 樣式）<br>Tailwind：`border-s-4`、`ps-*` | 待新增 | 未開始 |
 | R-014 | **Citation**<br>出處標記 | 行內的出處標記（文字或編號），連到資料來源或註腳。 | 新增 | 新增元件：行內編號或短文字，點選可到註腳或外部來源；外部連結要能看出是外部網站。 | 年報、專題報導需要標示資料來源與註腳。 | HeroUI：Link、Chip<br>舊 Lit：tc-link<br>Tailwind：`align-super`、`text-xs` | 待新增 | 未開始 |
-| R-015 | **Timestamp**<br>日期時間 | 用統一格式顯示日期與時間，可選時區。 | 新增 | 新增元件：輸入一個日期時間，依固定的幾種格式顯示，輸出 `<time datetime="…">`。用哪幾種格式（例如是否用民國年）由美編和內容單位決定。判斷：「即時更新」「滑過可複製」不是內容網站必要，第一版不做。 | 每則新聞的發布日期、每場活動的時間都要顯示，格式要全站一致。<br>備註：格式化用瀏覽器內建的 Intl.DateTimeFormat，不必加套件。 | HeroUI：無（TimeField 是輸入欄位） | 待新增 | 未開始 |
+| R-015 | **Timestamp**<br>日期時間 | 用統一格式顯示日期與時間，可選時區。 | 新增 | 新增元件：輸入一個日期時間，依固定的幾種格式顯示，輸出 `<time datetime="…">`。用哪幾種格式（例如是否用民國年）由美編和內容單位決定。判斷：「即時更新」「滑鼠移到上面可複製」不是內容網站必要，第一版不做。 | 每則新聞的發布日期、每場活動的時間都要顯示，格式要全站一致。<br>備註：格式化用瀏覽器內建的 Intl.DateTimeFormat，不必加套件。 | HeroUI：無（TimeField 是輸入欄位） | 待新增 | 未開始 |
 | R-016 | **Icon**<br>圖示 | 用名稱取用圖示，統一尺寸，顏色跟著文字。 | 新增 | 新增圖示元件與圖示清單：用名稱取用、尺寸綁 icon token、顏色跟著文字色、純裝飾時對螢幕報讀器隱藏。圖示的來源（自己畫或選一套開源圖示）由美編決定；圖示要隨程式一起提供，不從 CDN 載入。 | 第一批的導覽、輪播、看大圖都要用圖示（選單、上一張、關閉），要先有一套。<br>備註：低階的 SVGIcon（R-052）放在待辦，做 Icon 時一起評估。 | HeroUI：icons.tsx（只有約 10–15 個元件內部用的 SVG，沒有公開的圖示系統）<br>舊 Lit：tc-icon（內建圖示清單：search、close、menu、chevron-* 等）<br>Tailwind：`size-*` | `icon.tokens.json`（目前只有 size） | 未開始 |
 
 ### 表格與清單 Table & List（1）
@@ -164,7 +162,7 @@
 |---|---|---|---|---|---|---|---|---|
 | R-017 | **MetadataList**<br>資訊清單 | 「標籤：值」的資訊清單，例如活動時間、地點、主辦單位。 | 新增 | 新增元件：以 `<dl>` 呈現的標籤與值，可橫排（標籤在左）或直排（手機）。 | 活動頁、電子書的出版資訊、年報的基本資料都需要它。 | Tailwind：`grid`、`grid-cols-[auto_1fr]`、`gap-*` | 待新增 | 未開始 |
 
-### 浮層 Overlay（1）
+### 彈出層 Overlay（1）
 
 | 編號 | 元件 | 一句說明 | 動作 | 要做的事 | 理由（判斷） | 可參考的既有東西 | 元件 token | 狀態 |
 |---|---|---|---|---|---|---|---|---|
@@ -204,13 +202,13 @@
 | R-027 | **Table**<br>資料表格 | 資料表格。 | 優化 | **優化對象：HeroUI Table**<br>HeroUI Table 已有排序、拉欄寬、勾選、載入更多、虛擬捲動、可展開列；判斷：內容網站要補的是「手機上可橫向捲動或固定第一欄」和「數字欄靠右對齊」。篩選、分組列、欄位設定、批次操作列屬於後台功能，不做。 | 年報、統計頁偶爾會有資料表。 | HeroUI：Table、Pagination<br>Tailwind：`overflow-x-auto`、`sticky`、`tabular-nums` | 待新增 | 未開始 |
 | R-028 | **TreeList**<br>樹狀清單 | 樹狀清單（例如多層分類、章節）。 | 優化 | **優化對象：HeroUI Table（ExpandableRows 範例）**<br>HeroUI 只能用表格的可展開列模擬；補一個樹狀清單元件（React Aria 有 Tree，HeroUI 沒有包裝）。 | 電子書的多層章節、多層分類偶爾需要；SideNav（R-007）能涵蓋的話可延後。 | HeroUI：Table 的可展開列、Disclosure | 待新增 | 未開始 |
 
-### 浮層 Overlay（3）
+### 彈出層 Overlay（3）
 
 | 編號 | 元件 | 一句說明 | 動作 | 要做的事 | 理由（判斷） | 可參考的既有東西 | 元件 token | 狀態 |
 |---|---|---|---|---|---|---|---|---|
-| R-029 | **Overlay**<br>圖上文字層 | 疊在圖片或卡片上的文字或按鈕層，可加暗色遮罩、滑過才出現。 | 新增 | 新增元件：圖片上的文字層與漸層或暗色遮罩，確保文字對比至少 4.5:1。 | 判斷：主視覺上壓字、圖片卡片上壓標題在入口網很常見，若第一批的 Carousel 或 Card 需要，可提前到第一批。<br>備註：查證時由「部分對應」改判為「完全沒有」。 | HeroUI：無（Modal 的背景遮罩用途不同）<br>舊 Lit：tc-article-card（有圖上遮罩色 overlay-bg）<br>Tailwind：`absolute`、`inset-0`、`bg-gradient-to-t` | 待新增（可參考 `article-card.tokens.json` 的 overlay-bg） | 未開始 |
-| R-030 | **HoverCard**<br>滑過資訊卡 | 滑過或聚焦時出現、可放互動內容的浮動卡片（例如人物或連結預覽）。 | 優化 | **優化對象：HeroUI Popover、Tooltip**<br>HeroUI Popover 要點擊才開，Tooltip 滑過會開但只適合短文字；補一個滑過與鍵盤聚焦都能開、內容可互動的浮動卡片，手機上改成點擊。 | 名詞解釋、人物介紹偶爾會用；手機上沒有「滑過」，不能放關鍵資訊。 | HeroUI：Popover、Tooltip | 待新增（可參考 `tooltip.tokens.json`） | 未開始 |
-| R-031 | **DialogHeroHeader**<br>對話框圖片標頭 | 對話框頂部的滿版圖片，標題在圖下、關閉鈕疊在圖上。 | 優化 | **優化對象：HeroUI Modal**<br>在 HeroUI Modal.Header 上補「圖片標頭」：滿版圖片、標題在圖下、關閉鈕疊在圖上且對比足夠。 | 活動介紹彈窗偶爾會用。 | HeroUI：Modal（Header、CloseTrigger）<br>Tailwind：`aspect-video`、`object-cover` | 待新增（可參考 `modal.tokens.json`） | 未開始 |
+| R-029 | **Overlay**<br>圖上文字層 | 疊在圖片或卡片上的文字或按鈕層，可加暗色遮罩、滑鼠移到上面才出現。 | 新增 | 新增元件：圖片上的文字層與漸層或暗色遮罩，確保文字對比至少 4.5:1。 | 判斷：主視覺上壓字、圖片卡片上壓標題在入口網很常見，若第一批的 Carousel 或 Card 需要，可提前到第一批。<br>備註：查證時由「部分對應」改判為「完全沒有」。 | HeroUI：無（Modal 的背景遮罩用途不同）<br>舊 Lit：tc-article-card（有圖上遮罩色 overlay-bg）<br>Tailwind：`absolute`、`inset-0`、`bg-gradient-to-t` | 待新增（可參考 `article-card.tokens.json` 的 overlay-bg） | 未開始 |
+| R-030 | **HoverCard**<br>懸停資訊卡 | 滑鼠移到上面或鍵盤聚焦時出現、可放互動內容的浮動卡片（例如人物或連結預覽）。 | 優化 | **優化對象：HeroUI Popover、Tooltip**<br>HeroUI Popover 要點擊才開，Tooltip 滑鼠移到上面會開但只適合短文字；補一個滑鼠移到上面與鍵盤聚焦都能開、內容可互動的浮動卡片，手機上改成點擊。 | 名詞解釋、人物介紹偶爾會用；手機上沒有「滑鼠移到上面」這個動作，不能放關鍵資訊。 | HeroUI：Popover、Tooltip | 待新增（可參考 `tooltip.tokens.json`） | 未開始 |
+| R-031 | **DialogHeroHeader**<br>對話框圖片標頭 | 對話框頂部的滿版圖片，標題在圖下、關閉鈕疊在圖上。 | 優化 | **優化對象：HeroUI Modal**<br>在 HeroUI Modal.Header 上補「圖片標頭」：滿版圖片、標題在圖下、關閉鈕疊在圖上且對比足夠。 | 活動介紹的彈出視窗偶爾會用。 | HeroUI：Modal（Header、CloseTrigger）<br>Tailwind：`aspect-video`、`object-cover` | 待新增（可參考 `modal.tokens.json`） | 未開始 |
 
 ### 動作 Action（2）
 
@@ -223,7 +221,7 @@
 
 | 編號 | 元件 | 一句說明 | 動作 | 要做的事 | 理由（判斷） | 可參考的既有東西 | 元件 token | 狀態 |
 |---|---|---|---|---|---|---|---|---|
-| R-034 | **InfoTip**<br>說明提示 | 「ⓘ」說明按鈕，滑過或點擊顯示解釋，支援觸控。 | 優化 | **優化對象：HeroUI Tooltip、Button（純圖示）**<br>把 HeroUI Tooltip、純圖示 Button 和資訊圖示組成現成元件：預設無障礙標籤、觸控時點一下固定顯示、再點一下關閉。 | 表單欄位或數據的補充說明偶爾需要。 | HeroUI：Tooltip、Button、icons.tsx 的 InfoIcon | `tooltip.tokens.json` | 未開始 |
+| R-034 | **InfoTip**<br>說明提示 | 「ⓘ」說明按鈕，滑鼠移到上面或點擊時顯示解釋，支援觸控。 | 優化 | **優化對象：HeroUI Tooltip、Button（純圖示）**<br>把 HeroUI Tooltip、純圖示 Button 和資訊圖示組成現成元件：預設無障礙標籤、觸控時點一下固定顯示、再點一下關閉。 | 表單欄位或數據的補充說明偶爾需要。 | HeroUI：Tooltip、Button、icons.tsx 的 InfoIcon | `tooltip.tokens.json` | 未開始 |
 | R-035 | **InfoTip (lab)**<br>說明提示（舊匯出）<br>（重複，見 R-034） | 重複：與 InfoTip 是同一個元件（Astryx lab 套件裡已棄用的舊匯出），不另外做。 | 優化 | **優化對象：HeroUI Tooltip、Button（純圖示）**<br>不另外做；隨 InfoTip 一起完成，狀態跟著 InfoTip 走。 | 保留這一列只是為了讓 73 項清單完整。 | HeroUI：同 InfoTip | `tooltip.tokens.json` | 未開始 |
 | R-036 | **StatusDot**<br>狀態圓點 | 可以單獨放的小狀態圓點（例如「報名中」），必須附文字標籤。 | 優化 | **優化對象：HeroUI Badge**<br>HeroUI Badge 的圓點只能掛在別的元素角落；補一個可單獨放在文字前的圓點，顏色不能是唯一提示，一定要附文字或無障礙標籤。 | 活動狀態（報名中、已額滿）偶爾需要。 | HeroUI：Badge（圓點樣式）、Chip<br>舊 Lit：tc-badge（有前置狀態圓點 dot）<br>Tailwind：`size-2`、`rounded-full` | `badge.tokens.json`（已有 dot-size、dot-color） | 未開始 |
 
@@ -242,8 +240,8 @@
 
 | 編號 | 元件 | 一句說明 | 動作 | 要做的事 | 理由（判斷） | 可參考的既有東西 | 元件 token | 狀態 |
 |---|---|---|---|---|---|---|---|---|
-| R-039 | **Stack**<br>排列 | 把子元素橫向或直向排列並設間距。 | 新增 | 判斷：不建議做成元件，用 Tailwind flex 與 gap 就夠；手冊寫明間距只用 space token 的級距即可。 | Tailwind 已經能做，做成元件的好處很小。 | Tailwind：`flex`、`flex-col`、`gap-*` | 不需要（判斷） | 未開始 |
-| R-040 | **Center**<br>置中 | 置中容器（雙軸或單軸）。 | 新增 | 判斷：不建議做成元件，用 Tailwind 就夠。 | Tailwind 已經能做。 | 舊 Lit：tc-container（只有水平置中）<br>Tailwind：`grid place-items-center`、`mx-auto`、`flex items-center justify-center` | 不需要（判斷） | 未開始 |
+| R-039 | **Stack**<br>排列 | 把子元素橫向或直向排列並設間距。 | 新增 | 新增一個 kit 元件 Stack（很薄的一層，內部用 Tailwind flex 與 gap 實作），間距只接受 space token 的級距。 | 判斷：Tailwind 已經能做到，做成元件的好處是統一間距級距，但不急，所以放待辦。 | Tailwind：`flex`、`flex-col`、`gap-*` | 不需要（判斷） | 未開始 |
+| R-040 | **Center**<br>置中 | 置中容器（雙軸或單軸）。 | 新增 | 新增一個 kit 元件 Center（很薄的一層，內部用 Tailwind 實作），提供雙軸置中和水平置中。 | 判斷：Tailwind 已經能做到，不急，所以放待辦。 | 舊 Lit：tc-container（只有水平置中）<br>Tailwind：`grid place-items-center`、`mx-auto`、`flex items-center justify-center` | 不需要（判斷） | 未開始 |
 | R-041 | **Resizable**<br>可調整大小的面板 | 讓面板可以拖拉調整大小（含鍵盤操作）。 | 優化 | **優化對象：HeroUI Table（ColumnResizer）**<br>HeroUI 只有表格欄寬可拖拉；要補的是一般面板的拖拉把手、鍵盤操作與記憶寬度。 | 工具型介面才需要，內容網站用不到。 | HeroUI：Table.ColumnResizer、Table.ResizableContainer | 待新增 | 未開始 |
 
 ### 導覽 Navigation（3）
@@ -267,7 +265,7 @@
 | R-051 | **Schedule**<br>活動行事曆 | 活動行事曆：月、週、日、清單檢視。 | 優化 | **優化對象：HeroUI Calendar**<br>HeroUI Calendar 只是選日期的格子；要補的是活動資料、時間軸和月／週／日／清單檢視。 | 判斷：活動多半以清單呈現；若入口網要做活動月曆，再提前到第二批。<br>備註：查證時由「完全沒有」改判為「部分對應」。 | HeroUI：Calendar、RangeCalendar | 待新增 | 未開始 |
 | R-052 | **SVGIcon**<br>圖示底層 | 圖示系統的底層：用 CSS 變數控制線條與粗細。 | 優化 | **優化對象：HeroUI icons.tsx**<br>HeroUI 只有元件內部用的少量 SVG；這一層隨 Icon（R-016）的做法一起決定，若 Icon 已涵蓋就不另做。 | 屬於 Icon 的內部零件，Icon 先做。<br>備註：查證時由「完全沒有」改判為「部分對應」。 | HeroUI：icons.tsx<br>舊 Lit：tc-icon<br>Tailwind：`stroke-*` | `icon.tokens.json` | 未開始 |
 
-### 浮層 Overlay（1）
+### 彈出層 Overlay（1）
 
 | 編號 | 元件 | 一句說明 | 動作 | 要做的事 | 理由（判斷） | 可參考的既有東西 | 元件 token | 狀態 |
 |---|---|---|---|---|---|---|---|---|
@@ -283,7 +281,7 @@
 
 | 編號 | 元件 | 一句說明 | 動作 | 要做的事 | 理由（判斷） | 可參考的既有東西 | 元件 token | 狀態 |
 |---|---|---|---|---|---|---|---|---|
-| R-055 | **PowerSearch**<br>條件篩選搜尋列 | 用「欄位＋條件＋值」組出篩選標籤的搜尋列。 | 新增 | 新增元件。 | 後台工具才需要；網站搜尋用 SearchField（主題已套用 tc-search-bar 的樣式）即可。 | HeroUI：SearchField、TagGroup<br>舊 Lit：tc-search-bar（一般搜尋列） | 待新增（可參考 `search-bar.tokens.json`） | 未開始 |
+| R-055 | **PowerSearch**<br>條件篩選搜尋列 | 用「欄位＋條件＋值」組出篩選標籤的搜尋列。 | 新增 | 新增元件。 | 後台工具才需要；網站搜尋用 SearchField（慈濟主題已套用 tc-search-bar 的樣式）即可。 | HeroUI：SearchField、TagGroup<br>舊 Lit：tc-search-bar（一般搜尋列） | 待新增（可參考 `search-bar.tokens.json`） | 未開始 |
 | R-056 | **CodeEditor**<br>程式碼編輯器 | 可編輯的程式碼輸入框，含語法上色與行號。 | 新增 | 新增元件。 | 開發工具才需要。 | HeroUI：TextArea | 待新增 | 未開始 |
 | R-057 | **EmojiPicker**<br>表情符號選擇 | 表情符號選擇面板，可搜尋、常用優先。 | 新增 | 新增元件。 | 對話與留言功能才需要。 | HeroUI：Popover | 待新增 | 未開始 |
 | R-058 | **ListInput**<br>清單輸入 | 可新增、刪除、排序資料列的清單輸入。 | 新增 | 新增元件。 | 後台表單才需要。 | HeroUI：InputGroup、Button | 待新增 | 未開始 |
@@ -316,20 +314,20 @@
 
 | 編號 | 元件 | 一句說明 | 動作 | 要做的事 | 理由（判斷） | 可參考的既有東西 | 元件 token | 狀態 |
 |---|---|---|---|---|---|---|---|---|
-| R-073 | **VisuallyHidden**<br>視覺隱藏文字 | 畫面上看不到、但螢幕報讀器讀得到的文字。 | 新增 | 判斷：不建議做成元件，用 Tailwind sr-only 就夠；手冊在無障礙說明裡寫用法。 | Tailwind 已經能做。 | Tailwind：`sr-only`、`not-sr-only` | 不需要（判斷） | 未開始 |
+| R-073 | **VisuallyHidden**<br>視覺隱藏文字 | 畫面上看不到、但螢幕報讀器讀得到的文字。 | 新增 | 新增一個 kit 元件 VisuallyHidden（很薄的一層，內部用 Tailwind sr-only 實作）；手冊在無障礙說明裡寫用法。 | 判斷：Tailwind 已經能做到，不急，所以放待辦。 | Tailwind：`sr-only`、`not-sr-only` | 不需要（判斷） | 未開始 |
 
-## 10. 只用 Tailwind 就能做到的項目（判斷）
+## 10. 內部可以直接用 Tailwind 實作的項目（判斷）
 
-這些項目用 Tailwind 的工具類別就能做到。建議如下；「要不要做成元件」本身也是判斷，可以討論。
+這些項目用 Tailwind 的工具類別就能做到。依專案負責人「沒有就添加」的決定，它們**仍然各做成一個很薄的 kit 元件**（統一比例、欄數、間距級距等規則），Tailwind 是實作方式，不是取代元件。
 
-| 編號 | 項目 | 階段 | Tailwind | 建議 |
+| 編號 | 項目 | 階段 | Tailwind | 要做的事 |
 |---|---|---|---|---|
-| R-003 | Grid（格線版面） | 第一批 | `grid`、`grid-cols-*`、`gap-*`、`grid-cols-[repeat(auto-fit,minmax(240px,1fr))]` | 多數情況直接用 Tailwind grid 就夠。值得做成小元件的只有兩種固定模式：「固定欄數＋手機欄數」和「依最小欄寬自動排滿」（都是 tc-grid 已有的做法），並把間距綁到 space token。 |
-| R-004 | AspectRatio（固定長寬比） | 第一批 | `aspect-video`、`aspect-square`、`aspect-[4/3]`、`object-cover` | 不另做元件，用 Tailwind 就夠。第一批要做的是訂出網站用的幾種比例（建議 16:9 主圖、4:3 卡片圖、1:1 頭像、3:4 書封，由美編確定），寫進手冊，Carousel、Card、Lightbox 都用同一套比例。 |
-| R-005 | LineClamp（多行截斷） | 第一批 | `line-clamp-1～line-clamp-6`、`truncate` | 在 HeroUI Typography 的單行截斷（truncate）之外，補上「行數」選項（例如 1、2、3 行）與「被截斷時才顯示完整文字」的提示。判斷：只要截斷的話 Tailwind line-clamp-* 就夠；做成選項的價值是統一各卡片的行數與提示做法。 |
-| R-039 | Stack（排列） | 待辦 | `flex`、`flex-col`、`gap-*` | 不建議做成元件，用 Tailwind flex 與 gap 就夠；手冊寫明間距只用 space token 的級距即可。 |
-| R-040 | Center（置中） | 待辦 | `grid place-items-center`、`mx-auto`、`flex items-center justify-center` | 不建議做成元件，用 Tailwind 就夠。 |
-| R-073 | VisuallyHidden（視覺隱藏文字） | 待辦 | `sr-only`、`not-sr-only` | 不建議做成元件，用 Tailwind sr-only 就夠；手冊在無障礙說明裡寫用法。 |
+| R-003 | Grid（格線版面） | 第一批 | `grid`、`grid-cols-*`、`gap-*`、`grid-cols-[repeat(auto-fit,minmax(240px,1fr))]` | 新增一個 kit 元件 Grid（很薄的一層，內部用 Tailwind grid 實作）：提供兩種固定模式「固定欄數＋手機欄數」和「依最小欄寬自動排滿」（都是 tc-grid 已有的做法），間距只接受 space token 的級距。 |
+| R-004 | AspectRatio（固定長寬比） | 第一批 | `aspect-video`、`aspect-square`、`aspect-[4/3]`、`object-cover` | 新增一個 kit 元件 AspectRatio（很薄的一層，內部用 Tailwind aspect-* 實作），只接受網站用的幾種比例（建議 16:9 主圖、4:3 卡片圖、1:1 頭像、3:4 書封，由美編確定），寫進手冊；Carousel、Card、Lightbox 都用它，比例才會一致。 |
+| R-005 | LineClamp（多行截斷） | 第一批 | `line-clamp-1～line-clamp-6`、`truncate` | 在 HeroUI Typography 的單行截斷（truncate）之外，補上「行數」選項（例如 1、2、3 行）與「被截斷時才顯示完整文字」的提示。內部用 Tailwind line-clamp-* 實作；做成選項的價值是統一各卡片的行數與提示做法。 |
+| R-039 | Stack（排列） | 待辦 | `flex`、`flex-col`、`gap-*` | 新增一個 kit 元件 Stack（很薄的一層，內部用 Tailwind flex 與 gap 實作），間距只接受 space token 的級距。 |
+| R-040 | Center（置中） | 待辦 | `grid place-items-center`、`mx-auto`、`flex items-center justify-center` | 新增一個 kit 元件 Center（很薄的一層，內部用 Tailwind 實作），提供雙軸置中和水平置中。 |
+| R-073 | VisuallyHidden（視覺隱藏文字） | 待辦 | `sr-only`、`not-sr-only` | 新增一個 kit 元件 VisuallyHidden（很薄的一層，內部用 Tailwind sr-only 實作）；手冊在無障礙說明裡寫用法。 |
 
 ## 11. 新元件放在哪裡（提案，待工程確認）
 
@@ -344,11 +342,15 @@
 ### (a) 新增的元件
 
 - 新增一個 workspace 套件 `packages/ui`（套件名暫定 `@tzuchi/ui`，`"private": true`；名稱待工程確認）。`pnpm-workspace.yaml` 已經包含 `packages/*`，不用改。
-- 每個元件一個資料夾，結構比照 HeroUI：`packages/ui/src/components/<元件名>/` 裡有 `<元件名>.tsx`、`<元件名>.styles.ts`（tailwind-variants 的 `tv`）、`<元件名>.stories.tsx` 和 `index.ts`；樣式表放 `packages/ui/styles/components/<元件名>.css`。資料夾和檔名用小寫加連字號（`carousel`、`metadata-list`）。
-- 以 `@heroui/react` 的元件和 `react-aria-components` 為底，用 workspace 與 lockfile 裡已有的精確版本，不加新的外部套件。
+- 每個元件一個資料夾，參考 HeroUI 的元件資料夾慣例（HeroUI 本身把 React 元件放在 `heroui/react`、樣式放在 `heroui/styles`，分成兩個套件；本提案放在同一個套件）：`packages/ui/src/components/<元件名>/` 裡有 `<元件名>.tsx`、`<元件名>.styles.ts`（tailwind-variants 的 `tv`）、`<元件名>.stories.tsx` 和 `index.ts`；樣式表放 `packages/ui/styles/components/<元件名>.css`。資料夾和檔名用小寫加連字號（`carousel`、`metadata-list`）。
+- 以 `@heroui/react` 的元件和 `react-aria-components` 為底，先用 workspace 與 lockfile 裡已有的精確版本；需要新的外部套件時先問工程（`docs/rules/03-component-rules.md` R-C-20）。
 - 顏色的規則和慈濟主題相同（`heroui/styles/themes/tzuchi/components/index.css` 開頭的規則）：顏色只用 HeroUI 的主題變數（`--accent`、`--surface` 等）或 `generate.mjs` 產生的 `--tzuchi-*` 變數；尺寸、間距、圓角、字級直接用 `--tc-*` token。原因：`tokens.css` 的顏色只在 `data-theme="dark"`（或作業系統是深色、且沒有設 `light`）時切換，和慈濟主題的 `tzuchi`／`tzuchi-dark` 對不上，直接讀 `--tc-color-*` 會在深色模式拿到淺色的值。新元件若需要新的顏色 token，要在 `generate.mjs` 加上對應的 `--tzuchi-*` 變數。
 - 元件 token 放 `packages/tokens/src/component/<元件名>.tokens.json`，每個 token 只定義一次。顏色類的元件 token 引用語意色（例如 `{color.surface.default}`），深色模式由 `packages/tokens/src/themes/dark/` 改寫語意色，元件 token 就跟著變，不必另寫深色值。
-- 只用一個元件樣品室：在 `heroui/storybook/.storybook/main.ts` 的 `getStories()` 加上 `packages/ui/src/**/*.stories.tsx`，這是一處 `LOCAL CHANGE`，要列進 `heroui/NOTICE.md`。範例的標題放在獨立的分組（例如「慈濟元件／Carousel」），和 HeroUI 的元件分開。
+- 只用一個元件展示頁（Storybook，`heroui/storybook`），要改兩處，都是 `LOCAL CHANGE`、都要列進 `heroui/NOTICE.md`：
+  1. `heroui/storybook/.storybook/main.ts` 的 `getStories()` 加上 `packages/ui/src/**/*.stories.tsx`。
+  2. `heroui/storybook/styles/globals.css` 加上 `@source` 指向 `packages/ui/src`（今天它只掃 `heroui/react/src/components`，否則 `packages/ui` 用到的 Tailwind class 不會被編譯），並 `@import` `packages/ui/styles` 的 CSS。
+  範例的標題放在獨立的分組（例如「慈濟元件／Carousel」），和 HeroUI 的元件分開。
+- 使用這套 kit 的網站，也要在自己的 Tailwind 設定裡對 `@tzuchi/ui` 加 `@source`，並載入它的 CSS。
 
 ### (b) 優化 HeroUI 的元件
 
@@ -364,10 +366,10 @@
 |---|---|---|
 | 新元件的位置與套件名 | 第一批開工前要定 | 照第 11 節的提案：`packages/ui`，優化以包一層為主 |
 | 各網站自己的程式放在這個 repo，還是各自的專案 | 決定「只屬於某網站的元件」先放哪裡 | 放各自的專案；這個 repo 只放共用的元件庫和手冊 |
-| 誰核可、要不要用 CODEOWNERS 強制 | 決定狀態與階段的修改由誰核可 | 用 CODEOWNERS：token 與手冊內容指給美編，程式與建置指給工程，路線圖的階段調整指給專案負責人 |
+| 誰核可、要不要用 CODEOWNERS 強制 | 決定狀態與階段的修改由誰核可 | 用 CODEOWNERS 加上 GitHub「需要 Code Owners 核可」：token 與手冊內容指給美編團隊，程式與建置指給工程團隊，路線圖的階段調整指給專案負責人（整體規格 Q2） |
 | 網站主題和色彩模式在程式裡的屬性名 | 新元件怎麼跟著網站主題與色彩模式變 | 目前色彩模式是 `data-theme`（HeroUI 用 `tzuchi`／`tzuchi-dark`，`tokens.css` 用 `dark`），網站主題有 `data-site` 的提案。新元件只讀 CSS 變數、不直接讀這些屬性，之後怎麼定都不用改元件 |
 | 次要文字色 `#828282` 在白底只有 3.84:1 | 幾乎每個新元件的說明文字、日期、出處都會用到 | 請美編在第一批開始設計前修正，讓對比至少 4.5:1 |
-| 部署目標 | 已完成的元件何時出現在公開的手冊與樣品室 | 還沒決定；路線圖的進度不受影響 |
+| 部署目標 | 已完成的元件何時出現在公開的手冊與元件展示頁（Storybook） | 還沒決定；路線圖的進度不受影響 |
 | 頁面編輯器（tceditor）的整合 | 已延後 | 變體名稱現在就以用途命名、不改名，日後整合時才不用搬資料 |
 | 第一批由工程或廠商做哪幾項 | 分工 | 由專案負責人和工程、廠商討論後寫進對應的 PR |
 

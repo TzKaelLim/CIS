@@ -8,8 +8,8 @@ Sources read
 
 | side | files |
 |---|---|
-| Tzu Chi | `/Users/kaellim/Desktop/Personal/CISwebsite/packages/components/src/divider/tc-divider.styles.ts`, `tc-divider.ts`, `/Users/kaellim/Desktop/Personal/CISwebsite/packages/tokens/src/component/divider.tokens.json` |
-| resolved values | `/Users/kaellim/Desktop/Personal/CISwebsite-heroui-spike/packages/tokens/dist/tokens.css` (L14–27, 40–41, 49–50, 85, 101, 119, 124, 173–175, 281–282, 420–425) |
+| Tzu Chi | `packages/components/src/divider/tc-divider.styles.ts`, `tc-divider.ts`, `packages/tokens/src/component/divider.tokens.json` |
+| resolved values | `packages/tokens/dist/tokens.css` (L14–27, 40–41, 49–50, 85, 101, 119, 124, 173–175, 281–282, 420–425) |
 | HeroUI | `heroui/styles/components/separator.css`, `heroui/styles/src/components/separator/separator.styles.ts`, `heroui/react/src/components/separator/separator.tsx` + `separator.stories.tsx`, `heroui/styles/themes/default/variables.css` (L115, 172–173, 251, 313–314), `heroui/styles/themes/shared/theme.css` (L27, 96–97, 104–105) |
 | consumers of `.separator` | `styles/components/toolbar.css` L9–16, `menu.css` L8–11, `dropdown.css` L127–130, `list-box.css` L21–24 |
 

@@ -1,9 +1,9 @@
 # Button / icon-only — Tzu Chi ↔ HeroUI gap report (pass 2)
 
-- **Tzu Chi source**: `/Users/kaellim/Desktop/Personal/CISwebsite/packages/components/src/icon-button/tc-icon-button.styles.ts`,
+- **Tzu Chi source**: `packages/components/src/icon-button/tc-icon-button.styles.ts`,
   `tc-icon-button.ts`,
-  `/Users/kaellim/Desktop/Personal/CISwebsite/packages/tokens/src/component/icon-button.tokens.json`
-- **Resolved token values**: `/Users/kaellim/Desktop/Personal/CISwebsite-heroui-spike/packages/tokens/dist/tokens.css`
+  `packages/tokens/src/component/icon-button.tokens.json`
+- **Resolved token values**: `packages/tokens/dist/tokens.css`
 - **HeroUI source**: `heroui/styles/components/button.css`, `heroui/styles/components/button-group.css`,
   `heroui/styles/src/components/button/button.styles.ts`, `heroui/react/src/components/button/button.tsx`,
   `heroui/react/src/components/button/button.stories.tsx`,
