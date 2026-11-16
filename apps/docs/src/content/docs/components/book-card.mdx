@@ -5,15 +5,76 @@ description: tc-book-card — 以封面圖為主的直式書籍卡片，支援�
 
 import Demo from '../../../components/Demo.astro';
 import PropsTable from '../../../components/PropsTable.astro';
+import CurrentSiteNote from '../../../components/prototype/CurrentSiteNote.astro';
 import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
+import PreviewTile from '../../../components/handbook/PreviewTile.astro';
+import DoDont from '../../../components/handbook/DoDont.astro';
+import { LinkButton } from '@astrojs/starlight/components';
 
 <ComponentMeta id="book-card" />
 
-:::note[整理中]
-這一頁目前是給工程師的技術說明。給設計、企劃和廠商看的版面（用法、組成、該做與不該做）之後會補上，可以先看[按鈕](/components/button/)那一頁的樣子。
+<PreviewTile size="hero" scale={0.46} interactive>
+  <tc-book-card ratio="portrait" interactive width="200px">
+    <div slot="cover" role="img" aria-label="書籍封面（色塊代替照片）" style="display:block;width:100%;height:100%;background:linear-gradient(135deg,var(--tc-color-brand-surface-hover),var(--tc-color-brand-surface))"></div>
+    <span slot="title">每日一叮嚀</span>
+    <span slot="subtitle">世間祥和在於心</span>
+    <tc-link slot="footer" href="#用法">更多</tc-link>
+  </tc-book-card>
+  <tc-book-card ratio="portrait" width="200px">
+    <div slot="cover" role="img" aria-label="書籍封面（色塊代替照片）" style="display:block;width:100%;height:100%;background:linear-gradient(135deg,var(--tc-color-brand-surface-hover),var(--tc-color-brand-surface))"></div>
+    <span slot="title">靜思語選輯</span>
+    <span slot="subtitle">心寬念純</span>
+  </tc-book-card>
+  <tc-book-card ratio="square" width="200px">
+    <div slot="cover" role="img" aria-label="方形封面（色塊代替照片）" style="display:block;width:100%;height:100%;background:linear-gradient(135deg,var(--tc-color-brand-surface-hover),var(--tc-color-brand-surface))"></div>
+    <span slot="title">環保手冊</span>
+    <span slot="subtitle">方形封面</span>
+  </tc-book-card>
+</PreviewTile>
+
+## 用法
+
+書籍卡片以封面為主：封面圖佔卡片的大部分，下面只有書名、一行副標和「更多」這類連結，適合書籍、出版品和「每日一叮嚀」這類以一張圖為主角的內容。封面可以是直式（3:4，上方前兩張）或方形（1:1，上方第三張）。圖片不是主角、需要較長說明或按鈕的項目用「卡片」；新聞、文章列表用「文章卡片」。
+
+## 組成
+
+| 部位     | 說明                                                                                     |
+| -------- | ---------------------------------------------------------------------------------------- |
+| 容器     | 卡片的底色、圓角和淡淡的陰影，顏色跟著網站主題。                                         |
+| 封面     | 卡片上方的大圖，依設定裁成直式（3:4）或方形（1:1）；比例不合的圖片，超出的部分會被裁掉。 |
+| 標題     | 書名，用品牌主色的粗體字，最多顯示兩行，超過的部分會被截掉並顯示「…」。                  |
+| 副標     | 可省略。標題下方的淡色小字，只顯示一行，超過的部分會被截掉。                             |
+| 動作區   | 可省略。最下方的連結或按鈕，例如「更多」；整張卡片可以點時，這裡仍然可以單獨按。         |
+| 整張可點 | 可省略。整張卡片連到另一頁時，滑過卡片陰影會變深、標題變色。                             |
+| 焦點框   | 用鍵盤選到可點的卡片時出現的外框，讓不用滑鼠的人知道目前在哪裡。                         |
+
+## 該做與不該做
+
+:::caution[草稿]
+這一節是草稿，待美編（設計）確認。
 :::
 
-`<tc-book-card>` 是以封面圖為主的直式卡片，適用於書籍封面與「證嚴上人 每日一叮嚀」。封面圖在上、下方為標題（粗體品牌色）／副標（淡色）與 footer 動作區。封面依 `ratio`（`portrait` 直式 3/4 或 `square` 方形）裁切並貼齊頂部圓角。下方為**可互動的真實元件**（圖片為 Lorem Picsum 假圖）：
+<DoDont
+  rows={[
+    { kind: 'do', text: '封面圖照卡片的比例準備：書籍用直式 3:4，方形的書影或相片用 1:1。比例不合的圖片會被裁掉邊緣，書名可能被切到。' },
+    { kind: 'do', text: '同一排的書籍卡片用同一種封面比例和相同寬度，排起來才整齊。' },
+    { kind: 'do', text: '封面圖要寫替代文字，至少寫出書名，看不到圖片的讀者也知道這是哪一本。' },
+    { kind: 'dont', text: '副標只顯示一行，不要把作者、出版日期、價格等重要資訊都擠在副標裡。' },
+    { kind: 'dont', text: '書名不要超過兩行。超過的部分會被截掉，讀者看不到完整書名。' },
+  ]}
+/>
+
+## 在目前網站主題下的樣子
+
+<CurrentSiteNote />
+
+書籍卡片還沒有各網站的對照範例；上方的大預覽會跟著頁首的「網站主題」和「色彩模式」一起變。
+
+## 給工程師
+
+以下是給工程師的安裝與 API 說明，設計、企劃和廠商可以略過。
+
+`<tc-book-card>` 是以封面圖為主的直式卡片，適用於書籍封面與「證嚴上人 每日一叮嚀」。封面圖在上、下方為標題（粗體品牌色）／副標（淡色）與 footer 動作區。封面依 `ratio`（`portrait` 直式 3/4 或 `square` 方形）裁切並貼齊頂部圓角。下方為**可互動的真實元件**（圖片以色塊代替）：
 
 <Demo>
   <tc-book-card ratio="portrait" width="240px">
@@ -30,23 +91,11 @@ import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
   </tc-book-card>
 </Demo>
 
-## 封面比例（ratio）
+<LinkButton href="/storybook/?path=/docs/components-bookcard--docs" variant="secondary" icon="external">
+  在 Storybook 開啟
+</LinkButton>
 
-`ratio="portrait"`（預設）為 3/4 直式封面；`ratio="square"` 為 1/1 方形封面：
-
-<Demo>
-  <tc-book-card ratio="square" width="240px">
-    <div slot="cover" role="img" aria-label="書籍封面（色塊代替照片）" style="display:block;width:100%;height:100%;background:linear-gradient(135deg,var(--tc-color-brand-surface-hover),var(--tc-color-brand-surface))"></div>
-    <span slot="title">方形封面</span>
-    <span slot="subtitle">適用相片或方形書影</span>
-  </tc-book-card>
-</Demo>
-
-## 寬度（width）
-
-`width` 接受任何 CSS 長度（如 `240px`、`100%`），等同設定 `--tc-book-card-width`。
-
-## 用法
+Storybook 是工程師逐一檢查元件各種狀態的工具網站，目前只有預設網站主題（慈濟入口網）的淺色和深色。它只在正式上線的手冊才開得了；在自己的電腦上預覽手冊時，按鈕會顯示找不到頁面（詳見[開始使用](/docs/#給工程師)）。
 
 ### 純 HTML
 
@@ -74,7 +123,23 @@ import { TcBookCard } from '@tzuchi/react';
 </TcBookCard>;
 ```
 
-## 連結模式（Stretched Link）
+### 封面比例（ratio）
+
+`ratio="portrait"`（預設）為 3/4 直式封面；`ratio="square"` 為 1/1 方形封面：
+
+<Demo>
+  <tc-book-card ratio="square" width="240px">
+    <div slot="cover" role="img" aria-label="書籍封面（色塊代替照片）" style="display:block;width:100%;height:100%;background:linear-gradient(135deg,var(--tc-color-brand-surface-hover),var(--tc-color-brand-surface))"></div>
+    <span slot="title">方形封面</span>
+    <span slot="subtitle">適用相片或方形書影</span>
+  </tc-book-card>
+</Demo>
+
+### 寬度（width）
+
+`width` 接受任何 CSS 長度（如 `240px`、`100%`），等同設定 `--tc-book-card-width`。
+
+### 連結模式（Stretched Link）
 
 設定 `href` 後，整張卡片透過覆蓋層 `<a>` 變成連結；`footer` 內的控件（如「更多」連結）仍可獨立點擊，不會被連結攔截：
 
@@ -87,13 +152,13 @@ import { TcBookCard } from '@tzuchi/react';
   </tc-book-card>
 </Demo>
 
-## API
+### API
 
 下表自 Custom Elements Manifest 自動產生：
 
 <PropsTable tag="tc-book-card" />
 
-## 無障礙（Accessibility）
+### 無障礙（Accessibility）
 
 - `href` 模式以原生 `<a>` 為焦點與互動目標，支援鍵盤 Enter。
 - `interactive`（無 `href`）模式下，host 取得 `tabindex="0"` 與 `role="button"`，並以 Enter／Space 觸發 `tc-book-card-click`。

@@ -6,12 +6,77 @@ description: tc-container — 響應式、水平置中的最大寬度版心容�
 import Demo from '../../../components/Demo.astro';
 import PropsTable from '../../../components/PropsTable.astro';
 import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
+import PreviewTile from '../../../components/handbook/PreviewTile.astro';
+import DoDont from '../../../components/handbook/DoDont.astro';
+import CurrentSiteNote from '../../../components/prototype/CurrentSiteNote.astro';
+import { LinkButton } from '@astrojs/starlight/components';
 
 <ComponentMeta id="container" />
 
-:::note[整理中]
-這一頁目前是給工程師的技術說明。給設計、企劃和廠商看的版面（用法、組成、該做與不該做）之後會補上，可以先看[按鈕](/components/button/)那一頁的樣子。
+<PreviewTile size="hero" scale={0.5}>
+  <div style="display:grid;gap:14px;inline-size:100%;padding-block:24px;border-radius:16px;background:var(--tc-color-surface-default)">
+    <tc-container size="sm">
+      <div style="padding:14px;border:2px dashed var(--tc-color-brand-primary);border-radius:12px;background:var(--tc-color-brand-surface);color:var(--tc-color-brand-primary);font:600 26px/1.2 var(--tc-font-family-base);text-align:center">sm</div>
+    </tc-container>
+    <tc-container size="md">
+      <div style="padding:14px;border:2px dashed var(--tc-color-brand-primary);border-radius:12px;background:var(--tc-color-brand-surface);color:var(--tc-color-brand-primary);font:600 26px/1.2 var(--tc-font-family-base);text-align:center">md</div>
+    </tc-container>
+    <tc-container size="lg">
+      <div style="padding:14px;border:2px dashed var(--tc-color-brand-primary);border-radius:12px;background:var(--tc-color-brand-surface);color:var(--tc-color-brand-primary);font:600 26px/1.2 var(--tc-font-family-base);text-align:center">lg</div>
+    </tc-container>
+    <tc-container size="xl">
+      <div style="padding:14px;border:2px dashed var(--tc-color-brand-primary);border-radius:12px;background:var(--tc-color-brand-surface);color:var(--tc-color-brand-primary);font:600 26px/1.2 var(--tc-font-family-base);text-align:center">xl（預設）</div>
+    </tc-container>
+  </div>
+</PreviewTile>
+
+## 用法
+
+版心容器決定一段內容最寬可以到多寬，並把內容放在畫面中間，左右再留一點空白，讀者在大螢幕上不用左右轉頭讀很長的一行字。它本身看不見，上面的預覽用虛線框標出不同寬度的版心。整個網站的頁面區塊都用它包住主要內容，寬度才會一致；要把內容排成好幾欄，請在版心容器裡面再放「[格線](/components/grid/)」。
+
+## 組成
+
+| 部位     | 說明                                                                                                           |
+| -------- | -------------------------------------------------------------------------------------------------------------- |
+| 外層     | 佔滿它所在位置的整個寬度。滿版的底色可以放在這一層，底色會延伸到畫面兩邊，文字仍留在版心裡。                   |
+| 版心     | 內容真正所在的區域，有最大寬度，預設放在中間。最大寬度有五種，從窄到寬是 sm、md、lg、xl（預設）和 full。       |
+| 左右內距 | 版心兩邊的空白，手機最小，平板和桌機逐步加大，文字不會貼著螢幕邊緣。可以關掉，讓滿版圖片貼齊版心邊界。         |
+| 內容     | 放進版心容器的任何東西：標題、文章、格線、卡片等。版心容器不改變它們的樣子。                                   |
+
+每種寬度和內距的實際數值，見下方「給工程師」。
+
+## 該做與不該做
+
+:::caution
+這一節是草稿，待美編（設計）確認。
 :::
+
+<DoDont
+  rows={[
+    { kind: 'do', text: '同一個網站的頁面區塊用同一種版心寬度，讀者在頁面之間移動時，內容的左右邊界才會對齊。' },
+    { kind: 'do', text: '需要滿版底色的區塊（例如一整條淡色背景），把底色設在版心容器的外層，文字和按鈕仍留在版心裡。' },
+    { kind: 'do', text: '以文字為主的長篇內容，可以選比較窄的寬度，一行字不會太長，比較好讀。' },
+    { kind: 'dont', text: '不要在版心容器裡再放一個版心容器：左右內距會加兩次，內容會比旁邊的區塊窄。' },
+    { kind: 'dont', text: '不要為了某一個區塊自己訂一個新的寬度；先從五種寬度裡選，需要新的寬度請和美編（設計）、工程討論。' },
+    { kind: 'dont', text: '不要把左右內距關掉後還放文字：在手機上文字會貼著螢幕邊緣。關掉內距只用在要貼齊邊緣的滿版圖片。' },
+  ]}
+/>
+
+## 在目前網站主題下的樣子
+
+<CurrentSiteNote />
+
+版心容器的寬度和內距目前所有網站都一樣；上方預覽裡的色塊會跟著頁首的「網站主題」和「色彩模式」一起變。
+
+## 給工程師
+
+以下是給工程師的安裝與 API 說明，設計、企劃和廠商可以略過。
+
+<LinkButton href="/storybook/?path=/docs/components-container--docs" variant="secondary" icon="external">
+  在 Storybook 開啟
+</LinkButton>
+
+Storybook 是工程師逐一檢查元件各種狀態的工具網站，目前只有預設網站主題（慈濟入口網）的淺色和深色。它只在正式上線的手冊才開得了；在自己的電腦上預覽手冊時，按鈕會顯示找不到頁面（詳見[開始使用](/docs/#給工程師)）。
 
 `<tc-container>` 是版心（layout）容器：將內容約束在最大寬度內、水平置中，並提供隨視窗增長的左右內距（gutter）。`size` 對應設計系統的斷點寬度（`--tc-container-sm/md/lg/xl/full`），分別為 375 / 768 / 1024 / 1280 / 1920px。下方為**可互動的真實元件**（虛線框示意版心邊界）：
 
@@ -25,7 +90,7 @@ import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
   </div>
 </Demo>
 
-## 尺寸（size）
+### 尺寸（size）
 
 `size` 設定最大寬度，對應 `--tc-container-*` 斷點寬度原語。`full` 對應 1920px 寬版（桌機全幅）。
 
@@ -43,7 +108,7 @@ import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
   </div>
 </Demo>
 
-## 內距（gutter）與置中（centered）
+### 內距（gutter）與置中（centered）
 
 `gutter`（預設開啟）提供隨視窗增長的左右內距：行動裝置 `--tc-space-16`、平板（≥768px）`--tc-space-24`、桌機（≥1024px）`--tc-space-32`。`gutter` 是布林屬性——移除整個屬性即可關閉內距（例如讓全幅媒體貼齊邊緣）；以 JS 設定 `el.gutter = false` 亦可。`centered`（預設開啟）以 `margin-inline:auto` 水平置中。
 
@@ -56,8 +121,6 @@ import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
     </tc-container>
   </div>
 </Demo>
-
-## 用法
 
 ### 純 HTML
 
@@ -82,7 +145,7 @@ import { TcContainer } from '@tzuchi/react';
 </TcContainer>;
 ```
 
-## 自訂最大寬度
+### 自訂最大寬度
 
 `size` 變體會設定內部的 `--tc-container-max`；若需自訂任意寬度，可直接覆寫此變數：
 
@@ -90,13 +153,13 @@ import { TcContainer } from '@tzuchi/react';
 <tc-container style="--tc-container-max: 960px">…</tc-container>
 ```
 
-## API
+### API
 
 下表自 Custom Elements Manifest 自動產生：
 
 <PropsTable tag="tc-container" />
 
-## 無障礙（Accessibility）
+### 無障礙（Accessibility）
 
 - `<tc-container>` 純為版面（layout）容器，不引入額外的語意角色；請在其內容中使用適當的地標（如 `<main>`、`<section>`）與標題結構。
 - 內距與最大寬度皆使用設計 token（`--tc-container-*`、`--tc-space-*`），確保跨頁面一致的版心與留白。

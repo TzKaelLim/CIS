@@ -6,12 +6,86 @@ description: tc-ebook-toolbar — 電子書閱讀器上排功能列（慈濟書�
 import Demo from '../../../components/Demo.astro';
 import PropsTable from '../../../components/PropsTable.astro';
 import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
+import PreviewTile from '../../../components/handbook/PreviewTile.astro';
+import DoDont from '../../../components/handbook/DoDont.astro';
+import CurrentSiteNote from '../../../components/prototype/CurrentSiteNote.astro';
 
 <ComponentMeta id="ebook-toolbar" />
 
-:::note[整理中]
-這一頁目前是給工程師的技術說明。給設計、企劃和廠商看的版面（用法、組成、該做與不該做）之後會補上，可以先看[按鈕](/components/button/)那一頁的樣子。
+<PreviewTile size="hero" interactive>
+  <tc-ebook-toolbar book-title="靜思語" style="inline-size:100%">
+    <tc-icon-button label="搜尋">
+      <tc-icon name="search"></tc-icon>
+    </tc-icon-button>
+    <tc-icon-button label="目錄">
+      <tc-icon name="menu"></tc-icon>
+    </tc-icon-button>
+  </tc-ebook-toolbar>
+  <tc-ebook-toolbar
+    book-title="很長的書名會在這一列放不下的時候，從後面截斷並顯示省略號"
+    style="inline-size:100%;max-inline-size:420px"
+  >
+    <tc-icon-button label="搜尋">
+      <tc-icon name="search"></tc-icon>
+    </tc-icon-button>
+    <tc-icon-button label="目錄">
+      <tc-icon name="menu"></tc-icon>
+    </tc-icon-button>
+  </tc-ebook-toolbar>
+</PreviewTile>
+
+## 用法
+
+電子書工具列放在電子書閱讀畫面的最上方：左邊是返回鍵，中間是書名，右邊是閱讀時用的工具，例如搜尋、書籤、語音朗讀。整列是一個圓角的長條。畫面寬度小於 768px 時，書名從置中改成靠左、貼著返回鍵；右邊的工具按鈕不會收起來。它只用在電子書的閱讀畫面，一般網頁的最上方請用「導覽列」。元件另有一個品牌底色（brand）變體，但目前在網站上看起來和預設一樣（待工程修正），請先用預設。
+
+## 組成
+
+| 部位   | 說明                                                                                           |
+| ------ | ---------------------------------------------------------------------------------------------- |
+| 容器   | 圓角長條，有淡淡的底色和外框。底色和文字色跟著網站主題和色彩模式變。                           |
+| 返回鍵 | 內建在最左邊的箭頭按鈕，讓讀者離開閱讀畫面。螢幕閱讀器預設唸作「返回」，可以改成更清楚的說法。 |
+| 書名   | 可省略。寬畫面置中，窄畫面靠左。只排一行，太長時從後面截斷，顯示「…」（上方第二個預覽）。      |
+| 工具列 | 右邊的一排工具按鈕，通常用「圖示按鈕」，由網站決定放哪幾個。                                   |
+| 焦點框 | 用鍵盤選到返回鍵或工具按鈕時出現的外框，讓不用滑鼠的人知道目前在哪裡。顏色跟著網站主題。       |
+
+## 該做與不該做
+
+:::caution
+這一節是草稿，待美編（設計）確認。
 :::
+
+<DoDont
+  rows={[
+    {
+      kind: 'do',
+      text: '右邊只放閱讀時最常用的幾個工具。窄畫面上工具按鈕不會收起來，放太多會把書名擠到只剩「…」。',
+    },
+    {
+      kind: 'do',
+      text: '每個工具按鈕都寫好名稱，例如「搜尋」「書籤」，螢幕閱讀器才唸得出來；圖示也要和名稱相符。',
+    },
+    { kind: 'do', text: '返回鍵的名稱寫出會回到哪裡，例如「返回書櫃」，比只寫「返回」清楚。' },
+    {
+      kind: 'dont',
+      text: '不要依賴書名列讓讀者看到完整的書名；書名太長會被截斷，完整書名請放在書的介紹頁。',
+    },
+    { kind: 'dont', text: '不要把它當成一般網頁的頁首；網站的頁首請用「導覽列」。' },
+    {
+      kind: 'dont',
+      text: '不要自己改工具列的底色、文字色或圓角。顏色由網站主題決定，換網站時才會一致。',
+    },
+  ]}
+/>
+
+## 在目前網站主題下的樣子
+
+<CurrentSiteNote />
+
+上方的大預覽會跟著頁首的「網站主題」和「色彩模式」一起變。
+
+## 給工程師
+
+以下是給工程師的安裝與 API 說明，設計、企劃和廠商可以略過。
 
 `<tc-ebook-toolbar>` 是電子書閱讀器的上排功能列（慈濟書庫）。版面為三段式：內建**返回鍵**（inline-start）、**書籍名稱**（桌機置中）、以及尾端**工具列**（inline-end，由使用者以預設插槽放入 `<tc-icon-button>`，例如搜尋／書籤／語音／筆記／個人）。於平板斷點（`--tc-breakpoint-tablet` = 768px）以下，書名會由置中改為靠左貼近返回鍵。點擊返回鍵會派發 `tc-back` 事件。下方為**可互動的真實元件**：
 
@@ -25,7 +99,9 @@ import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
   </tc-ebook-toolbar>
 </Demo>
 
-## 變體（variant）
+Storybook 目前只有 HeroUI 的元件，還沒有 `<tc-ebook-toolbar>` 的頁面。
+
+### 變體（variant）
 
 `brand` 變體以品牌深藍底搭配 on-brand 文字／圖示；`light`（預設）為淺底（surface.subtle）搭配品牌色文字。
 
@@ -37,7 +113,7 @@ import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
   </tc-ebook-toolbar>
 </Demo>
 
-## 書名（book-title 與 title 插槽）
+### 書名（book-title 與 title 插槽）
 
 以 `book-title` 屬性設定置中書名；若需自訂排版，可改用 `title` 插槽覆寫（插槽優先）。過長的書名會以省略號截斷，避免擠壓工具列。
 
@@ -48,8 +124,6 @@ import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
     <tc-icon-button label="個人"><tc-icon name="menu"></tc-icon></tc-icon-button>
   </tc-ebook-toolbar>
 </Demo>
-
-## 用法
 
 ### 純 HTML
 
@@ -76,13 +150,13 @@ import { TcEbookToolbar, TcIconButton, TcIcon } from '@tzuchi/react';
 </TcEbookToolbar>;
 ```
 
-## API
+### API
 
 下表自 Custom Elements Manifest 自動產生：
 
 <PropsTable tag="tc-ebook-toolbar" />
 
-## 無障礙（Accessibility）
+### 無障礙（Accessibility）
 
 - host 取得 `role="toolbar"` 與 `aria-label`（電子書工具列）。
 - 返回鍵為原生 `<button>`，其 `aria-label` 由 `back-label` 控制（預設 `返回`），點擊派發 `tc-back`（composed、bubbles）。

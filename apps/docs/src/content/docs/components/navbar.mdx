@@ -6,12 +6,85 @@ description: tc-navbar — 響應式網站頂部導覽列；桌機水平導覽�
 import Demo from '../../../components/Demo.astro';
 import PropsTable from '../../../components/PropsTable.astro';
 import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
+import PreviewTile from '../../../components/handbook/PreviewTile.astro';
+import DoDont from '../../../components/handbook/DoDont.astro';
+import CurrentSiteNote from '../../../components/prototype/CurrentSiteNote.astro';
 
 <ComponentMeta id="navbar" />
 
-:::note[整理中]
-這一頁目前是給工程師的技術說明。給設計、企劃和廠商看的版面（用法、組成、該做與不該做）之後會補上，可以先看[按鈕](/components/button/)那一頁的樣子。
+<PreviewTile size="hero" interactive>
+  <tc-navbar variant="light" style="inline-size:100%">
+    <strong slot="brand">慈濟</strong>
+    <tc-link href="#">全球消息</tc-link>
+    <tc-link href="#">活動訊息</tc-link>
+    <tc-link href="#">前往捐款</tc-link>
+    <tc-link href="#">關於我們</tc-link>
+    <tc-icon-button slot="actions" label="搜尋">
+      <tc-icon name="search"></tc-icon>
+    </tc-icon-button>
+  </tc-navbar>
+</PreviewTile>
+
+## 用法
+
+導覽列放在每一頁的最上方，讓讀者知道自己在哪個網站，並且能前往網站的幾個主要區域。左邊放網站名稱或標誌，中間放主要選單，右邊放搜尋、語言等操作；畫面寬度小於 768px（手機、直向的平板）時，主要選單會收進「選單」按鈕。元件另有一個品牌底色（brand）變體，但目前在網站上看起來和預設一樣（待工程修正），請先用預設。如果只是在同一頁的幾組內容之間切換，請改用「頁籤」；電子書的閱讀畫面請改用「電子書工具列」。
+
+## 組成
+
+| 部位     | 說明                                                                                                           |
+| -------- | -------------------------------------------------------------------------------------------------------------- |
+| 容器     | 整條導覽列的底色、高度和下方的分隔線。底色和文字色跟著網站主題和色彩模式變。                                   |
+| 品牌區   | 可省略。左邊的網站名稱或標誌，讓讀者知道自己在哪個網站。                                                       |
+| 主要選單 | 中間的幾個主要連結，通常用「連結」元件。寬畫面排成一列；窄畫面收進抽屜。螢幕閱讀器會把這一區唸成「主要導覽」。 |
+| 操作區   | 可省略。右邊的搜尋、語言、登入等小按鈕，通常用「圖示按鈕」。窄畫面上也一直看得到，不會收進抽屜。               |
+| 選單按鈕 | 只在窄畫面出現的三條線按鈕，按下打開抽屜，圖示變成叉叉，再按一次關閉。                                         |
+| 抽屜     | 窄畫面上，主要選單改成一列一個連結，從導覽列下方展開。按 Esc 鍵或點導覽列外面也會關閉。                        |
+| 焦點框   | 用鍵盤選到選單按鈕時出現的外框，讓不用滑鼠的人知道目前在哪裡。顏色跟著網站主題。                               |
+
+## 該做與不該做
+
+:::caution
+這一節是草稿，待美編（設計）確認。
 :::
+
+<DoDont
+  rows={[
+    {
+      kind: 'do',
+      text: '主要選單只放網站最重要的幾個區域，連結文字寫得短，例如「全球消息」「前往捐款」。寬畫面上所有連結排在同一列，不會自動換行。',
+    },
+    {
+      kind: 'do',
+      text: '每一頁都放同一條導覽列，連結的順序和名稱在整個網站保持一致，讀者才不會迷路。',
+    },
+    {
+      kind: 'do',
+      text: '操作區只放圖示時，每個圖示按鈕都要寫好標籤（例如「搜尋」），螢幕閱讀器才唸得出來。',
+    },
+    {
+      kind: 'dont',
+      text: '不要在主要選單塞很多連結或很長的文字；放不下的內容請移到頁尾或各區域自己的頁面。',
+    },
+    {
+      kind: 'dont',
+      text: '不要把變體名稱 light 當成淺色模式。它是預設的底色，在深色模式下也會跟著變深。',
+    },
+    {
+      kind: 'dont',
+      text: '不要自己改導覽列的底色或文字色。顏色由網站主題決定，換網站時才會一致。',
+    },
+  ]}
+/>
+
+## 在目前網站主題下的樣子
+
+<CurrentSiteNote />
+
+上方的大預覽會跟著頁首的「網站主題」和「色彩模式」一起變。
+
+## 給工程師
+
+以下是給工程師的安裝與 API 說明，設計、企劃和廠商可以略過。
 
 `<tc-navbar>` 是響應式的網站頂部列／站台 header：`brand` 插槽放標誌或站名（inline-start），預設插槽放主要導覽項目（桌機水平排列），`actions` 插槽放搜尋／語言／登入等操作（inline-end）。於平板斷點（`--tc-breakpoint-tablet` = 768px）以下，導覽會收合為漢堡選單，點擊後以垂直抽屜呈現。下方為**可互動的真實元件**：
 
@@ -28,7 +101,9 @@ import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
   </tc-navbar>
 </Demo>
 
-## 變體（variant）
+Storybook 目前只有 HeroUI 的元件，還沒有 `<tc-navbar>` 的頁面。
+
+### 變體（variant）
 
 `brand` 變體以品牌深藍底搭配 on-brand 文字；`light`（預設）為白底搭配預設文字色。
 
@@ -43,7 +118,7 @@ import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
   </tc-navbar>
 </Demo>
 
-## 黏附（sticky）
+### 黏附（sticky）
 
 設定 `sticky` 後，導覽列以 `position: sticky; top: 0` 黏附於捲動容器頂部，`z-index` 採用 `--tc-z-sticky`。
 
@@ -54,7 +129,7 @@ import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
 </tc-navbar>
 ```
 
-## 行動抽屜（open）
+### 行動抽屜（open）
 
 768px 以下會出現漢堡按鈕；點擊切換 `open` 屬性並派發 `tc-menu-toggle`。導覽改以垂直抽屜呈現於列下方。按 `Escape` 或點擊列外區域皆會關閉抽屜。
 
@@ -71,8 +146,6 @@ navbar.addEventListener('tc-menu-toggle', (e) => {
   console.log('drawer open?', e.detail.open);
 });
 ```
-
-## 用法
 
 ### 純 HTML
 
@@ -101,13 +174,13 @@ import { TcNavbar } from '@tzuchi/react';
 </TcNavbar>;
 ```
 
-## API
+### API
 
 下表自 Custom Elements Manifest 自動產生：
 
 <PropsTable tag="tc-navbar" />
 
-## 無障礙（Accessibility）
+### 無障礙（Accessibility）
 
 - 外層為原生 `<header>` 並帶 `role="banner"`。
 - 導覽區為原生 `<nav>` 並帶 `aria-label="主要導覽"`。

@@ -6,12 +6,67 @@ description: tc-theme-toggle — 淺色／深色色彩模式切換鈕，切換 <
 import Demo from '../../../components/Demo.astro';
 import PropsTable from '../../../components/PropsTable.astro';
 import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
+import PreviewTile from '../../../components/handbook/PreviewTile.astro';
+import DoDont from '../../../components/handbook/DoDont.astro';
+import CurrentSiteNote from '../../../components/prototype/CurrentSiteNote.astro';
+import { LinkButton } from '@astrojs/starlight/components';
 
 <ComponentMeta id="theme-toggle" />
 
-:::note[整理中]
-這一頁目前是給工程師的技術說明。給設計、企劃和廠商看的版面（用法、組成、該做與不該做）之後會補上，可以先看[按鈕](/components/button/)那一頁的樣子。
+<PreviewTile size="hero" interactive>
+  <tc-theme-toggle></tc-theme-toggle>
+  <tc-theme-toggle show-label></tc-theme-toggle>
+</PreviewTile>
+
+上面是可以按的真實元件：左邊只有圖示，右邊加上文字。按下去會真的換掉這一頁的色彩模式，但頁首的「色彩模式」選單不會跟著改字；重新整理頁面後，以頁首的選擇為準。
+
+## 用法
+
+色彩模式切換讓讀者在淺色和深色之間切換整個網站。讀者第一次來時，網站先跟著他裝置的設定；按過一次之後，網站會記住他的選擇，下次再來也一樣。它只切換淺色和深色，不切換網站主題：網站主題是這個網站本身的外觀，讀者不能換。一般用只有圖示的樣式放在頁首；空間夠、或擔心讀者看不懂圖示時，用加上文字的樣式。
+
+## 組成
+
+| 部位     | 說明                                                                                                         |
+| -------- | ------------------------------------------------------------------------------------------------------------ |
+| 按鈕     | 圓形的外框按鈕，大小用的是控制項的標準尺寸，用手指也好按。滑鼠移上去時換成淡淡的品牌底色和主色外框。                           |
+| 圖示     | 顯示「按下去會換成什麼」：淺色時是月亮（換成深色），深色時是太陽（換成淺色）。                                 |
+| 文字     | 可省略。打開時在圖示旁顯示「切換至深色模式」或「切換至淺色模式」，文字是固定的，不能改。                       |
+| 焦點框   | 用鍵盤選到它時出現的外框，讓不用滑鼠的人知道目前在哪裡。                                                     |
+
+不論有沒有顯示文字，螢幕閱讀器都會唸出「切換至深色模式」或「切換至淺色模式」。
+
+## 該做與不該做
+
+:::caution
+這一節是草稿，待美編（設計）確認。
 :::
+
+<DoDont
+  rows={[
+    { kind: 'do', text: '放在每一頁相同的位置（例如頁首右邊），讀者換頁後還找得到。' },
+    { kind: 'do', text: '網站要提供深色模式時才放；放了就要確定每一頁在淺色和深色下都看過、文字都看得清楚。' },
+    { kind: 'do', text: '在說明文字裡把它叫「色彩模式」或「淺色／深色」，不叫「主題」。' },
+    { kind: 'dont', text: '不要用它來切換網站主題，它只會切換淺色和深色。' },
+    { kind: 'dont', text: '不要在很窄的地方用加上文字的樣式：文字不會換行，會把旁邊的東西擠開。窄的地方用只有圖示的樣式。' },
+    { kind: 'dont', text: '不要在同一個畫面放好幾個切換鈕；一個就夠，讀者才不會以為它們各管不同的東西。' },
+  ]}
+/>
+
+## 在目前網站主題下的樣子
+
+<CurrentSiteNote />
+
+上方預覽會跟著頁首的「網站主題」和「色彩模式」一起變：圖示的顏色，以及滑鼠移上去時的外框顏色，用的是這個網站的主色。
+
+## 給工程師
+
+以下是給工程師的安裝與 API 說明，設計、企劃和廠商可以略過。
+
+<LinkButton href="/storybook/?path=/docs/components-themetoggle--docs" variant="secondary" icon="external">
+  在 Storybook 開啟
+</LinkButton>
+
+Storybook 是工程師逐一檢查元件各種狀態的工具網站，目前只有預設網站主題（慈濟入口網）的淺色和深色。它只在正式上線的手冊才開得了；在自己的電腦上預覽手冊時，按鈕會顯示找不到頁面（詳見[開始使用](/docs/#給工程師)）。
 
 `<tc-theme-toggle>` 切換 `<html>` 的 `data-theme` 屬性。深色色票由 `@tzuchi/tokens` 的
 `[data-theme="dark"]` 區塊提供，元件僅引用語意色 token，因此整個元件庫會透過 CSS 變數
@@ -27,7 +82,7 @@ import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
 **可互動範例**會即時跟著深淺切換。
 :::
 
-## 行為
+### 行為
 
 - **記憶**：使用者點擊後寫入 `localStorage["tc-theme"]`；下次載入沿用。
 - **系統跟隨**：在使用者尚未選擇前，跟隨系統 `prefers-color-scheme`，並即時回應系統切換。
@@ -36,7 +91,7 @@ import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
 - **無障礙**：以 `role="switch"` + `aria-checked` 呈現，並提供動態 `aria-label`
   （「切換至深色／淺色模式」）。
 
-## 防止閃爍（anti-FOUC）
+### 防止閃爍（anti-FOUC）
 
 元件在 `connectedCallback` 才套用色彩模式，無法避免整頁載入時的閃爍。請在 `<head>`
 **最前面**加入一段同步 inline script，在首次繪製前就設定好 `data-theme`：
@@ -58,8 +113,6 @@ import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
 </script>
 ```
 
-## 用法
-
 ### 純 HTML
 
 ```html
@@ -77,12 +130,12 @@ import { TcThemeToggle } from '@tzuchi/react';
 <TcThemeToggle onTcThemeChange={(e) => console.log(e.detail.theme)} />;
 ```
 
-## API
+### API
 
 下表自 Custom Elements Manifest 自動產生：
 
 <PropsTable tag="tc-theme-toggle" />
 
-## 相關
+### 相關
 
 - [色彩模式（淺色／深色）](/foundations/theming/) — 深色色票如何運作、如何擴充。

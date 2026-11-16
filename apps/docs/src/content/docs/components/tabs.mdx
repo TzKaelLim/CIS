@@ -6,12 +6,75 @@ description: tc-tabs / tc-tab — 頁籤導覽，web / mobile 兩種版面，支
 import Demo from '../../../components/Demo.astro';
 import PropsTable from '../../../components/PropsTable.astro';
 import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
+import PreviewTile from '../../../components/handbook/PreviewTile.astro';
+import DoDont from '../../../components/handbook/DoDont.astro';
+import CurrentSiteNote from '../../../components/prototype/CurrentSiteNote.astro';
 
 <ComponentMeta id="tabs" />
 
-:::note[整理中]
-這一頁目前是給工程師的技術說明。給設計、企劃和廠商看的版面（用法、組成、該做與不該做）之後會補上，可以先看[按鈕](/components/button/)那一頁的樣子。
+<PreviewTile size="hero" interactive>
+  <tc-tabs value="overview">
+    <tc-tab value="overview">總覽</tc-tab>
+    <tc-tab value="news">最新消息</tc-tab>
+    <tc-tab value="video" disabled>影音</tc-tab>
+  </tc-tabs>
+  <tc-tabs variant="mobile" value="list" style="max-width:360px;">
+    <tc-tab value="list">列表</tc-tab>
+    <tc-tab value="map">地圖</tc-tab>
+    <tc-tab value="mine">我的</tc-tab>
+  </tc-tabs>
+</PreviewTile>
+
+## 用法
+
+頁籤讓讀者在同一個地方切換幾組同一層級的內容，例如「總覽」「最新消息」，不用離開這一頁，一次只看一組。它有兩種版面：寬版（web，預設）的頁籤依文字長短排成一列；窄版（mobile）的頁籤平分整列的寬度，適合手機上的少數幾個頁籤。頁籤元件只有上面這一排頁籤，下面要換成哪一組內容，由網站自己處理。要前往另一個頁面請用「導覽列」或「連結」；同一份列表分成很多頁時請用「分頁」。
+
+## 組成
+
+| 部位     | 說明                                                                                                   |
+| -------- | ------------------------------------------------------------------------------------------------------ |
+| 頁籤列   | 一排頁籤，下方有一條分隔線。寬版依文字長短排列；窄版每個頁籤一樣寬，撐滿整列。                         |
+| 頁籤文字 | 必填。每個頁籤的名稱，只排一行，不會換行。螢幕閱讀器會唸出這段文字，也會說出它是不是目前選中的頁籤。   |
+| 前置圖示 | 可省略。放在文字前面的小圖示，用來補充文字，不能取代文字。                                             |
+| 選取底線 | 目前選中的頁籤，文字變粗、改用網站主題的主色，下方加一條主色底線。                                     |
+| 停用狀態 | 暫時不能選的頁籤會變淡，點了不會切換。                                                                 |
+| 焦點框   | 用鍵盤選到頁籤時出現的外框。用左右方向鍵切換頁籤，Home、End 鍵跳到第一個、最後一個。顏色跟著網站主題。 |
+
+## 該做與不該做
+
+:::caution
+這一節是草稿，待美編（設計）確認。
 :::
+
+<DoDont
+  rows={[
+    {
+      kind: 'do',
+      text: '頁籤名稱寫短，例如「總覽」「最新消息」。頁籤不會換行，也不會自動捲動，太多或太長時會超出畫面。',
+    },
+    { kind: 'do', text: '每個頁籤放同一層級、可以任意切換的內容，讀者先看哪一個都可以。' },
+    { kind: 'do', text: '手機上用窄版（mobile），而且只放少數幾個頁籤，每個頁籤的文字才放得下。' },
+    { kind: 'do', text: '預先選好讀者最常看的頁籤。沒有指定時，元件會自動選第一個可以選的頁籤。' },
+    {
+      kind: 'dont',
+      text: '不要用頁籤做「第一步、第二步」這種要照順序完成的流程，也不要用頁籤換到另一個頁面。',
+    },
+    {
+      kind: 'dont',
+      text: '不要留下一直都不能選的頁籤；用不到就拿掉，暫時不能選時最好在附近說明原因。',
+    },
+  ]}
+/>
+
+## 在目前網站主題下的樣子
+
+<CurrentSiteNote />
+
+上方的大預覽會跟著頁首的「網站主題」和「色彩模式」一起變。
+
+## 給工程師
+
+以下是給工程師的安裝與 API 說明，設計、企劃和廠商可以略過。
 
 `<tc-tabs>` 是頁籤容器，內含多個 `<tc-tab>`，管理選取狀態、roving tabindex 與鍵盤瀏覽（方向鍵切換、Home / End 跳至首末）。下方為**可互動的真實元件**：
 
@@ -24,7 +87,9 @@ import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
   </tc-tabs>
 </Demo>
 
-## 版面變體
+Storybook 目前只有 HeroUI 的元件。它的 Tabs 是另一個元件，不是 `<tc-tabs>`，所以這裡不放連結。
+
+### 版面變體
 
 `variant="mobile"` 時頁籤等寬撐滿容器：
 
@@ -35,8 +100,6 @@ import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
     <tc-tab value="c">我的</tc-tab>
   </tc-tabs>
 </Demo>
-
-## 用法
 
 ### 純 HTML
 
@@ -69,19 +132,19 @@ import { TcTabs, TcTab } from '@tzuchi/react';
 </TcTabs>;
 ```
 
-## API
+### API
 
 下表自 Custom Elements Manifest 自動產生：
 
-### `<tc-tabs>`
+#### `<tc-tabs>`
 
 <PropsTable tag="tc-tabs" />
 
-### `<tc-tab>`
+#### `<tc-tab>`
 
 <PropsTable tag="tc-tab" />
 
-## 無障礙（Accessibility）
+### 無障礙（Accessibility）
 
 - `<tc-tabs>` 為 `role="tablist"`，`<tc-tab>` 為 `role="tab"`。
 - 鍵盤瀏覽：方向鍵切換頁籤、Home / End 跳至首末，採 roving tabindex（僅選取項在 Tab 順序中）。

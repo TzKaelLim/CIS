@@ -6,12 +6,64 @@ description: tc-link — 行內文字連結，包覆原生 <a>，支援 default 
 import Demo from '../../../components/Demo.astro';
 import PropsTable from '../../../components/PropsTable.astro';
 import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
+import PreviewTile from '../../../components/handbook/PreviewTile.astro';
+import DoDont from '../../../components/handbook/DoDont.astro';
+import CurrentSiteNote from '../../../components/prototype/CurrentSiteNote.astro';
 
 <ComponentMeta id="link" />
 
-:::note[整理中]
-這一頁目前是給工程師的技術說明。給設計、企劃和廠商看的版面（用法、組成、該做與不該做）之後會補上，可以先看[按鈕](/components/button/)那一頁的樣子。
+<PreviewTile size="hero" interactive>
+  <div style="display:grid; gap:1.25rem; justify-items:center; max-inline-size:34rem; text-align:center;">
+    <p style="margin:0;">
+      想先看看日期？歡迎<tc-link href="#">查看活動行事曆</tc-link>，或<tc-link href="#">下載報名表</tc-link>。
+    </p>
+    <div style="display:flex; flex-wrap:wrap; gap:1.5rem; justify-content:center;">
+      <tc-link href="#">預設連結</tc-link>
+      <tc-link variant="subtle" href="#">隱性連結</tc-link>
+      <tc-link disabled href="#">停用連結</tc-link>
+    </div>
+  </div>
+</PreviewTile>
+
+## 用法
+
+連結帶讀者前往另一個頁面或網站，常放在一段文字中間，或一整排列在頁尾、選單裡。預設連結是品牌色的粗體字，讀者一眼就看得出可以點；隱性連結（subtle）平常是內文的顏色，滑過時才變色，適合放在頁尾這類一整排都是連結、讀者本來就知道可以點的地方。如果是送出、報名這類「做一件事」的動作，請改用「按鈕」。
+
+## 組成
+
+| 部位     | 說明                                                                                               |
+| -------- | -------------------------------------------------------------------------------------------------- |
+| 連結文字 | 必填。寫出點下去會到哪裡，例如「查看活動行事曆」。字型大小跟著周圍的文字，所以可以直接放在段落裡。 |
+| 顏色     | 預設連結是品牌色粗體，隱性連結是內文的顏色。滑鼠移上去時變色並出現底線。                           |
+| 焦點框   | 用鍵盤選到連結時出現的外框，讓不用滑鼠的人知道目前在哪裡。                                         |
+| 停用狀態 | 變成淡灰色、點了不會換頁；螢幕閱讀器仍然唸得到這段文字。                                           |
+
+## 該做與不該做
+
+:::caution[草稿]
+這一節是草稿，待美編（設計）確認。
 :::
+
+<DoDont
+  rows={[
+    { kind: 'do', text: '連結文字寫出會到哪裡，例如「查看活動行事曆」「下載報名表」；不要只寫「這裡」「更多」。螢幕閱讀器的使用者常常只聽連結文字。' },
+    { kind: 'do', text: '只挑最能說明去向的幾個字做成連結，不要把整句或整段文字都做成連結。' },
+    { kind: 'do', text: '會開到其他網站或新視窗的連結，在文字裡說清楚，例如「慈濟基金會官網（另開新視窗）」。' },
+    { kind: 'dont', text: '不要在段落中間用隱性連結。它平常和內文同色，讀者看不出可以點；用手機時也沒有滑鼠移上去變色的提示。' },
+    { kind: 'dont', text: '不要用連結做送出、報名、捐款這類動作；請用「按鈕」。' },
+    { kind: 'dont', text: '不要自己改連結的顏色。顏色由網站主題決定，換網站時才會一致。' },
+  ]}
+/>
+
+## 在目前網站主題下的樣子
+
+<CurrentSiteNote />
+
+上方的大預覽會跟著頁首的「網站主題」和「色彩模式」一起變；這個元件還沒有淺色、深色並排的範例。
+
+## 給工程師
+
+以下是給工程師的安裝與 API 說明，美編（設計）、網站的編輯和廠商可以略過。
 
 `<tc-link>` 是行內文字連結，內部使用原生 `<a>`，保留原生點擊與導覽行為。下方為**可互動的真實元件**：
 
@@ -21,7 +73,7 @@ import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
   <tc-link disabled href="#">停用連結</tc-link>
 </Demo>
 
-## 行內使用
+### 行內使用
 
 `tc-link` 為 `display: inline`，可直接置於段落文字之中：
 
@@ -32,8 +84,6 @@ import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
     ，一起成就善的循環。
   </p>
 </Demo>
-
-## 用法
 
 ### 純 HTML
 
@@ -53,13 +103,13 @@ import { TcLink } from '@tzuchi/react';
 <TcLink href="/about">了解更多</TcLink>;
 ```
 
-## API
+### API
 
 下表自 Custom Elements Manifest 自動產生：
 
 <PropsTable tag="tc-link" />
 
-## 無障礙（Accessibility）
+### 無障礙（Accessibility）
 
 - 內含原生 `<a>`，支援鍵盤 Enter 與螢幕閱讀器的連結語意。
 - `:focus-visible` 焦點環使用 `--tc-focus-ring-*` token。

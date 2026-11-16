@@ -5,15 +5,77 @@ description: tc-article-card — 文稿卡片，涵蓋焦點／一般／互動�
 
 import Demo from '../../../components/Demo.astro';
 import PropsTable from '../../../components/PropsTable.astro';
+import CurrentSiteNote from '../../../components/prototype/CurrentSiteNote.astro';
 import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
+import PreviewTile from '../../../components/handbook/PreviewTile.astro';
+import DoDont from '../../../components/handbook/DoDont.astro';
+import { LinkButton } from '@astrojs/starlight/components';
 
 <ComponentMeta id="article-card" />
 
-:::note[整理中]
-這一頁目前是給工程師的技術說明。給設計、企劃和廠商看的版面（用法、組成、該做與不該做）之後會補上，可以先看[按鈕](/components/button/)那一頁的樣子。
+<PreviewTile size="hero" scale={0.42} interactive>
+  <tc-article-card interactive width="260px">
+    <div slot="media" role="img" aria-label="示意圖片（色塊代替照片）" style="display:block;width:100%;aspect-ratio:16/10;background:linear-gradient(135deg,var(--tc-color-brand-surface-hover),var(--tc-color-brand-surface))"></div>
+    <tc-chip slot="badge">慈善</tc-chip>
+    <span slot="headline">志工寒冬送暖，關懷獨居長者</span>
+    <p slot="excerpt">志工走入社區，為長者送上熱食與生活物資，並協助打掃居家環境。</p>
+    <span slot="meta">2026-03-21 ｜ 慈善新聞</span>
+  </tc-article-card>
+  <tc-article-card orientation="horizontal" width="440px">
+    <div slot="media" role="img" aria-label="示意圖片（色塊代替照片）" style="display:block;width:100%;height:100%;background:linear-gradient(135deg,var(--tc-color-brand-surface-hover),var(--tc-color-brand-surface))"></div>
+    <tc-chip slot="badge">週報</tc-chip>
+    <span slot="headline">本週志業簡報：各據點服務成果</span>
+    <p slot="excerpt">彙整本週各服務據點的活動與成果，並摘要下週重點行程。</p>
+    <span slot="meta">2026-03-15</span>
+  </tc-article-card>
+</PreviewTile>
+
+## 用法
+
+文章卡片是新聞、文章列表裡的一則：一張圖片，加上分類、標題、兩三行摘要和日期，讀者看一眼就知道要不要點進去讀。同一個元件可以排成圖片在上的直式（上方第一張）或圖片在左的橫式（上方第二張），也可以放大成凸顯最重要一則的焦點版式，或在圖片上疊一個播放鈕表示影片（兩種的樣子見下方「給工程師」的範例）。不需要分類、摘要和日期的一般項目（例如專案、募款項目）用「卡片」；以封面為主的書籍用「書籍卡片」；側欄裡只有標題和日期的短清單用「清單面板」。
+
+## 組成
+
+| 部位       | 說明                                                                                     |
+| ---------- | ---------------------------------------------------------------------------------------- |
+| 容器       | 卡片的底色、圓角和淡淡的陰影，顏色跟著網站主題。                                         |
+| 圖片       | 可省略。直式時放在最上方；橫式時放在左邊，約佔卡片寬度的四成。                           |
+| 播放鈕     | 只有影片卡片才有：疊在圖片中央的圓形播放鈕。它只是給眼睛看的提示，螢幕閱讀器不會唸出來。 |
+| 分類標籤   | 可省略。標題上方的小標籤，例如「慈善」「影片」。                                         |
+| 標題       | 品牌主色的粗體字，最多顯示兩行，超過的部分會被截掉並顯示「…」。焦點版式的標題比較大。    |
+| 摘要       | 可省略。一般文字色，最多顯示三行，超過的部分會被截掉。                                   |
+| 日期與來源 | 可省略。最下方的小字，用比較淡的次要文字色。                                             |
+| 動作區     | 可省略。例如「讚」「分享」的小按鈕；整張卡片可以點時，這些按鈕仍然可以單獨按。           |
+| 焦點框     | 用鍵盤選到可點的卡片時出現的外框，讓不用滑鼠的人知道目前在哪裡。                         |
+
+## 該做與不該做
+
+:::caution[草稿]
+這一節是草稿，待美編（設計）確認。
 :::
 
-`<tc-article-card>` 是文稿型內容卡片，以 `orientation`（vertical／horizontal）、`featured`（焦點放大）與插槽組合涵蓋焦點文稿、一般文稿、互動式文稿、公告、影片、志工早會與週報等版式。提供 media／badge／headline／excerpt／meta／actions 插槽，支援影片播放遮罩（`video`）、可互動（`interactive`）與整張卡片連結（`href`，stretched link）模式。下方為**可互動的真實元件**（圖片為 Lorem Picsum 假圖）：
+<DoDont
+  rows={[
+    { kind: 'do', text: '標題在兩行以內把重點講完。超過兩行的部分會被截掉，讀者在列表上看不到。' },
+    { kind: 'do', text: '摘要用一兩句話說明這篇在講什麼，超過三行的部分會被截掉。' },
+    { kind: 'do', text: '影片卡片在分類、標題或日期那一行寫出「影片」或片長。播放鈕只是圖案，看不到畫面的讀者聽不到它。' },
+    { kind: 'do', text: '同一個列表裡的卡片用同一種方向（都是直式或都是橫式），讀者比較容易往下掃。' },
+    { kind: 'dont', text: '不要整個列表都用焦點版式。焦點是用來凸顯最重要的那一則，一個區塊通常只放一則。' },
+    { kind: 'dont', text: '不要把重要資訊只放在日期與來源那一行。這一行字小、顏色淡，目前的次要文字色對比還不夠，正等美編（設計）修正。' },
+  ]}
+/>
+
+## 在目前網站主題下的樣子
+
+<CurrentSiteNote />
+
+文章卡片還沒有各網站的對照範例；上方的大預覽會跟著頁首的「網站主題」和「色彩模式」一起變。
+
+## 給工程師
+
+以下是給工程師的安裝與 API 說明，設計、企劃和廠商可以略過。
+
+`<tc-article-card>` 是文稿型內容卡片，以 `orientation`（vertical／horizontal）、`featured`（焦點放大）與插槽組合涵蓋焦點文稿、一般文稿、互動式文稿、公告、影片、志工早會與週報等版式。提供 media／badge／headline／excerpt／meta／actions 插槽，支援影片播放遮罩（`video`）、可互動（`interactive`）與整張卡片連結（`href`，stretched link）模式。下方為**可互動的真實元件**（圖片以色塊代替）：
 
 <Demo>
   <tc-article-card width="360px">
@@ -25,63 +87,11 @@ import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
   </tc-article-card>
 </Demo>
 
-## 焦點文稿（featured）
+<LinkButton href="/storybook/?path=/docs/components-articlecard--docs" variant="secondary" icon="external">
+  在 Storybook 開啟
+</LinkButton>
 
-`featured` 放大標題並適合搭配較大的主視覺：
-
-<Demo>
-  <tc-article-card featured width="480px">
-    <div slot="media" role="img" aria-label="示意圖片（色塊代替照片）" style="display:block;width:100%;aspect-ratio:16/9;background:linear-gradient(135deg,var(--tc-color-brand-surface-hover),var(--tc-color-brand-surface))"></div>
-    <tc-chip slot="badge">焦點文稿</tc-chip>
-    <span slot="headline">焦點報導：跨越國界的人道援助行動</span>
-    <p slot="excerpt">在多個國家展開的援助計畫，集結志工與在地夥伴的力量，將關懷送達最需要的地方。</p>
-    <span slot="meta">2022-03-21 ｜ TCnews 慈善新聞網</span>
-  </tc-article-card>
-</Demo>
-
-## 橫向版式（horizontal）
-
-`orientation="horizontal"` 將媒體置於 inline-start（約 40% 寬），文字內容並列於右側：
-
-<Demo>
-  <tc-article-card orientation="horizontal" style="max-width:560px">
-    <div slot="media" role="img" aria-label="示意圖片（色塊代替照片）" style="display:block;width:100%;height:100%;background:linear-gradient(135deg,var(--tc-color-brand-surface-hover),var(--tc-color-brand-surface))"></div>
-    <tc-chip slot="badge">週報</tc-chip>
-    <span slot="headline">本週志業簡報：各據點服務成果彙整</span>
-    <p slot="excerpt">彙整本週各服務據點的活動與成果，並摘要下週重點行程。</p>
-    <span slot="meta">2022-03-21</span>
-  </tc-article-card>
-</Demo>
-
-## 影片卡片（video）
-
-`video` 於媒體上方疊加置中的圓形播放鈕；可與 `href` 一起使用：
-
-<Demo>
-  <tc-article-card video href="#video" width="360px">
-    <div slot="media" role="img" aria-label="影片縮圖（色塊代替照片）" style="display:block;width:100%;aspect-ratio:16/10;background:linear-gradient(135deg,var(--tc-color-brand-surface-hover),var(--tc-color-brand-surface))"></div>
-    <tc-chip slot="badge">影片</tc-chip>
-    <span slot="headline">紀實影片：志工早會現場直擊</span>
-    <span slot="meta">2022-03-21 ｜ 03:24</span>
-  </tc-article-card>
-</Demo>
-
-## 連結模式與動作區（Stretched Link + actions）
-
-設定 `href` 後整張卡片透過覆蓋層 `<a>` 變成連結；`actions` 內的控件（如讚／分享）仍可獨立點擊，不會被連結攔截：
-
-<Demo>
-  <tc-article-card href="#article" width="360px">
-    <div slot="media" role="img" aria-label="示意圖片（色塊代替照片）" style="display:block;width:100%;aspect-ratio:16/10;background:linear-gradient(135deg,var(--tc-color-brand-surface-hover),var(--tc-color-brand-surface))"></div>
-    <tc-chip slot="badge">互動式文稿</tc-chip>
-    <span slot="headline">點整張卡片即可前往，動作區仍可獨立點擊</span>
-    <span slot="meta">2022-03-21</span>
-    <tc-icon-button slot="actions" variant="tonal" label="讚">♥</tc-icon-button>
-    <tc-icon-button slot="actions" variant="tonal" label="分享">↗</tc-icon-button>
-  </tc-article-card>
-</Demo>
-
-## 用法
+Storybook 是工程師逐一檢查元件各種狀態的工具網站，目前只有預設網站主題（慈濟入口網）的淺色和深色。它只在正式上線的手冊才開得了；在自己的電腦上預覽手冊時，按鈕會顯示找不到頁面（詳見[開始使用](/docs/#給工程師)）。
 
 ### 純 HTML
 
@@ -111,13 +121,69 @@ import { TcArticleCard } from '@tzuchi/react';
 </TcArticleCard>;
 ```
 
-## API
+### 焦點文稿（featured）
+
+`featured` 放大標題並適合搭配較大的主視覺：
+
+<Demo>
+  <tc-article-card featured width="480px">
+    <div slot="media" role="img" aria-label="示意圖片（色塊代替照片）" style="display:block;width:100%;aspect-ratio:16/9;background:linear-gradient(135deg,var(--tc-color-brand-surface-hover),var(--tc-color-brand-surface))"></div>
+    <tc-chip slot="badge">焦點文稿</tc-chip>
+    <span slot="headline">焦點報導：跨越國界的人道援助行動</span>
+    <p slot="excerpt">在多個國家展開的援助計畫，集結志工與在地夥伴的力量，將關懷送達最需要的地方。</p>
+    <span slot="meta">2022-03-21 ｜ TCnews 慈善新聞網</span>
+  </tc-article-card>
+</Demo>
+
+### 橫向版式（horizontal）
+
+`orientation="horizontal"` 將媒體置於 inline-start（約 40% 寬），文字內容並列於右側：
+
+<Demo>
+  <tc-article-card orientation="horizontal" style="max-width:560px">
+    <div slot="media" role="img" aria-label="示意圖片（色塊代替照片）" style="display:block;width:100%;height:100%;background:linear-gradient(135deg,var(--tc-color-brand-surface-hover),var(--tc-color-brand-surface))"></div>
+    <tc-chip slot="badge">週報</tc-chip>
+    <span slot="headline">本週志業簡報：各據點服務成果彙整</span>
+    <p slot="excerpt">彙整本週各服務據點的活動與成果，並摘要下週重點行程。</p>
+    <span slot="meta">2022-03-21</span>
+  </tc-article-card>
+</Demo>
+
+### 影片卡片（video）
+
+`video` 於媒體上方疊加置中的圓形播放鈕；可與 `href` 一起使用：
+
+<Demo>
+  <tc-article-card video href="#video" width="360px">
+    <div slot="media" role="img" aria-label="影片縮圖（色塊代替照片）" style="display:block;width:100%;aspect-ratio:16/10;background:linear-gradient(135deg,var(--tc-color-brand-surface-hover),var(--tc-color-brand-surface))"></div>
+    <tc-chip slot="badge">影片</tc-chip>
+    <span slot="headline">紀實影片：志工早會現場直擊</span>
+    <span slot="meta">2022-03-21 ｜ 03:24</span>
+  </tc-article-card>
+</Demo>
+
+### 連結模式與動作區（Stretched Link + actions）
+
+設定 `href` 後整張卡片透過覆蓋層 `<a>` 變成連結；`actions` 內的控件（如讚／分享）仍可獨立點擊，不會被連結攔截：
+
+<Demo>
+  <tc-article-card href="#article" width="360px">
+    <div slot="media" role="img" aria-label="示意圖片（色塊代替照片）" style="display:block;width:100%;aspect-ratio:16/10;background:linear-gradient(135deg,var(--tc-color-brand-surface-hover),var(--tc-color-brand-surface))"></div>
+    <tc-chip slot="badge">互動式文稿</tc-chip>
+    <span slot="headline">點整張卡片即可前往，動作區仍可獨立點擊</span>
+    <span slot="meta">2022-03-21</span>
+    <tc-icon-button slot="actions" variant="tonal" label="讚">♥</tc-icon-button>
+    <tc-icon-button slot="actions" variant="tonal" label="分享">↗</tc-icon-button>
+  </tc-article-card>
+</Demo>
+
+### API
 
 下表自 Custom Elements Manifest 自動產生：
 
 <PropsTable tag="tc-article-card" />
 
-## 無障礙（Accessibility）
+### 無障礙（Accessibility）
 
 - `href` 模式以原生 `<a>` 為焦點與互動目標，支援鍵盤 Enter。
 - `interactive`（無 `href`）模式下，host 取得 `tabindex="0"` 與 `role="button"`，並以 Enter／Space 觸發 `tc-card-click`。

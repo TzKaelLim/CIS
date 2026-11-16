@@ -6,12 +6,61 @@ description: tc-input — form-associated 文字輸入欄位，支援 label、he
 import Demo from '../../../components/Demo.astro';
 import PropsTable from '../../../components/PropsTable.astro';
 import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
+import PreviewTile from '../../../components/handbook/PreviewTile.astro';
+import DoDont from '../../../components/handbook/DoDont.astro';
+import CurrentSiteNote from '../../../components/prototype/CurrentSiteNote.astro';
 
 <ComponentMeta id="input" />
 
-:::note[整理中]
-這一頁目前是給工程師的技術說明。給設計、企劃和廠商看的版面（用法、組成、該做與不該做）之後會補上，可以先看[按鈕](/components/button/)那一頁的樣子。
+<PreviewTile size="hero" interactive>
+  <div style="display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:1rem 1.5rem; inline-size:min(100%, 34rem); text-align:start;">
+    <tc-input label="姓名" placeholder="請輸入姓名" required helper-text="請填寫身分證上的姓名"></tc-input>
+    <tc-input label="電子郵件" type="email" value="name@" invalid error-text="請輸入完整的電子郵件"></tc-input>
+  </div>
+</PreviewTile>
+
+## 用法
+
+輸入框讓讀者輸入一行文字，例如姓名、電話、電子郵件。框的上方是標題，說明要填什麼；下方可以放一行說明，填錯時改顯示錯誤訊息。如果讀者是要搜尋網站的內容，請改用「搜尋列」；如果答案只有幾個固定的選項，請改用「下拉選單」或「單選鈕」，讀者不用自己打字，也不會打錯。
+
+## 組成
+
+| 部位           | 說明                                                                                             |
+| -------------- | ------------------------------------------------------------------------------------------------ |
+| 標題           | 框上方的文字，說明要填什麼。必填的欄位會在標題後面加一個紅色星號。                               |
+| 輸入框         | 有框線的區域，讀者在這裡打字。滑鼠移上去或選到時框線變色；選到時外面還多一圈柔光。           |
+| 提示文字       | 可省略。框內的淡色文字，例如「請輸入姓名」；讀者一開始打字就消失。                               |
+| 前後附加內容   | 可省略。放在框內前面或後面的小圖示或單位，例如「元」。                                           |
+| 說明文字       | 可省略。框下方的一行淡色文字，補充怎麼填。                                                       |
+| 錯誤訊息       | 填錯時取代說明文字，以紅色顯示，框線也變成紅色。                                                 |
+| 停用、唯讀狀態 | 停用時整個框變淡、不能輸入；唯讀時看起來和平常一樣，但內容不能修改。                             |
+
+## 該做與不該做
+
+:::caution[草稿]
+這一節是草稿，待美編（設計）確認。
 :::
+
+<DoDont
+  rows={[
+    { kind: 'do', text: '每個輸入框都寫標題，例如「電子郵件」。不要只靠框內的提示文字：讀者一開始打字，提示就不見了。' },
+    { kind: 'do', text: '錯誤訊息寫出怎麼改，例如「請輸入完整的電子郵件，例如 name@example.com」，不要只寫「格式錯誤」。錯誤不能只靠紅色表示，文字要說得清楚。' },
+    { kind: 'do', text: '必填的欄位標題後面會出現紅色星號；在表單開頭寫一次「標示 * 的欄位必填」，讓讀者知道星號的意思。' },
+    { kind: 'do', text: '框的寬度配合要填的內容：電話、郵遞區號可以短一點，地址、電子郵件長一點。' },
+    { kind: 'dont', text: '只給讀者看、不能修改的資料不要用停用的輸入框；停用的框顏色很淡，不容易看清楚。請用唯讀，或直接寫成一般文字。' },
+    { kind: 'dont', text: '不要自己改框線的顏色或圓角。顏色由網站主題決定，換網站時才會一致。' },
+  ]}
+/>
+
+## 在目前網站主題下的樣子
+
+<CurrentSiteNote />
+
+上方的大預覽會跟著頁首的「網站主題」和「色彩模式」一起變；這個元件還沒有淺色、深色並排的範例。
+
+## 給工程師
+
+以下是給工程師的安裝與 API 說明，美編（設計）、網站的編輯和廠商可以略過。
 
 `<tc-input>` 是 form-associated 的文字輸入欄位，內含原生 `<input>`，支援 `label`、`helper-text`、`error-text` 與表單驗證。下方為**可互動的真實元件**：
 
@@ -22,8 +71,6 @@ import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
   <tc-input label="信箱" value="not-an-email" invalid error-text="信箱格式錯誤" style="width:478px;"></tc-input>
   <tc-input value="無法編輯" disabled style="width:478px;"></tc-input>
 </Demo>
-
-## 用法
 
 ### 純 HTML
 
@@ -47,12 +94,12 @@ import { TcInput } from '@tzuchi/react';
 />;
 ```
 
-## 事件
+### 事件
 
 - `tc-input`：每次鍵入時觸發，`detail: { value }`。
 - `tc-change`：內部 `<input>` change 時觸發，`detail: { value }`。
 
-## 表單
+### 表單
 
 `<tc-input>` 透過 Form-Associated Custom Elements（ElementInternals）參與表單：`name` / `value` 會被序列化到 `FormData`，`required`、`invalid` 會回報驗證狀態。
 
@@ -67,13 +114,13 @@ import { TcInput } from '@tzuchi/react';
   </form>
 </Demo>
 
-## API
+### API
 
 下表自 Custom Elements Manifest 自動產生：
 
 <PropsTable tag="tc-input" />
 
-## 無障礙（Accessibility）
+### 無障礙（Accessibility）
 
 - 內含原生 `<input>`，`label` 透過 `for` / `id` 與輸入框關聯。
 - `delegatesFocus` 讓點擊 `label` 自動聚焦輸入框。

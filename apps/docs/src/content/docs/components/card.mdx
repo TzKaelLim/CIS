@@ -5,42 +5,92 @@ description: tc-card — 卡片容器，elevated / outlined 兩種變體，支�
 
 import Demo from '../../../components/Demo.astro';
 import PropsTable from '../../../components/PropsTable.astro';
+import CurrentSiteNote from '../../../components/prototype/CurrentSiteNote.astro';
 import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
+import PreviewTile from '../../../components/handbook/PreviewTile.astro';
+import DoDont from '../../../components/handbook/DoDont.astro';
+import { LinkButton } from '@astrojs/starlight/components';
 
 <ComponentMeta id="card" />
 
-:::note[整理中]
-這一頁目前是給工程師的技術說明。給設計、企劃和廠商看的版面（用法、組成、該做與不該做）之後會補上，可以先看[按鈕](/components/button/)那一頁的樣子。
+<PreviewTile size="hero" scale={0.52} interactive>
+  <tc-card variant="elevated" interactive width="280px">
+    <div slot="media" role="img" aria-label="示意圖片（色塊代替照片）" style="display:block;width:100%;aspect-ratio:16/10;background:linear-gradient(135deg,var(--tc-color-brand-surface-hover),var(--tc-color-brand-surface))"></div>
+    <span slot="headline">冬令發放</span>
+    <p style="margin:0;color:var(--tc-color-text-muted)">2026-03-21 ｜ 慈善新聞</p>
+    <tc-button slot="footer" variant="filled">捐款</tc-button>
+  </tc-card>
+  <tc-card variant="outlined" width="280px">
+    <div slot="media" role="img" aria-label="示意圖片（色塊代替照片）" style="display:block;width:100%;aspect-ratio:16/10;background:linear-gradient(135deg,var(--tc-color-brand-surface-hover),var(--tc-color-brand-surface))"></div>
+    <span slot="headline">社區環保日</span>
+    <p style="margin:0;color:var(--tc-color-text-muted)">2026-03-18 ｜ 環保新聞</p>
+  </tc-card>
+</PreviewTile>
+
+## 用法
+
+卡片把一張圖片、一個標題、一兩行說明和按鈕收成一塊，讓讀者可以並排瀏覽、挑一個點進去，例如專案、活動或募款項目。上方第一張是有陰影的卡片（elevated），它可以點，把滑鼠移上去陰影會變深；第二張是只有外框、沒有陰影的卡片（outlined），看起來比較平。如果是新聞或文章列表，需要分類、摘要和日期，請改用「文章卡片」；以封面為主的書籍或出版品用「書籍卡片」；沒有圖片的純文字清單用「清單面板」。
+
+## 組成
+
+| 部位     | 說明                                                                                     |
+| -------- | ---------------------------------------------------------------------------------------- |
+| 容器     | 卡片的底色和圓角。有陰影（elevated）或只有外框（outlined）兩種，顏色跟著網站主題。       |
+| 圖片     | 可省略。放在卡片最上方、和卡片一樣寬。                                                   |
+| 標題     | 卡片的名稱，用品牌主色的粗體大字。標題不會自動截短，字太多時卡片會被撐高。               |
+| 內文     | 可省略。標題下方的說明，例如日期、來源或一兩句介紹。                                     |
+| 動作區   | 可省略。放在最下方的按鈕，例如「捐款」。按鈕排成一列，不會換行。                         |
+| 整張可點 | 可省略。整張卡片連到另一頁時，滑過卡片陰影會變深、標題變色；動作區的按鈕仍然可以單獨按。 |
+| 焦點框   | 用鍵盤選到可點的卡片時出現的外框，讓不用滑鼠的人知道目前在哪裡。                         |
+
+## 該做與不該做
+
+:::caution[草稿]
+這一節是草稿，待美編（設計）確認。
 :::
 
-`<tc-card>` 是卡片容器，提供 media／headline／內文／footer 插槽，以及 elevated 與 outlined 兩種變體。互動時提升陰影（elevation）。用 `width` 屬性控制寬度（CSS 長度）。下方為**可互動的真實元件**（圖片為 Lorem Picsum 假圖）：
+<DoDont
+  rows={[
+    { kind: 'do', text: '同一排並排的卡片用同一種樣式（有陰影或只有外框）和相同寬度，標題長度也接近，排起來才整齊。' },
+    { kind: 'do', text: '標題寫短一點，最好在 15 個字以內；卡片標題不會自動截短，太長會讓這一張比旁邊的高。' },
+    { kind: 'do', text: '整張卡片要帶讀者到另一頁時，就讓整張卡片可以點，不要只讓標題可以點；需要另外的動作（例如「分享」）放在動作區。' },
+    { kind: 'do', text: '圖片要寫替代文字，說明圖片的內容；只是裝飾的圖片才留空。' },
+    { kind: 'dont', text: '動作區不要放超過兩個按鈕。按鈕排成一列、不會換行，卡片窄的時候會擠出卡片外。' },
+    { kind: 'dont', text: '不要自己改卡片的陰影、圓角或標題顏色。這些由網站主題決定，換網站時才會一致。' },
+  ]}
+/>
+
+## 在目前網站主題下的樣子
+
+<CurrentSiteNote />
+
+卡片還沒有各網站的對照範例；上方的大預覽會跟著頁首的「網站主題」和「色彩模式」一起變。
+
+## 給工程師
+
+以下是給工程師的安裝與 API 說明，設計、企劃和廠商可以略過。
+
+`<tc-card>` 是卡片容器，提供 media／headline／內文／footer 插槽，以及 elevated 與 outlined 兩種變體。互動時提升陰影（elevation）。用 `width` 屬性控制寬度（CSS 長度）。下方為**可互動的真實元件**（圖片以色塊代替）：
 
 <Demo>
   <tc-card variant="elevated" width="360px">
     <div slot="media" role="img" aria-label="示意圖片（色塊代替照片）" style="display:block;width:100%;aspect-ratio:16/10;background:linear-gradient(135deg,var(--tc-color-brand-surface-hover),var(--tc-color-brand-surface))"></div>
     <span slot="headline">專案名稱</span>
-    <p style="margin:0;color:#616161">2022-03-21 ｜ TCnews 慈善新聞網</p>
+    <p style="margin:0;color:var(--tc-color-text-muted)">2022-03-21 ｜ TCnews 慈善新聞網</p>
     <tc-button slot="footer" variant="filled">捐款</tc-button>
   </tc-card>
   <tc-card variant="outlined" width="360px">
     <div slot="media" role="img" aria-label="示意圖片（色塊代替照片）" style="display:block;width:100%;aspect-ratio:16/10;background:linear-gradient(135deg,var(--tc-color-brand-surface-hover),var(--tc-color-brand-surface))"></div>
     <span slot="headline">文章標題（建議字數在 15 字以內）</span>
-    <p style="margin:0;color:#616161">2022-03-21 ｜ TCnews 慈善新聞網</p>
+    <p style="margin:0;color:var(--tc-color-text-muted)">2022-03-21 ｜ TCnews 慈善新聞網</p>
   </tc-card>
 </Demo>
 
-## 寬度（width）
+<LinkButton href="/storybook/?path=/docs/components-card--docs" variant="secondary" icon="external">
+  在 Storybook 開啟
+</LinkButton>
 
-`width` 接受任何 CSS 長度（如 `320px`、`100%`），等同設定 `--tc-card-width`：
-
-<Demo>
-  <tc-card variant="elevated" width="240px">
-    <div slot="media" role="img" aria-label="示意圖片（色塊代替照片）" style="display:block;width:100%;aspect-ratio:16/10;background:linear-gradient(135deg,var(--tc-color-brand-surface-hover),var(--tc-color-brand-surface))"></div>
-    <span slot="headline">240px 卡片</span>
-  </tc-card>
-</Demo>
-
-## 用法
+Storybook 是工程師逐一檢查元件各種狀態的工具網站，目前只有預設網站主題（慈濟入口網）的淺色和深色。它只在正式上線的手冊才開得了；在自己的電腦上預覽手冊時，按鈕會顯示找不到頁面（詳見[開始使用](/docs/#給工程師)）。
 
 ### 純 HTML
 
@@ -67,25 +117,36 @@ import { TcCard } from '@tzuchi/react';
 </TcCard>;
 ```
 
-## 連結模式（Stretched Link）
+### 寬度（width）
+
+`width` 接受任何 CSS 長度（如 `320px`、`100%`），等同設定 `--tc-card-width`：
+
+<Demo>
+  <tc-card variant="elevated" width="240px">
+    <div slot="media" role="img" aria-label="示意圖片（色塊代替照片）" style="display:block;width:100%;aspect-ratio:16/10;background:linear-gradient(135deg,var(--tc-color-brand-surface-hover),var(--tc-color-brand-surface))"></div>
+    <span slot="headline">240px 卡片</span>
+  </tc-card>
+</Demo>
+
+### 連結模式（Stretched Link）
 
 設定 `href` 後，整張卡片透過覆蓋層 `<a>` 變成連結；`footer` 內的控件仍可獨立點擊，不會被連結攔截：
 
 <Demo>
   <tc-card href="#article" variant="elevated" style="max-width:360px">
     <span slot="headline">點整張卡片即可前往</span>
-    <p style="margin:0;color:#616161">footer 按鈕仍可獨立點擊</p>
+    <p style="margin:0;color:var(--tc-color-text-muted)">footer 按鈕仍可獨立點擊</p>
     <tc-button slot="footer" variant="outlined">分享</tc-button>
   </tc-card>
 </Demo>
 
-## API
+### API
 
 下表自 Custom Elements Manifest 自動產生：
 
 <PropsTable tag="tc-card" />
 
-## 無障礙（Accessibility）
+### 無障礙（Accessibility）
 
 - `href` 模式以原生 `<a>` 為焦點與互動目標，支援鍵盤 Enter。
 - `interactive`（無 `href`）模式下，host 取得 `tabindex="0"` 與 `role="button"`，並以 Enter／Space 觸發 `tc-card-click`。

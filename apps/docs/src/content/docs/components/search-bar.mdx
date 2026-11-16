@@ -6,20 +6,71 @@ description: tc-search-bar — 外框搜尋列，含可選前置分類選擇器�
 import Demo from '../../../components/Demo.astro';
 import PropsTable from '../../../components/PropsTable.astro';
 import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
+import PreviewTile from '../../../components/handbook/PreviewTile.astro';
+import DoDont from '../../../components/handbook/DoDont.astro';
+import CurrentSiteNote from '../../../components/prototype/CurrentSiteNote.astro';
 
 <ComponentMeta id="search-bar" />
 
-:::note[整理中]
-這一頁目前是給工程師的技術說明。給設計、企劃和廠商看的版面（用法、組成、該做與不該做）之後會補上，可以先看[按鈕](/components/button/)那一頁的樣子。
+<PreviewTile size="hero" interactive>
+  <div style="display:grid; grid-template-columns:minmax(0, 1fr); gap:1.25rem; inline-size:min(100%, 30rem);">
+    <tc-search-bar placeholder="搜尋文章、活動"></tc-search-bar>
+    <tc-search-bar
+      with-category
+      category="all"
+      placeholder="搜尋書籍或文章"
+      categories='[{"value":"all","label":"全部"},{"value":"book","label":"書籍"},{"value":"article","label":"文章"}]'
+    ></tc-search-bar>
+    <tc-search-bar placeholder="搜尋（停用）" disabled></tc-search-bar>
+  </div>
+</PreviewTile>
+
+## 用法
+
+搜尋列讓讀者輸入關鍵字，搜尋網站的內容，通常放在頁首或搜尋結果頁的上方。右邊固定有一個放大鏡按鈕，按下它或按 Enter 就開始搜尋；需要讓讀者先選搜尋範圍時，可以在左邊加上分類選單，例如「全部」「書籍」「文章」。如果是表單裡要填的一個欄位，例如姓名或電子郵件，請改用「輸入框」。
+
+## 組成
+
+| 部位     | 說明                                                                                                   |
+| -------- | ------------------------------------------------------------------------------------------------------ |
+| 外框     | 有圓角和框線的一整條。滑鼠移上去或選到時框線變色；選到時外面還多一圈柔光。                             |
+| 分類選單 | 可省略。最左邊的選單，讓讀者先選搜尋範圍。它的寬度有上限，名稱太長會被截掉。                           |
+| 輸入區   | 讀者打字的地方。框內的提示文字同時是螢幕閱讀器唸出的名稱，沒有寫時是「搜尋」。                         |
+| 搜尋鈕   | 最右邊的放大鏡按鈕，按下去開始搜尋；螢幕閱讀器會唸「搜尋」。                                           |
+| 停用狀態 | 整條變淡，不能輸入、不能選分類，也不能按搜尋。                                                         |
+
+## 該做與不該做
+
+:::caution[草稿]
+這一節是草稿，待美編（設計）確認。
 :::
+
+<DoDont
+  rows={[
+    { kind: 'do', text: '提示文字寫出可以搜尋什麼，例如「搜尋文章、活動」。這段文字也是螢幕閱讀器唸出的名稱，請不要留白。' },
+    { kind: 'do', text: '分類名稱保持兩、三個字，例如「全部」「書籍」「文章」。分類選單的寬度有上限，太長的名稱會被截掉。' },
+    { kind: 'do', text: '把搜尋列放在讀者習慣找的位置，例如頁首或搜尋結果頁的上方，整個網站保持一致。' },
+    { kind: 'dont', text: '不要在搜尋列旁邊再放一個「搜尋」按鈕；搜尋列已經有自己的放大鏡按鈕。' },
+    { kind: 'dont', text: '不要用搜尋列讓讀者填姓名、電話這類資料；請用「輸入框」。' },
+    { kind: 'dont', text: '不要自己改外框的顏色或圓角。顏色由網站主題決定，換網站時才會一致。' },
+  ]}
+/>
+
+## 在目前網站主題下的樣子
+
+<CurrentSiteNote />
+
+上方的大預覽會跟著頁首的「網站主題」和「色彩模式」一起變；這個元件還沒有淺色、深色並排的範例。
+
+## 給工程師
+
+以下是給工程師的安裝與 API 說明，美編（設計）、網站的編輯和廠商可以略過。
 
 `<tc-search-bar>` 是外框式（outlined）搜尋列，採用白色底、`radius.md` 圓角與 focus-within 焦點環，視覺與 `<tc-input>` 一致。版面為 `[可選分類選擇器 | 文字輸入框 | 搜尋鈕]`，搜尋鈕使用內嵌的 `search` 圖示。下方為**可互動的真實元件**：
 
 <Demo>
   <tc-search-bar placeholder="搜尋"></tc-search-bar>
 </Demo>
-
-## 用法
 
 ### 純 HTML
 
@@ -41,7 +92,7 @@ import { TcSearchBar } from '@tzuchi/react';
 />;
 ```
 
-## 含分類選擇器
+### 含分類選擇器
 
 加上 `with-category` 會在前端顯示分類選擇器，選項以 `categories`（物件陣列 property 或 JSON 字串屬性）提供。切換分類會派發 `tc-category-change`：
 
@@ -53,7 +104,7 @@ import { TcSearchBar } from '@tzuchi/react';
   ></tc-search-bar>
 </Demo>
 
-## 事件
+### 事件
 
 - 輸入時派發 `tc-input`，`detail: { value }`。
 - 按下 `Enter` 或點擊搜尋鈕派發 `tc-search`，`detail: { value, category }`。
@@ -61,13 +112,13 @@ import { TcSearchBar } from '@tzuchi/react';
 
 所有事件皆 `composed` 且 `bubbles`。
 
-## API
+### API
 
 下表自 Custom Elements Manifest 自動產生：
 
 <PropsTable tag="tc-search-bar" />
 
-## 無障礙（Accessibility）
+### 無障礙（Accessibility）
 
 - 外框為 `<form role="search">`，組成自己的提交流程（非 form-associated）。
 - 文字輸入框以 `aria-label`（預設取 `placeholder`）提供無障礙名稱。

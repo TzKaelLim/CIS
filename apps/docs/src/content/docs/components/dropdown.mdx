@@ -6,12 +6,62 @@ description: tc-dropdown — 單選 outlined 下拉選單（combobox / listbox�
 import Demo from '../../../components/Demo.astro';
 import PropsTable from '../../../components/PropsTable.astro';
 import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
+import PreviewTile from '../../../components/handbook/PreviewTile.astro';
+import DoDont from '../../../components/handbook/DoDont.astro';
+import CurrentSiteNote from '../../../components/prototype/CurrentSiteNote.astro';
 
 <ComponentMeta id="dropdown" />
 
-:::note[整理中]
-這一頁目前是給工程師的技術說明。給設計、企劃和廠商看的版面（用法、組成、該做與不該做）之後會補上，可以先看[按鈕](/components/button/)那一頁的樣子。
+<PreviewTile size="hero" interactive>
+  <div style="padding-block-end:8.75rem;">
+    <tc-dropdown
+      placeholder="請選擇地區"
+      options='[{"value":"north","label":"北部"},{"value":"central","label":"中部"},{"value":"south","label":"南部"}]'
+      style="width:200px;"
+    ></tc-dropdown>
+  </div>
+</PreviewTile>
+
+## 用法
+
+下拉選單讓讀者從一串選項裡選一個，例如地區、場次。平常只佔一行，點開後才在下方列出所有選項，選好後選單自動收起，框裡顯示選到的那一項。適合選項比較多、版面放不下的時候；如果只有少少幾個選項、希望讀者一眼看到全部，請改用「單選鈕」。需要讀者自己打字的，請用「輸入框」。
+
+## 組成
+
+| 部位     | 說明                                                                                           |
+| -------- | ---------------------------------------------------------------------------------------------- |
+| 選單框   | 有框線的一格，顯示提示文字或已選的選項，右邊有向下的箭頭。點開時框的底色變深、箭頭轉向上。     |
+| 提示文字 | 還沒選的時候顯示的淡色文字，例如「請選擇地區」。選好後換成主色的選項名稱。                     |
+| 選項清單 | 點開後在選單框下方出現，底色是淡淡的品牌色；目前選到的那一項底色比較深。                       |
+| 焦點框   | 用鍵盤選到選單時出現的外框。用鍵盤的方向鍵就能上下選擇、按 Enter 選定、按 Esc 關閉。           |
+| 停用狀態 | 整格變淡，點了不會展開。                                                                       |
+
+## 該做與不該做
+
+:::caution[草稿]
+這一節是草稿，待美編（設計）確認。
 :::
+
+<DoDont
+  rows={[
+    { kind: 'do', text: '提示文字寫出要選什麼，例如「請選擇地區」「請選擇場次」。' },
+    { kind: 'do', text: '下拉選單本身沒有標題。放在表單裡時，請在它上方另外寫一行標題，並請工程把標題和選單連在一起，讓螢幕閱讀器也唸得到。' },
+    { kind: 'do', text: '選項依讀者好找的順序排列，例如依地理位置、時間先後；選項名稱短而清楚，一看就能分辨。' },
+    { kind: 'dont', text: '不要放太多選項。清單會一路往下長、不會出現捲軸，選項太多時長長一串會超出畫面。' },
+    { kind: 'dont', text: '只有兩、三個選項時不要用下拉選單；用「單選鈕」把選項直接列出來，讀者不用多點一次。' },
+    { kind: 'dont', text: '不要用下拉選單當作網站的導覽選單（選了就換頁）。它是表單裡用來選一個值的元件。' },
+  ]}
+/>
+
+## 在目前網站主題下的樣子
+
+<CurrentSiteNote />
+
+上方的大預覽會跟著頁首的「網站主題」和「色彩模式」一起變；這個元件還沒有淺色、深色並排的範例。
+
+## 給工程師
+
+以下是給工程師的安裝與 API 說明，美編（設計）、網站的編輯和廠商可以略過。
 
 `<tc-dropdown>` 是單選的 outlined 下拉選單（combobox / listbox）。選項可由 `options` property（物件陣列）或 `options` 屬性（JSON 字串）提供，因此純 HTML 與 React 皆可使用。下方為**可互動的真實元件**：
 
@@ -34,8 +84,6 @@ import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
     style="width:180px;"
   ></tc-dropdown>
 </Demo>
-
-## 用法
 
 ### 純 HTML
 
@@ -70,11 +118,11 @@ import { TcDropdown } from '@tzuchi/react';
 />;
 ```
 
-## 事件
+### 事件
 
 - `tc-change`：選取值改變時觸發，`detail: { value }`（composed、bubbles）。
 
-## 鍵盤操作
+### 鍵盤操作
 
 - `Enter` / `空白鍵` / `↓`：展開選單。
 - `↓` / `↑`：在選單中移動作用中選項。
@@ -83,17 +131,17 @@ import { TcDropdown } from '@tzuchi/react';
 - `Esc`：關閉選單並將焦點移回觸發按鈕。
 - 點選選單外或按 `Esc` 皆會關閉選單。
 
-## 表單
+### 表單
 
 `<tc-dropdown>` 透過 Form-Associated Custom Elements（ElementInternals）參與表單：`name` / `value` 會被序列化到 `FormData`。
 
-## API
+### API
 
 下表自 Custom Elements Manifest 自動產生：
 
 <PropsTable tag="tc-dropdown" />
 
-## 無障礙（Accessibility）
+### 無障礙（Accessibility）
 
 - 觸發按鈕為原生 `<button>`，標註 `role=combobox`、`aria-haspopup=listbox`、`aria-expanded`、`aria-controls`。
 - 選單為 `role=listbox`，選項為 `role=option` 並以 `aria-selected` 標示目前選取項。

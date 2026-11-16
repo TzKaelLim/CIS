@@ -5,70 +5,103 @@ description: tc-list-panel — 彩色標題列加上垂直分隔清單的標題�
 
 import Demo from '../../../components/Demo.astro';
 import PropsTable from '../../../components/PropsTable.astro';
+import CurrentSiteNote from '../../../components/prototype/CurrentSiteNote.astro';
 import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
+import PreviewTile from '../../../components/handbook/PreviewTile.astro';
+import DoDont from '../../../components/handbook/DoDont.astro';
+import { LinkButton } from '@astrojs/starlight/components';
 
 <ComponentMeta id="list-panel" />
 
-:::note[整理中]
-這一頁目前是給工程師的技術說明。給設計、企劃和廠商看的版面（用法、組成、該做與不該做）之後會補上，可以先看[按鈕](/components/button/)那一頁的樣子。
+<PreviewTile size="hero" scale={0.55}>
+  <tc-list-panel label="最新消息" width="260px">
+    <article>
+      <strong style="color:var(--tc-color-text-default)">慈濟志工關懷行動</strong>
+      <p style="margin:4px 0 0;color:var(--tc-color-text-muted)">2026-06-15</p>
+    </article>
+    <article>
+      <strong style="color:var(--tc-color-text-default)">環保站開放參訪</strong>
+      <p style="margin:4px 0 0;color:var(--tc-color-text-muted)">2026-06-12</p>
+    </article>
+  </tc-list-panel>
+  <tc-list-panel variant="plain" label="相關連結" width="260px">
+    <article>
+      <strong style="color:var(--tc-color-text-default)">慈濟全球資訊網</strong>
+    </article>
+    <article>
+      <strong style="color:var(--tc-color-text-default)">慈濟月刊</strong>
+    </article>
+  </tc-list-panel>
+</PreviewTile>
+
+## 用法
+
+清單面板是一塊有標題列的直式清單：上面一條彩色的標題列說明這一組是什麼，下面一列一列排出項目，項目之間自動加上細分隔線，常放在首頁側欄，例如「最新消息」。重要的區塊用品牌主色的標題列（上方第一個），次要的區塊例如「相關連結」用淡色的標題列（上方第二個）。每一則都需要圖片和摘要時，請改用「文章卡片」；要讓讀者並排挑選的項目用「卡片」。
+
+## 組成
+
+| 部位     | 說明                                                                                                                                         |
+| -------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| 標題列   | 面板最上方的一條。品牌主色底配白字（brand），或淡色底配一般文字色（plain）。螢幕閱讀器會把它當成這一區的標題。需要圖示時可以換成自訂的標題。 |
+| 清單項目 | 標題列下方的一列一列內容，例如標題加日期。每一則是一列，內容由網站自己放。                                                                   |
+| 分隔線   | 項目之間的細線，自動加上，不必自己畫。                                                                                                       |
+| 外框     | 整個面板的細外框和圓角，顏色跟著網站主題。                                                                                                   |
+
+## 該做與不該做
+
+:::caution[草稿]
+這一節是草稿，待美編（設計）確認。
 :::
 
-`<tc-list-panel>` 是標題面板：上方為彩色標題列（`brand` 變體為品牌主色底、白字），下方為由預設插槽提供的垂直清單，項目間自動加上細分隔線。標題以 `label` 屬性設定，或用 `header` 插槽覆寫。用 `width` 屬性控制寬度（CSS 長度）。下方為**可互動的真實元件**（圖片為 Lorem Picsum 假圖）：
+<DoDont
+  rows={[
+    { kind: 'do', text: '標題列用幾個字說出這一組是什麼，例如「最新消息」「相關連結」。它也是這一區給螢幕閱讀器的標題。' },
+    { kind: 'do', text: '每一列的寫法保持一致，例如都是「標題＋日期」，讀者才能很快往下掃。' },
+    { kind: 'do', text: '一個頁面上，主要的面板用品牌主色的標題列，次要的面板用淡色標題列，讀者一眼分得出輕重。' },
+    { kind: 'dont', text: '不要在清單面板裡放大圖或長摘要；每一則需要圖片和摘要時，改用「文章卡片」。' },
+    { kind: 'dont', text: '不要讓標題列空白。沒有標題的面板，讀者和螢幕閱讀器都不知道這一區在講什麼。' },
+    { kind: 'dont', text: '不要自己改標題列的顏色。顏色由網站主題決定，換網站時才會一致。' },
+  ]}
+/>
+
+## 在目前網站主題下的樣子
+
+<CurrentSiteNote />
+
+清單面板還沒有各網站的對照範例；上方的大預覽會跟著頁首的「網站主題」和「色彩模式」一起變。
+
+## 給工程師
+
+以下是給工程師的安裝與 API 說明，設計、企劃和廠商可以略過。
+
+`<tc-list-panel>` 是標題面板：上方為彩色標題列（`brand` 變體為品牌主色底、白字），下方為由預設插槽提供的垂直清單，項目間自動加上細分隔線。標題以 `label` 屬性設定，或用 `header` 插槽覆寫。用 `width` 屬性控制寬度（CSS 長度）。下方為**可互動的真實元件**：
 
 <Demo>
   <tc-list-panel label="內部觀點：領航慈濟" width="360px">
     <article>
-      <h3 style="margin:0 0 4px;font-weight:700;color:#1b2d58">目前做的事情原因與做法做法</h3>
-      <p style="margin:0 0 4px;color:#616161">2023-06-15</p>
-      <p style="margin:0;display:flex;justify-content:space-between;color:#616161">
-        <span>顏博文 執行長</span>
+      <h3 style="margin:0 0 4px;font-weight:700;color:var(--tc-color-text-default)">目前做的事情原因與做法做法</h3>
+      <p style="margin:0 0 4px;color:var(--tc-color-text-muted)">2023-06-15</p>
+      <p style="margin:0;display:flex;justify-content:space-between;color:var(--tc-color-text-muted)">
+        <span>執行長</span>
         <span>讚 ｜ 分享</span>
       </p>
     </article>
     <article>
-      <h3 style="margin:0 0 4px;font-weight:700;color:#1b2d58">目前做的事情原因與做法</h3>
-      <p style="margin:0 0 4px;color:#616161">2023-06-15</p>
-      <p style="margin:0;display:flex;justify-content:space-between;color:#616161">
-        <span>顏博文 執行長</span>
+      <h3 style="margin:0 0 4px;font-weight:700;color:var(--tc-color-text-default)">目前做的事情原因與做法</h3>
+      <p style="margin:0 0 4px;color:var(--tc-color-text-muted)">2023-06-15</p>
+      <p style="margin:0;display:flex;justify-content:space-between;color:var(--tc-color-text-muted)">
+        <span>執行長</span>
         <span>讚 ｜ 分享</span>
       </p>
     </article>
   </tc-list-panel>
 </Demo>
 
-## 變體（variant）
+<LinkButton href="/storybook/?path=/docs/components-listpanel--docs" variant="secondary" icon="external">
+  在 Storybook 開啟
+</LinkButton>
 
-`brand`（預設）為品牌主色標題列、白字；`plain` 為淡色標題列、內文色標題，適合次要區塊：
-
-<Demo>
-  <tc-list-panel variant="plain" label="相關連結" width="360px">
-    <article>
-      <h3 style="margin:0;font-weight:700;color:#1b2d58">慈濟全球資訊網</h3>
-    </article>
-    <article>
-      <h3 style="margin:0;font-weight:700;color:#1b2d58">慈濟月刊</h3>
-    </article>
-  </tc-list-panel>
-</Demo>
-
-## 自訂標題（header 插槽）
-
-需要圖示或更複雜的標題時，用 `header` 插槽覆寫 `label`：
-
-<Demo>
-  <tc-list-panel width="360px">
-    <h2 slot="header" style="margin:0;display:flex;align-items:center;gap:8px">
-      <div aria-hidden="true" style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--tc-color-brand-surface-hover),var(--tc-color-brand-surface))"></div>
-      內部觀點：領航慈濟
-    </h2>
-    <article>
-      <h3 style="margin:0;font-weight:700;color:#1b2d58">用願力與行動翻轉人生</h3>
-      <p style="margin:4px 0 0;color:#616161">2023-06-15 ｜ 顏博文 執行長</p>
-    </article>
-  </tc-list-panel>
-</Demo>
-
-## 用法
+Storybook 是工程師逐一檢查元件各種狀態的工具網站，目前只有預設網站主題（慈濟入口網）的淺色和深色。它只在正式上線的手冊才開得了；在自己的電腦上預覽手冊時，按鈕會顯示找不到頁面（詳見[開始使用](/docs/#給工程師)）。
 
 ### 純 HTML
 
@@ -79,11 +112,11 @@ import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
 <tc-list-panel label="內部觀點：領航慈濟">
   <article>
     <h3>目前做的事情原因與做法</h3>
-    <p>2023-06-15 ｜ 顏博文 執行長</p>
+    <p>2023-06-15 ｜ 執行長</p>
   </article>
   <article>
     <h3>用願力與行動翻轉人生</h3>
-    <p>2023-06-15 ｜ 顏博文 執行長</p>
+    <p>2023-06-15 ｜ 執行長</p>
   </article>
 </tc-list-panel>
 ```
@@ -96,18 +129,50 @@ import { TcListPanel } from '@tzuchi/react';
 <TcListPanel label="內部觀點：領航慈濟" variant="brand">
   <article>
     <h3>目前做的事情原因與做法</h3>
-    <p>2023-06-15 ｜ 顏博文 執行長</p>
+    <p>2023-06-15 ｜ 執行長</p>
   </article>
 </TcListPanel>;
 ```
 
-## API
+### 變體（variant）
+
+`brand`（預設）為品牌主色標題列、白字；`plain` 為淡色標題列、內文色標題，適合次要區塊：
+
+<Demo>
+  <tc-list-panel variant="plain" label="相關連結" width="360px">
+    <article>
+      <h3 style="margin:0;font-weight:700;color:var(--tc-color-text-default)">慈濟全球資訊網</h3>
+    </article>
+    <article>
+      <h3 style="margin:0;font-weight:700;color:var(--tc-color-text-default)">慈濟月刊</h3>
+    </article>
+  </tc-list-panel>
+</Demo>
+
+### 自訂標題（header 插槽）
+
+需要圖示或更複雜的標題時，用 `header` 插槽覆寫 `label`：
+
+<Demo>
+  <tc-list-panel width="360px">
+    <h2 slot="header" style="margin:0;display:flex;align-items:center;gap:8px">
+      <div aria-hidden="true" style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--tc-color-brand-surface-hover),var(--tc-color-brand-surface))"></div>
+      內部觀點：領航慈濟
+    </h2>
+    <article>
+      <h3 style="margin:0;font-weight:700;color:var(--tc-color-text-default)">用願力與行動翻轉人生</h3>
+      <p style="margin:4px 0 0;color:var(--tc-color-text-muted)">2023-06-15 ｜ 執行長</p>
+    </article>
+  </tc-list-panel>
+</Demo>
+
+### API
 
 下表自 Custom Elements Manifest 自動產生：
 
 <PropsTable tag="tc-list-panel" />
 
-## 無障礙（Accessibility）
+### 無障礙（Accessibility）
 
 - 標題列以 `<h2>` 呈現，建立頁面標題層級；使用 `header` 插槽時請放入適當的標題標籤。
 - 清單項目為使用者提供的內容，建議用語意化標籤（如 `<article>`）並維持標題層級。

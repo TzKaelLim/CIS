@@ -6,12 +6,63 @@ description: tc-radio — 單選圓鈕，form-associated，同名群組互斥。
 import Demo from '../../../components/Demo.astro';
 import PropsTable from '../../../components/PropsTable.astro';
 import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
+import PreviewTile from '../../../components/handbook/PreviewTile.astro';
+import DoDont from '../../../components/handbook/DoDont.astro';
+import CurrentSiteNote from '../../../components/prototype/CurrentSiteNote.astro';
 
 <ComponentMeta id="radio" />
 
-:::note[整理中]
-這一頁目前是給工程師的技術說明。給設計、企劃和廠商看的版面（用法、組成、該做與不該做）之後會補上，可以先看[按鈕](/components/button/)那一頁的樣子。
+<PreviewTile size="hero" interactive>
+  <div role="radiogroup" aria-labelledby="hero-donation-label" style="display:flex; flex-direction:column; gap:.5rem; align-items:flex-start; text-align:start;">
+    <strong id="hero-donation-label">捐款方式</strong>
+    <tc-radio name="hero-donation" value="monthly" checked>每月定期捐款</tc-radio>
+    <tc-radio name="hero-donation" value="once">單次捐款</tc-radio>
+    <tc-radio name="hero-donation" value="later">先了解，之後再決定</tc-radio>
+    <tc-radio name="hero-donation" value="yearly" disabled>每年捐款（尚未開放）</tc-radio>
+  </div>
+</PreviewTile>
+
+## 用法
+
+單選鈕讓讀者在幾個互斥的選項中選一個，例如捐款方式、衣服尺寸。所有選項同時列出來，讀者一眼就能比較；選了其中一個，原本選的就自動取消。選項很多、版面放不下時，請改用「下拉選單」；如果讀者可以同時選好幾個，就不要用單選鈕。
+
+## 組成
+
+| 部位     | 說明                                                                                         |
+| -------- | -------------------------------------------------------------------------------------------- |
+| 圓鈕     | 24px 的圓圈。沒選時是灰色外圈，選到時外圈變成主色，中間多一個主色的圓點。                     |
+| 選項文字 | 必填。寫在圓鈕右邊；點文字也能選這個選項。                                                   |
+| 焦點框   | 用鍵盤選到時出現的外框。用方向鍵可以在同一組選項之間移動並選取。                             |
+| 停用狀態 | 整個選項變淡，不能選，也不能用鍵盤選到。                                                     |
+
+這個元件只有一個一個的選項，沒有整組的標題；整組上方的問題（例如「捐款方式」）要在網頁上另外寫。
+
+## 該做與不該做
+
+:::caution[草稿]
+這一節是草稿，待美編（設計）確認。
 :::
+
+<DoDont
+  rows={[
+    { kind: 'do', text: '每組單選鈕上方寫一個問題或標題，例如「捐款方式」，讓讀者知道在選什麼。' },
+    { kind: 'do', text: '選項一個一行、由上往下排，比橫排容易看，也容易點。' },
+    { kind: 'do', text: '選項文字一句話說清楚，例如「每月定期捐款」；需要補充說明時，寫在整組的下方。' },
+    { kind: 'dont', text: '不要只放一個單選鈕。單選鈕選了之後就不能再取消，讀者會沒辦法改回來。' },
+    { kind: 'dont', text: '讀者可以同時選好幾個時，不要用單選鈕。' },
+    { kind: 'dont', text: '不要自己改圓鈕的顏色或大小。顏色由網站主題決定，換網站時才會一致。' },
+  ]}
+/>
+
+## 在目前網站主題下的樣子
+
+<CurrentSiteNote />
+
+上方的大預覽會跟著頁首的「網站主題」和「色彩模式」一起變；這個元件還沒有淺色、深色並排的範例。
+
+## 給工程師
+
+以下是給工程師的安裝與 API 說明，美編（設計）、網站的編輯和廠商可以略過。
 
 `<tc-radio>` 是 24×24 的單選圓鈕，提供外圈 ring 與選取時填滿的內點，並支援 form-associated 表單提交。同 `name` 的 `<tc-radio>` 互斥，僅能選取一個。下方為**可互動的真實元件**：
 
@@ -23,8 +74,6 @@ import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
     <tc-radio name="demo" value="d" disabled>停用選項</tc-radio>
   </div>
 </Demo>
-
-## 用法
 
 ### 純 HTML
 
@@ -44,7 +93,7 @@ import { TcRadio } from '@tzuchi/react';
 <TcRadio name="color" value="red" onTcChange={handleChange}>紅</TcRadio>;
 ```
 
-## 群組與表單
+### 群組與表單
 
 同名的 `<tc-radio>` 互斥，選取後其它選項自動取消。`tc-radio` 透過 Form-Associated Custom Elements（ElementInternals）以 `name` / `value` 參與所屬 `<form>` 提交；未選取時不貢獻任何值。加上 `required` 時，群組未選取即為無效。
 
@@ -61,13 +110,13 @@ import { TcRadio } from '@tzuchi/react';
   </form>
 </Demo>
 
-## API
+### API
 
 下表自 Custom Elements Manifest 自動產生：
 
 <PropsTable tag="tc-radio" />
 
-## 無障礙（Accessibility）
+### 無障礙（Accessibility）
 
 - `role="radio"` 並同步 `aria-checked` / `aria-disabled`。
 - 鍵盤 Space / Enter 選取；方向鍵在同名群組內移動並選取。
