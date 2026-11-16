@@ -418,7 +418,7 @@ packages/tokens/src/sites/<id>/
 
 ### 9.5 元件頁的結構
 
-- S-82　給一般讀者的元件頁，依序有這六段：〔部分：22 個元件頁都有這六段；第 5 段的預設變體要等網站設定檔，淺色、深色並排的範例只有按鈕頁有；第 6 段沒有 Storybook 連結，因為 Storybook 還沒有這些元件的頁面〕
+- S-82　給一般讀者的元件頁，依序有這六段：〔部分：22 個元件頁都有這六段；第 5 段的預設變體要等網站設定檔，淺色、深色並排的範例只有按鈕頁有；第 6 段沒有 Storybook 連結，因為 Storybook 還沒有這些元件的頁面；「該做與不該做」是草稿，待美編（設計）確認〕
   1. **預覽**：真的元件，不是截圖，用目前選定的網站主題和色彩模式顯示。
   2. **用法**：什麼時候用、什麼時候不用。
   3. **組成**：元件由哪些部分組成。
@@ -447,7 +447,7 @@ packages/tokens/src/sites/<id>/
 ### 9.7 內容規則
 
 - S-84　手冊對外公開，只放設計內容。共編流程、電腦準備放在 repo 的 `CONTRIBUTING.md`。〔部分：電腦準備只在 `CONTRIBUTING.md`；手冊的「如何參與修改」頁有角色、五個步驟和三級判斷的摘要，要不要保留這一頁待專案負責人決定〕
-- S-85　手冊顯示的色票和數值由 tokens 產生（S-5），淺色和深色的值都要看得到。〔目標〕
+- S-85　手冊顯示的色票和數值由 tokens 產生（S-5），淺色和深色的值都要看得到。〔部分：預設網站主題的色票從 tokens 的原始 JSON 算出來，淺色和深色都看得到，但還不是讀建置產物；示意的環保網用手冊裡自訂的綠色〕
 - S-86　手冊頁面不發出任何第三方請求（S-98）；範例圖片放在 repo 裡。〔現行〕
 - S-87　手冊的本機預覽只用 `pnpm run docs:dev`（127.0.0.1:4321）。〔現行〕
 
@@ -686,6 +686,6 @@ S-24 規定基礎只新增、不修改。但如果某個基礎值當初就抄錯
 | `.gitlab-ci.yml` | GitHub Actions 的 CI 建好後移除；移除前不再修改它的部署流程 | S-22、Q3 |
 | `apps/docs/src/content/docs/index.mdx` | 刪掉「以 Lit Web Components 為單一來源」的說法 | S-3 |
 | `apps/docs/src/content/docs/foundations/theming.mdx` | 「淺色與深色兩套主題」改成「色彩模式」 | S-40 |
-| `apps/docs/src/content/docs/components/*.mdx`（5 頁） | 範例圖片改成 repo 裡的圖片 | S-86 |
+| `apps/docs/src/content/docs/components/*.mdx`（5 頁） | 範例圖片改成 repo 裡的圖片〔已完成：改成色塊〕 | S-86 |
 | `heroui/storybook/.storybook/addons/theme/constants.ts` | 工具列拆成網站主題和色彩模式（`LOCAL CHANGE`） | S-89 |
 | `packages/tokens/package.json`、`apps/docs/package.json`、root `package.json` | `^` 範圍改成精確版本 | S-94 |
