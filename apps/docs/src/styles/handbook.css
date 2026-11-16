@@ -149,9 +149,9 @@
     justify-content: center;
   }
 }
-/* 上一頁／下一頁的頁面名稱（Starlight 原本 24px）。 */
+/* 上一頁／下一頁的頁面名稱（Starlight 原本 24px）：和側欄連結同樣大小，不比內文突出。 */
 .pagination-links .link-title {
-  font-size: var(--hb-text-lead);
+  font-size: var(--hb-text-ui);
 }
 
 /* hero 的標題和副標（首頁另外放大，見 HomeHeroStrip.astro）。 */

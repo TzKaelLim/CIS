@@ -29,6 +29,12 @@
   --hb-text-h2: 1.375rem; /* 22px */
   --hb-text-h1: 2rem; /* 32px：頁面標題 */
   --hb-text-hero: 2.125rem; /* 34px：首頁的大標題（手機）；桌機見下面 */
+  --hb-text-icon: 1.0625rem; /* 17px：和文字並排的小圖示（例如下拉選單的箭頭） */
+
+  /* ── 示意縮圖：網站主題頁上縮小的示範網站畫面和示範按鈕（不是手冊本身的文字） ── */
+  --hb-sample-text: 0.875rem; /* 14px：縮圖的基準字級、示範按鈕 */
+  --hb-sample-text-sm: 0.8125rem; /* 13px：縮圖裡的按鈕、摘要、提示 */
+  --hb-sample-text-xs: 0.75rem; /* 12px：縮圖裡的導覽、日期 */
 
   /* ── 行高 ───────────────────────────────────────────────────── */
   --hb-line-height: 1.5715; /* 14px 內文的 22px */
@@ -71,6 +77,8 @@
 
   /* 頁首跟著字級變矮一點（Starlight 原本手機 56px、桌機 64px）。 */
   --sl-nav-height: 3.5rem;
+  /* 手機的選單按鈕和搜尋按鈕、手機選單的項目一樣 40px 高（Starlight 原本 32px）。 */
+  --sl-menu-button-size: 2.5rem;
 }
 
 @media (min-width: 50rem) {
@@ -99,4 +107,24 @@ body {
 .tc-bento .preview:not(.claude-preview) {
   font-size: var(--hb-kit-text);
   line-height: var(--hb-kit-line-height);
+}
+
+/* Starlight 的淺色／深色選單：箭頭圖示和「網站主題」選單的箭頭同樣大小（Starlight 原本 20px）。 */
+starlight-theme-select label {
+  --sl-caret-size: var(--hb-text-icon);
+}
+
+/* 右側目錄：Starlight 的行高 1.25 在 12px 時只有 15px，長的中文標題換行會擠在一起。 */
+starlight-toc a,
+mobile-starlight-toc a {
+  line-height: var(--hb-line-height);
+}
+
+/* Starlight 的徽章（Badge）原本是 line-height: normal，在等寬字型下行高等於字級，字貼著框線。
+   側欄裡的徽章維持 Starlight 的 line-height: 1。 */
+.sl-badge {
+  line-height: var(--hb-line-height-ui);
+}
+.sidebar-content .sl-badge {
+  line-height: 1;
 }
