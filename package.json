@@ -18,6 +18,7 @@
     "heroui:theme": "node heroui/styles/themes/tzuchi/generate.mjs",
     "heroui:storybook": "node scripts/dev/storybook.mjs",
     "docs:dev": "node scripts/dev/docs.mjs",
+    "docs:build": "pnpm --filter @tzuchi/tokens build && node scripts/dev/astro.mjs build",
     "test:scripts": "node --test \"scripts/**/*.test.mjs\"",
     "heroui:storybook:build": "pnpm --filter @heroui/storybook build"
   },
