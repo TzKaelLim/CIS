@@ -16,7 +16,7 @@
 | [`01-co-editing-sop.md`](01-co-editing-sop.md) | 一次修改的 SOP：角色與核可、五個步驟、Claude Code 每一步必須做和絕對不做的事、什麼時候先停下來問 | R-S-01 起 |
 | [`02-design-rules.md`](02-design-rules.md) | tokens、網站主題、色彩模式、變體、版本和三級判斷 | R-D-01 起 |
 | [`03-component-rules.md`](03-component-rules.md) | 怎麼「優化」或「新增」一個元件，以及完成的條件 | R-C-01 起 |
-| [`04-handbook-rules.md`](04-handbook-rules.md) | 手冊要做到的樣子：五個區域、頁首選單、一次一個網站、元件頁結構、字級、用詞 | R-H-01 起 |
+| [`04-handbook-rules.md`](04-handbook-rules.md) | 手冊要做到的樣子：五個區域、頁首選單、一次一個網站、元件頁結構、字級、用詞、範本區域 | R-H-01 起 |
 
 相關文件（不是規則檔，但規則會引用）：
 

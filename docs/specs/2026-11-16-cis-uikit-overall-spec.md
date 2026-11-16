@@ -384,7 +384,7 @@ packages/tokens/src/sites/<id>/
 
 ### 9.1 現況（事實）
 
-- `apps/docs` 是 Astro 5.18.2 + Starlight 0.34.8。手冊分成首頁、文件、元件、範本、網站主題五個區域：3 個基礎頁、22 個元件頁、4 個範本頁和 2 個網站主題頁。
+- `apps/docs` 是 Astro 5.18.2 + Starlight 0.34.8。手冊分成首頁、文件、元件、範本、網站主題五個區域：3 個基礎頁、22 個元件頁、範本總覽（4 個範本，每個在對話框裡預覽，第 9.8 節）和 2 個網站主題頁。
 - 頁首（`apps/docs/src/components/starlight/Header.astro`）有「網站主題」選單（`apps/docs/src/components/handbook/SiteMenu.astro`；手機選單裡是 `SiteSelect.astro` 的下拉選單）和「色彩模式」按鈕（`ColorModeToggle.astro`，淺色和深色兩者切換）。網站主題的資料在 `apps/docs/src/data/site-themes.ts`：只有預設網站主題（慈濟入口網）是正式的，慈濟環保網是示意（顏色寫在手冊裡，不在 `packages/tokens`）。
 - 元件頁照第 9.5 節的六段排列，但介紹的仍是凍結的 Lit `tc-*` 元件；Storybook 還沒有這些元件的頁面。
 - 手冊頁面不載入第三方資源（`scripts/docs/handbook.test.mjs` 檢查原始檔）。
@@ -394,14 +394,14 @@ packages/tokens/src/sites/<id>/
 
 ### 9.2 五個區域
 
-- S-75　手冊分五個區域：**首頁**、**文件**、**元件**、**範本**、**網站主題**。頁首有這五個區域的導覽；側欄只顯示目前所在區域的頁面。〔現行〕
+- S-75　手冊分五個區域：**首頁**、**文件**、**元件**、**範本**、**網站主題**。頁首有這五個區域的導覽；側欄只顯示目前所在區域的頁面。〔現行；範本區域沒有側欄（S-113）〕
 
 | 區域 | 內容 |
 | --- | --- |
 | 首頁 | 這套 kit 是什麼、從哪裡開始讀 |
 | 文件 | 基礎 Foundations、語意色、字級、間距等設計原則；用詞說明 |
 | 元件 | 元件總覽和每個元件一頁（第 9.5 節） |
-| 範本 | 用元件組成的頁面範例 |
+| 範本 | 用元件組成的頁面範例：一頁總覽，每個範本在對話框裡預覽（第 9.8 節） |
 | 網站主題 | 網站主題總覽，以及每個網站一頁：名稱、和預設不同的地方、各元件的預設變體 |
 
 ### 9.3 頁首的選單
@@ -450,6 +450,10 @@ packages/tokens/src/sites/<id>/
 - S-85　手冊顯示的色票和數值由 tokens 產生（S-5），淺色和深色的值都要看得到。〔部分：預設網站主題的色票從 tokens 的原始 JSON 算出來，淺色和深色都看得到，但還不是讀建置產物；示意的環保網用手冊裡自訂的綠色〕
 - S-86　手冊頁面不發出任何第三方請求（S-98）；範例圖片放在 repo 裡。〔現行〕
 - S-87　手冊的本機預覽只用 `pnpm run docs:dev`（127.0.0.1:4321）。〔現行〕
+
+### 9.8 範本區域
+
+- S-113　範本區域只有一頁總覽，沒有側欄：標題、「示意」提示框、分類篩選、範本卡片格線。卡片的縮圖是範本本身；滑鼠移上或用鍵盤選到時疊上名稱、兩行說明和「預覽」。按卡片打開預覽對話框：名稱、分類、「示意」、寬度切換（桌機 1280／平板 768／手機 390 px）、上一個／下一個、關閉，下方列出使用的元件。範本在 iframe 裡用選的寬度排版，跟著頁首的網站主題和色彩模式變。打開時網址加上 `?t=<id>`，可以分享，「上一頁」會關閉；舊網址 `/templates/<id>/` 轉到這裡。細節見手冊規則 R-H-17 到 R-H-19。〔現行〕
 
 ---
 
@@ -604,6 +608,7 @@ packages/tokens/src/sites/<id>/
 | S-110 沒有不公開的檔案 | 已實作 | `heroui/MAINTAINING.md` 開頭已改成「不隨 Storybook 提供，但一樣公開」；SOP R-S-28 |
 | S-111 NOTICE 與 MAINTAINING 分工 | 已實作 | `heroui/NOTICE.md`、`heroui/MAINTAINING.md` |
 | S-112 手動挑選上游修正 | 已實作 | `heroui/MAINTAINING.md`「Looking at upstream later」 |
+| S-113 範本區域 | 已實作 | `apps/docs/src/components/handbook/TemplateGallery.astro`（卡片和預覽對話框）、`apps/docs/src/pages/templates/frame/[id].astro`（畫面頁）、`apps/docs/src/pages/templates/[id].astro`（舊網址的轉址頁）；`scripts/docs/handbook.test.mjs` 檢查範本目錄、範本元件和兩個網址一致；互動是 puppeteer 人工檢查 |
 
 ---
 
