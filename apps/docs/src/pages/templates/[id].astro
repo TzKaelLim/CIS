@@ -1,16 +1,16 @@
 ---
-// 每個範本一頁：/templates/<id>/。內容全部來自 src/prototype/template-catalog.ts 和
+// 每個範本一頁：/templates/<id>/。內容全部來自 src/data/template-catalog.ts 和
 // src/components/templates/<id>.astro，新增範本不必新增這種頁面。
 import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 import { Aside } from '@astrojs/starlight/components';
 import TemplateFrame from '../../components/handbook/TemplateFrame.astro';
-import CurrentSiteNote from '../../components/prototype/CurrentSiteNote.astro';
+import CurrentSiteNote from '../../components/handbook/CurrentSiteNote.astro';
 import {
   TEMPLATES,
   getTemplateCategory,
   type TemplateEntry,
-} from '../../prototype/template-catalog';
-import { componentUrl, getComponent } from '../../prototype/component-catalog';
+} from '../../data/template-catalog';
+import { componentUrl, getComponent } from '../../data/component-catalog';
 
 export function getStaticPaths() {
   return TEMPLATES.map((entry) => ({ params: { id: entry.id }, props: { entry } }));

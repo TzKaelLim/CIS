@@ -1,4 +1,11 @@
-// 設計示範（prototype）：「一套 UIKit、多個網站主題」的資料。
+// 手冊裡「一套 UIKit、多個網站主題」的資料：頁首的「網站主題」選單、網站主題頁、
+// 各元件頁的「在目前網站主題下的樣子」都讀這個檔案。
+//
+// 注意：今天只有預設網站主題（慈濟入口網）是正式的。網站主題的正式檔案
+// （packages/tokens/src/sites/<id>/，R-D-17）還沒有實作，所以這裡的其他網站
+// （目前是慈濟環保網）都是示意，isDemo 一律是 true，名稱後面會自動加上「（示意）」。
+// 示意網站主題不是核定的網站主題：它的名稱、顏色和做法都還待核定，不可以當成正式值引用。
+// 網站主題要用哪個 HTML 屬性也還沒決定（Q4）；手冊用的 data-site 只是提案。
 //
 // 每個網站一筆 SiteTheme。預設主題（慈濟入口網）的值在建置時直接從真正的 token
 // 原始檔（primitive + 淺色語意 + 深色覆寫）解析成色碼；其他網站只寫「要改哪些語意色」，
@@ -231,6 +238,8 @@ export const SITE_THEMES: readonly SiteTheme[] = [
     },
     true,
   ),
+  // 示意（非正式）：不是核定的網站主題。名稱、顏色和做法都待核定，只用來說明
+  // 「同一套元件，換一組語意色」的效果。
   defineSite({
     id: 'eco',
     名稱: '慈濟環保網',
@@ -265,6 +274,9 @@ export const SITE_THEMES: readonly SiteTheme[] = [
 for (const [i, site] of SITE_THEMES.entries()) {
   if (SITE_THEMES.findIndex((s) => s.id === site.id) !== i)
     throw new Error(`網站主題 id 重複：${site.id}`);
+  // 正式的網站主題檔案（R-D-17）還沒有實作，所以預設以外的網站一定要標成示意。
+  if (!site.isDefault && !site.isDemo)
+    throw new Error(`${site.id}：預設以外的網站主題目前只能是示意（isDemo: true）`);
 }
 
 export const DEFAULT_SITE: SiteTheme = SITE_THEMES.find((s) => s.isDefault) ?? SITE_THEMES[0];

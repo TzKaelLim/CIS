@@ -2,17 +2,17 @@ import { readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
-// 設計示範（prototype）：網站主題的資料。側欄的「各網站」、頁首選單的初始化 script
+// 網站主題的資料。側欄的「各網站」、頁首選單的初始化 script
 // 和顯示規則都由它產生，所以新增網站時不必改這個檔案。
-import { siteHeadTags, siteSidebarItems } from './src/prototype/site-selection.ts';
+import { siteHeadTags, siteSidebarItems } from './src/data/site-selection.ts';
 // 讓真正的 <tc-*> 元件跟著頁首的「網站主題」變色的樣式表（由網站主題資料產生）。
-import { SITE_THEME_VARS_MODULE, siteThemeVarsCss } from './src/prototype/site-theme-vars.ts';
+import { SITE_THEME_VARS_MODULE, siteThemeVarsCss } from './src/data/site-theme-vars.ts';
 // 手冊的五個區域（首頁、文件、元件、範本、網站主題）與元件目錄。
-import { getSection } from './src/prototype/sections.ts';
-import { COMPONENTS, componentSidebarItems } from './src/prototype/component-catalog.ts';
-import { TEMPLATES, templateSidebarItems } from './src/prototype/template-catalog.ts';
+import { getSection } from './src/data/sections.ts';
+import { COMPONENTS, componentSidebarItems } from './src/data/component-catalog.ts';
+import { TEMPLATES, templateSidebarItems } from './src/data/template-catalog.ts';
 
-const PROTOTYPE_FILES = [
+const DATA_FILES = [
   'site-themes.ts',
   'site-selection.ts',
   'site-theme-vars.ts',
@@ -22,12 +22,12 @@ const PROTOTYPE_FILES = [
 ];
 
 /** 改了網站主題、區域或元件目錄的資料時重新載入設定，側欄和 <head> 才會跟著更新。 */
-const watchPrototypeData = {
-  name: 'tc-watch-prototype-data',
+const watchHandbookData = {
+  name: 'tc-watch-handbook-data',
   hooks: {
     'astro:config:setup': ({ addWatchFile }) => {
-      for (const file of PROTOTYPE_FILES) {
-        addWatchFile(new URL(`./src/prototype/${file}`, import.meta.url));
+      for (const file of DATA_FILES) {
+        addWatchFile(new URL(`./src/data/${file}`, import.meta.url));
       }
     },
   },
@@ -38,7 +38,7 @@ const watchPrototypeData = {
  * 解析成專案裡的一個路徑（檔案本身不存在，內容由 load 產生），Astro 收集頁面 CSS 時才會帶上它。
  */
 const RESOLVED_SITE_THEME_VARS = fileURLToPath(
-  new URL('./src/prototype/site-theme-vars.generated.css', import.meta.url),
+  new URL('./src/data/site-theme-vars.generated.css', import.meta.url),
 );
 const siteThemeVarsPlugin = {
   name: 'tc-site-theme-vars',
@@ -46,7 +46,7 @@ const siteThemeVarsPlugin = {
     if (id === SITE_THEME_VARS_MODULE) return RESOLVED_SITE_THEME_VARS;
     // 檔案不存在，所以瀏覽器或 Astro 用網址（可能帶 ?inline）再要一次時，也要由這裡解析。
     const [path, query] = id.split('?');
-    if (path.endsWith('/src/prototype/site-theme-vars.generated.css')) {
+    if (path.endsWith('/src/data/site-theme-vars.generated.css')) {
       return query ? `${RESOLVED_SITE_THEME_VARS}?${query}` : RESOLVED_SITE_THEME_VARS;
     }
     return undefined;
@@ -64,7 +64,7 @@ const missingInCatalog = componentPages.filter((id) => !catalogIds.includes(id))
 const missingPages = catalogIds.filter((id) => !componentPages.includes(id));
 if (missingInCatalog.length > 0 || missingPages.length > 0) {
   throw new Error(
-    `元件目錄（src/prototype/component-catalog.ts）和元件頁面不一致。` +
+    `元件目錄（src/data/component-catalog.ts）和元件頁面不一致。` +
       ` 沒有目錄資料的頁面：${missingInCatalog.join('、') || '無'}；` +
       ` 沒有頁面的目錄資料：${missingPages.join('、') || '無'}`,
   );
@@ -79,7 +79,7 @@ const templatesWithoutFile = templateIds.filter((id) => !templateFiles.includes(
 const filesWithoutTemplate = templateFiles.filter((id) => !templateIds.includes(id));
 if (templatesWithoutFile.length > 0 || filesWithoutTemplate.length > 0) {
   throw new Error(
-    `範本目錄（src/prototype/template-catalog.ts）和範本元件（src/components/templates/）不一致。` +
+    `範本目錄（src/data/template-catalog.ts）和範本元件（src/components/templates/）不一致。` +
       ` 沒有元件檔的範本：${templatesWithoutFile.join('、') || '無'}；` +
       ` 沒有目錄資料的元件檔：${filesWithoutTemplate.join('、') || '無'}`,
   );
@@ -89,7 +89,7 @@ if (templatesWithoutFile.length > 0 || filesWithoutTemplate.length > 0) {
 export default defineConfig({
   vite: { plugins: [siteThemeVarsPlugin] },
   integrations: [
-    watchPrototypeData,
+    watchHandbookData,
     starlight({
       title: '慈濟 CIS UIKit',
       description: '一套設計規則和元件，給每一個慈濟網站使用。',
@@ -117,7 +117,7 @@ export default defineConfig({
       routeMiddleware: './src/route-data.ts',
       // 在第一次繪製前套用記住的網站主題，並載入「只顯示目前網站」的規則。
       head: siteHeadTags(),
-      // 最上層的每個群組是一個區域，名稱要和 src/prototype/sections.ts 的 label 相同。
+      // 最上層的每個群組是一個區域，名稱要和 src/data/sections.ts 的 label 相同。
       sidebar: [
         {
           label: getSection('docs').label,
@@ -130,7 +130,7 @@ export default defineConfig({
         },
         { label: getSection('components').label, items: componentSidebarItems() },
         { label: getSection('templates').label, items: templateSidebarItems() },
-        // 設計示範（prototype）：總覽在前，各網站收在可展開的子群組裡，網站再多側欄也不會被塞滿。
+        // 總覽在前，各網站收在可展開的子群組裡，網站再多側欄也不會被塞滿。
         {
           label: getSection('themes').label,
           items: [

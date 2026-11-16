@@ -1,4 +1,4 @@
-// 設計示範：讓手冊裡「真正的 <tc-*> 元件」跟著頁首的「網站主題」選單變色。
+// 讓手冊裡「真正的 <tc-*> 元件」跟著頁首的「網站主題」選單變色。
 //
 // tokens.css 在 :root 宣告預設網站（入口網）的語意色，並在 [data-theme='dark'] 換成深色。
 // 這裡替每個「非預設」網站產生兩條規則，只寫和預設網站不同的語意色：
@@ -23,7 +23,7 @@ function declarations(site: SiteTheme, mode: 'light' | 'dark', tokens: readonly 
 
 export function siteThemeVarsCss(): string {
   const blocks: string[] = [
-    '/* 由 src/prototype/site-theme-vars.ts 依 site-themes.ts 產生，請勿手動修改。 */',
+    '/* 由 src/data/site-theme-vars.ts 依 site-themes.ts 產生，請勿手動修改。預設以外的網站主題都是示意值（非正式）；data-site 屬性名稱是提案（Q4）。 */',
   ];
   for (const site of SITE_THEMES) {
     if (site.isDefault) continue;

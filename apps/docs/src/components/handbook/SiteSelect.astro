@@ -1,13 +1,13 @@
 ---
-// 設計示範：頁首的「網站主題」選單。選項由 SITE_THEMES 產生，新增網站就會多一個選項。
+// 頁首的「網站主題」選單。選項由 SITE_THEMES 產生，新增網站就會多一個選項。
 //
 // 狀態放在 <html data-site="…">。第一次繪製前由 <head> 裡的 script 設好
-// （src/prototype/site-selection.ts 的 siteInitScript）；這裡只負責讓選單顯示同一個值，
+// （src/data/site-selection.ts 的 siteInitScript）；這裡只負責讓選單顯示同一個值，
 // 以及讀者改選時更新屬性、記住選擇。沒有 JavaScript 時選單停在預設網站，頁面也顯示預設網站。
 // 它只改變手冊「展示」的內容（色票、範例），不改變手冊本身的外觀。
 import { Icon } from '@astrojs/starlight/components';
-import { DEFAULT_SITE, SITE_THEMES, siteLabel } from '../../prototype/site-themes';
-import { SITE_STORAGE_KEY, SITE_URL_PARAM } from '../../prototype/site-selection';
+import { DEFAULT_SITE, SITE_THEMES, siteLabel } from '../../data/site-themes';
+import { SITE_STORAGE_KEY, SITE_URL_PARAM } from '../../data/site-selection';
 ---
 
 <tc-site-select data-storage-key={SITE_STORAGE_KEY} data-url-param={SITE_URL_PARAM}>

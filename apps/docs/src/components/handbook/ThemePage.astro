@@ -1,5 +1,5 @@
 ---
-// 設計示範：網站主題頁的共用版型（入口網、環保網都用這一個）。
+// 網站主題頁的共用版型（入口網、環保網都用這一個）。
 import { Badge, LinkButton } from '@astrojs/starlight/components';
 import ThemeGallery from './ThemeGallery.astro';
 import ThemeColorTable from './ThemeColorTable.astro';
@@ -10,8 +10,8 @@ import {
   MODE_LABEL,
   contrastChecks,
   getSite,
-} from '../../prototype/site-themes';
-import { SITE_URL_PARAM } from '../../prototype/site-selection';
+} from '../../data/site-themes';
+import { SITE_URL_PARAM } from '../../data/site-selection';
 
 interface Props {
   siteId: string;

@@ -1,4 +1,4 @@
-// 設計示範：元件目錄。元件總覽頁（/components/）的卡片、側欄「元件」的清單和
+// 元件目錄。元件總覽頁（/components/）的卡片、側欄「元件」的清單和
 // 元件頁上方的「分類 · 英文名」都由這份資料產生。新增一個元件 = 在 COMPONENTS 加一筆，
 // 並在 src/content/docs/components/ 放同名的 .mdx 頁面（astro.config.mjs 會檢查兩邊一致）。
 //

@@ -3,10 +3,10 @@
 // 每張卡片有標題、兩句說明、「前往 →」連結和一小塊真正元件的預覽（跟著網站主題變）。
 // 卡片的連結延伸蓋住整張卡片；預覽是 inert，不能點也不會被螢幕閱讀器唸出來。
 import TemplateThumb from '../handbook/TemplateThumb.astro';
-import SiteOnly from '../prototype/SiteOnly.astro';
-import { COMPONENTS } from '../../prototype/component-catalog';
-import { TEMPLATES } from '../../prototype/template-catalog';
-import { SITE_THEMES, siteLabel } from '../../prototype/site-themes';
+import SiteOnly from '../handbook/SiteOnly.astro';
+import { COMPONENTS } from '../../data/component-catalog';
+import { TEMPLATES } from '../../data/template-catalog';
+import { SITE_THEMES, siteLabel } from '../../data/site-themes';
 
 /** 網站主題卡片上最多列出幾個網站的色點；其餘用「+N」表示，網站再多也不會撐爆卡片。 */
 const MAX_SITE_DOTS = 6;

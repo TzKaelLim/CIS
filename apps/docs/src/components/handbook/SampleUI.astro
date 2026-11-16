@@ -1,9 +1,9 @@
 ---
-// 設計示範：一個迷你網頁（頁首、按鈕、連結、文章卡片、成功訊息），
+// 一個迷你網頁（頁首、按鈕、連結、文章卡片、成功訊息），
 // 用指定網站主題的固定色碼畫出來。配色對應真正元件 token 的用法：
 // 按鈕 = button.*、連結 = link.fg（主色 hover）、文章卡片 = article-card.*。
 import SampleFrame from './SampleFrame.astro';
-import { getSite, type Mode } from '../../prototype/site-themes';
+import { getSite, type Mode } from '../../data/site-themes';
 
 interface Props {
   siteId: string;

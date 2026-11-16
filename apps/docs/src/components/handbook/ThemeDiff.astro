@@ -1,5 +1,5 @@
 ---
-// 設計示範：一個網站主題和預設主題不一樣的顏色（只列有差異的 token）。
+// 一個網站主題和預設主題不一樣的顏色（只列有差異的 token）。
 // 淺色、深色各一張表，每張只有兩欄色值：預設 → 這個網站。
 import ColorChip from './ColorChip.astro';
 import {
@@ -9,7 +9,7 @@ import {
   getSite,
   tokenLabel,
   varName,
-} from '../../prototype/site-themes';
+} from '../../data/site-themes';
 
 interface Props {
   siteId: string;

@@ -1,4 +1,4 @@
-// 設計示範：範本目錄。範本總覽頁（/templates/）的卡片、側欄「範本」的清單、
+// 範本目錄。範本總覽頁（/templates/）的卡片、側欄「範本」的清單、
 // 每個範本的頁面（/templates/<id>/）和首頁的範本預覽都由這份資料產生。
 //
 // 新增一個範本 = 在 TEMPLATES 加一筆，並在 src/components/templates/ 放一個 <id>.astro

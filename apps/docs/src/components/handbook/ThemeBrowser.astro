@@ -8,7 +8,7 @@
 // - 窄螢幕：清單在上（同樣有最大高度、可捲動），樣本在下。
 import { Badge } from '@astrojs/starlight/components';
 import SiteOnly from './SiteOnly.astro';
-import TemplateFrame from '../handbook/TemplateFrame.astro';
+import TemplateFrame from './TemplateFrame.astro';
 import {
   MODES,
   MODE_LABEL,
@@ -16,9 +16,9 @@ import {
   siteLabel,
   sitePageUrl,
   type TokenName,
-} from '../../prototype/site-themes';
-import { SITE_URL_PARAM } from '../../prototype/site-selection';
-import { getTemplate, templateUrl } from '../../prototype/template-catalog';
+} from '../../data/site-themes';
+import { SITE_URL_PARAM } from '../../data/site-selection';
+import { getTemplate, templateUrl } from '../../data/template-catalog';
 
 const KEY_COLORS: { label: string; token: TokenName }[] = [
   { label: '主色', token: 'brand.primary' },

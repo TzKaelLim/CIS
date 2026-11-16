@@ -11,7 +11,7 @@ import SidebarPersister from '@astrojs/starlight/components/SidebarPersister.ast
 import SidebarSublist from '@astrojs/starlight/components/SidebarSublist.astro';
 import SectionNav from '../handbook/SectionNav.astro';
 import StorybookLink from '../handbook/StorybookLink.astro';
-import { sectionForPath } from '../../prototype/sections';
+import { sectionForPath } from '../../data/sections';
 
 const { sidebar } = Astro.locals.starlightRoute;
 const section = sectionForPath(Astro.url.pathname);
