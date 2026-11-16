@@ -1,0 +1,16 @@
+{
+  "container": {
+    "padding-inline-mobile": {
+      "$type": "dimension",
+      "$value": "{space.16}"
+    },
+    "padding-inline-tablet": {
+      "$type": "dimension",
+      "$value": "{space.24}"
+    },
+    "padding-inline": {
+      "$type": "dimension",
+      "$value": "{space.32}"
+    }
+  }
+}

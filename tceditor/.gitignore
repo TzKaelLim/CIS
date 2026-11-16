@@ -1,0 +1,55 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+node_modules
+.pnp
+.pnp.js
+
+# testing
+coverage
+
+# next.js
+.next/
+out/
+build
+next-env.d.ts
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# local env files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# turbo
+.turbo
+
+# vercel
+.vercel
+
+# webstorm
+.idea
+
+dist
+
+# The built design tokens are part of the vendored uikit snapshot
+# (pnpm sync:uikit builds them), so re-include them after the dist rule above
+!vendor/uikit/packages/tokens/dist/
+
+# Block Storybook: the HOME the Storybook CLI writes to, the debug log it
+# leaves after a failed run, and the static build
+apps/storybook/.home/
+apps/storybook/debug-storybook.log
+storybook-static/
+
+# Showcase: pages published through its publish API (delete to restore the preset)
+apps/showcase/.data/

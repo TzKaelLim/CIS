@@ -1,0 +1,233 @@
+/*
+ * Disclosure — Tzu Chi theme overrides
+ * ====================================
+ * Scoped to [data-theme^="tzuchi"]; loaded into @layer components AFTER
+ * heroui/styles/components/disclosure.css (import it from
+ * themes/tzuchi/components/index.css in the "Navigation" group, next to
+ * accordion.css), so upstream's own light / dark themes are provably untouched.
+ * HeroUI's markup, slots, props, class names and every state keep working.
+ *
+ * Reviewed: no changes. Verified every selector against the live base
+ * disclosure.css, disclosure.tsx/.stories.tsx and disclosure.styles.ts's slot
+ * map; every rule is [data-theme^="tzuchi"]-scoped, no !important, no
+ * physical left/right; the one colour declaration
+ * (--tzuchi-accordion-trigger-hover-bg, falling back to --surface-hover) is a
+ * HeroUI theme variable already present in both blocks of
+ * themes/tzuchi/variables.css, not a new --tzuchi-* invention; every
+ * mode-independent token (--tc-typography-subtitle/-body, --tc-space-8/-16,
+ * --tc-size-icon-sm, --tc-motion-duration-fast/-base,
+ * --tc-motion-easing-standard) resolves in packages/tokens/dist/tokens.css
+ * and is absent from its [data-theme="dark"] block; the override wins the
+ * cascade in every state checked (hover, reduced-motion, and inside a
+ * consumer's `flex` utility for the gap); no other override file references
+ * any `.disclosure*` class; and every "*" in a comment is followed by a
+ * space, never "/". Both story ids and all eight assertions resolve to the
+ * values claimed (verified against disclosure.stories.tsx and
+ * storybook-static/index.json).
+ *
+ * WHY THIS FILE EXISTS
+ *   Disclosure is Accordion's single-item sibling: the same trigger + chevron +
+ *   height-collapsing panel, minus the item list and the surface container.
+ *   accordion.css already made four decisions for exactly these parts; this file
+ *   re-applies those four and nothing else, so a bare <Disclosure> reads as one
+ *   Accordion row.
+ *
+ * WHAT THIS CHANGES
+ *   .disclosure__trigger    type   base sets NO font at all -> inherited
+ *                                  400 16px / normal;  now tc subtitle
+ *                                  700 16px / 1.5                 [§1 R1]
+ *                           gap    none -> 8px icon-to-label      [§9 R147]
+ *                           hover  none -> the accordion trigger
+ *                                  fill, faded over 150ms    [§5 R80, §8 R131]
+ *   .disclosure__indicator   size   size-4 = 16px -> 20px    [accordion.css:76-78]
+ *                           motion 250ms / HeroUI default easing
+ *                                  -> 200ms / tc standard         [§8 R132]
+ *   .disclosure__body        padding p-2 = 8px -> 16px on all sides [§9 R152]
+ *                           type   inherited -> tc body 400 16px / 1.6  [§1 R5]
+ *
+ * WHAT IS DELIBERATELY LEFT ALONE
+ *   · .disclosure — `position: relative` only; pure structure, nothing to theme.
+ *   · .disclosure__content — the open / close transition is `height 200ms
+ *     var(--ease-out-quad), opacity 200ms var(--ease-out)`, byte-identical to
+ *     .accordion__panel, which accordion.css lists under "WHAT IS KEPT". §8 R140
+ *     forbids new choreography and the declaration is a positional list (R138)
+ *     that must not be half-restated. Nothing here.
+ *   · .disclosure__body-inner — HeroUI ships NO rule for this class (the only
+ *     `-inner` rule in the base CSS is .accordion__body-inner). It carries the
+ *     consumer's className, so it is theirs, not the theme's. accordion.css's
+ *     `color: var(--foreground)` on its own body-inner existed only to undo a
+ *     `text-muted` that this component never applies (R5's colour half).
+ *   · .disclosure__heading — likewise has no base rule of its own
+ *     (styles/components/disclosure.css:6 declares `.accordion__heading`, not
+ *     `.disclosure__heading`). Whether that is intentional or an upstream typo
+ *     is a structural question for the React layer (D32), not a theming one:
+ *     adding `display: flex` here would change layout, not language.
+ *   · The focus ring. accordion.css sets `--ring-offset-width: 0px` on its
+ *     trigger for a container-specific reason — the trigger is full-bleed inside
+ *     the surface variant's new 1px border, where a 2px offset ring would spill
+ *     past it (§4 R72). Disclosure has no container: its trigger is a
+ *     content-sized `inline-block`, so the theme-wide 2px / 2px / --focus ring
+ *     (D3, R70) is already the right answer and is left untouched.
+ *   · Trigger padding, radius, background at rest, and any separator. HeroUI's
+ *     Disclosure is deliberately unchromed — every story either wraps the
+ *     trigger in a <Button> (disclosure.stories.tsx:43, every DisclosureGroup
+ *     story) or supplies its own border / padding utilities, and DisclosureGroup
+ *     spaces its items with an explicit <Separator> (already themed in
+ *     separator.css). Inventing a box here would be a redesign, not a
+ *     translation (§10 D32, brief rule 6).
+ *   · Disabled (--disabled-opacity 0.38 theme-wide, D2), pressed, the
+ *     data-expanded chevron rotation itself, aria wiring and the panel height
+ *     mechanism (--disclosure-panel-height, owned by React Aria).
+ *
+ * CASCADE (hand-derived)
+ *   base .disclosure__trigger / __indicator / __body are (0,1,0); every rule
+ *   below is (0,2,0) or higher, so each wins on specificity alone, independent
+ *   of import order. The hover rule is (0,4,0) and competes with nothing in the
+ *   base file.
+ *   ONE DELIBERATE LOSS: when <Disclosure.Indicator /> is rendered inside a
+ *   <Button> — which is what every shipped story does — HeroUI's
+ *   `.button svg:not([data-slot="spinner"] svg, [data-slot="link-icon"] svg)`
+ *   (button.css:63, specificity (0,2,2)) outranks the (0,2,0) indicator rule
+ *   below, so the chevron follows the BUTTON's icon scale (size-5 / sm:size-4)
+ *   instead of 20px. That is correct and intended: §3.3 R45-R48 make icon size a
+ *   property of the button that hosts it, and reaching past that rule would
+ *   break brief rule 7 (ownership). The 20px below therefore applies to a
+ *   standalone indicator — the Accordion-shaped usage.
+ *   Story-level utilities (e.g. `hover:bg-gray-50`, `text-sm`) still win over
+ *   everything here: the utilities layer is ordered after components.
+ *
+ * COLOUR (N2)
+ *   One colour declaration: the hover fill, taken verbatim from §5 R80 —
+ *   --tzuchi-accordion-trigger-hover-bg (declared in BOTH modes,
+ *   themes/tzuchi/variables.css:67 gray-50 / :109 gray-980) with --surface-hover
+ *   as the fallback. No --tc-color-* token, no component token that resolves to
+ *   a colour or a shadow, no hex / rgb / hsl / oklch literal, no named colour.
+ *   Sharing the accordion's variable is the point: if the generator ever rewires
+ *   that token, both triggers move together.
+ *
+ * TOKENS (N3) — all mode-independent, all with fallbacks, all verified present
+ *   in packages/tokens/dist/tokens.css and absent from both of its dark blocks:
+ *   --tc-typography-subtitle (:140 = 700 16px/1.5 + family)
+ *   --tc-typography-body     (:141 = 400 16px/1.6 + family)
+ *   --tc-space-8 (:39 = 8px) · --tc-space-16 (:41 = 16px)
+ *   --tc-size-icon-sm (:53 = 20px)
+ *   --tc-motion-duration-fast (:62 = 150ms) · -base (:63 = 200ms)
+ *   --tc-motion-easing-standard (:64 = cubic-bezier(0.2, 0, 0, 1))
+ *
+ * Consistency pass: closed the `data-reduce-motion` half of the hover-fade
+ * guard (§8 R137). HeroUI's `motion-reduce:` variant has TWO branches
+ * (styles/variants/index.css:22-42): an attribute branch,
+ * `&:is([data-reduce-motion="true"], [data-reduce-motion="true"] *)`, carrying
+ * NO media query, and a `@media (prefers-reduced-motion: reduce)` fallback
+ * that explicitly excludes the attribute. R139's shortcut — nest the rule in
+ * `no-preference` and let HeroUI's own guard win — only closes the second
+ * branch, and its stated mechanism ("HeroUI's lower-specificity guard still
+ * wins") does not exist here at all: base disclosure.css declares NO
+ * transition on `.disclosure__trigger`, so there is no `motion-reduce:
+ * transition-none` on this element to lean on. An app that opts in with
+ * `data-reduce-motion="true"` while the OS preference is unset therefore
+ * matches `no-preference`, and this file was INTRODUCING a 150ms fade where
+ * the base had none. The rule now carries R137's attribute switch itself, as a
+ * zero-risk `:not(:is(...))` exclusion: `:is()` takes its most specific
+ * argument (0,1,0), so the selector is (0,3,0) and there is nothing it must
+ * lose to; for every reader who has not asked for reduced motion the computed
+ * result is byte-identical. NOTE FOR THE OWNER: accordion.css:64-73 — the file
+ * this rule is modelled on — has the same gap, with one difference: its base
+ * DOES ship `motion-reduce:transition-none`, but that guard's attribute branch
+ * compiles to (0,2,0) and ties `[data-theme^="tzuchi"] .accordion__trigger`,
+ * which the later import wins. It needs the identical exclusion; this pass may
+ * not edit it, so it is reported instead.
+ */
+
+/* --- Trigger: tc subtitle type + the 8px icon-to-label gap ----------------
+ * R1 — the trigger label IS the control, so it takes the subtitle voice
+ * (700 16px/1.5), exactly as accordion.css:53-56 does. The base ships no font
+ * declaration at all here, so today the trigger inherits the page's 400 weight.
+ * R147 — 8px between a leading icon and the label. The base trigger is
+ * `inline-block`, so `gap` lies dormant until the consumer makes it a flex row
+ * (both Disclosure.Trigger stories do: `flex w-full items-center`), which is the
+ * same arrangement accordion.css:56 relies on.
+ */
+[data-theme^="tzuchi"] .disclosure__trigger {
+  font: var(--tc-typography-subtitle, 700 16px/1.5 sans-serif);
+  gap: var(--tc-space-8, 8px);
+}
+
+/* --- Trigger: the accordion's hover fill ----------------------------------
+ * R80 — "hover, on a surface-filled container", declaration verbatim; the
+ * "Where it applies" column names the disclosure trigger alongside the
+ * accordion one. Mirrors accordion.css:104-113 in shape as well as value,
+ * including the :not([aria-expanded="true"]) guard (an open row does not
+ * re-tint) and the @media (hover: hover) wrapper. `data-hovered` is left out on
+ * purpose, for the reason the base accordion file documents at
+ * accordion.css:71-80: React Aria writes that attribute a render tick late, so
+ * keying off :hover alone keeps this fill in lockstep with any `hover:` utility
+ * a consumer layers on top. The trigger is disabled-safe: `status-disabled`
+ * sets `pointer-events: none` (utilities/index.css:61-65), so :hover cannot
+ * match a disabled trigger.
+ * The fill itself is a whisper — the page colour on a card — which is what lets
+ * it sit on an unpadded, unrounded trigger without inventing a box.
+ */
+@media (hover: hover) {
+  [data-theme^="tzuchi"] .disclosure__trigger:hover:not([aria-expanded="true"]) {
+    background-color: var(--tzuchi-accordion-trigger-hover-bg, var(--surface-hover));
+  }
+}
+
+/* --- Trigger: fade that fill ---------------------------------------------
+ * R131 — a colour fade on a trigger runs 150ms on the tc standard curve.
+ * The base .disclosure__trigger declares NO transition and therefore no
+ * `motion-reduce:transition-none` guard for R136 to lean on, so this rule sets
+ * transition-property and must restate the reduced-motion guard itself.
+ * R137 says: BOTH switches. The media query below is the first
+ * (`no-preference` is the complement of `reduce`, the form accordion.css:64-73
+ * uses); the `:not(:is(...))` is the second, mirroring HeroUI's own attribute
+ * branch verbatim (styles/variants/index.css:23), because that branch carries
+ * no media query and would otherwise never fire on this element. `:is()` takes
+ * its most specific argument, (0,1,0), so the selector is (0,3,0) — it beats
+ * nothing it needs to and loses to nothing that exists. There is no existing
+ * positional list to repeat (R138): background-color is the only property.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  [data-theme^="tzuchi"]
+    .disclosure__trigger:not(:is([data-reduce-motion="true"], [data-reduce-motion="true"] *)) {
+    transition-property: background-color;
+    transition-duration: var(--tc-motion-duration-fast, 150ms);
+    transition-timing-function: var(--tc-motion-easing-standard, ease);
+  }
+}
+
+/* --- Indicator: tc 20px chevron, tc rotation timing -----------------------
+ * Same pair accordion.css:76-84 applies. `size-4` in the base compiles to
+ * width/height inside the components layer, which these logical longhands
+ * outrank on specificity. Longhands only (R136): the base's
+ * `motion-reduce:transition-none` sets transition-property, so it keeps
+ * overriding these for users who ask for reduced motion.
+ * Colour is untouched: the base paints the disclosure chevron `text-inherit`
+ * (vs the accordion's `text-muted`), which is HeroUI's own hierarchy call and
+ * lets the hosting Button's label colour carry through.
+ */
+[data-theme^="tzuchi"] .disclosure__indicator {
+  inline-size: var(--tc-size-icon-sm, 20px);
+  block-size: var(--tc-size-icon-sm, 20px);
+
+  transition-duration: var(--tc-motion-duration-base, 200ms);
+  transition-timing-function: var(--tc-motion-easing-standard, ease);
+}
+
+/* --- Panel: tc panel inset and body voice --------------------------------
+ * R152 — a panel is inset 16px on all sides. HeroUI pads the panel one level
+ * higher than the Accordion does (`.disclosure__body { p-2 }` = 8px, while
+ * .disclosure__body-inner has no rule), so the 16px lands here; the resolved
+ * value is the same --tc-space-16 that accordion.css:94 reaches through
+ * --tc-accordion-panel-padding. The raw step is used rather than the accordion's
+ * component token because this is not an accordion panel.
+ * R5 — panel copy is prose: body, 400 16px/1.6. The `font` shorthand also
+ * re-asserts the family, which is a no-op under this theme (--font-sans is
+ * already --tc-font-family-base) and is the form card.css:65 and
+ * accordion.css:89 both use.
+ */
+[data-theme^="tzuchi"] .disclosure__body {
+  padding: var(--tc-space-16, 16px);
+  font: var(--tc-typography-body, 400 16px/1.6 sans-serif);
+}

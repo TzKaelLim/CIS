@@ -1,0 +1,207 @@
+/* ------------------------------------------------------------------------------------------------
+ * Typography — Tzu Chi theme overrides
+ * ------------------------------------------------------------------------------------------------
+ * Base            : heroui/styles/components/typography.css
+ * Tzu Chi source  : NONE as a component (DESIGN-LANGUAGE.md §12 Q8 lists Typography), but the TYPE
+ *                   SCALE itself is the Figma record: the `--tc-typography-*` tokens in
+ *                   packages/tokens/dist/tokens.css. This is the one component where the scale IS
+ *                   the design, so this file is a mapping table, not a set of tweaks.
+ *
+ * THE MAPPING — HeroUI's six heading steps onto Tzu Chi's six, in order, one for one:
+ *
+ *   class        HeroUI (Tailwind)          ->  Tzu Chi token            resolves to
+ *   --h1         text-4xl 600  36px/1.111       typography.heading-1     700  46px/1.3
+ *   --h2         text-3xl 600  30px/1.2         typography.heading-2     700  34px/1.3
+ *   --h3         text-2xl 600  24px/1.333       typography.heading-3     700  26px/1.4
+ *   --h4         text-xl  600  20px/1.4         typography.heading-4     700  24px/1.4
+ *   --h5         text-lg  600  18px/1.556       typography.title         700  20px/1.5
+ *   --h6         text-base 600 16px/1.5         typography.subtitle      700  16px/1.5
+ *   --body       text-base leading-7 16px/1.75  typography.body          400  16px/1.6   §1 R5
+ *   --body-sm    text-sm  14px/1.714            (no 14px step — see below) 16px/1.5      §1 R15
+ *   --body-xs    text-xs  12px/1.667            KEPT at 12px                             §1 R8
+ *   --code       text-sm  14px, radius 6px      16px/1.6, radius 4px     §1 preamble · §2 R33
+ *
+ * Both writing surfaces get the same values: the `.typography--*` modifier classes that
+ * `<Typography>` emits, and the element rules inside `.typography-prose` that style raw HTML.
+ * §1 R12 (card.css:56-60) is the precedent for reading a `--tc-typography-*` token straight onto a
+ * heading; it is spelled out here as longhands rather than the `font` shorthand for a cascade
+ * reason recorded under CASCADE below.
+ *
+ * THE TWO SUB-16px VARIANTS — the one real decision in this file.
+ * Tzu Chi has no 14px and no 12px step (§1 preamble; §0's list starts at 16). §1's mechanical rule
+ * sends both to 16px — but Typography's whole public API IS its size ramp, and collapsing
+ * `body-sm` and `body-xs` onto `body` would leave two props that render identically, which HARD
+ * RULE 5 forbids. So each takes the nearest rule that already exists rather than the mechanical one:
+ *   - `body-sm` moves to 16px and keeps the variant alive on the LINE-HEIGHT ladder instead of the
+ *     size ladder: 400 16px/1.5 is not invented, it is exactly R15's shipped tooltip metric
+ *     (tooltip.css:64-66, from tc-tooltip). Result: body 25.6px line box, body-sm 24px.
+ *   - `body-xs` is left at 12px. In every story it is the overline / caption above other copy
+ *     ("BODY — SMALL", "START (DEFAULT)"), which is R8's role — the one place §1.3 deliberately
+ *     KEEPS 12px, "a structural label above 16/700 rows … raising it would make it compete with the
+ *     rows it introduces". Same argument, same answer, so this file leaves it untouched.
+ * Both are listed as spec gaps in the report; they are derivations, not Figma.
+ *
+ * CASCADE
+ *   - `[data-theme^="tzuchi"] .typography--h1` is (0,2,0) vs the base's (0,1,0);
+ *     `[data-theme^="tzuchi"] .typography-prose h1` is (0,2,1) vs the base's (0,1,1). Both win on
+ *     specificity alone, with no dependence on import order.
+ *   - Longhands, never `font:`. The shorthand would also reset `font-family` and `font-weight`, and
+ *     at (0,2,0) it would out-rank `.typography--weight-*` (0,1,0) — silently killing the `weight`
+ *     prop on every heading. Instead the four weight modifiers are RESTATED, unchanged, at (0,2,0)
+ *     at the END of this file, so they keep out-ranking the heading rules exactly as upstream
+ *     intends. (Same "restated, not changed" pattern as badge.css:69-74.)
+ *   - `semibold` restates HeroUI's own `--font-weight-semibold` (600): Tzu Chi's scale has 400 /
+ *     500 / 700 only, so 600 is a HeroUI-only step with no counterpart — §5 R88 case ①, keep it.
+ *     `--font-weight-semibold` is a real Tailwind-emitted custom property (confirmed in the
+ *     compiled bundle, e.g. `.typography--h6{...--font-weight-semibold...}`), always 600 and never
+ *     redefined per mode anywhere in this theme — not an invented or --tc-color-adjacent variable.
+ *
+ * DELIBERATELY NOT CHANGED
+ *   - `tracking-tight` (-0.025em) on the six headings. Tzu Chi's tokens carry no letter-spacing at
+ *     all and no `tc-*` component sets one, so there is no value to move it to; the spec is silent
+ *     (reported as a gap — negative tracking on CJK is worth an owner decision, not a guess here).
+ *   - `font-mono` on `code` / `pre`. There is no Tzu Chi mono token; §10 D-style reading: no
+ *     counterpart, leave it.
+ *   - Inline `code`'s `px-1.5` / `py-0.5` (6 / 2px) padding. Sub-token optical values on a tiny
+ *     inline chip, the same call badge.css made for `.badge__label` padding (§10 D5).
+ *   - blockquote (mt-4 / border-s-4 / ps-4 / muted / italic), ul / ol (my-4 / space-y-2 / ps-6),
+ *     hr (my-8), and the prose `a` colour: every one of those numbers is already a Tzu Chi space
+ *     step (16 / 4 / 24 / 8 / 32px) and every colour is already a theme variable. §1 R18's
+ *     declaration column lists only the weight and the underline offset, so only those two move.
+ *   - `.typography` / `.typography-prose` roots, align, color and truncate modifiers.
+ *
+ * VARIANTS — none hidden or flattened. All ten `type` values stay distinct (46 / 34 / 26 / 24 / 20 /
+ * 16 / 16-at-1.6 / 16-at-1.5 / 12 / code). All four `weight` values stay distinct (400 / 500 / 600 /
+ * 700). align, color and truncate are untouched.
+ *
+ * Reviewed: no changes. Verified against heroui/styles/components/typography.css,
+ * typography.tsx and typography.styles.ts's tv() slot map (confirming `type` and `weight` classes
+ * co-occur on the same element, which is why the weight modifiers must be restated), the compiled
+ * storybook CSS for exact base specificity/values (`.typography--h6`, `.typography--code`, and
+ * `--text-base--line-height: 1.5` all confirmed), and packages/tokens/dist/tokens.css for every
+ * --tc-typography-*, --tc-font-* and --tc-line-height-* value quoted in the mapping table above
+ * (all matched exactly, including h6 needing only a weight restatement since text-base already is
+ * 16px/1.5). Every rule is scoped, uses only mode-independent tokens or HeroUI theme variables
+ * (no --tc-color-*, no literals), and reaches only this component's own `.typography*` classes.
+ * storyId/selector/expected-value assertions checked against the actual story renders. No variant
+ * hidden or flattened.
+ * ------------------------------------------------------------------------------------------------ */
+
+/* ---- Heading ramp: HeroUI h1…h6 -> Tzu Chi heading-1 … subtitle (§1 R12's form, longhands) ---- */
+
+[data-theme^="tzuchi"] .typography--h1,
+[data-theme^="tzuchi"] .typography-prose h1 {
+  font-size: var(--tc-font-size-46, 46px);
+  font-weight: var(--tc-font-weight-bold, 700);
+  line-height: var(--tc-line-height-tight, 1.3);
+}
+
+[data-theme^="tzuchi"] .typography--h2,
+[data-theme^="tzuchi"] .typography-prose h2 {
+  font-size: var(--tc-font-size-34, 34px);
+  font-weight: var(--tc-font-weight-bold, 700);
+  line-height: var(--tc-line-height-tight, 1.3);
+}
+
+[data-theme^="tzuchi"] .typography--h3,
+[data-theme^="tzuchi"] .typography-prose h3 {
+  font-size: var(--tc-font-size-26, 26px);
+  font-weight: var(--tc-font-weight-bold, 700);
+  line-height: var(--tc-line-height-snug, 1.4);
+}
+
+[data-theme^="tzuchi"] .typography--h4,
+[data-theme^="tzuchi"] .typography-prose h4 {
+  font-size: var(--tc-font-size-24, 24px);
+  font-weight: var(--tc-font-weight-bold, 700);
+  line-height: var(--tc-line-height-snug, 1.4);
+}
+
+[data-theme^="tzuchi"] .typography--h5,
+[data-theme^="tzuchi"] .typography-prose h5 {
+  font-size: var(--tc-font-size-20, 20px);
+  font-weight: var(--tc-font-weight-bold, 700);
+  line-height: var(--tc-line-height-normal, 1.5);
+}
+
+/* h6 already resolves to 16px/1.5 under `text-base`, which IS typography.subtitle's metric, so only
+   the weight moves (600 -> 700). Restating the other two would be duplication (§0 N5's spirit). */
+[data-theme^="tzuchi"] .typography--h6,
+[data-theme^="tzuchi"] .typography-prose h6 {
+  font-weight: var(--tc-font-weight-bold, 700);
+}
+
+/* ---- Body copy (§1 R5: 16px/1.6). Size is already `text-base`; only the leading moves. ---- */
+
+[data-theme^="tzuchi"] .typography--body,
+[data-theme^="tzuchi"] .typography-prose p,
+[data-theme^="tzuchi"] .typography-prose li {
+  line-height: var(--tc-line-height-relaxed, 1.6);
+}
+
+/* The 14px step does not exist in this scale; the variant survives on the line-height ladder at
+   R15's shipped 16px/1.5 (400) instead of on a size step Tzu Chi does not have. */
+[data-theme^="tzuchi"] .typography--body-sm {
+  font-size: var(--tc-font-size-16, 16px);
+  line-height: var(--tc-line-height-normal, 1.5);
+}
+
+/* `.typography--body-xs` is the overline / caption role — §1 R8 and §1.3 keep 12px. No rule. */
+
+/* ---- Code (§1 preamble for the size, §2 R33 for the corner — the same cell as Kbd) ---- */
+
+[data-theme^="tzuchi"] .typography--code,
+[data-theme^="tzuchi"] .typography-prose code {
+  border-radius: var(--tc-radius-sm, 4px);
+  font-size: var(--tc-font-size-16, 16px);
+  line-height: var(--tc-line-height-relaxed, 1.6);
+}
+
+/* A fenced block is a resting panel of content sitting in the prose flow, so it takes the surface
+   radius (§2 R27) rather than the 12px HeroUI ships, which is off this scale entirely (0/4/8/16).
+   `leading-relaxed` (1.625) moves onto the token's 1.6 and the size follows the inline chip. */
+[data-theme^="tzuchi"] .typography-prose pre {
+  border-radius: var(--tc-card-radius, var(--radius-2xl));
+  font-size: var(--tc-font-size-16, 16px);
+  line-height: var(--tc-line-height-relaxed, 1.6);
+}
+
+/* Media in the content flow: §2 R27. Tzu Chi's own media confirms it — tc-article-card.styles.ts:17
+   and tc-book-card.styles.ts:17 give the picture `border-radius: inherit` from a 16px card. */
+[data-theme^="tzuchi"] .typography-prose img {
+  border-radius: var(--tc-card-radius, var(--radius-2xl));
+}
+
+/* §1 R18 — an inline link inside body copy, exactly as link.css:32-41 states it. The colour is not
+   part of R18's declaration, so `text-link` stays. */
+[data-theme^="tzuchi"] .typography-prose a {
+  font-weight: var(--tc-font-weight-bold, 700);
+  text-underline-offset: 0.15em;
+}
+
+/* Inline emphasis takes the scale's only bold (§0: 400 / 500 / 700 — there is no 600). */
+[data-theme^="tzuchi"] .typography-prose strong {
+  font-weight: var(--tc-font-weight-bold, 700);
+}
+
+/* ---- Weight modifiers: RESTATED, not changed ------------------------------------------------
+   The heading rules above are (0,2,0) and would otherwise out-rank the base's (0,1,0) `weight`
+   classes, killing the prop. These repeat upstream's own four values at matching specificity,
+   later in source, so `weight` keeps winning on every element. `semibold` (600) has no Tzu Chi
+   counterpart and is kept verbatim via HeroUI's own theme variable (§5 R88 case ①). */
+
+[data-theme^="tzuchi"] .typography--weight-normal {
+  font-weight: var(--tc-font-weight-regular, 400);
+}
+
+[data-theme^="tzuchi"] .typography--weight-medium {
+  font-weight: var(--tc-font-weight-medium, 500);
+}
+
+[data-theme^="tzuchi"] .typography--weight-semibold {
+  font-weight: var(--font-weight-semibold, 600);
+}
+
+[data-theme^="tzuchi"] .typography--weight-bold {
+  font-weight: var(--tc-font-weight-bold, 700);
+}

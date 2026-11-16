@@ -1,0 +1,41 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "fullWidth": {
+      "type": "boolean"
+    },
+    "href": {
+      "maxLength": 2048,
+      "minLength": 1,
+      "type": "string",
+      "x-link": {
+        "optional": false
+      },
+      "x-lost-checks": [
+        "safe-href"
+      ]
+    },
+    "label": {
+      "maxLength": 40,
+      "minLength": 1,
+      "type": "string"
+    },
+    "size": {
+      "enum": [
+        "lg",
+        "md",
+        "sm"
+      ],
+      "type": "string"
+    },
+    "variant": {
+      "enum": [
+        "outline",
+        "primary",
+        "secondary"
+      ],
+      "type": "string"
+    }
+  },
+  "type": "object"
+}

@@ -1,0 +1,299 @@
+/*
+ * Tzu Chi theme — SearchField
+ * ---------------------------------------------------------------------------
+ * Base:   styles/components/search-field.css — `.search-field`,
+ *         `.search-field__group`, `.search-field__input`,
+ *         `.search-field__search-icon`, `.search-field__clear-button`,
+ *         `.search-field--primary`, `.search-field--secondary`,
+ *         `.search-field--full-width`, `.search-field__group--full-width`.
+ *         (It is a sibling of, not a user of, input-group.css: the two files
+ *         share a shape but no selector.)
+ * Model:  packages/components/src/search-bar/tc-search-bar.styles.ts — the
+ *         TEXT-FIELD half of `tc-search-bar` only, i.e. the `.bar` shell plus
+ *         `.input`; tokens/src/component/search-bar.tokens.json. The leading
+ *         category <select> and the trailing submit <button> are a composite,
+ *         not a base component — see "Not here" at the bottom.
+ *         Cross-checked against packages/components/src/input/tc-input.styles.ts
+ *         and the pass-1 overrides input.css and textarea.css, so the themed
+ *         SearchField, Input and Textarea share one field geometry.
+ *
+ * VARIANT MAPPING
+ *   tc-search-bar — one single look        <->  .search-field  and
+ *                                               .search-field--primary
+ *   — no tc equivalent —                   <->  .search-field--secondary
+ *        (neutral `--default` fill, which the theme now maps to the Tzu Chi
+ *        neutral). It inherits every rule below, because they all hang off the
+ *        shared BEM classes, and it keeps the theme-wide 1px `--field-border`:
+ *        every Tzu Chi field is bordered.
+ *   tc `:host { display: block }`, always   <->  .search-field--full-width and
+ *        full width                              .search-field__group--full-width
+ *        — untouched; HeroUI makes it opt-in, which is strictly more flexible.
+ *
+ * WHAT THIS CHANGES — shape, density, typography and two state edges only.
+ * Radius (8px), border width (1px), border, background, text and placeholder
+ * colour, the flattened field shadow, the hover border, the disabled opacity
+ * and cursor, the 4px label-to-field gap and the font family already resolve to
+ * the Tzu Chi values through themes/tzuchi/variables.css. None of that is
+ * repeated here.
+ *
+ *   1. HEIGHT   `h-9` (a fixed 36px) becomes content-driven with a 43.6px
+ *      floor: exactly the themed Input's height (1 + 8 + 25.6 + 8 + 1).
+ *      tc-search-bar fixes no height either — the input drives the shell.
+ *   2. TYPE     16px/1.6 at every width; HeroUI steps down to 14px/1.4286
+ *      from 40rem up. Tzu Chi has one body size.
+ *   3. DENSITY  the shell's inline inset becomes 20px, as on the themed Input
+ *      and on tc's `.control`: the magnifier and the clear button sit 20px from
+ *      the edge and 8px from the text (tc `.control`'s gap). The input's own
+ *      padding-inline goes 12px to 20px for the affix-less case; HeroUI's more
+ *      specific `ps-2` and `pe-2` rules keep the 8px gap wherever an affix is
+ *      present, which is precisely what tc specifies.
+ *   4. ICON     16px grey becomes 20px in the brand colour — the only magnifier
+ *      Tzu Chi draws (`--tc-search-bar-icon-fg` = color.brand.primary, which
+ *      `--accent` mirrors in both modes; `--tc-size-icon-sm` = 20px).
+ *   5. FOCUS    the border turns `--field-border-focus`, as tc's `.bar` does
+ *      and as HeroUI's own Input and InputGroup already do. search-field.css
+ *      is the odd one out upstream: it adds the ring and leaves the edge grey.
+ *   6. INVALID  the border turns `--danger` and survives hover, mirroring
+ *      tc-input and the pass-1 Input override. Upstream points it at
+ *      `--color-field-border-invalid`, which nothing in styles/ ever defines.
+ *   7. PLACEHOLDER  gets `--field-placeholder`, the token every other themed
+ *      field already uses. Upstream forgot the declaration on this one input,
+ *      so the hint was falling through to Tailwind's preflight default.
+ *
+ *   8. FOCUS RING  (Pass 4) the 2px `--focus` ring becomes tc's 3px pale halo,
+ *      and a focused invalid shell gets it in `--danger`. This item used to
+ *      read "KEPT DELIBERATELY — the focus ring", on the grounds that
+ *      overriding it means re-declaring `box-shadow` and fighting Tailwind's
+ *      `--tw-ring-shadow` composition and the `shadow-field` stack. The owner
+ *      has since settled §11 I1 / §12 Q2 the other way: tc-search-bar
+ *      (styles.ts:31-35), tc-input and tc-textarea all specify the halo, and
+ *      the ring was here for a mechanical reason, not a design one. The
+ *      mechanical reason is gone too — the rules below swap only Tailwind's
+ *      ring LAYER variable and never touch `box-shadow`, so the
+ *      `shadow-field` stack survives intact. SearchField, Input and Textarea
+ *      still focus identically; all three now do it Tzu Chi's way.
+ *
+ *   9. CLEAR GLYPH (Pass 5) the ✕ inside the clear button goes 12px -> 16px,
+ *      HeroUI's own close-button glyph size, so the field's two ends carry
+ *      comparable marks. Only the glyph: the 20px pill, its fill, its colour
+ *      and its hit area are left exactly as they are.
+ *
+ * NOT HERE — the composite half of tc-search-bar (category <select>, its
+ * chevron and divider, the submit <button> and its hover fill), plus Label,
+ * Description and FieldError, which HeroUI splits into their own components.
+ *
+ * Reviewed: no changes. Verified against styles/components/search-field.css,
+ * react/src/components/search-field/search-field.tsx (+ .stories.tsx), the
+ * react-aria-components SearchField/Group source (data-invalid/-focus-within/
+ * -hovered/-disabled/-empty all confirmed present on the rendered Group), the
+ * pass-1 input.css/textarea.css files, themes/tzuchi/variables.css and
+ * tokens.css. Every selector exists, every rule is scoped under
+ * [data-theme^="tzuchi"], no --tc-color-* / literal colour / shadow token is
+ * referenced (only HeroUI theme variables --field-border-focus, --danger,
+ * --accent, --field-placeholder, plus mode-independent --tc-space-*,
+ * --tc-font-size-16, --tc-line-height-relaxed, --tc-size-icon-sm), every
+ * override's specificity was checked against its base rule and against the
+ * ps-2/pe-2 affix rules and pass-1 files (no duplication or contradiction),
+ * no variant/size/state is broken, and no comment closes early. Assertions
+ * confirmed by manual computation (43.6px = 1.6*16 + 2*8 + 2*1; 25.6px =
+ * 1.6*16). All seven kept as given.
+ *
+ * Pass 4 (2026-09-20): added the Tzu Chi focus halo (item 8 above) — a 3px
+ * --accent-soft-hover band on the focused shell and a 3px --danger band when
+ * the shell is also invalid, both applied by overriding Tailwind's
+ * --tw-ring-shadow layer rather than by declaring `box-shadow`. Nothing else
+ * in the file changed; the focus border rule it sits beside is untouched.
+ *
+ * Pass 4 reviewed: diffed against the pre-Pass-4 file — only item 8's two
+ * --tw-ring-shadow lines were added, replacing the old "KEPT DELIBERATELY"
+ * paragraph; nothing else moved. Specificity re-derived: the halo lives inside
+ * the existing (0,3,0) focus-border rule, so it clears the base's (0,2,0)
+ * focus rule automatically, and the danger variant inside the invalid block is
+ * (0,4,0), clearing the base's invalid-focus branch (0,3,0). Injection-verified
+ * live in both themes: the invalid, focused group's box-shadow carries the 3px
+ * danger band; the plain focused group carries the pale one. No corrections
+ * needed.
+ *
+ * Pass 5 (2026-09-20): the clear button's glyph goes from 12px to 16px
+ * (item 9 below). Pass 1 took the magnifier to 20px in the brand navy but left
+ * the trailing end at HeroUI's own 20px grey pill with a 12px glyph
+ * (base search-field.css:133-140), so the same 43.6px field carried a heavy,
+ * saturated 20px icon at one end and a faint half-size one at the other — the
+ * two ends stopped reading as a pair. Upstream keeps both at 16px in one grey,
+ * which is why it never showed there. Nothing else about the button moves: the
+ * 20px pill, its fill, its glyph colour and therefore its hit area are all
+ * untouched, so only the drawn mark changes.
+ *
+ * Pass 5 reviewed: the 16px value is HeroUI's own close-button default
+ * (base close-button.css:39-43, `size-4 shrink-0 -mx-0.5 my-0.5`), which
+ * search-field.css:136-139 is the only file to override — so this restores the
+ * shared glyph size rather than inventing one, and it is the same 16px
+ * close-button.css's own Tzu Chi note calls the standard. The geometry works
+ * out exactly: the pill is 20px with 4px padding, and the base's -2px inline
+ * margins bring a 16px svg back to a 12px inline box, so nothing reflows and
+ * nothing is clipped — confirmed by injection in both themes with a value
+ * typed into the field. Specificity (0,3,0) against the base's (0,2,0).
+ * `--tc-space-16` is mode-independent and carries its fallback.
+ *
+ * Pass 5 reviewed (independent, 2026-09-20): diffed against the live theme
+ * file — only item 9's glyph rule and its header entries were added; every
+ * other declaration is untouched. Confirmed base close-button.css:39-43 is
+ * `size-4` (16px) so this restores rather than invents a size, and that
+ * search-field.css:136-139 is the only `size-3` override in the library.
+ * Re-verified live by css: injection in both themes on searchfield--
+ * controlled with a typed value (glyph 16x16, pill/hit-area/colour unchanged)
+ * and on searchfield--invalid focused (danger border and halo unaffected by
+ * the glyph change). No colour, no --tc-color-*, no !important, no physical
+ * property, no premature comment close. No corrections needed.
+ */
+
+[data-theme^="tzuchi"] {
+  /* ---------------------------------------------------------------- shell -- */
+  .search-field__group {
+    /* tc-search-bar.styles.ts:12-24 — `.bar` declares no height; it is as tall
+       as its input. HeroUI pins `h-9` = 36px, which only fits its own 14px/20px
+       text. Floor the shell at the themed Input's height so an affix-only group
+       cannot collapse: a 16px/1.6 line box + 2x8px block padding + 2x1px border
+       = 43.6px, the same number input.css and tc's `.control` land on. */
+    block-size: auto;
+    min-block-size: calc(
+      var(--tc-font-size-16, 16px) * var(--tc-line-height-relaxed, 1.6) + 2 *
+        var(--tc-space-8, 8px) + 2 * var(--field-border-width, 1px)
+    );
+
+    /* tc-search-bar.styles.ts:31-32 — focus paints the border, not only a ring.
+       HeroUI's `.input` (input.css:29) and `.input-group` (input-group.css:36)
+       both do this; `.search-field__group` only applies `status-focused-field`,
+       leaving the edge at the resting grey. Specificity 0,3,0 clears the base
+       `border-color: var(--field-border)` (0,1,0), and the base hover rule is
+       guarded by `:not(:focus-within)` so it does not compete. */
+    &:focus-within,
+    &[data-focus-within="true"] {
+      border-color: var(--field-border-focus);
+
+      /* tc-search-bar.styles.ts:31-35 — the same rule that paints the border
+         also draws `box-shadow: 0 0 0 3px color.brand.surface-hover`.
+         --accent-soft-hover is that tint in both modes (blue-200 / blue-700).
+         MECHANISM: `status-focused-field` is Tailwind's `ring-2 ring-focus`,
+         which sets --tw-ring-shadow; the base composes `box-shadow` from
+         var(--tw-inset-shadow), var(--tw-inset-ring-shadow),
+         var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow),
+         so overriding that one layer turns the ring into the halo and leaves
+         `shadow-field` and the inset layers alone. --tw-ring-offset-width is
+         already 0 in `focus-field-ring`, so no offset band survives.
+         Specificity: this rule is (0,3,0), the base focus rule (0,2,0). */
+      --tw-ring-shadow: 0 0 0 3px var(--accent-soft-hover);
+    }
+
+    /* tc-search-bar has no invalid state of its own; tc-input.styles.ts:65-69
+       defines the Tzu Chi field rule — the border itself turns the error
+       colour and stays there through hover AND focus. Upstream writes
+       `border-color: var(--color-field-border-invalid)`, a variable no theme or
+       stylesheet in styles/ defines, so the declaration is invalid at
+       computed-value time and the edge falls back to currentColor (the text
+       colour) instead of red. Declared after the focus rule on purpose: equal
+       specificity, later wins, so a focused invalid field keeps the danger
+       edge, as in tc. */
+    &[data-invalid="true"] {
+      border-color: var(--danger);
+
+      /* Pass 4 — tc-input.styles.ts:71-73: a focused invalid field swaps the
+         pale halo for a solid danger one, exactly as textarea.css has always
+         done. (0,4,0) against the base invalid-focus ring (0,3,0) and against
+         this file's own (0,3,0) pale-halo rule, so neither can win it back on
+         source order. */
+      &:focus-within,
+      &[data-focus-within="true"] {
+        --tw-ring-shadow: 0 0 0 3px var(--danger);
+      }
+
+      /* Cascade fix, same one pass 1 made for Input and Textarea: the base
+         hover rule (search-field.css:40-44) is `.search-field__group:hover:
+         not(:focus-within)` — specificity 0,3,0, a tie with the rule above that
+         would otherwise be decided by import order alone. Mirroring both forms
+         of it under `[data-invalid]` makes this 0,4,0 / 0,5,0 and wins
+         outright, so hovering an invalid, unfocused field cannot repaint the
+         border `--field-border-hover`. */
+      @media (hover: hover) {
+        &:hover:not(:focus-within),
+        &[data-hovered="true"]:not([data-focus-within="true"]) {
+          border-color: var(--danger);
+        }
+      }
+    }
+  }
+
+  /* ----------------------------------------------------------------- text -- */
+  .search-field__input {
+    /* tc-search-bar.styles.ts:100 — `.input { padding: var(--tc-space-8)
+       var(--tc-space-20) }`. The 8px block padding already matches `py-2`.
+       This 20px only takes effect on the sides with no affix: HeroUI's
+       `:has(search-icon) & { ps-2 }` and `:has([slot="clear"]) & { pe-2 }`
+       rules are 0,3,0 and keep the 8px gap next to an affix — which is exactly
+       tc's model (`.control` pads 20px and gaps 8px to its slots). */
+    padding-inline: var(--tc-space-20, 20px);
+
+    /* tc-search-bar.styles.ts:103 — `font: var(--tc-typography-body)` =
+       400 16px/1.6, one size at every width, where HeroUI's `text-base
+       sm:text-sm` shrinks to 14px/1.4286 above 40rem. Set the parts, not the
+       `font` shorthand, so the inherited (already Tzu Chi) family survives. */
+    font-size: var(--tc-font-size-16, 16px);
+    line-height: var(--tc-line-height-relaxed, 1.6);
+
+    /* tc-search-bar.styles.ts:108-111 — the hint is color.text.muted. Unlike
+       `.input` and `.input-group__input`, `.search-field__input` is never given
+       `placeholder:text-field-placeholder`, so the hint falls through to
+       Tailwind's preflight — `color-mix(in oklab, currentcolor 50%,
+       transparent)`, i.e. the field foreground at half alpha. That reads too
+       light next to a themed Input in light mode and too dim in dark mode.
+       Preflight already pins `opacity: 1`, so only the colour is needed. */
+    &::placeholder {
+      color: var(--field-placeholder);
+    }
+  }
+
+  /* -------------------------------------------------------------- affixes -- */
+  .search-field__search-icon {
+    /* tc-search-bar.styles.ts:148-149 — the magnifier is `--tc-size-icon-sm`
+       square (20px); HeroUI's `size-4` is 16px. */
+    inline-size: var(--tc-size-icon-sm, 20px);
+    block-size: var(--tc-size-icon-sm, 20px);
+
+    /* tc-search-bar.styles.ts:122 — `--tc-search-bar-icon-fg` is
+       color.brand.primary, and `--accent` resolves to exactly that token in
+       both Tzu Chi modes (blue-900 light, blue-300 dark). HeroUI paints the
+       magnifier `--field-placeholder`, i.e. the same grey as the hint text. */
+    color: var(--accent);
+
+    /* 20px from the shell's edge — tc `.control`'s padding-inline — leaving the
+       8px gap to the text that the base `ps-2` rule already provides.
+       HeroUI's `ms-3` is 12px. */
+    margin-inline-start: var(--tc-space-20, 20px);
+  }
+
+  .search-field__clear-button {
+    /* Mirror of the magnifier's inset so the text box is symmetrical: the clear
+       button sits where tc's `.control` puts a `suffix` slot — 20px from the
+       edge, 8px from the text (base `pe-2`). HeroUI's `me-2` is 8px, which
+       would read lopsided against the 20px leading inset above. The 20px pill,
+       its fill and its hit area are left alone: Tzu Chi has no clear
+       affordance to copy. */
+    margin-inline-end: var(--tc-space-20, 20px);
+
+    /* Pass 5 — the glyph alone goes back to 16px. Base search-field.css:136-139
+       is the only place in the library that shrinks a close-button glyph to
+       `size-3`; everywhere else it is `size-4` (base close-button.css:39-43),
+       which is also the 16px-on-a-box proportion close-button.css's own theme
+       note treats as the Tzu Chi equivalent of tc's 20px-on-32px. Next to this
+       file's 20px brand magnifier a 12px pale ✕ made the two ends of one field
+       read as unrelated marks. The pill is 20px with 4px padding and the base
+       gives the svg -2px inline margins, so a 16px glyph still occupies a 12px
+       inline box: nothing reflows, nothing is clipped, and `shrink-0` keeps it
+       from being squeezed back. Specificity (0,3,0) against the base's
+       (0,2,0); colour and hit area untouched. */
+    [data-slot="close-button-icon"] {
+      inline-size: var(--tc-space-16, 16px);
+      block-size: var(--tc-space-16, 16px);
+    }
+  }
+}

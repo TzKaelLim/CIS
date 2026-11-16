@@ -1,0 +1,48 @@
+{
+  "footer": {
+    "bg": {
+      "$type": "color",
+      "$value": "{color.surface.subtle}"
+    },
+    "fg": {
+      "$type": "color",
+      "$value": "{color.text.default}"
+    },
+    "muted-fg": {
+      "$type": "color",
+      "$value": "{color.text.muted}"
+    },
+    "border": {
+      "$type": "color",
+      "$value": "{color.border.default}"
+    },
+    "divider": {
+      "$type": "color",
+      "$value": "{color.border.default}"
+    },
+    "copyright-bg": {
+      "$type": "color",
+      "$value": "{color.brand.primary}"
+    },
+    "copyright-fg": {
+      "$type": "color",
+      "$value": "{color.text.on-brand}"
+    },
+    "heading-fg": {
+      "$type": "color",
+      "$value": "{color.brand.primary}"
+    },
+    "link-fg": {
+      "$type": "color",
+      "$value": "{color.text.muted}"
+    },
+    "link-fg-hover": {
+      "$type": "color",
+      "$value": "{color.brand.primary}"
+    },
+    "focus-ring-color": {
+      "$type": "color",
+      "$value": "{color.border.focus}"
+    }
+  }
+}

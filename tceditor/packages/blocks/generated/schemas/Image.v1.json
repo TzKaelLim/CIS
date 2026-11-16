@@ -1,0 +1,45 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "caption": {
+      "maxLength": 120,
+      "type": "string"
+    },
+    "image": {
+      "additionalProperties": false,
+      "properties": {
+        "alt": {
+          "maxLength": 200,
+          "type": "string"
+        },
+        "assetId": {
+          "pattern": "^[A-Za-z0-9_-]{1,64}$",
+          "type": "string"
+        },
+        "decorative": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "alt",
+        "assetId",
+        "decorative"
+      ],
+      "type": "object",
+      "x-image": true,
+      "x-lost-checks": [
+        "alt-required"
+      ]
+    },
+    "ratio": {
+      "enum": [
+        "16:9",
+        "1:1",
+        "4:3",
+        "auto"
+      ],
+      "type": "string"
+    }
+  },
+  "type": "object"
+}

@@ -1,0 +1,69 @@
+/* ==========================================================================
+   Menu — Tzu Chi option-column box (the standalone Menu)
+   --------------------------------------------------------------------------
+   Destination: styles/themes/tzuchi/components/menu.css, imported into the
+   "components" layer AFTER heroui/styles/components/menu.css. Every rule is
+   scoped by [data-theme^="tzuchi"], so upstream's own light/dark themes are
+   provably untouched.
+
+   MODEL: the same tc `.listbox` box the other two columns in this family
+   already use — packages/components/src/dropdown/tc-dropdown.styles.ts:75,
+   `padding: 8px 0`, rows stacked with no gap. Spec §3.5 R58 (list box) and
+   §2 "Rounding a container never rounds its rows".
+
+   WHY THIS FILE EXISTS
+   `.menu` is the class the standalone <Menu> renders (menu.styles.ts:6).
+   Dropdown does NOT use it: it renders `.dropdown__menu`, and pass-1
+   dropdown.css:81-85 already re-boxed that one through
+   `.dropdown__popover [data-slot="dropdown-menu"]`. Pass 2 did the same for
+   `.list-box` (list-box.css:41-51). So a Menu composed outside a Dropdown —
+   inside a Popover, a Toolbar, a custom shell — is the one column in the
+   family still carrying HeroUI's 4px inset and 4px row gap. This file closes
+   that with the identical two declarations, so the three columns read alike.
+   Nothing here is mode-dependent: no colour, no shadow.
+
+   WHAT THIS CHANGES
+     padding   menu.css:6 `p-1` = 4px on all four sides
+               -> `padding-block: 8px; padding-inline: 0`            (R58)
+     row gap   menu.css:6 `gap-1` = 4px
+               -> `gap: 0`                                            (R58)
+
+   LEFT AS HeroUI'S
+     `relative`, `w-full`, `flex-col`, `overflow-clip` — structural (D15/D32).
+     The separator's `ms-[3%] w-[94%]` narrowing — D24/D15: spacing around a
+     separator belongs to the consumer, tc ships no separator to copy, and the
+     Dropdown column keeps the identical rule.
+     The section header's 32px inset is NOT restated here: ./header.css sets it
+     on `.header` itself, so every column that renders one gets it once.
+     Row geometry and type live in ./menu-item.css, not here.
+
+   CASCADE
+     [data-theme^="tzuchi"] .menu = (0,2,0) vs base `.menu` (0,1,0) — wins
+     outright. Nothing else in the tzuchi theme targets `.menu`.
+
+   Reviewed: no changes. Verified against the live files — `.menu`
+   (menu.tsx:26, `data-slot="menu"`) and its base rule (menu.css:6, `p-1
+   gap-1`) match; the rule is scoped under [data-theme^="tzuchi"]; the one
+   token used (--tc-space-8) is confirmed mode-independent (8px, :root only)
+   in packages/tokens/dist/tokens.css; no colour, no shadow, no `!important`,
+   no physical left/right, no comment closed early. Specificity (0,2,0) beats
+   the base rule (0,1,0) outright, and does not collide with any declaration
+   in dropdown.css or list-box.css — those files box `.dropdown__menu` and
+   `.list-box` respectively, never `.menu`. No variant/size/state is hidden.
+   `.menu` has no Storybook story (menuVariants is exported but unused by any
+   component — Dropdown renders `.dropdown__menu` instead), so this file is
+   verified by reading only; see the unit report for that gap. No corrections
+   required.
+   ========================================================================== */
+
+[data-theme^="tzuchi"] .menu {
+  /* tc-dropdown.styles.ts:75 — `padding: 8px 0`: the rows run edge to edge and
+     the 8px block padding is what keeps them clear of the shell's corner
+     radius. Same two declarations as dropdown.css:82-83 and list-box.css:45-46. */
+  padding-block: var(--tc-space-8, 8px);
+  padding-inline: 0;
+
+  /* tc stacks its rows with no gap. dropdown.css:84 zeroes the same `gap`;
+     list-box.css:49-51 zeroes the `mt-1` that does the same job there. */
+  gap: 0;
+}

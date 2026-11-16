@@ -1,0 +1,147 @@
+/* ------------------------------------------------------------------------------------------------
+ * Tzu Chi theme override — Breadcrumbs
+ *   (tc-breadcrumb + tc-breadcrumb-item  ↔  HeroUI `.breadcrumbs`)
+ * ------------------------------------------------------------------------------------------------
+ * Destination: heroui/styles/themes/tzuchi/components/breadcrumbs.css
+ * Layer: `components`, imported AFTER heroui/styles/components/breadcrumbs.css — and it must also
+ * out-specify ./link.css from pass 1 (see "FIGHT WITH link.css" below), which it does by
+ * specificity, not by import order.
+ * Every rule is scoped by [data-theme^="tzuchi"], so upstream's own light/dark are untouched.
+ *
+ * Reviewed: no changes. Verified every selector against react-aria-components' Breadcrumbs.mjs
+ * and Link.mjs (data-current/aria-current/data-hovered/aria-disabled all really land on the
+ * rendered <a>/<span>, confirming the (0,5,0) tie-break note below), heroui/styles/components/
+ * breadcrumbs.css and link.css (base declarations + specificity math), the tc-breadcrumb(-item)
+ * Lit sources and breadcrumb.tokens.json (role mapping and 8px/16px/1.6/400/500 values),
+ * tokens.dist/tokens.css (--tc-breadcrumb-* chains stay dimension-only; --muted/--foreground
+ * confirmed as the correct light+dark resolutions of {color.text.muted}/{color.text.default}
+ * in themes/tzuchi/variables.css), and pass-1 link.css/index.css. No --tc-color-*, no component
+ * colour token, no hex/rgb/hsl literal in any declaration; every --tc- token used resolves to a
+ * dimension or number. Every rule (incl. nested @media/:hover/[data-current] via `&`) scoped
+ * under [data-theme^="tzuchi"]. No comment contains a premature "* /" (checked with a dedicated
+ * grep). No variant/size/state hidden — status-disabled, status-focused, the current item's
+ * opacity-100 override and the pressed/underline states from base + link.css are all left
+ * untouched and still apply. All 6 assertions recomputed and confirmed against the resolved
+ * cascade (border-box, computed line-height 1.6 x 16px = 25.6px, tie between the [data-current]
+ * and :hover clauses correctly broken by source order). No issues found; shipping as-is.
+ *
+ * VARIANT MAPPING  (neither side has variants or sizes — the mapping is per role)
+ *   tc-breadcrumb  <ol part="list">              ↔  .breadcrumbs            (<ol>)
+ *   tc-breadcrumb-item  :host                    ↔  .breadcrumbs__item      (<li>)
+ *   tc-breadcrumb-item  .link   (<a href>)       ↔  .breadcrumbs__link      (<a>, non-current)
+ *   tc-breadcrumb-item  .current (<span>)        ↔  .breadcrumbs__link[data-current="true"]
+ *                                                   (<span role="link" aria-current="page">)
+ *   tc-breadcrumb-item  .sep  ("›" text glyph)   ↔  .breadcrumbs__separator (12px chevron icon)
+ *   (no tc equivalent)                           ↔  <Breadcrumbs isDisabled> — kept as upstream's
+ *                                                   status-disabled treatment
+ *
+ * WHAT THIS CHANGES  (everything else is upstream's, on purpose)
+ *   1. container gap    6px    -> 8px      tc `ol { gap: var(--tc-breadcrumb-gap) }`
+ *   2. container wrap   nowrap -> wrap     tc's <ol> is `flex-wrap: wrap`
+ *   3. item gap         4px    -> 8px      tc `tc-breadcrumb-item :host { gap: 8px }`
+ *   4. link font-size   14px   -> 16px     tc `--tc-breadcrumb-font-size` = {font.size.16}
+ *   5. link line-height 20px   -> 25.6px   tc inherits --tc-typography-body (400 16px, ratio 1.6)
+ *   6. link weight      500    -> 400      tc's <a> inherits body weight; only .current is 500
+ *   7. link colour      taken back to --muted  (see the note on the rule)
+ *   8. hover colour     --muted -> --foreground   tc `--tc-breadcrumb-link-fg-hover`
+ *                                                 = {color.text.default}
+ *   9. current          --link (brand blue) -> --foreground, weight 500
+ *                                                 tc `--tc-breadcrumb-current-fg`
+ *                                                 = {color.text.default}
+ *
+ * FIGHT WITH link.css — HeroUI renders every crumb through <Link>, so each crumb carries
+ * class="link breadcrumbs__link". Pass 1's `[data-theme^="tzuchi"] .link:not(.button)` is (0,3,0)
+ * and already beats upstream's `.breadcrumbs .breadcrumbs__link` (0,2,0): without this file the
+ * crumbs render bold 700 in brand blue, and hover in --focus. Naming `.link` in the selector here
+ * lifts it to (0,4,0), and the nested hover clause to (0,5,0) over link.css's (0,4,0) hover, so the
+ * breadcrumb roles win whichever file is imported first.
+ * link.css's OTHER declarations are deliberately NOT repeated here: border-radius 4px
+ * (= --tc-radius-sm, exactly tc's own `.link` radius) and text-underline-offset 0.15em already
+ * reach these crumbs through that file, per property — re-declaring them would duplicate it.
+ * ------------------------------------------------------------------------------------------------ */
+
+[data-theme^="tzuchi"] .breadcrumbs {
+  /* tc: ol { gap: var(--tc-breadcrumb-gap, var(--tc-space-8)); flex-wrap: wrap } */
+  gap: var(--tc-breadcrumb-gap, var(--tc-space-8, 8px));
+  flex-wrap: wrap;
+}
+
+[data-theme^="tzuchi"] .breadcrumbs .breadcrumbs__item {
+  /* tc: tc-breadcrumb-item :host { gap: var(--tc-breadcrumb-item-gap, var(--tc-space-8)) }.
+     There is no `--tc-breadcrumb-item-gap` in tokens.css — it is only a public CSS property of the
+     Lit element — so the space token it falls back to is referenced directly.
+     HeroUI places the separator AFTER the link and tc places it BEFORE the text, but with the
+     container gap and the item gap both at 8px the rendered rhythm is the same either way. */
+  gap: var(--tc-space-8, 8px);
+}
+
+[data-theme^="tzuchi"] .breadcrumbs .breadcrumbs__link.link {
+  font-size: var(--tc-breadcrumb-font-size, var(--tc-font-size-16, 16px));
+  line-height: var(--tc-line-height-relaxed, 1.6);
+  font-weight: var(--tc-font-weight-regular, 400);
+
+  /* tc `--tc-breadcrumb-link-fg` = {color.text.muted}; the generator maps that same primitive onto
+     --muted (light gray-700, dark gray-400). Upstream's base already says `text-muted` here — this
+     declaration exists only to take the colour back from ./link.css, which forces --accent-hover
+     onto every `.link`. */
+  color: var(--muted);
+
+  @media (hover: hover) {
+    &:hover,
+    &[data-hovered="true"] {
+      /* tc `--tc-breadcrumb-link-fg-hover` = {color.text.default} -> --foreground.
+         The underline and its currentColor come from the base plus ./link.css. */
+      color: var(--foreground);
+    }
+  }
+
+  /* Current page. react-aria marks the last crumb aria-current + data-current and renders it as a
+     <span role="link" aria-disabled="true"> — upstream's `opacity-100` on the data-current clause
+     already neutralises status-disabled's opacity, and pointer-events:none keeps it unhoverable;
+     both are kept. tc `--tc-breadcrumb-current-fg` = {color.text.default} -> --foreground,
+     `.current` weight 500. Declared last so it also outranks the hover clause above, which has
+     equal specificity. */
+  &[data-current="true"] {
+    color: var(--foreground);
+    font-weight: var(--tc-font-weight-medium, 500);
+  }
+}
+
+/* Pass 5 (2026-09-20) — separator 12px -> 16px (1em).  The earlier reading compared
+   tc's "›" text glyph with HeroUI's chevron ICON and concluded the icon draws more ink at the same
+   size; what it did not weigh is that the crumbs around it had already moved from 14px to 16px
+   (change 4 above) while `size-3` held the chevron at 12px, so the separator ended up the only
+   12px mark in the line — and 12px is a step the Tzu Chi scale does not have (§1).  `1em` rather
+   than the token: this element is an <svg> whose font-size is the item's own 16px (measured), so
+   1em ties the separator to whatever the crumb type is and it can never fall behind it again.
+   Logical properties, so RTL (where the base rotates the glyph) is unaffected.  COLOUR stays
+   --muted, which is tc's separator-fg.
+   Specificity: base `.breadcrumbs .breadcrumbs__separator` is (0,2,0), this is (0,3,0).  A custom
+   `separator` element gets the same class (breadcrumbs.tsx:68-78 clones it with
+   `slots.separator()`), so a custom glyph scales with the crumbs too — checked in the browser on
+   --custom-separator. */
+[data-theme^="tzuchi"] .breadcrumbs .breadcrumbs__separator {
+  inline-size: 1em;
+  block-size: 1em;
+}
+
+/* Not overridden, on purpose:
+   - .breadcrumbs__separator — SUPERSEDED BY PASS 5 (see the rule above), which does move its size.
+     The original entry read: "upstream is `size-3 text-muted`; tc's separator-fg is
+     {color.text.muted}, i.e. the same --muted, and tc's "›" glyph draws less ink at 16px than a
+     12px chevron, so the size is left alone."  Its colour half still holds and is still not
+     overridden.
+   - focus ring — upstream's status-focused is ring-2 + --ring-offset-width, which the theme
+     already pins to --tc-focus-ring-offset (2px) in --focus (= {color.border.focus}); identical to
+     tc's `outline: 2px solid var(--tc-focus-ring-color)` with a 2px offset.
+   - disabled, pressed, RTL, transitions, decoration thickness — upstream's, unchanged. */
+
+/* Pass 5 reviewed (2026-09-20): no changes. Diffed against the live
+   styles/themes/tzuchi/components/breadcrumbs.css — only the briefed
+   inline-size/block-size rule on .breadcrumbs__separator is new; the
+   "Not overridden, on purpose" note was correctly marked superseded rather
+   than deleted. Re-probed in the browser: the separator is 16x16 next to
+   16px crumbs at level-2 and level-3 nesting, in both themes; the custom
+   separator, the focus ring and the disabled state are unaffected. Comment
+   safety, colour-literal, !important, physical-property and scope scans:
+   clean. */

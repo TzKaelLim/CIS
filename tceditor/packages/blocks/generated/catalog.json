@@ -1,0 +1,975 @@
+{
+  "catalogVersion": 1,
+  "nodeIdPattern": "^[A-Za-z0-9_-]{1,64}$",
+  "limits": {
+    "maxBytes": 2097152,
+    "maxDepth": 32,
+    "maxBlocks": 5000
+  },
+  "blocks": [
+    {
+      "type": "Heading",
+      "label": "標題",
+      "category": "文字",
+      "description": "頁面或段落的標題。層級同時決定 HTML 標籤（h1–h4），一頁通常只放一個標題 1。",
+      "version": 1,
+      "deprecated": false,
+      "props": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "default": "標題文字",
+            "title": "標題文字",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "level": {
+            "default": "h2",
+            "title": "層級",
+            "x-labels": {
+              "h1": "標題 1",
+              "h2": "標題 2",
+              "h3": "標題 3",
+              "h4": "標題 4"
+            },
+            "type": "string",
+            "enum": [
+              "h1",
+              "h2",
+              "h3",
+              "h4"
+            ]
+          },
+          "align": {
+            "default": "start",
+            "title": "對齊",
+            "x-labels": {
+              "start": "靠左",
+              "center": "置中",
+              "end": "靠右"
+            },
+            "type": "string",
+            "enum": [
+              "start",
+              "center",
+              "end"
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "slots": {},
+      "examples": [
+        {
+          "name": "只用預設值",
+          "props": {}
+        },
+        {
+          "name": "置中的頁面主標題",
+          "props": {
+            "text": "2026 年淨灘活動",
+            "level": "h1",
+            "align": "center"
+          }
+        }
+      ]
+    },
+    {
+      "type": "Paragraph",
+      "label": "段落",
+      "category": "文字",
+      "description": "一段內文，可以在畫布上直接編輯。可用粗體、斜體、連結、項目清單、編號清單與換行；對齊方式由區塊設定，不在文字裡設定。",
+      "version": 1,
+      "deprecated": false,
+      "props": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "default": {
+              "type": "doc",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "請輸入內文。"
+                    }
+                  ]
+                }
+              ]
+            },
+            "title": "內文",
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "const": "doc"
+              }
+            },
+            "required": [
+              "type"
+            ],
+            "additionalProperties": {},
+            "x-richtext": {
+              "features": [
+                "bold",
+                "italic",
+                "link",
+                "bulletList",
+                "orderedList",
+                "hardBreak"
+              ]
+            },
+            "x-lost-checks": [
+              "richtext-normalize"
+            ]
+          },
+          "align": {
+            "default": "start",
+            "title": "對齊",
+            "x-labels": {
+              "start": "靠左",
+              "center": "置中",
+              "end": "靠右"
+            },
+            "type": "string",
+            "enum": [
+              "start",
+              "center",
+              "end"
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "slots": {},
+      "examples": [
+        {
+          "name": "只用預設值",
+          "props": {}
+        },
+        {
+          "name": "含格式與清單",
+          "props": {
+            "body": {
+              "type": "doc",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "活動當天請"
+                    },
+                    {
+                      "type": "text",
+                      "marks": [
+                        {
+                          "type": "bold"
+                        }
+                      ],
+                      "text": "準時報到"
+                    },
+                    {
+                      "type": "text",
+                      "text": "，並攜帶："
+                    }
+                  ]
+                },
+                {
+                  "type": "bulletList",
+                  "content": [
+                    {
+                      "type": "listItem",
+                      "content": [
+                        {
+                          "type": "paragraph",
+                          "content": [
+                            {
+                              "type": "text",
+                              "text": "環保杯與餐具"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "listItem",
+                      "content": [
+                        {
+                          "type": "paragraph",
+                          "content": [
+                            {
+                              "type": "text",
+                              "text": "防曬用品"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "詳細資訊請見"
+                    },
+                    {
+                      "type": "text",
+                      "marks": [
+                        {
+                          "type": "link",
+                          "attrs": {
+                            "href": "/activity",
+                            "target": "_blank",
+                            "rel": "noopener noreferrer nofollow",
+                            "class": null,
+                            "title": null
+                          }
+                        }
+                      ],
+                      "text": "活動說明"
+                    },
+                    {
+                      "type": "text",
+                      "text": "。"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "Button",
+      "label": "按鈕",
+      "category": "互動",
+      "description": "導向其他頁面或網站的按鈕。新加入的按鈕沒有連結網址，填好網址才能發布。",
+      "version": 1,
+      "deprecated": false,
+      "props": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "default": "立即報名",
+            "title": "按鈕文字",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 40
+          },
+          "href": {
+            "x-link": {
+              "optional": false
+            },
+            "x-lost-checks": [
+              "safe-href"
+            ],
+            "title": "連結網址",
+            "description": "必填。只接受 http、https、mailto、tel 或站內路徑。",
+            "default": "",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048
+          },
+          "variant": {
+            "default": "primary",
+            "title": "樣式",
+            "x-labels": {
+              "primary": "主要",
+              "secondary": "次要",
+              "outline": "外框"
+            },
+            "type": "string",
+            "enum": [
+              "primary",
+              "secondary",
+              "outline"
+            ]
+          },
+          "size": {
+            "default": "md",
+            "title": "大小",
+            "x-labels": {
+              "sm": "小",
+              "md": "中",
+              "lg": "大"
+            },
+            "type": "string",
+            "enum": [
+              "sm",
+              "md",
+              "lg"
+            ]
+          },
+          "fullWidth": {
+            "default": false,
+            "title": "滿版寬度",
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "href"
+        ]
+      },
+      "slots": {},
+      "examples": [
+        {
+          "name": "主要按鈕",
+          "props": {
+            "label": "立即報名",
+            "href": "/register"
+          }
+        },
+        {
+          "name": "外框、滿版",
+          "props": {
+            "label": "了解更多",
+            "href": "/about",
+            "variant": "outline",
+            "fullWidth": true
+          }
+        }
+      ]
+    },
+    {
+      "type": "Card",
+      "label": "卡片",
+      "category": "內容",
+      "description": "有標題、摘要與內容區的卡片。填了連結網址時，標題會變成連結；內容區可以放段落、按鈕、標籤列與圖片。",
+      "version": 1,
+      "deprecated": false,
+      "props": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "default": "卡片標題",
+            "title": "標題",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "summary": {
+            "default": "",
+            "title": "摘要",
+            "type": "string",
+            "maxLength": 200
+          },
+          "href": {
+            "default": "",
+            "x-link": {
+              "optional": true
+            },
+            "x-lost-checks": [
+              "safe-href"
+            ],
+            "title": "連結網址",
+            "description": "選填。填寫時標題變成連結；只接受 http、https、mailto、tel 或站內路徑。",
+            "type": "string",
+            "maxLength": 2048
+          },
+          "variant": {
+            "default": "default",
+            "title": "樣式",
+            "x-labels": {
+              "default": "預設",
+              "secondary": "次要"
+            },
+            "type": "string",
+            "enum": [
+              "default",
+              "secondary"
+            ]
+          },
+          "content": {
+            "default": [],
+            "title": "內容",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string"
+                },
+                "props": {
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {}
+                }
+              },
+              "required": [
+                "type",
+                "props"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "slots": {
+        "content": [
+          "Paragraph",
+          "Button",
+          "TagList",
+          "Image"
+        ]
+      },
+      "examples": [
+        {
+          "name": "含段落與按鈕",
+          "props": {
+            "title": "淨灘志工招募",
+            "summary": "每月第一個週六上午，在福隆海灘集合。",
+            "href": "/activity",
+            "content": [
+              {
+                "type": "Paragraph",
+                "props": {
+                  "body": {
+                    "type": "doc",
+                    "content": [
+                      {
+                        "type": "paragraph",
+                        "attrs": {
+                          "textAlign": null
+                        },
+                        "content": [
+                          {
+                            "type": "text",
+                            "text": "不需要經驗，現場有志工說明。"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "type": "Button",
+                "props": {
+                  "label": "立即報名",
+                  "href": "/register",
+                  "size": "sm"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "TagList",
+      "label": "標籤列",
+      "category": "內容",
+      "description": "一排簡短的標籤，例如活動的類別或對象。",
+      "version": 1,
+      "deprecated": false,
+      "props": {
+        "type": "object",
+        "properties": {
+          "tags": {
+            "default": [
+              {
+                "label": "志工"
+              },
+              {
+                "label": "環保"
+              }
+            ],
+            "title": "標籤",
+            "minItems": 1,
+            "maxItems": 10,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 20,
+                  "title": "標籤文字"
+                }
+              },
+              "required": [
+                "label"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "color": {
+            "default": "default",
+            "title": "顏色",
+            "x-labels": {
+              "default": "預設",
+              "accent": "強調",
+              "success": "成功"
+            },
+            "type": "string",
+            "enum": [
+              "default",
+              "accent",
+              "success"
+            ]
+          },
+          "variant": {
+            "default": "secondary",
+            "title": "樣式",
+            "x-labels": {
+              "secondary": "次要",
+              "soft": "柔和"
+            },
+            "type": "string",
+            "enum": [
+              "secondary",
+              "soft"
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "slots": {},
+      "examples": [
+        {
+          "name": "只用預設值",
+          "props": {}
+        },
+        {
+          "name": "強調、柔和",
+          "props": {
+            "tags": [
+              {
+                "label": "親子"
+              },
+              {
+                "label": "戶外"
+              },
+              {
+                "label": "免費參加"
+              }
+            ],
+            "color": "accent",
+            "variant": "soft"
+          }
+        }
+      ]
+    },
+    {
+      "type": "Section",
+      "label": "區段",
+      "category": "版面",
+      "description": "把幾個區塊包成一段，可以加背景色與上下留白。區段裡不能再放區段。",
+      "version": 1,
+      "deprecated": false,
+      "props": {
+        "type": "object",
+        "properties": {
+          "background": {
+            "default": "transparent",
+            "title": "背景",
+            "x-labels": {
+              "transparent": "無背景",
+              "default": "白色",
+              "secondary": "淺灰"
+            },
+            "type": "string",
+            "enum": [
+              "transparent",
+              "default",
+              "secondary"
+            ]
+          },
+          "paddingY": {
+            "default": "48",
+            "title": "上下留白",
+            "x-labels": {
+              "16": "小",
+              "32": "中",
+              "48": "大",
+              "64": "特大"
+            },
+            "type": "string",
+            "enum": [
+              "16",
+              "32",
+              "48",
+              "64"
+            ]
+          },
+          "content": {
+            "default": [],
+            "title": "內容",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string"
+                },
+                "props": {
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {}
+                }
+              },
+              "required": [
+                "type",
+                "props"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "slots": {
+        "content": [
+          "Heading",
+          "Paragraph",
+          "Button",
+          "Card",
+          "TagList",
+          "Columns",
+          "Image"
+        ]
+      },
+      "examples": [
+        {
+          "name": "淺灰背景，含標題、段落與按鈕",
+          "props": {
+            "background": "secondary",
+            "content": [
+              {
+                "type": "Heading",
+                "props": {
+                  "text": "活動資訊",
+                  "level": "h2"
+                }
+              },
+              {
+                "type": "Paragraph",
+                "props": {
+                  "body": {
+                    "type": "doc",
+                    "content": [
+                      {
+                        "type": "paragraph",
+                        "attrs": {
+                          "textAlign": null
+                        },
+                        "content": [
+                          {
+                            "type": "text",
+                            "text": "集合時間為上午八點，活動約三小時。"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "type": "Button",
+                "props": {
+                  "label": "立即報名",
+                  "href": "/register"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "Columns",
+      "label": "多欄",
+      "category": "版面",
+      "description": "把內容分成 2 到 3 欄並排；畫面寬度小於 768px 時改成上下排列。刪除一欄時，那一欄的內容會一起刪除。",
+      "version": 1,
+      "deprecated": false,
+      "props": {
+        "type": "object",
+        "properties": {
+          "columns": {
+            "default": [
+              {
+                "content": []
+              },
+              {
+                "content": []
+              }
+            ],
+            "title": "欄",
+            "minItems": 2,
+            "maxItems": 3,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "content": {
+                  "default": [],
+                  "title": "內容",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string"
+                      },
+                      "props": {
+                        "type": "object",
+                        "propertyNames": {
+                          "type": "string"
+                        },
+                        "additionalProperties": {}
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "props"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "gap": {
+            "default": "24",
+            "title": "欄距",
+            "x-labels": {
+              "16": "小",
+              "24": "中",
+              "32": "大"
+            },
+            "type": "string",
+            "enum": [
+              "16",
+              "24",
+              "32"
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "slots": {
+        "columns[].content": [
+          "Heading",
+          "Paragraph",
+          "Button",
+          "Card",
+          "TagList",
+          "Image"
+        ]
+      },
+      "examples": [
+        {
+          "name": "兩欄：圖片與說明",
+          "props": {
+            "columns": [
+              {
+                "content": [
+                  {
+                    "type": "Image",
+                    "props": {
+                      "image": {
+                        "assetId": "demo-1",
+                        "alt": "志工在海灘上撿拾垃圾",
+                        "decorative": false
+                      },
+                      "ratio": "4:3"
+                    }
+                  }
+                ]
+              },
+              {
+                "content": [
+                  {
+                    "type": "Heading",
+                    "props": {
+                      "text": "一起守護海岸",
+                      "level": "h3"
+                    }
+                  },
+                  {
+                    "type": "Paragraph",
+                    "props": {
+                      "body": {
+                        "type": "doc",
+                        "content": [
+                          {
+                            "type": "paragraph",
+                            "attrs": {
+                              "textAlign": null
+                            },
+                            "content": [
+                              {
+                                "type": "text",
+                                "text": "每一次彎腰，都讓海灘更乾淨一點。"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "type": "TagList",
+                    "props": {
+                      "tags": [
+                        {
+                          "label": "環保"
+                        },
+                        {
+                          "label": "戶外"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "Image",
+      "label": "圖片",
+      "category": "內容",
+      "description": "一張圖片，可加圖說。新加入的圖片還沒選圖；選好圖並填寫替代文字（純裝飾的圖片除外）才能發布。",
+      "version": 1,
+      "deprecated": false,
+      "props": {
+        "type": "object",
+        "properties": {
+          "image": {
+            "x-image": true,
+            "x-lost-checks": [
+              "alt-required"
+            ],
+            "title": "圖片",
+            "description": "替代文字給看不到圖片的讀者使用；純裝飾的圖片可以留空。",
+            "default": {
+              "assetId": "",
+              "alt": "",
+              "decorative": false
+            },
+            "type": "object",
+            "properties": {
+              "assetId": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,64}$",
+                "title": "圖片"
+              },
+              "alt": {
+                "type": "string",
+                "maxLength": 200,
+                "title": "替代文字"
+              },
+              "decorative": {
+                "type": "boolean",
+                "title": "裝飾用圖片"
+              }
+            },
+            "required": [
+              "assetId",
+              "alt",
+              "decorative"
+            ],
+            "additionalProperties": false
+          },
+          "ratio": {
+            "default": "auto",
+            "title": "比例",
+            "description": "原始比例以外的比例，會裁切圖片填滿。",
+            "x-labels": {
+              "auto": "原始比例",
+              "16:9": "16:9",
+              "4:3": "4:3",
+              "1:1": "1:1"
+            },
+            "type": "string",
+            "enum": [
+              "auto",
+              "16:9",
+              "4:3",
+              "1:1"
+            ]
+          },
+          "caption": {
+            "default": "",
+            "title": "圖說",
+            "type": "string",
+            "maxLength": 120
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "image"
+        ]
+      },
+      "slots": {},
+      "examples": [
+        {
+          "name": "寬幅圖片與圖說",
+          "props": {
+            "image": {
+              "assetId": "demo-1",
+              "alt": "志工在海灘上撿拾垃圾",
+              "decorative": false
+            },
+            "ratio": "16:9",
+            "caption": "2025 年福隆淨灘活動"
+          }
+        },
+        {
+          "name": "純裝飾圖片",
+          "props": {
+            "image": {
+              "assetId": "demo-3",
+              "alt": "",
+              "decorative": true
+            },
+            "ratio": "1:1"
+          }
+        }
+      ]
+    }
+  ],
+  "root": {
+    "label": "頁面",
+    "props": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "default": "未命名頁面",
+          "title": "頁面標題",
+          "description": "顯示在瀏覽器分頁與搜尋結果。",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "description": {
+          "default": "",
+          "title": "頁面說明",
+          "description": "搜尋結果中標題下方的說明文字。",
+          "type": "string",
+          "maxLength": 160
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

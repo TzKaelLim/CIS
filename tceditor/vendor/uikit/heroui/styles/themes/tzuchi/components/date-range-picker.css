@@ -1,0 +1,164 @@
+/* ==========================================================================
+   DateRangePicker — Tzu Chi shape and type overrides
+   --------------------------------------------------------------------------
+   Base:   heroui/styles/components/date-range-picker.css — `.date-range-picker`,
+           `.date-range-picker__trigger`,
+           `.date-range-picker__trigger-indicator`,
+           `.date-range-picker__range-separator`,
+           `.date-range-picker__popover`, plus the two
+           `.date-range-picker__popover .range-calendar__nav-button-icon`
+           rotation rules.
+   Model:  none. DateRangePicker has no tc-* counterpart. The file is the twin
+           of date-picker.css — upstream's two base files are byte-identical
+           apart from the class prefix and the extra range separator — with one
+           additional rule for that separator.
+
+   Scoped to [data-theme^="tzuchi"], loaded into the same "components" layer as
+   heroui/styles/components/date-range-picker.css but after it, so upstream's
+   own light and dark themes are provably untouched.
+
+   WHAT THIS CHANGES
+
+     1. TRIGGER TYPE  `.date-range-picker__trigger`
+        `text-sm` (14px / 20px / inherited 400)  ->  16px / 700 / 1.5.
+        §1 R1 (control label) plus §1's mechanical "no 14px step" rule; the
+        same three longhands select.css:120-122 gives the Select trigger and
+        date-picker.css gives the DatePicker trigger.
+
+     2. INDICATOR SIZE  `.date-range-picker__trigger-indicator`
+        `size-4` (16px square)  ->  var(--tc-size-icon-sm) = 20px.
+        16px is off the Tzu Chi icon scale (20 / 32 / 40px) and §1.3 lists the
+        only two 16px glyphs the theme keeps; this is neither. Both themed
+        field affixes already move to 20px — the SearchField magnifier (R54,
+        search-field.css:179-180) and the Select chevron (select.css:192-195).
+
+     3. RANGE SEPARATOR TYPE  `.date-range-picker__range-separator`
+        inherits `.date-input-group`'s `text-sm` (14px)  ->  16px / 1.6.
+        §1 R2, the field-value voice: the separator is a glyph ON the value
+        line, reading with the two date inputs on either side of it, so it
+        takes their metrics (input.css:55-56, textarea.css:69-70,
+        search-field.css:160-161 all land on the same pair). Without this it
+        would be the one 14px glyph left between two 16px date inputs. Weight
+        and colour still inherit / stay HeroUI's --field-placeholder.
+
+     4. POPOVER RADIUS  `.date-range-picker__popover`
+        `min(32px, calc(var(--radius) * 2.5))` = 20px under this theme  ->
+        var(--tc-card-radius) = 16px. §6(b) R98/R30 — a CONTENT popover (it
+        holds a range calendar, not an option column) follows the Card/Modal
+        surface radius, not the 8px option-panel radius.
+
+   KEPT DELIBERATELY
+     • Popover background (`bg-overlay`) and elevation (`--overlay-shadow`) —
+       §6(b) R99/R100 and the §6 shadow table. No --accent-soft tint: that is
+       tc-dropdown's listbox signature and would make the calendar read as a
+       Select menu.
+     • Popover padding `p-3` (12px) — §6(b) R102.
+     • Popover enter/exit animation, durations, placement slide-ins, transform
+       origin, `overflow-y-auto`, `overscroll-contain`, `w-fit`. R140, and the
+       precedent of dropdown.css / select.css, which leave popover motion alone.
+     • Trigger radius — `rounded-field` already resolves to 8px (R22); N5 / D1.
+     • Trigger padding (`p-1`), `w-full`, `no-highlight`, cursor and its 150ms
+       box-shadow transition — spec silent; the 28px box still clears the 24px
+       WCAG 2.5.8 minimum.
+     • Trigger focus ring and disabled treatment — D2 / D3 / R70 / R85.
+     • Indicator COLOUR (`text-field-placeholder`) — the Select chevron, the
+       nearest Tzu Chi disclosure affordance, resolves to the same grey at rest
+       (select.css:180). The SearchField magnifier's --accent comes from a tc
+       token with no DateRangePicker counterpart. Listed as a gap.
+     • The separator's `px-1` (4px) inline padding — already R154's micro gap —
+       and its `select-none`.
+     • `.date-range-picker` root `gap-1` = 4px — already R141/R142.
+     • The DateField shell the trigger and separator sit in
+       (`.date-input-group`, its `__suffix` inset, height, border and type) and
+       the `:has(.date-range-picker__range-separator)` start/end padding rules
+       belong to the date-input-group unit, which applies R49-R54. Nothing here
+       reaches them.
+     • The range calendar inside the popover, including the two
+       nav-button-icon rotation rules, belongs to the range-calendar unit.
+
+   CASCADE
+     Every base declaration touched here is written against a single class
+     (0,1,0); every selector below is (0,2,0), so all four win outright and
+     none of them depends on import order. The separator rule adds a
+     declaration rather than beating one — the base sets no font-size on it, so
+     any declaration beats the inherited value.
+     `inline-size` / `block-size` versus the base `size-4`'s `width` /
+     `height`: logical and physical properties that map to the same used value
+     are resolved against each other by the normal cascade, so the more
+     specific logical declaration wins — the pairing search-field.css:179-180
+     already ships against this same base utility.
+     Focus-ring clearance: `.date-input-group` is `overflow-hidden`, so the
+     trigger's 2px ring at a 2px offset needs 4px of room inside the shell.
+     With the 20px glyph the trigger is 28px tall, which clears comfortably
+     inside the 43.6px field shell R41/R49 gives every field-family component,
+     but is 1px short against HeroUI's un-themed `h-9` 36px shell — this file
+     assumes the date-input-group override lands. Recorded in the report.
+
+   VARIANTS / SIZES / STATES — DateRangePicker ships none of its own. The
+   states on the base (`:focus-visible` / `[data-focus-visible]`, `:disabled` /
+   `[data-disabled]` / `[aria-disabled]` on the trigger; `[data-entering]` /
+   `[data-exiting]` / `[data-placement]` on the popover) are all untouched and
+   keep working.
+
+   Reviewed: no changes. Verified against the live sources — every selector
+   (.date-range-picker__trigger, __trigger-indicator, __range-separator,
+   __popover) exists in heroui/styles/components/date-range-picker.css, the
+   React source (date-range-picker.tsx) and date-range-picker.styles.ts
+   (no `variants` key, so no size/colour axis is hidden). Every rule sits
+   inside the single [data-theme^="tzuchi"] block; grepped clean for
+   --tc-color-*, hex/rgb/hsl/oklch literals, !important and physical
+   left/right. --tc-font-size-16, --tc-font-weight-bold,
+   --tc-line-height-normal, --tc-line-height-relaxed, --tc-size-icon-sm and
+   --tc-card-radius all exist in packages/tokens/dist/tokens.css and are
+   absent from its dark blocks, so all are mode-independent. Confirmed no
+   other of the 26 shipped override files mentions date-picker,
+   date-range-picker or date-input-group — no ownership collision.
+   Confirmed via storybook/styles/globals.css and themes/tzuchi/index.css
+   that this file's block lands in the same "components" layer as HeroUI's
+   base CSS but after it, so the (0,2,0) vs (0,1,0)/inherited cascade table
+   above is not load-order-dependent. Confirmed .date-input-group is h-9
+   (36px), overflow-hidden and text-sm in the live base CSS, matching the
+   cross-unit-dependency note; both story ids the assertions use exist in
+   storybook-static/index.json and Default's render tree (two
+   DateField.Input around DateRangePicker.RangeSeparator, DateField.Suffix >
+   Trigger > TriggerIndicator, popover > RangeCalendar) matches every
+   asserted selector. No corrections were needed.
+   ========================================================================== */
+
+[data-theme^="tzuchi"] {
+  /* ---------------------------------------------------------------- trigger -- */
+  .date-range-picker__trigger {
+    /* §1 R1 — control label: 16px / 700 / 1.5. Longhands only, so the theme's
+       --font-sans stack is not re-declared (N5). */
+    font-size: var(--tc-font-size-16, 16px);
+    font-weight: var(--tc-font-weight-bold, 700);
+    line-height: var(--tc-line-height-normal, 1.5);
+  }
+
+  /* -------------------------------------------------------------- indicator -- */
+  .date-range-picker__trigger-indicator {
+    /* §1.3 + R54 — the Tzu Chi small icon is 20px. Scoped to the indicator
+       element, not to `svg`, so the WithCustomIndicator story's own `size-4`
+       Iconify glyph keeps its size and simply centres in the 20px box. */
+    inline-size: var(--tc-size-icon-sm, 20px);
+    block-size: var(--tc-size-icon-sm, 20px);
+  }
+
+  /* -------------------------------------------------------------- separator -- */
+  .date-range-picker__range-separator {
+    /* §1 R2 — field value: 16px / 1.6, the metrics the two date inputs it sits
+       between carry. It inherits 14px from `.date-input-group`'s `text-sm`
+       otherwise. Weight inherits (400) and the colour stays HeroUI's
+       --field-placeholder. */
+    font-size: var(--tc-font-size-16, 16px);
+    line-height: var(--tc-line-height-relaxed, 1.6);
+  }
+
+  /* ---------------------------------------------------------------- popover -- */
+  .date-range-picker__popover {
+    /* §6(b) R98/R30 — content popover, so the Card/Modal surface radius (16px),
+       not the option panel's 8px. Background, shadow, padding and motion stay
+       HeroUI's (R99/R100/R102). */
+    border-radius: var(--tc-card-radius, var(--radius-2xl));
+  }
+}

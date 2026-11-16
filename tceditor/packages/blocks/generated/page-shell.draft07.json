@@ -1,0 +1,99 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "tceditor page shell",
+  "type": "object",
+  "required": [
+    "root",
+    "content"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "root": {
+      "type": "object",
+      "required": [
+        "props"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "props": {
+          "type": "object"
+        }
+      }
+    },
+    "content": {
+      "$ref": "#/definitions/nodeList"
+    },
+    "zones": {
+      "type": "object",
+      "maxProperties": 0
+    }
+  },
+  "definitions": {
+    "nodeList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/node"
+      }
+    },
+    "node": {
+      "type": "object",
+      "required": [
+        "type",
+        "props"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "Heading",
+            "Paragraph",
+            "Button",
+            "Card",
+            "TagList",
+            "Section",
+            "Columns",
+            "Image"
+          ]
+        },
+        "props": {
+          "$ref": "#/definitions/props"
+        }
+      }
+    },
+    "props": {
+      "type": "object",
+      "required": [
+        "id"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,64}$",
+          "not": {
+            "const": "root"
+          }
+        },
+        "columns": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/item_columns"
+          }
+        },
+        "content": {
+          "$ref": "#/definitions/nodeList"
+        }
+      }
+    },
+    "item_columns": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "content": {
+          "$ref": "#/definitions/nodeList"
+        }
+      }
+    }
+  }
+}

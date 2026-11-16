@@ -1,0 +1,10 @@
+{
+  "progress": {
+    "height": { "$type": "dimension", "$value": "8px" },
+    "radius": { "$type": "dimension", "$value": "{radius.full}" },
+    "track-bg": { "$type": "color", "$value": "{color.surface.subtle}" },
+    "fill-bg": { "$type": "color", "$value": "{color.brand.primary}" },
+    "label-fg": { "$type": "color", "$value": "{color.text.muted}" },
+    "font-size": { "$type": "dimension", "$value": "{font.size.16}" }
+  }
+}

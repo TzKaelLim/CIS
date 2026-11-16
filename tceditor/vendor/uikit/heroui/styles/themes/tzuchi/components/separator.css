@@ -1,0 +1,49 @@
+/* ------------------------------------------------------------------------------------------------
+ * Separator — Tzu Chi overrides  (tc-divider)
+ * ------------------------------------------------------------------------------------------------
+ * Almost nothing to do: HeroUI's Separator is already the Tzu Chi divider.
+ *   line thickness  1px          = tc divider.thickness 1px
+ *   line colour     var(--separator) = tc divider.color -> border.default (#bdbdbd / #6b6b6e)
+ *   horizontal      full width   = tc .line inline-size 100%
+ *   vertical        self-stretch = tc .line block-size 100%
+ * So shape, density and border are kept as-is; only the two extra colour variants are re-anchored.
+ *
+ * Variant mapping (tc has exactly ONE divider colour, HeroUI has three strengths):
+ *   tc divider.color  <->  variant="default"    — already var(--separator); untouched.
+ *   (none)            <->  variant="secondary"  — re-anchored on --separator, see below.
+ *   (none)            <->  variant="tertiary"   — re-anchored on --separator, see below.
+ *
+ * Why the two rules exist: upstream derives --separator-secondary and --separator-tertiary from
+ * --surface mixed toward --surface-foreground, so upstream's ladder runs default -> secondary ->
+ * tertiary, each step a little STRONGER than the last (light 92% -> 88.2% -> 85.0% oklab L;
+ * dark 25% -> 32.8% -> 35.9%). Tzu Chi's divider line is much bolder than HeroUI's, so once
+ * --separator points at border.default the ladder inverts: default becomes the strongest and the
+ * other two nearly vanish (light 79.8% vs 89.8% and 87.0%; dark 52.9% vs 33.8% and 36.8%).
+ * Re-anchoring both on --separator and keeping upstream's own 15% and 19% steps toward --foreground
+ * restores the order while keeping all three lines Tzu Chi greys:
+ *   light  #bdbdbd -> #a7a7a7 -> #a1a1a1      dark  #6b6b6e -> #7e7e81 -> #838386
+ * Only the component's own variant classes are touched — the --separator-secondary and
+ * --separator-tertiary variables keep their values for table borders and link underlines.
+ *
+ * Kept on purpose (see the report): the 4px rounded-sm end caps (invisible on a 1px line),
+ * the 8px min-height floor of the vertical line, and tc's baked-in 16px margin — spacing around a
+ * separator belongs to the consumer in HeroUI (.menu and .dropdown__menu space theirs with flex gap,
+ * .toolbar with its grid), so baking a margin in here would double up inside every menu.
+ *
+ * Reviewed: no changes. Verified the two hex ladders in the comment above with an exact
+ * color-mix(in oklab, …) reimplementation (srgb -> linear -> oklab -> lerp -> back): both ladders
+ * reproduce byte-for-byte (#a7a7a7 / #a1a1a1 light, #7e7e81 / #838386 dark). Confirmed
+ * .separator--secondary/.separator--tertiary are real tailwind-variants classes (always paired with
+ * the base "separator" class — see separator.styles.ts), that no other stylesheet touches them, and
+ * that the added attribute-scoped selector (specificity 0,2,0) beats the unscoped base rule
+ * (0,1,0) in every mode regardless of import order. No selectors, colours, scoping, cascade, variant
+ * coverage or comment-safety issues found.
+ * ------------------------------------------------------------------------------------------------ */
+
+[data-theme^="tzuchi"] .separator--secondary {
+  background-color: color-mix(in oklab, var(--separator) 85%, var(--foreground) 15%);
+}
+
+[data-theme^="tzuchi"] .separator--tertiary {
+  background-color: color-mix(in oklab, var(--separator) 81%, var(--foreground) 19%);
+}

@@ -1,0 +1,40 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "color": {
+      "enum": [
+        "accent",
+        "default",
+        "success"
+      ],
+      "type": "string"
+    },
+    "tags": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "label": {
+            "maxLength": 20,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "label"
+        ],
+        "type": "object"
+      },
+      "maxItems": 10,
+      "minItems": 1,
+      "type": "array"
+    },
+    "variant": {
+      "enum": [
+        "secondary",
+        "soft"
+      ],
+      "type": "string"
+    }
+  },
+  "type": "object"
+}

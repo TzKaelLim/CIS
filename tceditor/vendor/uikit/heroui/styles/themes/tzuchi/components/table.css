@@ -1,0 +1,332 @@
+/* ==========================================================================
+   Table — Tzu Chi theme overrides
+   Destination: styles/themes/tzuchi/components/table.css
+   (layer: components, imported after HeroUI's own base table stylesheet).
+
+   Table has NO Tzu Chi counterpart (DESIGN-LANGUAGE §12 Q8), so every value
+   below is either a rule the spec states outright or the most conservative
+   derivation from the closest role. Nothing here is invented.
+
+   WHAT THIS CHANGES
+   1. Shell radius — `.table-root--primary` 20px (min(32px, --radius * 2.5))
+      -> --tc-card-radius = 16px.                                       [R37]
+   2. Table type — the `<table>` root's 14px (text-sm) -> 16px/1.6 body,
+      so no 14px step survives anywhere inside the table.          [§1, R10]
+   3. Header cell — 12px/500 -> 16px/700/1.5, and block padding 10px -> 8px.
+      R9 derives the header cell from R4 (option row); R4's geometry is R57
+      (`padding-block: --tc-space-8`), which lands a *text* header cell on
+      the same 40px content-plus-padding total as a themed menu option
+      (24 + 16). Note: the leading `pe-0` checkbox column in the default
+      story carries a 32px themed control (checkbox.css), so the rendered
+      header row is actually 48px (32 + 8 + 8), driven by that column, not
+      by this rule — the 40px figure is the type/padding derivation for a
+      label cell, not an asserted row height. 10px is also off the Tzu Chi
+      4px space scale, which has no 10px step.               [R9, R4, R57]
+   4. Body cell — 14px -> 16px/1.6 (weight still inherits 400).        [R10]
+      Its 12px block padding and 16px inline padding are already
+      --tc-space-12 / --tc-space-16 and are NOT restated.
+   5. Row hover — `bg-surface/40` -> --accent-soft. A table row is "a row
+      outside a tinted panel".                                         [R78]
+      Row selected — `bg-surface/10` -> --accent-soft-hover, one step above
+      the hover fill, so the hover < selected ordering of R78/R79 holds.
+      R81's solid --accent fill is excluded by its own guard (selection is
+      not the only state a row carries, and a row holds its own chips,
+      avatars and buttons); R83 needs a tonal fill at rest, which a table
+      row does not have.                                          [R82, R78]
+   6. Sort chevron — 12px -> 1em, so it tracks the header label that grew
+      from 12px to 16px (the same 16px glyph D18 keeps on the pagination
+      chevrons). Rotation retimed 100ms ease-out -> 200ms
+      motion.easing.standard: "a value/indicator travelling (… chevron
+      rotation)".                                           [§1.3, R132/R136]
+   7. Footer band — block padding 10px -> 8px, level with the header band
+      and on the 4px space scale.                                   [§0, §9]
+
+   LEFT AS HEROUI'S — deliberately
+   - Header fill --surface-secondary, and --separator / --separator-tertiary
+     row and cell borders: D31 leaves the surface steps unmapped and D25
+     states the separator variables are shared with table borders and are
+     settled. No border rule in this file.
+   - `.table__body` corner radius (already min(32px, --radius-2xl) = 16px =
+     --tc-card-radius) and `.table-root--secondary`'s header-card corners
+     (same expression, same 16px). Both already sit on the card role, R27.
+   - Cell / column padding-inline 16px (= --tc-space-16, the card inset D9
+     keeps), and the body cell's 12px block padding (= --tc-space-12).
+     R57's 32px inset is earned by popover option rows running edge to edge
+     and does not transfer to a table.                                  [I3]
+   - Header colour --muted and its sortable-hover --foreground: R9 gives
+     type only, and the spec states no colour for a table header.
+   - Focus rings (the inset 2px --focus shadow split across cells, and the
+     8px focus shape): D3 settles width/offset/colour, and R73 already is
+     the inset-ring pattern this overflow-clipped component needs.
+   - Disabled (--disabled-opacity 0.38, D2), dragging opacity, drop-target
+     --accent-soft (already the grammar's tint), column-resizer --separator
+     / --accent / --focus, load-more and empty-state geometry, the virtualized
+     branches, tree-column indent, scroll container, sticky-header story
+     utilities, and both variants' structural rules.
+   - The checkbox column: the 32px themed checkbox (checkbox.css:65-67) is
+     centred by HeroUI's own `align-middle` on the cell and simply drives the
+     row height, with the 16px inline padding and the story's `pe-0` intact.
+     No alignment rule is needed and none is written.
+
+   VARIANTS / STATES — all still work
+   - `--primary` (grey frame + white card) and `--secondary` (transparent
+     rows, standalone rounded header card) both keep their own structure;
+     the row-state rules are scoped through `.table-root` so they outrank
+     `--secondary`'s own (0,4,0) hover rule in BOTH variants instead of
+     tying with it.
+   - hover / selected / focus-visible / disabled / dragging / drop-target /
+     sortable / resizable / virtualized / sticky header / load-more /
+     expandable rows: unchanged except where listed above.
+
+   CASCADE NOTES
+   - `.table__content`, `.table__column`, `.table__cell`, `.table__footer`,
+     `.table-root--primary`, `.table__sortable-column-indicator`: base rules
+     are (0,1,0); these are (0,2,0).
+   - Row states: base is (0,3,0) for `--primary` and (0,4,0) for
+     `--secondary`; the rules here are (0,5,0) via `.table-root`.
+   - The per-story utilities (`pe-0`, `after:hidden`, `font-medium`,
+     `text-xs`, `sticky top-0 bg-surface-secondary`, `min-w-*`) live in the
+     utilities layer and keep beating everything here, by design.
+   - Motion uses duration/timing longhands only, never transition-property,
+     so any `motion-reduce:transition-none` guard keeps winning.       [R136]
+
+   Reviewed: verified every selector against heroui/styles/components/table.css,
+   table.tsx and table.stories.tsx (all real); confirmed every rule scoped
+   under [data-theme^="tzuchi"]; confirmed every --tc-* token (--tc-card-radius,
+   --tc-font-size-16, --tc-font-weight-bold, --tc-line-height-normal/-relaxed,
+   --tc-space-8, --tc-motion-duration-base, --tc-motion-easing-standard) exists
+   in packages/tokens/dist/tokens.css, is mode-independent (absent from both
+   dark blocks) and carries a fallback; confirmed --accent-soft /
+   --accent-soft-hover are HeroUI theme variables that flip correctly under
+   [data-theme="tzuchi-dark"] (variables.css:76-77); hand-checked the cascade
+   arithmetic for every rule against the base declaration it must beat,
+   including the --primary/--secondary hover-vs-selected tie-break; scanned
+   for !important, hex/rgb/hsl/oklch literals, --tc-color-*, physical
+   left/right and premature comment-closes (glob immediately followed by
+   slash) — none found.
+   One correction: softened the header-cell comment
+   (item 3) — the "40px" figure is the label cell's own type+padding
+   derivation, not the story's actual rendered row height, which the 32px
+   themed checkbox column pushes to 48px; no CSS changed, only the claim.
+
+   PASS 4 (2026-09-20) — column headers off --muted onto the header band's own
+   foreground.
+   NEW DESIGN-LANGUAGE RULE (the integrator's call, delegated by the owner): text that sits on a FILL never
+   uses --muted; it uses that fill's own foreground.  Tzu Chi's own components
+   never put muted text on a fill (tc-dropdown's option text on brand.surface
+   is brand.primary; tc-search-bar's category label on surface.subtle is
+   text.default).  `.table__column` sits on the --surface-secondary band —
+   painted by `.table-root--primary` (base table.css:25-27) in the primary
+   variant and by `.table-root--secondary .table__column` (base:40-42) in the
+   secondary one — so it takes --surface-secondary-foreground, HeroUI's own
+   foreground for that surface step (themes/default/variables.css:76 light,
+   :212 dark, both `var(--foreground)`, which this theme remaps to gray-900 /
+   gray-100).  Measured --muted on that band (band = rgb(239,239,240) light,
+   rgb(35,35,37) dark): 3.34:1 light, 7.48:1 dark; after: 11.00:1 light,
+   14.01:1 dark.  `.table__sortable-column-header` (base
+   :165) declares no colour of its own and simply inherits from the `<th>`, so
+   the one declaration fixes both elements named in the sweep.
+   This SUPERSEDES the "Header colour --muted … R9 gives type only" bullet in
+   LEFT AS HEROUI'S above — R9 still gives type only; the colour now comes
+   from the fill rule, not from R9.
+   CONSEQUENCE, reported not fixed: the base's sortable-column hover
+   (base:139-144, `text-muted` -> `text-foreground`) still wins the cascade
+   ((0,3,0) vs this rule's (0,2,0)) but now resolves to the SAME colour as the
+   rest state, because --surface-secondary-foreground IS `var(--foreground)`.
+   The state is not removed or hidden — cursor, sort indicator and
+   aria-sort are untouched — but it no longer changes the label's colour.
+   Giving it a different colour means choosing one (e.g. --accent), which is a
+   DESIGN-LANGUAGE decision this brief does not authorise.  See
+   reports/fills-and-scale.md.
+   FOOTER — reported, NOT fixed here.  The pagination summary in the footer
+   band is `.pagination__summary`, which takes its `text-muted` from
+   styles/components/pagination.css:11-13; it sits on the same
+   --surface-secondary band (the primary root's own background, behind the
+   footer div) and measures the same 3.34:1.  Base table.css owns exactly one
+   footer rule, `.table__footer` (base:331-333, `flex items-center px-4
+   py-2.5`), and never reaches into the footer's children with a descendant
+   selector — so there is no HeroUI precedent in this file for styling
+   somebody else's component through it, and per the brief the case is
+   reported rather than fixed.  It belongs in pagination.css (a `.table__footer
+   .pagination__summary` rule here would also be a cross-component reach that
+   hard rule 7 keeps out of this file).
+
+   Pass 4 reviewed (2026-09-20): no changes to the CSS. Diffed this file line
+   for line against the live styles/themes/tzuchi/components/table.css and
+   confirmed only the briefed `color: var(--surface-secondary-foreground)`
+   declaration and its comment differ — every other rule, ordering and
+   comment is byte-identical, nothing lost or reformatted. Confirmed
+   --surface-secondary-foreground exists (aliases --foreground in
+   themes/default/variables.css, which tzuchi remaps to gray-900/gray-100)
+   and --surface-secondary/--surface-secondary-foreground are the fill this
+   selector actually sits on in BOTH the primary variant (`.table-root--primary`
+   bg-surface-secondary, base:25-27) and the secondary variant
+   (`.table-root--secondary .table__column`, base:40-42). Re-probed the live
+   `.table__column` with this file's declaration injected: color resolves to
+   rgb(51,51,51) in tzuchi / rgb(242,242,242) in tzuchi-dark on the primary
+   variant, and the same two values on the secondary variant's own
+   --surface-secondary fill in dark — both a clean win over the base's
+   text-muted (0,1,0). Re-confirmed the reported, not-fixed consequence: the
+   base's `[data-allows-sorting]:hover`/`[data-hovered]` rule (0,3,0) still
+   outranks this file's (0,2,0) and keeps firing, but now paints the same
+   colour as the resting state, matching the comment exactly — verified by
+   hovering the sortable column live. Confirmed `.pagination__summary` in the
+   footer band is untouched (still --muted, rgb(130,130,130)) and that no
+   selector in this file or the live base file reaches into `.table__footer`'s
+   children, so reporting rather than fixing the footer is correct under hard
+   rule 7. Re-checked hover, selected, disabled, dragging, drop-target,
+   resizable and both `--primary`/`--secondary` row-state ladders in both
+   themes: unchanged and unbroken. Comment safety, colour-literal, !important,
+   physical-property and scope scans: clean.
+
+   PASS 5 (2026-09-20) — row hover is NEUTRAL; the brand tint now belongs to
+   selection alone.  This SUPERSEDES item 5 of WHAT THIS CHANGES above.
+   The old ladder painted --accent-soft on hover and --accent-soft-hover on
+   selection.  Under tzuchi-dark those two variables are opaque navies
+   (blue-900 / blue-700), so simply running the mouse down the table recoloured
+   every row, and the row's own action buttons — .button--tertiary (opaque
+   --default) and .button--danger-soft (an alpha-0.15 red) — composited over the
+   tint: the delete button turned lavender and stopped reading as "danger" at
+   all.  New ladder, owner-decided and identical in both modes:
+       hover               var(--default)          — a neutral row highlight
+       selected            var(--accent-soft)      — the brand tint, earned
+       selected + hovered  var(--accent-soft-hover)
+   Measured: light  white -> gray-100 -> blue-100 -> blue-200;
+             dark   gray-950 -> gray-900 -> blue-900 -> blue-700.
+   The hover step is now the same kind of move HeroUI itself makes
+   (base table.css:225-231 uses bg-surface/40, a neutral wash), so the
+   danger-soft delete button keeps its red over a hovered row in both modes.
+   CONSEQUENCE, reported not fixed: on a HOVERED row the .button--tertiary disc
+   is also --default, so the disc itself melts into the row; its glyph
+   (--default-foreground) keeps full contrast and the button is neither removed
+   nor hidden.  On a SELECTED row the danger-soft fill still composites against
+   the tint (muted periwinkle in dark) — much weaker than before, because the
+   selected row is now the calmer --accent-soft instead of --accent-soft-hover,
+   and because selection is a deliberate state rather than mere pointer travel.
+   Giving the buttons their own in-row fills would be a cross-component reach
+   into button.css, which hard rule 7 keeps out of this file.
+   Cascade: the hover pair and the selected rule are both (0,5,0) and the
+   selected rule is declared later, so selection still beats hover; the new
+   selected-and-hovered pair is (0,6,0) and beats both.  Both hover branches
+   stay inside @media (hover: hover), exactly like the base.
+   Verified live in both themes on table--default and table--secondary-variant
+   (hover, select-all, single select, selected+hovered), and on
+   table--virtualization (sticky header) — no structural change anywhere.
+   Note: HeroUI v3.2.6 has NO striped table option (no `striped` token in
+   styles/ or react/), so there was nothing striped to re-check.
+
+   Pass 5 reviewed (2026-09-20): diffed line-for-line against the live
+   styles/themes/tzuchi/components/table.css — only the row-state block (hover
+   pair, selected rule, new selected+hovered pair) and this header differ;
+   shell, type, sort-indicator and footer rules byte-identical. Confirmed the
+   cascade math (hover pair and selected rule both (0,5,0), selected declared
+   after hover so it still wins a tie; the new selected+hovered pair is
+   (0,6,0) and outranks both). Verified live with the browser tool in both
+   themes: an unselected row's hover fill is neutral --default (no brand
+   tint), a selected row is --accent-soft, and a selected+hovered row (probed
+   directly, mouse left over the row after the click) resolves to
+   --accent-soft-hover (rgb(209,222,255) light / rgb(48,85,159) dark) while a
+   selected-but-not-hovered row measures --accent-soft (rgb(232,238,254)
+   light) — the three-step ladder is real, not just claimed. Row action
+   buttons (eye/pencil tertiary, trash danger) stay legible over hovered and
+   selected rows in both themes. Re-checked table--secondary-variant (hover
+   still neutral) and table--virtualization (sticky header renders
+   unaffected). Scoping, colour-token, !important, physical-property and
+   comment-safety scans clean (comment-delimiter counts balanced). No changes
+   made — the fix matches the brief exactly.
+   ========================================================================== */
+
+/* -- Shell ---------------------------------------------------------------- */
+
+/* R37: a Table is a surface holding content, like a Card (R27). HeroUI's
+   min(32px, calc(var(--radius) * 2.5)) resolves to 20px under --radius: 8px. */
+[data-theme^="tzuchi"] .table-root--primary {
+  border-radius: var(--tc-card-radius, var(--radius-2xl));
+}
+
+/* -- Type ----------------------------------------------------------------- */
+
+/* §1: Tzu Chi has no 14px step. The table's default voice is prose, so the
+   root takes the body pair (R10 / R5): 16px at 1.6. Weight inherits 400. */
+[data-theme^="tzuchi"] .table__content {
+  font-size: var(--tc-font-size-16, 16px);
+  line-height: var(--tc-line-height-relaxed, 1.6);
+}
+
+/* R9 (via R4): the header cell is the "control label" voice — subtitle,
+   16/700/1.5 — and R57 gives that row its 8px block padding: 24 + 16 = 40px. */
+[data-theme^="tzuchi"] .table__column {
+  padding-block: var(--tc-space-8, 8px);
+
+  /* Pass 4 — the header band is a fill (--surface-secondary), so its text is
+     that fill's own foreground, never --muted.  `.table__sortable-column-header`
+     inherits this.  Base `.table__column` is (0,1,0), this is (0,2,0); the
+     base's sortable-hover rule (0,3,0) still outranks it. */
+  color: var(--surface-secondary-foreground);
+  font-size: var(--tc-font-size-16, 16px);
+  font-weight: var(--tc-font-weight-bold, 700);
+  line-height: var(--tc-line-height-normal, 1.5);
+}
+
+/* R10 (via R5): the body cell is prose — 16/400/1.6. The base file's
+   `text-sm` is (0,1,0) and would otherwise beat inheritance from the root. */
+[data-theme^="tzuchi"] .table__cell {
+  font-size: var(--tc-font-size-16, 16px);
+  line-height: var(--tc-line-height-relaxed, 1.6);
+}
+
+/* -- Sort indicator --------------------------------------------------------*/
+
+/* The chevron tracked a 12px label 1:1; the label is now 16px, so 1em keeps
+   that relationship without inventing a size token (there is no 16px step in
+   --tc-size-icon-*; §1.3 and D18 both keep 16px glyphs at this scale).
+   R132: a travelling indicator (chevron rotation) moves at 200ms with
+   motion.easing.standard. Longhands only, per R136. */
+[data-theme^="tzuchi"] .table__sortable-column-indicator {
+  inline-size: 1em;
+  block-size: 1em;
+  transition-duration: var(--tc-motion-duration-base, 200ms);
+  transition-timing-function: var(--tc-motion-easing-standard, ease);
+}
+
+/* -- Row states ------------------------------------------------------------*/
+
+/* PASS 5 — hover is a NEUTRAL highlight, not a brand tint: pointer travel must
+   not recolour a table or reshade the row's own status chips and action
+   buttons. --default is the neutral fill step this theme already uses for a
+   resting neutral control, and it is the closest equivalent of the base's own
+   bg-surface/40 wash (base table.css:225-231). Scoped through `.table-root`
+   (0,5,0) so it also outranks
+   `.table-root--secondary .table__row:hover .table__cell` (0,4,0). */
+@media (hover: hover) {
+  [data-theme^="tzuchi"] .table-root .table__row:hover .table__cell,
+  [data-theme^="tzuchi"] .table-root .table__row[data-hovered="true"] .table__cell {
+    background-color: var(--default);
+  }
+}
+
+/* R82 — selection is what earns the brand tint. --accent-soft is the first
+   tonal step (blue-100 light / blue-900 dark), plainly stronger than the
+   neutral hover fill in both modes. Declared after the hover pair (same
+   (0,5,0)) so a hovered, selected row cannot fall back to the neutral. */
+[data-theme^="tzuchi"] .table-root .table__row[data-selected="true"] .table__cell {
+  background-color: var(--accent-soft);
+}
+
+/* Selected AND hovered — one ladder step above the selected fill, so the
+   hover-over-selection feedback the base gives survives. (0,6,0), beats both
+   rules above on specificity. */
+@media (hover: hover) {
+  [data-theme^="tzuchi"] .table-root .table__row[data-selected="true"]:hover .table__cell,
+  [data-theme^="tzuchi"] .table-root .table__row[data-selected="true"][data-hovered="true"] .table__cell {
+    background-color: var(--accent-soft-hover);
+  }
+}
+
+/* -- Footer band -------------------------------------------------------- */
+
+/* Level with the header band; 10px is not a step on the Tzu Chi space scale.
+   padding-inline stays HeroUI's 16px (= --tc-space-16). */
+[data-theme^="tzuchi"] .table__footer {
+  padding-block: var(--tc-space-8, 8px);
+}

@@ -1,0 +1,28 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "align": {
+      "enum": [
+        "center",
+        "end",
+        "start"
+      ],
+      "type": "string"
+    },
+    "level": {
+      "enum": [
+        "h1",
+        "h2",
+        "h3",
+        "h4"
+      ],
+      "type": "string"
+    },
+    "text": {
+      "maxLength": 120,
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "type": "object"
+}

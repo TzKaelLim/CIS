@@ -1,0 +1,40 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "align": {
+      "enum": [
+        "center",
+        "end",
+        "start"
+      ],
+      "type": "string"
+    },
+    "body": {
+      "additionalProperties": {},
+      "properties": {
+        "type": {
+          "const": "doc",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "type": "object",
+      "x-lost-checks": [
+        "richtext-normalize"
+      ],
+      "x-richtext": {
+        "features": [
+          "bold",
+          "bulletList",
+          "hardBreak",
+          "italic",
+          "link",
+          "orderedList"
+        ]
+      }
+    }
+  },
+  "type": "object"
+}

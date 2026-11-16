@@ -1,0 +1,5 @@
+# Secrets and data are ignored by docker/.gitignore (vendored from upstream):
+# docker/.env, docker/volumes/db/data, docker/volumes/storage, ...
+# Backups of docker/.env written by utils/generate-keys.sh and setup-env.sh
+docker/.env.old
+docker/.env.tmp

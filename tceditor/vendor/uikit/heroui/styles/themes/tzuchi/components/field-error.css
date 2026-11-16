@@ -1,0 +1,87 @@
+/* ==========================================================================
+   FieldError — Tzu Chi theme override
+   Destination: styles/themes/tzuchi/components/field-error.css
+   (layer: components, imported after ../../../components/field-error.css).
+
+   FieldError is React Aria's collapsible validation line: it sits at
+   `h-0 / opacity-0` and expands on `[data-visible]`. Base field-error.css:3
+   is `h-0 px-1 text-xs wrap-break-word text-danger opacity-0
+   data-visible:h-auto data-visible:opacity-100` — 12px / 400 / 16px.
+
+   WHAT THIS CHANGES — type only, two declarations.
+
+     · font-size    12px  ->  16px    (§1 R7)
+     · line-height  16px  ->  25.6px  (1.6, the prose voice)
+
+   EVIDENCE. R7 "Error text (.field-error, .error-message, text-xs)": same
+   metrics as the helper line (R6), keep `text-danger`. tc's
+   `.helper.error` (tc-input.styles.ts:91-93, tc-textarea.styles.ts:98-100)
+   is the helper rule with only the colour swapped, so under Tzu Chi a field's
+   helper line and its error line are the same type. §1 forbids a 12px step
+   and §1.3 does not exempt this element. Keeping it identical to
+   description.css also means a field does not resize its help row when
+   validation flips.
+
+   Colour is NOT restated — `text-danger` -> --danger already (N5 / D1 / R86).
+   Under a checkbox / radio / switch the base deliberately repaints it
+   `text-muted` (field-error.css:19-27); that stays, and it now shares
+   description.css's metrics there too, which is exactly what that base rule
+   is trying to achieve ("stack below the label like description").
+
+   LEFT EXACTLY AS HEROUI HAS IT
+     · THE COLLAPSE MECHANISM — `h-0` / `opacity-0` / `data-visible:h-auto` /
+       `data-visible:opacity-100`. Nothing here touches height or opacity, so
+       a hidden FieldError still contributes no block size (its line box is
+       clipped by `h-0`, exactly as at 12px).
+     · MOTION. field-error.css:9-12's
+       `transition: opacity 150ms var(--ease-out), height 350ms var(--ease-smooth)`
+       plus `motion-reduce:transition-none`. §8 gives no rule for a validation
+       reveal; R140 forbids new choreography and R136 warns against rewriting
+       `transition-property`, which the shorthand would do — that would
+       out-specify HeroUI's reduced-motion guard and force this file to
+       restate both guards for no design gain. Untouched. (The 350ms height
+       leg is also what makes the taller 25.6px line box animate smoothly.)
+     · `px-1` — the 4px inline inset. §9 has no rule for it and the spec is
+       silent on aligning a field's error line with its description line
+       (which has no inset); recorded as a spec gap rather than guessed at.
+     · The toggle-field re-layout `.checkbox > .field-error` /
+       `.switch > …` / `.radio > …` (field-error.css:19-27): `m-0 h-auto
+       min-h-0 p-0 text-muted opacity-100` and `transition: none`. Untouched
+       — and note checkbox.css:137-141 / radio.css:164-167 /
+       switch.css:128-131 re-add the padding-inline-start indent at (0,3,0),
+       which still wins.
+
+   CASCADE
+   (0,2,0) — attribute + class. Beats base field-error.css:3 (0,1,0)
+   outright. It TIES the three base rules that re-assert `text-xs` on a
+   field-error through the slot attribute — checkbox.css:11-14,
+   radio.css:27-30 and switch.css:34-36, all (0,2,0) — and wins on source
+   order, because the whole base component layer is imported before this
+   theme's components/index.css in the same unlayered "components" layer.
+   Nothing in this theme's own files declares a font-size or line-height that
+   reaches a field-error, so there is no intra-theme tie.
+
+   Reviewed: no changes. Verified against the live files, not just the
+   report — base field-error.css:1-27 confirmed byte-for-byte, including the
+   collapse mechanism, the motion block and the toggle-field re-layout rule
+   for `.checkbox > …` / `.switch > …` / `.radio > …`. Confirmed
+   checkbox.css:11-14, radio.css:27-30 and switch.css:34-36 each re-assert
+   `text-xs` on `[data-slot="field-error"]` at (0,2,0) — switch.css:34-36 in
+   particular is exactly `& > [data-slot="field-error"] { … text-xs
+   text-muted }`, matching the cited line numbers exactly — so all three ties
+   are real and resolved only by source order (both index.css files share the
+   unlayered `components` layer, tzuchi's imported after HeroUI's). Confirmed
+   the indent rules (checkbox.css:139-141, radio.css:166, switch.css:130) set
+   only padding-inline-start, never colliding with this rule's font
+   properties. Confirmed `--tc-font-size-16` / `--tc-line-height-relaxed` are
+   mode-independent in tokens.css. Grepped clean for colour literals,
+   --tc-color-, !important, physical left/right; comment delimiters balanced.
+   No corrections needed.
+   ========================================================================== */
+
+[data-theme^="tzuchi"] .field-error {
+  /* R7 — error text carries the helper-text metrics (R6); the colour, the
+     collapse and the transition are all HeroUI's and stay HeroUI's. */
+  font-size: var(--tc-font-size-16, 16px);
+  line-height: var(--tc-line-height-relaxed, 1.6);
+}

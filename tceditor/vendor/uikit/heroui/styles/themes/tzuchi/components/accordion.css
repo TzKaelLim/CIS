@@ -1,0 +1,140 @@
+/* ---------------------------------------------------------------------------
+ * Tzu Chi theme — Accordion shape / density / type overrides
+ *
+ * Belongs at heroui/styles/themes/tzuchi/components/accordion.css, imported
+ * into the same `components` layer as heroui/styles/components/accordion.css
+ * but AFTER it. Every rule is scoped by [data-theme^="tzuchi"], so upstream's
+ * own light/dark themes are untouched.
+ *
+ * Reviewed: no changes. Verified against the live base accordion.css,
+ * accordion.tsx/.stories.tsx, tokens.css and both theme variables.css files —
+ * every selector exists, every rule is [data-theme^="tzuchi"]-scoped, no
+ * --tc-color-* /hex/rgb/hsl/oklch literal appears, every mode-independent
+ * token carries a fallback, the override wins the cascade in every state
+ * checked (hover, focus-visible, disabled, expanded, first/last-child,
+ * reduced-motion), and both story ids + all six assertions resolve to the
+ * values claimed.
+ *
+ * VARIANT MAPPING
+ *   tc-accordion has exactly one look: a 1px bordered, 8px-rounded box filled
+ *   with surface, items separated by a 1px border-default hairline.
+ *     tc-accordion            <->  HeroUI variant="surface"
+ *                                  (the only HeroUI variant with a container:
+ *                                   bg-surface + radius). Gets the tc border,
+ *                                   the tc 8px radius and a full-bleed,
+ *                                   border-default hairline.
+ *     HeroUI variant="default" ->   no tc counterpart. Deliberately LEFT
+ *                                   unboxed (no border, no radius, no fill) so
+ *                                   the two HeroUI variants stay visually
+ *                                   distinct; it inherits only the shared tc
+ *                                   density / typography / icon / motion below.
+ *     hideSeparator, allowsMultipleExpanded, disabled, pressed, focus-visible,
+ *     data-expanded  ->  untouched.
+ *
+ * WHAT CHANGES
+ *   trigger   : type 14px/500 -> tc subtitle 16px/700/1.5; adds the tc 8px gap;
+ *               focus ring sits flush (tc rings inset, HeroUI offsets 2px);
+ *               adds background-color to the transition (tc fades its hover).
+ *   indicator : 16px -> tc 20px icon; rotation 250ms/ease -> tc 200ms/standard.
+ *   body      : type 14px -> tc body 16px/1.6; muted -> default text colour;
+ *               panel padding gains the tc 16px block-start (HeroUI used 0).
+ *   surface   : container border + 8px radius (was 24px, borderless); the
+ *               3%-inset, 6%-alpha hairline becomes full-bleed --separator;
+ *               hover fill --default -> surface-derived tint.
+ *
+ * WHAT IS KEPT (already matches — see report)
+ *   trigger padding 16px, default-variant separator colour/width/inset,
+ *   last-item separator suppression, disabled opacity (0.38 via the theme),
+ *   focus ring width 2px + colour, panel open/close duration 200ms,
+ *   chevron colour (--muted), trigger/heading/panel structure.
+ * ------------------------------------------------------------------------- */
+
+/* --- Trigger: tc subtitle type, 8px gap, flush focus ring ---------------- */
+[data-theme^="tzuchi"] .accordion__trigger {
+  /* 700 16px/1.5 Noto Sans TC — tc-accordion-item.styles.ts:36 */
+  font: var(--tc-typography-subtitle, 700 16px/1.5 sans-serif);
+  gap: var(--tc-space-8, 8px);
+
+  /* tc rings inside the trigger (outline-offset: -2px); the nearest HeroUI
+   * equivalent is a ring with no offset, which also stops the ring spilling
+   * past the surface variant's new container border. */
+  --ring-offset-width: 0px;
+}
+
+/* tc fades the header background on hover; HeroUI only transitions opacity and
+ * box-shadow. HeroUI's `motion-reduce:` variant has TWO branches — the OS media
+ * query and an app-level [data-reduce-motion="true"] attribute with no media
+ * query. `no-preference` covers the first; the :not() covers the second, which
+ * would otherwise tie this rule on specificity (0,2,0) and lose on source order.
+ * Same shape as ./disclosure.css, its sibling. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-theme^="tzuchi"]
+    .accordion__trigger:not(:is([data-reduce-motion="true"], [data-reduce-motion="true"] *)) {
+    transition-property: opacity, box-shadow, background-color;
+    transition-duration: var(--tc-motion-duration-fast, 150ms);
+    transition-timing-function: var(--tc-motion-easing-standard, ease);
+  }
+}
+
+/* --- Indicator: tc 20px chevron, tc rotation timing --------------------- */
+[data-theme^="tzuchi"] .accordion__indicator {
+  inline-size: var(--tc-size-icon-sm, 20px);
+  block-size: var(--tc-size-icon-sm, 20px);
+
+  /* Longhands only: `motion-reduce:transition-none` sets transition-property,
+   * so it keeps overriding these. */
+  transition-duration: var(--tc-motion-duration-base, 200ms);
+  transition-timing-function: var(--tc-motion-easing-standard, ease);
+}
+
+/* --- Panel body: tc body type, default (not muted) text, 16px padding --- */
+[data-theme^="tzuchi"] .accordion__body {
+  /* 400 16px/1.6 Noto Sans TC — tc-accordion-item.styles.ts:112 */
+  font: var(--tc-typography-body, 400 16px/1.6 sans-serif);
+}
+
+[data-theme^="tzuchi"] .accordion__body-inner {
+  /* tc pads the panel evenly, including the block-start HeroUI zeroes out. */
+  padding: var(--tc-accordion-panel-padding, var(--tc-space-16, 16px));
+  /* tc panel text is the default foreground, not the muted one. */
+  color: var(--foreground);
+}
+
+/* --- Surface variant = the tc-accordion box ----------------------------- */
+[data-theme^="tzuchi"] .accordion--surface {
+  border: 1px solid var(--border);
+  border-radius: var(--tc-accordion-radius, var(--radius));
+
+  .accordion__trigger {
+    /* tc hover fill is surface.subtle, which flips direction per mode and has
+     * no HeroUI theme variable; --surface-hover is the closest, and the custom
+     * property lets the theme generator wire the exact token later. */
+    @media (hover: hover) {
+      &:hover:not([aria-expanded="true"]) {
+        background-color: var(--tzuchi-accordion-trigger-hover-bg, var(--surface-hover));
+      }
+    }
+  }
+}
+
+[data-theme^="tzuchi"] .accordion--surface .accordion__item {
+  /* tc separates items with a full-bleed 1px border-default hairline; HeroUI
+   * insets it 3% and paints it at 6% alpha. */
+  &::after {
+    inset-inline-start: 0;
+    inline-size: 100%;
+    background-color: var(--separator);
+  }
+
+  /* Re-point HeroUI's first/last corner rounding at the tc 8px radius. */
+  &:first-child [data-slot="accordion-trigger"] {
+    border-start-start-radius: var(--tc-accordion-radius, var(--radius));
+    border-start-end-radius: var(--tc-accordion-radius, var(--radius));
+  }
+
+  &:last-child:not(:has([data-slot="accordion-trigger"][aria-expanded="true"]))
+    [data-slot="accordion-trigger"] {
+    border-end-start-radius: var(--tc-accordion-radius, var(--radius));
+    border-end-end-radius: var(--tc-accordion-radius, var(--radius));
+  }
+}

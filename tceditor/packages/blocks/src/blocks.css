@@ -1,0 +1,340 @@
+/*
+ * tceditor blocks: every tcb-* class the block views use, and the
+ * editor-only tcb-picker-* classes of the image picker.
+ *
+ * - No inline styles: token values in block props map to classes here
+ *   (token-classes.ts), so the public page can run under a strict CSP.
+ * - Colours come only from HeroUI theme variables (var(--border), ...) or
+ *   primitive tokens (var(--tc-color-gray-300), ...), never from the semantic
+ *   --tc-color-* tokens: tokens.css flips those under an OS dark mode even
+ *   inside data-theme="tzuchi".
+ * - Imported unlayered after HeroUI, so these rules win over its layers.
+ */
+
+/* Page and vertical rhythm ------------------------------------------------ */
+
+.tcb-page {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 1120px;
+  margin-inline: auto;
+  padding: var(--tc-space-32) var(--tc-space-16);
+}
+
+/* The page and every slot stack their blocks with one gap. In the editor the
+   page's blocks sit in Puck's root drop zone, or (interactive preview, client
+   Render) in an unclassed wrapper div. No block view's outer element is an
+   unclassed div. */
+.tcb-stack,
+.tcb-page > [data-puck-dropzone],
+.tcb-page > div:not([class]) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tc-space-24);
+}
+
+/* Token classes (token-classes.ts): space tokens 16/32/48/64 and 16/24/32 */
+
+.tcb-py-16 {
+  padding-block: var(--tc-space-16);
+}
+
+.tcb-py-32 {
+  padding-block: var(--tc-space-32);
+}
+
+.tcb-py-48 {
+  padding-block: var(--tc-space-48);
+}
+
+.tcb-py-64 {
+  padding-block: var(--tc-space-64);
+}
+
+.tcb-gap-16 {
+  gap: var(--tc-space-16);
+}
+
+.tcb-gap-24 {
+  gap: var(--tc-space-24);
+}
+
+.tcb-gap-32 {
+  gap: var(--tc-space-32);
+}
+
+/* Paragraph ---------------------------------------------------------------- */
+
+.tcb-paragraph p + p {
+  margin-block-start: var(--tc-space-16);
+}
+
+/* Card ---------------------------------------------------------------------- */
+
+.tcb-card-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.tcb-card-link:hover {
+  text-decoration: underline;
+}
+
+.tcb-card-link:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: var(--tc-radius-sm);
+}
+
+/* Tag list ------------------------------------------------------------------ */
+
+.tcb-tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--tc-space-8);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Section ------------------------------------------------------------------- */
+
+.tcb-section {
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.tcb-section--inset {
+  padding-inline: var(--tc-space-24);
+  border-radius: var(--tc-radius-lg);
+}
+
+/* Columns ------------------------------------------------------------------- */
+
+.tcb-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.tcb-columns--2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.tcb-columns--3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.tcb-columns-column {
+  min-width: 0;
+}
+
+/* Below the tablet breakpoint (--tc-breakpoint-tablet: 768px) the columns
+   stack. Media queries cannot read custom properties; a test keeps this
+   value in step with tokens.css. */
+@media (max-width: 767.98px) {
+  .tcb-columns--2,
+  .tcb-columns--3 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Image --------------------------------------------------------------------- */
+
+.tcb-image {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tc-space-8);
+  margin: 0;
+}
+
+.tcb-image-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--tc-radius-md);
+}
+
+.tcb-image-img--cover {
+  object-fit: cover;
+}
+
+.tcb-image-placeholder {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  padding: var(--tc-space-16);
+  border: 1px solid var(--border);
+  border-radius: var(--tc-radius-md);
+  background-color: var(--default);
+  color: var(--default-foreground);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  text-align: center;
+}
+
+/* Not chosen yet: a dashed box. Chosen but gone: a warning-coloured one. */
+.tcb-image-placeholder--empty {
+  border-style: dashed;
+}
+
+.tcb-image-placeholder--missing {
+  border-color: var(--warning);
+}
+
+/* After the placeholder: a ratio class overrides its default 16 / 9. */
+.tcb-ratio-16-9 {
+  aspect-ratio: 16 / 9;
+}
+
+.tcb-ratio-4-3 {
+  aspect-ratio: 4 / 3;
+}
+
+.tcb-ratio-1-1 {
+  aspect-ratio: 1 / 1;
+}
+
+/* Image picker (editor side panel only) -------------------------------------- */
+
+.tcb-picker {
+  box-sizing: border-box;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: var(--tc-color-gray-900);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.tcb-picker-legend {
+  margin-block-end: var(--tc-space-8);
+  padding: 0;
+  font-weight: 600;
+}
+
+.tcb-picker-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tc-space-8);
+}
+
+.tcb-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--tc-space-8);
+}
+
+.tcb-picker-option {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--tc-space-4);
+  width: 100%;
+  padding: var(--tc-space-4);
+  border: 1px solid var(--tc-color-gray-300);
+  border-radius: var(--tc-radius-md);
+  background-color: var(--tc-color-white);
+  color: inherit;
+  font: inherit;
+  font-size: 12px;
+  text-align: start;
+  cursor: pointer;
+}
+
+.tcb-picker-option:hover {
+  border-color: var(--tc-color-blue-500);
+}
+
+/* The radio button stays focusable and announced; the card shows its state */
+.tcb-picker-radio {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.tcb-picker-option:has(.tcb-picker-radio:focus-visible) {
+  outline: 2px solid var(--tc-color-blue-500);
+  outline-offset: 2px;
+}
+
+.tcb-picker-option:has(.tcb-picker-radio:checked) {
+  border-color: var(--tc-color-blue-900);
+  box-shadow: 0 0 0 1px var(--tc-color-blue-900);
+}
+
+.tcb-picker-option:has(.tcb-picker-radio:disabled) {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.tcb-picker-thumb {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: var(--tc-radius-sm);
+  background-color: var(--tc-color-gray-100);
+}
+
+.tcb-picker-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tcb-picker-status,
+.tcb-picker-hint {
+  margin: 0;
+  color: var(--tc-color-gray-750);
+}
+
+.tcb-picker-hint {
+  font-size: 12px;
+}
+
+.tcb-picker-alert {
+  margin: 0;
+  color: var(--tc-color-amber-700);
+}
+
+.tcb-picker-label {
+  display: block;
+  font-weight: 600;
+}
+
+.tcb-picker-input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: var(--tc-space-8) var(--tc-space-12);
+  border: 1px solid var(--tc-color-gray-300);
+  border-radius: var(--tc-radius-sm);
+  background-color: var(--tc-color-white);
+  color: inherit;
+  font: inherit;
+}
+
+.tcb-picker-input:focus-visible {
+  outline: 2px solid var(--tc-color-blue-500);
+  outline-offset: 1px;
+}
+
+.tcb-picker-input:disabled {
+  background-color: var(--tc-color-gray-100);
+  color: var(--tc-color-gray-750);
+}
+
+.tcb-picker-check {
+  display: flex;
+  align-items: center;
+  gap: var(--tc-space-8);
+  cursor: pointer;
+}
