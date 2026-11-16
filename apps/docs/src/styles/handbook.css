@@ -1,0 +1,161 @@
+/*
+ * 手冊本身的外觀（Starlight 的 --sl-* 變數與版面）。
+ *
+ * - 強調色是慈濟品牌藍，數值抄自正式 token（packages/tokens 的 color.blue.*），寫成固定值：
+ *   手冊外觀不跟著頁首的「網站主題」變，只有頁面裡的元件範例會變。
+ * - 中性色用不帶藍味的灰，深色背景取自 token 的 gray-980／gray-950。
+ * - 這個檔案沒有放進 cascade layer，所以會蓋過 Starlight 在 layer 裡的預設值；
+ *   因此深色（:root）和淺色（:root[data-theme='light']）兩組都要寫。
+ */
+
+/* 深色（Starlight 的預設） */
+:root {
+  --sl-color-white: #ffffff;
+  --sl-color-gray-1: #ececee;
+  --sl-color-gray-2: #c5c5c9;
+  --sl-color-gray-3: #95969b; /* gray-500 */
+  --sl-color-gray-4: #5f5f64;
+  --sl-color-gray-5: #3a3a3e;
+  --sl-color-gray-6: #26262a;
+  --sl-color-black: #161618; /* gray-980 */
+
+  --sl-color-accent-low: #1b2d58; /* blue-900 */
+  --sl-color-accent: #4f7bbe; /* blue-500 */
+  --sl-color-accent-high: #c2d4f2; /* blue-250 */
+
+  --sl-color-bg-nav: var(--sl-color-black);
+  --sl-color-bg-sidebar: var(--sl-color-black);
+  --sl-color-hairline-light: var(--sl-color-gray-5);
+  --sl-color-hairline: var(--sl-color-gray-6);
+  --sl-color-hairline-shade: var(--sl-color-gray-6);
+
+  /* 頁面元素共用的圓角與預覽格底色。預覽格用元件的 surface token，才會跟著網站主題；
+     深色用 surface.default（比頁面背景亮一階），淺色用 surface.subtle（比白色暗一階）。 */
+  --tc-handbook-radius: 14px;
+  --tc-handbook-tile: var(--tc-color-surface-default);
+  --tc-handbook-tile-border: var(--sl-color-gray-6);
+}
+
+/* 淺色 */
+:root[data-theme='light'] {
+  --sl-color-white: #1c1c1e; /* gray-950，最深的文字 */
+  --sl-color-gray-1: #2c2c2f;
+  --sl-color-gray-2: #45464a;
+  --sl-color-gray-3: #6b6b6e; /* gray-750 */
+  --sl-color-gray-4: #95969b; /* gray-500 */
+  --sl-color-gray-5: #d4d4d8;
+  --sl-color-gray-6: #ededef;
+  --sl-color-gray-7: #f6f6f7;
+  --sl-color-black: #ffffff;
+
+  --sl-color-accent-low: #e8eefe; /* blue-100 */
+  --sl-color-accent: #30559f; /* blue-700 */
+  --sl-color-accent-high: #1b2d58; /* blue-900，品牌主色 */
+
+  --sl-color-bg-nav: var(--sl-color-black);
+  --sl-color-bg-sidebar: var(--sl-color-black);
+  --sl-color-hairline-light: var(--sl-color-gray-6);
+  --sl-color-hairline: var(--sl-color-gray-6);
+  --sl-color-hairline-shade: var(--sl-color-gray-6);
+
+  --tc-handbook-tile: var(--tc-color-surface-subtle);
+  --tc-handbook-tile-border: var(--sl-color-gray-6);
+}
+
+/* ── 版面 ─────────────────────────────────────────────────────────────── */
+
+/* 沒有右側目錄的頁面（總覽、元件庫）內容區放寬。 */
+:root[data-has-sidebar]:not([data-has-toc]) {
+  --sl-content-width: 76rem;
+}
+
+/* 側欄：一般字重的清單，目前頁面用淡品牌色底標示。 */
+#starlight__sidebar .sidebar-content {
+  gap: 1.25rem;
+}
+#starlight__sidebar a.large {
+  font-size: var(--sl-text-sm);
+  font-weight: 400;
+  color: var(--sl-color-gray-2);
+}
+#starlight__sidebar a {
+  padding-block: 0.4em;
+  border-radius: 0.5rem;
+}
+#starlight__sidebar a:hover {
+  color: var(--sl-color-white);
+  background-color: var(--sl-color-gray-6);
+}
+#starlight__sidebar a[aria-current='page'],
+#starlight__sidebar a[aria-current='page']:hover,
+#starlight__sidebar a[aria-current='page']:focus {
+  font-weight: 600;
+  color: var(--sl-color-accent-high);
+  background-color: var(--sl-color-accent-low);
+}
+#starlight__sidebar a:focus-visible,
+#starlight__sidebar summary:focus-visible {
+  outline: 2px solid var(--sl-color-accent);
+  outline-offset: -2px;
+}
+#starlight__sidebar summary .large {
+  font-size: var(--sl-text-sm);
+  font-weight: 600;
+  color: var(--sl-color-white);
+}
+#starlight__sidebar ul ul li {
+  border-inline-start: 0;
+}
+
+/* 沒有圖片的 hero（例如元件庫的「瀏覽元件庫」）置中排列。 */
+@media (min-width: 50rem) {
+  [data-has-hero] .hero:not(:has(> img, > .hero-html)) {
+    grid-template-columns: 1fr;
+    padding-block: clamp(2rem, 6vmin, 4.5rem) clamp(1.5rem, 4vmin, 3rem);
+  }
+  [data-has-hero] .hero:not(:has(> img, > .hero-html)) .stack {
+    text-align: center;
+  }
+  [data-has-hero] .hero:not(:has(> img, > .hero-html)) .copy {
+    align-items: center;
+  }
+  [data-has-hero] .hero:not(:has(> img, > .hero-html)) .actions {
+    justify-content: center;
+  }
+}
+[data-has-hero] .hero h1 {
+  font-size: clamp(var(--sl-text-3xl), calc(0.5rem + 3.5vw), var(--sl-text-5xl));
+}
+[data-has-hero] .hero .actions {
+  gap: 0.75rem;
+}
+
+/* 文章裡的表格：細框、圓角。 */
+.sl-markdown-content table:not(:where(.not-content *)) {
+  border: 1px solid var(--sl-color-hairline-light);
+  border-radius: 12px;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.sl-markdown-content :is(th, td):not(:where(.not-content *)) {
+  border-block-end: 1px solid var(--sl-color-hairline-light);
+}
+.sl-markdown-content tr:last-child > td:not(:where(.not-content *)) {
+  border-block-end: 0;
+}
+.sl-markdown-content th:not(:where(.not-content *)) {
+  color: var(--sl-color-gray-3);
+  font-size: var(--sl-text-sm);
+  font-weight: 500;
+}
+/* 第一欄通常是短名稱（例如「前後圖示」），不要被擠成兩行。 */
+.sl-markdown-content td:first-child:not(:where(.not-content *)) {
+  min-inline-size: 6em;
+}
+/* 表格有外框了，第一欄和最後一欄也要留內距（Starlight 原本貼齊兩邊）。 */
+.sl-markdown-content :is(th, td):first-child:not(:where(.not-content *)) {
+  padding-inline-start: 1rem;
+}
+.sl-markdown-content :is(th, td):last-child:not(:where(.not-content *)) {
+  padding-inline-end: 1rem;
+}

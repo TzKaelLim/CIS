@@ -1,0 +1,85 @@
+---
+// 手冊的區域導覽：文件／元件／範本／網站主題。目前所在的區域會被標示出來。
+// 頁首用 variant="header"（橫排）；手機選單用 variant="menu"（直排，多一個「首頁」）。
+import { HOME, SECTIONS, isSectionHome, sectionForPath } from '../../prototype/sections';
+
+interface Props {
+  variant?: 'header' | 'menu';
+}
+
+const { variant = 'header' } = Astro.props;
+const pathname = Astro.url.pathname;
+const current = sectionForPath(pathname);
+const items = variant === 'menu' ? [HOME, ...SECTIONS] : SECTIONS;
+---
+
+<nav class:list={['section-nav', variant]} aria-label="手冊區域">
+  <ul>
+    {
+      items.map((section) => {
+        const isCurrent = section.id === current.id;
+        // 區域入口頁本身是「目前頁面」；區域裡的其他頁只標示「目前區域」。
+        const ariaCurrent = isCurrent
+          ? isSectionHome(section, pathname)
+            ? 'page'
+            : 'true'
+          : undefined;
+        return (
+          <li>
+            <a href={section.href} aria-current={ariaCurrent}>
+              {section.label}
+            </a>
+          </li>
+        );
+      })
+    }
+  </ul>
+</nav>
+
+<style>
+  ul {
+    display: flex;
+    gap: 0.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  a {
+    display: block;
+    padding: 0.4rem 0.85rem;
+    border-radius: 999px;
+    color: var(--sl-color-gray-2);
+    font-size: var(--sl-text-sm);
+    line-height: 1.4;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  a:hover {
+    color: var(--sl-color-white);
+    background-color: var(--sl-color-gray-6);
+  }
+  a[aria-current] {
+    color: var(--sl-color-white);
+    font-weight: 600;
+    background-color: var(--sl-color-gray-6);
+  }
+  a:focus-visible {
+    outline: 2px solid var(--sl-color-accent);
+    outline-offset: 2px;
+  }
+
+  /* 手機選單：直排、整列可點，目前區域用品牌色標示。 */
+  .menu ul {
+    flex-direction: column;
+    gap: 0.125rem;
+  }
+  .menu a {
+    padding: 0.6rem 0.75rem;
+    border-radius: 0.6rem;
+    font-size: var(--sl-text-base);
+  }
+  .menu a[aria-current] {
+    color: var(--sl-color-accent-high);
+    background-color: var(--sl-color-accent-low);
+  }
+</style>
