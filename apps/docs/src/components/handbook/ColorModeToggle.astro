@@ -1,0 +1,80 @@
+---
+// 頁首的「色彩模式」：一個圓形按鈕，在淺色和深色之間切換。
+//
+// - 淺色時顯示月亮（按下去換成深色），深色時顯示太陽（按下去換成淺色）。按鈕的名稱
+//   （給螢幕閱讀器）說出按下去會做什麼：「切換到深色模式」／「切換到淺色模式」。
+// - 圖示和名稱都由 <html data-theme> 決定，而這個屬性在第一次繪製前就由 Starlight 的
+//   ThemeProvider 設好，所以載入時不會閃一下。
+// - 讀者還沒按過之前，手冊跟著作業系統的設定（Starlight 的「自動」：localStorage 裡沒有值）。
+//   按過之後，選擇存在 Starlight 自己的 key（starlight-theme），Starlight 的 ThemeProvider
+//   下次載入時照樣讀得到。
+// - Starlight 原本的三選一選單（淺色／深色／自動）不再出現在頁首和手機選單；它原本負責的
+//   「自動時跟著作業系統即時改變」，改由這裡的 script 處理。
+import HeaderIcon from './HeaderIcon.astro';
+---
+
+<tc-mode-toggle>
+  <button type="button" class="hb-icon-button">
+    <HeaderIcon name="moon" class="when-light" />
+    <HeaderIcon name="sun" class="when-dark" />
+    <span class="sr-only when-light">切換到深色模式</span>
+    <span class="sr-only when-dark">切換到淺色模式</span>
+  </button>
+</tc-mode-toggle>
+
+<script>
+  type Mode = 'light' | 'dark';
+
+  /** Starlight 存色彩模式的 key（ThemeProvider 讀它）。空字串或沒有值 = 自動（跟著作業系統）。 */
+  const STORAGE_KEY = 'starlight-theme';
+  const lightQuery = matchMedia('(prefers-color-scheme: light)');
+
+  const storedMode = (): Mode | null => {
+    try {
+      const value = localStorage.getItem(STORAGE_KEY);
+      return value === 'light' || value === 'dark' ? value : null;
+    } catch {
+      return null;
+    }
+  };
+  const systemMode = (): Mode => (lightQuery.matches ? 'light' : 'dark');
+  const applyMode = (mode: Mode): void => {
+    document.documentElement.dataset.theme = mode;
+  };
+
+  class TcModeToggle extends HTMLElement {
+    connectedCallback() {
+      this.querySelector('button')?.addEventListener('click', () => {
+        const next: Mode = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+        applyMode(next);
+        try {
+          localStorage.setItem(STORAGE_KEY, next);
+        } catch {
+          // 私密視窗或封鎖網站資料時不能記住，但這一頁照樣切換。
+        }
+      });
+    }
+  }
+
+  // 還沒選過（自動）時，作業系統的設定改變，手冊也跟著變。
+  lightQuery.addEventListener('change', () => {
+    if (storedMode() === null) applyMode(systemMode());
+  });
+  // 在別的分頁切換時，這一頁也跟著變。
+  window.addEventListener('storage', (event) => {
+    if (event.key === STORAGE_KEY) applyMode(storedMode() ?? systemMode());
+  });
+
+  customElements.define('tc-mode-toggle', TcModeToggle);
+</script>
+
+<style>
+  tc-mode-toggle {
+    display: block;
+  }
+  /* 淺色：顯示月亮和「切換到深色模式」；深色：顯示太陽和「切換到淺色模式」。 */
+  :global(:root[data-theme='light'] tc-mode-toggle .when-dark),
+  :global(:root:not([data-theme='light']) tc-mode-toggle .when-light) {
+    display: none;
+  }
+</style>

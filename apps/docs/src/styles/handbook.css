@@ -263,12 +263,92 @@
   color: #c62828;
 }
 
+/* ── 頁首 ─────────────────────────────────────────────────────────────── */
+
+/* 48px 高的半透明頁首（背景色 80% 不透明，後面的內容模糊 12px），沒有下框線。
+   內容區上方留了同樣的高度（Starlight 用 --sl-nav-height），所以頁面一開始不會被它蓋住；
+   往下捲時內容從它後面經過。左右各留 8px。 */
+header.header {
+  padding-block: 0;
+  padding-inline: 0.5rem;
+  border-block-end: 0;
+  background-color: color-mix(in srgb, var(--sl-color-black) 80%, transparent);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+/* 手機寬度、頁面有選單時：右邊留出選單按鈕（32px，離右邊 8px）的位置。 */
+@media (max-width: 49.99rem) {
+  :root[data-has-sidebar] header.header {
+    padding-inline-end: calc(0.5rem + var(--sl-menu-button-size) + 2px);
+  }
+}
+
+/* 頁首的圓形圖示按鈕（搜尋、色彩模式、網站主題、GitHub）：32px，滑鼠移上時有淡底色。 */
+.hb-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  inline-size: 2rem;
+  block-size: 2rem;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background-color: transparent;
+  color: var(--sl-color-white);
+  text-decoration: none;
+  cursor: pointer;
+}
+.hb-icon-button:hover {
+  background-color: var(--sl-color-gray-6);
+}
+
+/* 「開始使用」：實心、全圓角的 32px 按鈕，淺色時深底白字，深色時淺底深字。 */
+.hb-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  block-size: 2rem;
+  padding-inline: 0.875rem;
+  border-radius: 999px;
+  background-color: var(--sl-color-white);
+  color: var(--sl-color-black);
+  font-size: var(--hb-text-ui);
+  font-weight: 500;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.hb-pill:hover {
+  background-color: var(--sl-color-gray-1);
+  color: var(--sl-color-black);
+}
+
+/* 手機的選單按鈕：和頁首其他圖示按鈕一樣，透明底、深色圖示，離右邊 8px。 */
+starlight-menu-button button {
+  inset-inline-end: 0.5rem;
+  background-color: transparent;
+  color: var(--sl-color-white);
+  box-shadow: none;
+}
+:root[data-theme='light'] starlight-menu-button button {
+  background-color: transparent;
+  color: var(--sl-color-white);
+}
+starlight-menu-button button:hover,
+starlight-menu-button[aria-expanded='true'] button,
+:root[data-theme='light'] starlight-menu-button[aria-expanded='true'] button {
+  background-color: var(--sl-color-gray-6);
+}
+
 /* ── 焦點框 ───────────────────────────────────────────────────────────── */
 
 /* 頁首和頁面裡的連結、按鈕、選單用同一組焦點框（Starlight 預設是瀏覽器的細藍框）。 */
 .site-title:focus-visible,
 site-search button:focus-visible,
-starlight-theme-select select:focus-visible,
+.hb-icon-button:focus-visible,
+.hb-pill:focus-visible,
 .sl-link-button:focus-visible,
 .pagination-links a:focus-visible,
 mobile-starlight-toggle button:focus-visible,

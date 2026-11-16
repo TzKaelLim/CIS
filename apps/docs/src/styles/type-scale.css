@@ -75,10 +75,11 @@
   --sl-line-height: var(--hb-line-height);
   --sl-line-height-headings: var(--hb-line-height-headings);
 
-  /* 頁首跟著字級變矮一點（Starlight 原本手機 56px、桌機 64px）。 */
-  --sl-nav-height: 3.5rem;
-  /* 手機的選單按鈕和搜尋按鈕、手機選單的項目一樣 40px 高（Starlight 原本 32px）。 */
-  --sl-menu-button-size: 2.5rem;
+  /* 頁首 48px 高（Starlight 原本手機 56px、桌機 64px）。側欄的上緣、右側目錄、
+     標題的捲動位置和網站主題頁的固定欄都用這個變數，會一起跟著變。 */
+  --sl-nav-height: 3rem;
+  /* 手機的選單按鈕和頁首其他圖示按鈕一樣是 32px 的圓形。 */
+  --sl-menu-button-size: 2rem;
 }
 
 @media (min-width: 50rem) {
@@ -109,11 +110,6 @@ body {
   line-height: var(--hb-kit-line-height);
 }
 
-/* Starlight 的淺色／深色選單：箭頭圖示和「網站主題」選單的箭頭同樣大小（Starlight 原本 20px）。 */
-starlight-theme-select label {
-  --sl-caret-size: var(--hb-text-icon);
-}
-
 /* 右側目錄：Starlight 的行高 1.25 在 12px 時只有 15px，長的中文標題換行會擠在一起。 */
 starlight-toc a,
 mobile-starlight-toc a {
@@ -129,7 +125,7 @@ mobile-starlight-toc a {
   line-height: 1;
 }
 
-/* 手機的選單按鈕：按鈕放大成 40px 後，圖示（1em）跟著放大到 20px，並放在圓形正中間。 */
+/* 手機的選單按鈕：圖示（1em）20px，放在 32px 圓形的正中間（外觀見 handbook.css）。 */
 starlight-menu-button button {
   align-items: center;
   justify-content: center;

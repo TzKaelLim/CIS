@@ -385,7 +385,7 @@ packages/tokens/src/sites/<id>/
 ### 9.1 現況（事實）
 
 - `apps/docs` 是 Astro 5.18.2 + Starlight 0.34.8。手冊分成首頁、文件、元件、範本、網站主題五個區域：3 個基礎頁、22 個元件頁、4 個範本頁和 2 個網站主題頁。
-- 頁首有「網站主題」選單（`apps/docs/src/components/handbook/SiteSelect.astro`）和 Starlight 的色彩模式選單。網站主題的資料在 `apps/docs/src/data/site-themes.ts`：只有預設網站主題（慈濟入口網）是正式的，慈濟環保網是示意（顏色寫在手冊裡，不在 `packages/tokens`）。
+- 頁首（`apps/docs/src/components/starlight/Header.astro`）有「網站主題」選單（`apps/docs/src/components/handbook/SiteMenu.astro`；手機選單裡是 `SiteSelect.astro` 的下拉選單）和「色彩模式」按鈕（`ColorModeToggle.astro`，淺色和深色兩者切換）。網站主題的資料在 `apps/docs/src/data/site-themes.ts`：只有預設網站主題（慈濟入口網）是正式的，慈濟環保網是示意（顏色寫在手冊裡，不在 `packages/tokens`）。
 - 元件頁照第 9.5 節的六段排列，但介紹的仍是凍結的 Lit `tc-*` 元件；Storybook 還沒有這些元件的頁面。
 - 手冊頁面不載入第三方資源（`scripts/docs/handbook.test.mjs` 檢查原始檔）。
 - `pnpm run docs:build` 建置 tokens 和手冊；它是推之前的檢查之一（S-16）。
@@ -406,9 +406,9 @@ packages/tokens/src/sites/<id>/
 
 ### 9.3 頁首的選單
 
-- S-76　頁首有「網站主題」選單和「色彩模式」選單。〔現行〕
-- S-77　「網站主題」選單列出所有網站，預設是慈濟入口網；「色彩模式」選單有淺色和深色。兩個選單互相獨立。〔現行；色彩模式選單另有「自動」（跟隨系統），要不要保留待決定 Q12〕
-- S-78　選單的用詞照第 2 節：選單叫「網站主題」和「色彩模式」，不叫「Theme」或「主題」。〔現行〕
+- S-76　頁首有「網站主題」選單和「色彩模式」按鈕；頁首的排列見手冊規則 R-H-02。〔現行〕
+- S-77　「網站主題」選單列出所有網站，預設是慈濟入口網；「色彩模式」按鈕在淺色和深色之間切換，讀者按過之前跟隨作業系統。兩者互相獨立。〔現行；這是專案負責人指定的做法，Q12 的「跟隨系統」只在讀者按過之前有效〕
+- S-78　選單和按鈕的用詞照第 2 節：叫「網站主題」和「色彩模式」，不叫「Theme」或「主題」。〔現行〕
 
 ### 9.4 一次只看一個網站
 

@@ -1,34 +1,58 @@
 ---
-// 取代 Starlight 的頁首：網站名稱（回首頁）、區域導覽（文件／元件／範本／網站主題）、
-// 搜尋、「網站主題」與色彩模式選單，以及 Storybook 連結。
-// 手機寬度只留網站名稱和搜尋；區域導覽與選單都移到手機選單（見 Sidebar.astro）。
+// 取代 Starlight 的頁首。48px 高，三組：
+// - 左：網站名稱（回首頁）。
+// - 中：區域導覽（文件／元件／範本／網站主題／Storybook），72rem 以上一定在畫面正中間。
+// - 右：32px 的圓形圖示按鈕（搜尋、色彩模式、網站主題、GitHub），最後是「開始使用」。
+//
+// 寬度：
+// - 50rem 以上：全部照上面排列。左右兩組放在等寬的兩欄裡，中間那組因此在畫面正中間。
+//   60rem 以下區域連結的左右內距縮小；52rem 以下再藏起 Storybook（手機選單裡還有）。
+// - 50rem 以下：網站名稱、搜尋、色彩模式、網站主題和選單按鈕。區域導覽、GitHub、
+//   「開始使用」和網站主題的下拉選單都在手機選單裡（見 Sidebar.astro）。
 import config from 'virtual:starlight/user-config';
 import Search from 'virtual:starlight/components/Search';
-import SiteTitle from 'virtual:starlight/components/SiteTitle';
-import ThemeSelect from 'virtual:starlight/components/ThemeSelect';
 import SectionNav from '../handbook/SectionNav.astro';
-import StorybookLink from '../handbook/StorybookLink.astro';
+import ColorModeToggle from '../handbook/ColorModeToggle.astro';
+import SiteMenu from '../handbook/SiteMenu.astro';
+import HeaderIcon from '../handbook/HeaderIcon.astro';
+import { iconDataUrl } from '../../data/header-icons';
+import { REPOSITORY_URL } from '../../data/repository';
 
 /** 和 Starlight 原本的頁首一樣：有 Pagefind 或自訂搜尋時才顯示搜尋。 */
 const shouldRenderSearch =
   config.pagefind || config.components.Search !== '@astrojs/starlight/components/Search.astro';
+const { siteTitle, siteTitleHref } = Astro.locals.starlightRoute;
+// 搜尋按鈕是 Starlight 的元件（保留它的對話框和 Ctrl／⌘ K）；它的放大鏡換成手冊自己畫的圖示。
+const searchIcon = `--hb-search-icon: ${iconDataUrl('search')};`;
 ---
 
-<div class="tc-header">
-  <div class="title-wrapper sl-flex">
-    <SiteTitle />
+<div class="tc-header" style={searchIcon}>
+  <div class="start">
+    <a href={siteTitleHref} class="site-title" translate="no">
+      {
+        /* 標誌的位置：之後有慈濟的 SVG 標誌時，把 <svg>（24px 高，aria-hidden="true"）放在這裡、
+           網站名稱前面。今天沒有可用的標誌檔，所以只有文字。 */
+      }
+      <span>{siteTitle}</span>
+    </a>
   </div>
-  <div class="sections sl-hidden md:sl-flex print:hidden">
+  <div class="center print:hidden">
     <SectionNav />
   </div>
-  <div class="end sl-flex print:hidden">
+  <div class="end print:hidden">
     {shouldRenderSearch && <Search />}
-    <div class="prefs sl-hidden md:sl-flex">
-      <ThemeSelect />
-      <div class="storybook">
-        <StorybookLink />
-      </div>
-    </div>
+    <ColorModeToggle />
+    <SiteMenu />
+    <a
+      class="hb-icon-button wide-only"
+      href={REPOSITORY_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="GitHub repository"
+    >
+      <HeaderIcon name="github" />
+    </a>
+    <a class="hb-pill wide-only" href="/docs/">開始使用</a>
   </div>
 </div>
 
@@ -36,86 +60,108 @@ const shouldRenderSearch =
   .tc-header {
     display: flex;
     align-items: center;
-    gap: var(--sl-nav-gap);
+    justify-content: space-between;
+    gap: 0.5rem;
     block-size: 100%;
   }
-  .title-wrapper {
-    /* 標題太長時不要蓋住搜尋和選單按鈕。 */
-    overflow: clip;
-    padding: 0.25rem;
-    margin: -0.25rem;
+  .start {
+    display: flex;
+    align-items: center;
     min-inline-size: 0;
-    flex: 0 1 auto;
   }
-  .tc-header :global(.site-title) {
-    font-size: var(--hb-text-site-title);
+  .site-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-inline-size: 0;
+    block-size: 2rem;
+    padding-inline: 0.5rem;
+    border-radius: 12px;
     color: var(--sl-color-white);
+    font-size: var(--hb-text-site-title);
+    font-weight: 600;
     letter-spacing: 0.01em;
+    text-decoration: none;
+    white-space: nowrap;
   }
-  .sections {
-    flex: 1 1 auto;
-    justify-content: center;
-    min-inline-size: 0;
+  .site-title span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .center {
+    display: none;
   }
   .end {
+    display: flex;
     align-items: center;
-    gap: 0.75rem;
-    margin-inline-start: auto;
-    min-inline-size: 0;
+    gap: 2px;
+    flex: 0 0 auto;
   }
-  .prefs {
-    align-items: center;
-    gap: 0.75rem;
+  .wide-only {
+    display: none;
   }
 
-  /* 中等寬度：搜尋只留放大鏡、網站主題選單不顯示文字標籤（螢幕閱讀器仍唸得到）、
-     Storybook 只在元件頁和元件總覽出現。 */
+  /* Starlight 的搜尋按鈕：只留圖示的 32px 圓形按鈕（各種寬度都一樣），快捷鍵照舊。 */
+  .tc-header :global(site-search) {
+    display: block;
+  }
+  .tc-header :global(button[data-open-modal]) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 2rem;
+    block-size: 2rem;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background-color: transparent;
+    color: var(--sl-color-white);
+    box-shadow: none;
+    cursor: pointer;
+  }
+  .tc-header :global(button[data-open-modal] > *) {
+    display: none !important;
+  }
+  .tc-header :global(button[data-open-modal])::before {
+    content: '';
+    inline-size: 20px;
+    block-size: 20px;
+    background-color: currentColor;
+    -webkit-mask: var(--hb-search-icon) center / contain no-repeat;
+    mask: var(--hb-search-icon) center / contain no-repeat;
+  }
+  .tc-header :global(button[data-open-modal]:hover) {
+    background-color: var(--sl-color-gray-6);
+  }
+
   @media (min-width: 50rem) {
-    .tc-header :global(button[data-open-modal]) {
-      inline-size: 2.5rem;
-      justify-content: center;
-      padding: 0;
-      border-radius: 999px;
+    .center {
+      display: block;
     }
-    .tc-header :global(button[data-open-modal] > span),
-    .tc-header :global(button[data-open-modal] > kbd) {
-      display: none !important;
+    .wide-only {
+      display: inline-flex;
     }
-    .tc-header :global(tc-site-select .label-text) {
-      position: absolute;
-      inline-size: 1px;
-      block-size: 1px;
-      overflow: hidden;
-      clip-path: inset(50%);
-      white-space: nowrap;
-    }
-    .tc-header :global(tc-site-select select) {
-      inline-size: 11rem;
-    }
-    .storybook {
-      display: none;
+    .hb-pill {
+      margin-inline-start: 0.5rem;
     }
   }
-  @media (min-width: 80rem) {
-    .tc-header :global(button[data-open-modal]) {
-      inline-size: 11rem;
-      justify-content: flex-start;
-      padding-inline: 0.75rem 0.5rem;
+  /* 50rem 以上：左右兩組各佔一欄、兩欄一樣寬，中間那組因此在畫面正中間
+     （頁首左右的內距一樣，都是 8px）。 */
+  @media (min-width: 50rem) {
+    .tc-header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      gap: 0;
     }
-    .tc-header :global(button[data-open-modal] > span) {
-      display: block !important;
+    .end {
+      justify-self: end;
     }
-    .tc-header :global(tc-site-select .label-text) {
-      position: static;
-      inline-size: auto;
-      block-size: auto;
-      clip-path: none;
-    }
-    .tc-header :global(tc-site-select select) {
-      inline-size: 11rem;
-    }
-    .storybook {
-      display: block;
+  }
+  /* 50rem 到 52rem：區域連結的間距已經縮小（SectionNav.astro），再藏起 Storybook，
+     避免中間那組碰到左右兩組（手機選單和 /docs/ 仍有 Storybook 的連結）。 */
+  @media (min-width: 50rem) and (max-width: 51.99rem) {
+    .center :global(.storybook) {
+      display: none;
     }
   }
 </style>

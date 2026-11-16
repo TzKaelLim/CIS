@@ -1,0 +1,31 @@
+---
+// 頁首用的線條圖示（24×24、1.5px 線寬、跟著文字顏色）。圖示都畫在這裡，不用圖示套件、
+// 不載入外部檔案。頁首的搜尋按鈕是 Starlight 的元件，它的放大鏡在 Header.astro 用同一個
+// 路徑（SEARCH_PATH）畫成 CSS 遮罩。
+import { HEADER_ICON_PATHS, type HeaderIconName } from '../../data/header-icons';
+
+interface Props {
+  name: HeaderIconName;
+  class?: string;
+  /** 圖示大小（px），預設 20。 */
+  size?: number;
+}
+
+const { name, class: className, size = 20 } = Astro.props;
+---
+
+<svg
+  class:list={['hb-icon', className]}
+  viewBox="0 0 24 24"
+  width={size}
+  height={size}
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.5"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+  focusable="false"
+>
+  {HEADER_ICON_PATHS[name].map((d) => <path d={d} />)}
+</svg>

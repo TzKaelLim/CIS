@@ -79,6 +79,12 @@ const ALLOWED = [
     pattern: /^http:\/\/www\.w3\.org\/(2000\/svg|1999\/xlink|1999\/xhtml)$/,
     reason: 'XML namespace',
   },
+  {
+    // The header's "GitHub repository" link (apps/docs/src/data/repository.ts). It is a
+    // navigation link the reader may follow in a new tab; the handbook never loads anything from it.
+    pattern: /^https:\/\/github\.com\/TzKaelLim\/CIS$/,
+    reason: 'navigation link to this repository',
+  },
 ];
 
 /** Files whose text ends up in the handbook's pages, styles or scripts. */

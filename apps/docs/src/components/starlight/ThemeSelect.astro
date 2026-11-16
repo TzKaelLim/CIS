@@ -1,52 +1,22 @@
 ---
-// 取代 Starlight 的 ThemeSelect：先放「網站主題」選單，再放 Starlight 原本的
-// 淺色／深色選單。Starlight 在頁首和手機選單裡都用 ThemeSelect，所以兩處都會出現。
-import Default from '@astrojs/starlight/components/ThemeSelect.astro';
+// 取代 Starlight 的 ThemeSelect。Starlight 只在手機選單（MobileMenuFooter）用到它
+// （手冊的頁首不用它，見 Header.astro）。
+//
+// 這裡只放「網站主題」的下拉選單（有看得到的標籤）。Starlight 原本的淺色／深色／自動選單
+// 不再出現：色彩模式由頁首的圓形按鈕切換（ColorModeToggle.astro），手機寬度的頁首也有它。
 import SiteSelect from '../handbook/SiteSelect.astro';
 ---
 
-<div class="site-and-mode">
+<div class="site-pref">
   <SiteSelect />
-  <div class="mode">
-    {/* 和「網站主題」一樣有看得到的標籤（頁首夠寬時和手機選單裡）；選單本身已有給螢幕閱讀器的標籤，所以這裡 aria-hidden。 */}
-    <span class="mode-label" aria-hidden="true">色彩模式</span>
-    <Default />
-  </div>
 </div>
 
 <style>
-  .site-and-mode {
+  .site-pref {
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
-    gap: 0.25rem 1rem;
+    flex: 1 1 100%;
     min-inline-size: 0;
-  }
-  .mode {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  .mode-label {
-    display: none;
-    color: var(--sl-color-gray-1);
-    font-size: var(--hb-text-ui);
-    white-space: nowrap;
-  }
-  /* 頁首夠寬時，色彩模式選單也顯示文字標籤，和「網站主題」一樣看得出兩個選單各管什麼（R-H-04）。 */
-  @media (min-width: 80rem) {
-    .mode-label {
-      display: inline;
-    }
-  }
-  /* 手機選單：網站主題選單自己一行，名稱比較不會被截斷；色彩模式也顯示文字標籤。 */
-  @media (max-width: 49.99rem) {
-    .site-and-mode {
-      flex: 1 1 100%;
-      padding-block: 0.5rem;
-    }
-    .mode-label {
-      display: inline;
-    }
+    padding-block: 0.5rem;
   }
 </style>

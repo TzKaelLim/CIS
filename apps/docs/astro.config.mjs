@@ -106,11 +106,13 @@ export default defineConfig({
         './src/styles/handbook.css',
       ],
       components: {
-        // 頁首：網站名稱、區域導覽（文件／元件／範本／網站主題）、搜尋、選單和 Storybook。
+        // 頁首：網站名稱、區域導覽（文件／元件／範本／網站主題／Storybook）、
+        // 圖示按鈕（搜尋、色彩模式、網站主題、GitHub）和「開始使用」。
         Header: './src/components/starlight/Header.astro',
         // 側欄只顯示目前區域；元件區域上方有「搜尋元件…」篩選框。
         Sidebar: './src/components/starlight/Sidebar.astro',
-        // 頁首的淺色／深色選單旁加上「網站主題」選單（手機選單裡也會出現）。
+        // 手機選單裡的「網站主題」下拉選單，取代 Starlight 的淺色／深色／自動選單
+        // （色彩模式改由頁首的圓形按鈕切換）。
         ThemeSelect: './src/components/starlight/ThemeSelect.astro',
       },
       // 決定目前在哪個區域：側欄只留這個區域、上一頁／下一頁不跨區域、首頁不顯示側欄。

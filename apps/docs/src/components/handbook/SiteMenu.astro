@@ -1,0 +1,306 @@
+---
+// 頁首的「網站主題」：圓形圖示按鈕，按下去打開一個小選單，列出所有網站（SITE_THEMES）。
+// 新增網站就會多一個選項；網站很多時（10 到 20 個）選單有最大高度，可以捲動。
+//
+// - 按鈕右下角的小圓點是目前網站的主色，不打開選單也看得出選了哪個網站。
+// - 按鈕的名稱（給螢幕閱讀器）是「網站主題：<目前的網站名稱>」。
+// - 小圓點和名稱裡的網站名稱每個網站各畫一份，由 <head> 裡的 .site-only 規則只顯示目前的那一份
+//   （src/data/site-selection.ts），所以第一次繪製就是對的，不會閃一下。
+// - 選了之後的處理（data-site、localStorage、?site=）和手機選單裡的下拉選單相同，
+//   都在 src/scripts/site-choice.ts。
+//
+// 鍵盤：Enter／空白鍵或上下鍵打開選單並移到目前的網站；上下鍵移動、Home／End 到頭尾；
+// Enter／空白鍵選擇；Esc 關閉並回到按鈕；Tab 關閉並離開選單。點選單外面也會關閉。
+import HeaderIcon from './HeaderIcon.astro';
+import { DEFAULT_SITE, SITE_THEMES, type SiteTheme } from '../../data/site-themes';
+import { SITE_STORAGE_KEY, SITE_URL_PARAM } from '../../data/site-selection';
+
+const menuId = 'tc-site-menu-list';
+/** 小圓點的顏色：淺色、深色各用那個色彩模式的主色。 */
+const dotStyle = (site: SiteTheme): string =>
+  `--dot-light: ${site.light['brand.primary']}; --dot-dark: ${site.dark['brand.primary']};`;
+---
+
+<tc-site-menu
+  data-storage-key={SITE_STORAGE_KEY}
+  data-url-param={SITE_URL_PARAM}
+  data-site-ids={SITE_THEMES.map((site) => site.id).join(',')}
+>
+  <button
+    type="button"
+    class="hb-icon-button trigger"
+    aria-haspopup="menu"
+    aria-expanded="false"
+    aria-controls={menuId}
+  >
+    <HeaderIcon name="palette" />
+    <span class="sr-only">網站主題：</span>
+    {
+      SITE_THEMES.map((site) => (
+        <span class="site-only sr-only" data-site-only={site.id}>
+          {site.名稱}
+        </span>
+      ))
+    }
+    {
+      SITE_THEMES.map((site) => (
+        <span class="site-only current-dot" data-site-only={site.id} style={dotStyle(site)} />
+      ))
+    }
+  </button>
+  <div class="popover" hidden>
+    <p class="menu-title" aria-hidden="true">網站主題</p>
+    <div class="items" id={menuId} role="menu" aria-label="網站主題">
+      {
+        SITE_THEMES.map((site) => (
+          <button
+            type="button"
+            role="menuitemradio"
+            tabindex="-1"
+            aria-checked={site.id === DEFAULT_SITE.id ? 'true' : 'false'}
+            data-value={site.id}
+          >
+            <span class="dot" style={dotStyle(site)} aria-hidden="true" />
+            <span class="name">{site.名稱}</span>
+            {site.isDemo && <span class="badge">示意</span>}
+            <HeaderIcon name="check" class="check" size={16} />
+          </button>
+        ))
+      }
+    </div>
+  </div>
+</tc-site-menu>
+
+<script>
+  import { applySite, currentSite, onSiteChange } from '../../scripts/site-choice';
+
+  class TcSiteMenu extends HTMLElement {
+    private trigger: HTMLButtonElement | null = null;
+    private popover: HTMLElement | null = null;
+    private items: HTMLButtonElement[] = [];
+
+    connectedCallback() {
+      this.trigger = this.querySelector<HTMLButtonElement>('.trigger');
+      this.popover = this.querySelector<HTMLElement>('.popover');
+      this.items = Array.from(this.querySelectorAll<HTMLButtonElement>('[role="menuitemradio"]'));
+      if (!this.trigger || !this.popover) return;
+
+      this.sync();
+      onSiteChange(() => this.sync());
+
+      this.trigger.addEventListener('click', () => {
+        if (this.isOpen) this.close(false);
+        else this.open('checked');
+      });
+      this.trigger.addEventListener('keydown', (event) => {
+        if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+          event.preventDefault();
+          this.open(event.key === 'ArrowDown' ? 'checked' : 'last');
+        }
+      });
+
+      for (const item of this.items) {
+        item.addEventListener('click', () => {
+          const id = item.dataset.value;
+          if (id) applySite(id);
+          this.close(true);
+        });
+      }
+
+      this.popover.addEventListener('keydown', (event) => this.onMenuKey(event));
+      // 焦點離開整個元件（例如 Tab）時關閉。
+      this.addEventListener('focusout', (event) => {
+        const next = event.relatedTarget;
+        if (this.isOpen && !(next instanceof Node && this.contains(next))) this.close(false);
+      });
+    }
+
+    private get isOpen(): boolean {
+      return this.popover ? !this.popover.hidden : false;
+    }
+
+    /** 讓打勾的項目跟著 <html data-site>。 */
+    private sync(): void {
+      const current = currentSite();
+      for (const item of this.items) {
+        item.setAttribute('aria-checked', String(item.dataset.value === current));
+      }
+    }
+
+    private readonly onOutsidePointer = (event: PointerEvent): void => {
+      if (event.target instanceof Node && !this.contains(event.target)) this.close(false);
+    };
+
+    private open(focus: 'checked' | 'last'): void {
+      if (!this.trigger || !this.popover) return;
+      this.sync();
+      this.popover.hidden = false;
+      this.trigger.setAttribute('aria-expanded', 'true');
+      document.addEventListener('pointerdown', this.onOutsidePointer);
+      const checked = this.items.find((item) => item.getAttribute('aria-checked') === 'true');
+      const target = focus === 'last' ? this.items[this.items.length - 1] : (checked ?? this.items[0]);
+      target?.focus();
+      target?.scrollIntoView({ block: 'nearest' });
+    }
+
+    private close(returnFocus: boolean): void {
+      if (!this.trigger || !this.popover) return;
+      this.popover.hidden = true;
+      this.trigger.setAttribute('aria-expanded', 'false');
+      document.removeEventListener('pointerdown', this.onOutsidePointer);
+      if (returnFocus) this.trigger.focus();
+    }
+
+    private onMenuKey(event: KeyboardEvent): void {
+      const index = this.items.findIndex((item) => item === document.activeElement);
+      const count = this.items.length;
+      const move = (to: number) => {
+        event.preventDefault();
+        this.items[(to + count) % count]?.focus();
+      };
+      switch (event.key) {
+        case 'ArrowDown':
+          move(index + 1);
+          break;
+        case 'ArrowUp':
+          move(index < 0 ? count - 1 : index - 1);
+          break;
+        case 'Home':
+          move(0);
+          break;
+        case 'End':
+          move(count - 1);
+          break;
+        case 'Escape':
+          event.preventDefault();
+          this.close(true);
+          break;
+        case 'Tab':
+          // 不攔下 Tab：焦點照常移到下一個元素，focusout 會關閉選單。
+          break;
+      }
+    }
+  }
+
+  customElements.define('tc-site-menu', TcSiteMenu);
+</script>
+
+<style>
+  tc-site-menu {
+    position: relative;
+    display: block;
+  }
+  .trigger {
+    position: relative;
+  }
+  /* 按鈕右下角：目前網站的主色。 */
+  .current-dot {
+    position: absolute;
+    inset-block-end: 5px;
+    inset-inline-end: 5px;
+    inline-size: 8px;
+    block-size: 8px;
+    border-radius: 50%;
+    background-color: var(--dot-dark);
+    box-shadow: 0 0 0 1.5px var(--sl-color-black);
+  }
+  .popover {
+    position: absolute;
+    inset-block-start: calc(100% + 0.5rem);
+    inset-inline-end: 0;
+    z-index: 1;
+    inline-size: min(17rem, calc(100vw - 1rem));
+    padding: 0.375rem;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 12px;
+    background-color: var(--sl-color-black);
+    box-shadow: var(--sl-shadow-lg);
+  }
+  .popover[hidden] {
+    display: none;
+  }
+  .menu-title {
+    margin: 0;
+    padding: 0.375rem 0.625rem 0.25rem;
+    color: var(--sl-color-gray-3);
+    font-size: var(--hb-text-label);
+    font-weight: 500;
+  }
+  /* 網站多的時候（10 到 20 個）在選單裡捲動。 */
+  .items {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    max-block-size: min(22rem, calc(100vh - 6rem));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  [role='menuitemradio'] {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    inline-size: 100%;
+    min-block-size: 2.25rem;
+    padding: 0.375rem 0.625rem;
+    border: 0;
+    border-radius: 8px;
+    background: none;
+    color: var(--sl-color-gray-1);
+    font: inherit;
+    font-size: var(--hb-text-ui);
+    line-height: var(--hb-line-height-ui);
+    text-align: start;
+    cursor: pointer;
+  }
+  [role='menuitemradio']:hover,
+  [role='menuitemradio']:focus-visible {
+    background-color: var(--sl-color-gray-6);
+    color: var(--sl-color-white);
+  }
+  [role='menuitemradio']:focus-visible {
+    outline: 2px solid var(--sl-color-accent);
+    outline-offset: -2px;
+  }
+  [role='menuitemradio'][aria-checked='true'] {
+    color: var(--sl-color-white);
+    font-weight: 600;
+  }
+  .dot {
+    flex: 0 0 auto;
+    inline-size: 12px;
+    block-size: 12px;
+    border-radius: 50%;
+    background-color: var(--dot-dark);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.15);
+  }
+  .name {
+    flex: 1 1 auto;
+    min-inline-size: 0;
+  }
+  .badge {
+    flex: 0 0 auto;
+    padding: 0 0.375rem;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 999px;
+    color: var(--sl-color-gray-2);
+    font-size: var(--hb-text-label);
+    font-weight: 400;
+    line-height: 1.5;
+  }
+  .popover :global(.check) {
+    flex: 0 0 auto;
+    visibility: hidden;
+    color: var(--sl-color-accent-high);
+  }
+  [aria-checked='true'] :global(.check) {
+    visibility: visible;
+  }
+  /* 淺色：小圓點用淺色的主色。 */
+  :global(:root[data-theme='light']) .current-dot,
+  :global(:root[data-theme='light']) .dot {
+    background-color: var(--dot-light);
+  }
+  :global(:root[data-theme='light']) .dot {
+    box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.12);
+  }
+</style>
