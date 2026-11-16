@@ -4,7 +4,9 @@
 // - 桌機寬度（視窗 768px 以上）：<tc-navbar>、<tc-footer> 依「視窗寬度」決定用桌機版，
 //   但外框比視窗窄。所以範本至少用 LAYOUT_MIN_PX 的寬度排版，外框比這窄時整塊等比例縮小
 //   （和 TemplateThumb 同一種做法），導覽列的字不會被擠成直排。
-// - 手機寬度：範本用外框的寬度排版、不縮小，看到的就是範本在手機寬度的樣子。
+// - 手機寬度：範本用手機版面排版。外框比 PHONE_MIN_PX 窄時（例如 390 寬的手機，外框只有 358px），
+//   用 PHONE_MIN_PX 排版再等比例縮小：<tc-navbar> 的手機版至少要 406px，直接用外框的寬度排版時，
+//   右邊的選單按鈕會被切掉。
 // - 沒有 JavaScript 時：用外框的寬度排版，不縮小。
 //
 // - interactive（預設 true）：可以點頁籤、按鈕；範本裡的 href="#" 連結不會跳走。
@@ -42,6 +44,8 @@ const title = label ?? `範本預覽：${entry.名稱}`;
 <script>
   /** 範本在桌機寬度至少用多寬排版（px）；外框比這窄時等比例縮小。 */
   const LAYOUT_MIN_PX = 1080;
+  /** 範本在手機寬度至少用多寬排版（px）；<tc-navbar> 的手機版需要 406px（凍結的元件，不能改）。 */
+  const PHONE_MIN_PX = 420;
   /** <tc-navbar> 從這個視窗寬度開始用桌機版（packages/components 的 media query）。 */
   const DESKTOP_QUERY = '(min-width: 768px)';
 
@@ -79,7 +83,7 @@ const title = label ?? `範本預覽：${entry.名稱}`;
       const stage = this.querySelector<HTMLElement>('.stage');
       if (!viewport || !stage) return;
       const available = viewport.clientWidth;
-      const layout = this.#mql?.matches ? Math.max(available, LAYOUT_MIN_PX) : available;
+      const layout = Math.max(available, this.#mql?.matches ? LAYOUT_MIN_PX : PHONE_MIN_PX);
       const scale = available > 0 ? available / layout : 1;
       stage.style.inlineSize = `${layout}px`;
       stage.style.transform = scale < 1 ? `scale(${scale})` : '';

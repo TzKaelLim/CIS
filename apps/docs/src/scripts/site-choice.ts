@@ -60,7 +60,7 @@ export function applySite(id: string): void {
   notify();
 }
 
-/** 從「上一頁」回來（bfcache）或在別的分頁改選時，改用記住的選擇（網址上有 ?site= 時以網址為準）。 */
+/** 從「上一頁」回來（bfcache）或在別的分頁改選時，改用記住的選擇（網址上有認得的 ?site= 時以網址為準）。 */
 function restoreFromStorage(): void {
   const config = readConfig();
   if (!config || !config.storageKey) return;
@@ -69,7 +69,8 @@ function restoreFromStorage(): void {
     const fromUrl = config.urlParam
       ? new URLSearchParams(location.search).get(config.urlParam)
       : null;
-    if (fromUrl === null && saved && config.ids.includes(saved)) {
+    const urlKnown = fromUrl !== null && config.ids.includes(fromUrl);
+    if (!urlKnown && saved && config.ids.includes(saved)) {
       document.documentElement.dataset.site = saved;
     }
   } catch {

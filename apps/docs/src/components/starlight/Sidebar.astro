@@ -196,6 +196,14 @@ const grouped = sidebar.filter((entry) => entry.type === 'group').length > 1;
     padding-block-start: 0.75rem;
     border-block-start: 1px solid var(--sl-color-hairline);
   }
+  /* 手機選單裡的按鈕至少 40px 高，手指才好按。 */
+  .mobile-actions .hb-pill {
+    block-size: 2.5rem;
+    padding-inline: 1.125rem;
+  }
+  .mobile-footer :global(select) {
+    min-block-size: 2.5rem;
+  }
   .github {
     display: inline-flex;
     align-items: center;

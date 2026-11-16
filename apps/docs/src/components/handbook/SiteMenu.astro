@@ -10,12 +10,20 @@
 //   都在 src/scripts/site-choice.ts。
 //
 // 鍵盤：Enter／空白鍵或上下鍵打開選單並移到目前的網站；上下鍵移動、Home／End 到頭尾；
-// Enter／空白鍵選擇；Esc 關閉並回到按鈕；Tab 關閉並離開選單。點選單外面也會關閉。
+// Enter／空白鍵選擇；Esc 關閉並回到按鈕；Tab 關閉並離開選單。點選單外面（包括點進範本預覽的
+// iframe）也會關閉。
+//
+// 同一頁可以放兩個（頁首一個、範本預覽對話框裡一個），每個要給不同的 id。
 import HeaderIcon from './HeaderIcon.astro';
 import { DEFAULT_SITE, SITE_THEMES, type SiteTheme } from '../../data/site-themes';
 import { SITE_STORAGE_KEY, SITE_URL_PARAM } from '../../data/site-selection';
 
-const menuId = 'tc-site-menu-list';
+interface Props {
+  /** 選單清單的 id；同一頁有兩個網站主題選單時要不同。 */
+  id?: string;
+}
+
+const { id: menuId = 'tc-site-menu-list' } = Astro.props;
 /** 小圓點的顏色：淺色、深色各用那個色彩模式的主色。 */
 const dotStyle = (site: SiteTheme): string =>
   `--dot-light: ${site.light['brand.primary']}; --dot-dark: ${site.dark['brand.primary']};`;
@@ -34,14 +42,8 @@ const dotStyle = (site: SiteTheme): string =>
     aria-controls={menuId}
   >
     <HeaderIcon name="palette" />
-    <span class="sr-only">網站主題：</span>
-    {
-      SITE_THEMES.map((site) => (
-        <span class="site-only sr-only" data-site-only={site.id}>
-          {site.名稱}
-        </span>
-      ))
-    }
+    {/* 名稱「網站主題：<名稱>」寫在同一行，中間才不會多出空格。 */}
+    <span class="sr-only">網站主題：{SITE_THEMES.map((site) => <span class="site-only" data-site-only={site.id}>{site.名稱}</span>)}</span>
     {
       SITE_THEMES.map((site) => (
         <span class="site-only current-dot" data-site-only={site.id} style={dotStyle(site)} />
@@ -108,11 +110,6 @@ const dotStyle = (site: SiteTheme): string =>
       }
 
       this.popover.addEventListener('keydown', (event) => this.onMenuKey(event));
-      // 焦點離開整個元件（例如 Tab）時關閉。
-      this.addEventListener('focusout', (event) => {
-        const next = event.relatedTarget;
-        if (this.isOpen && !(next instanceof Node && this.contains(next))) this.close(false);
-      });
     }
 
     private get isOpen(): boolean {
@@ -130,6 +127,15 @@ const dotStyle = (site: SiteTheme): string =>
     private readonly onOutsidePointer = (event: PointerEvent): void => {
       if (event.target instanceof Node && !this.contains(event.target)) this.close(false);
     };
+    // 焦點移到元件外面（例如 Tab）時關閉。用 document 的 focusin，不用元件的 focusout：
+    // Safari 點按鈕時不會把焦點移過去，focusout 的 relatedTarget 會是 null，選單會在點選項之前就關掉。
+    private readonly onOutsideFocus = (event: FocusEvent): void => {
+      if (event.target instanceof Node && !this.contains(event.target)) this.close(false);
+    };
+    // 點進 iframe（例如範本預覽）時，這一頁收不到 pointerdown，只會失去焦點。
+    private readonly onWindowBlur = (): void => {
+      this.close(false);
+    };
 
     private open(focus: 'checked' | 'last'): void {
       if (!this.trigger || !this.popover) return;
@@ -137,6 +143,8 @@ const dotStyle = (site: SiteTheme): string =>
       this.popover.hidden = false;
       this.trigger.setAttribute('aria-expanded', 'true');
       document.addEventListener('pointerdown', this.onOutsidePointer);
+      document.addEventListener('focusin', this.onOutsideFocus);
+      window.addEventListener('blur', this.onWindowBlur);
       const checked = this.items.find((item) => item.getAttribute('aria-checked') === 'true');
       const target = focus === 'last' ? this.items[this.items.length - 1] : (checked ?? this.items[0]);
       target?.focus();
@@ -148,6 +156,8 @@ const dotStyle = (site: SiteTheme): string =>
       this.popover.hidden = true;
       this.trigger.setAttribute('aria-expanded', 'false');
       document.removeEventListener('pointerdown', this.onOutsidePointer);
+      document.removeEventListener('focusin', this.onOutsideFocus);
+      window.removeEventListener('blur', this.onWindowBlur);
       if (returnFocus) this.trigger.focus();
     }
 
@@ -172,11 +182,13 @@ const dotStyle = (site: SiteTheme): string =>
           move(count - 1);
           break;
         case 'Escape':
+          // 選單在預覽對話框裡時，Esc 只關選單，不關對話框。
           event.preventDefault();
+          event.stopPropagation();
           this.close(true);
           break;
         case 'Tab':
-          // 不攔下 Tab：焦點照常移到下一個元素，focusout 會關閉選單。
+          // 不攔下 Tab：焦點照常移到下一個元素，focusin 會關閉選單。
           break;
       }
     }

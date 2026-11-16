@@ -40,6 +40,11 @@ const searchIcon = `--hb-search-icon: ${iconDataUrl('search')};`;
     <SectionNav />
   </div>
   <div class="end print:hidden">
+    {
+      /* 沒有 JavaScript 時，色彩模式、網站主題（頁首的選單和手機選單裡的下拉選單）按了也沒有作用，
+         所以整個藏起來；連結（區域導覽、GitHub、「開始使用」）照常可以用。 */
+    }
+    <noscript><style is:inline>tc-mode-toggle,tc-site-menu,tc-site-select{display:none!important}</style></noscript>
     {shouldRenderSearch && <Search />}
     <ColorModeToggle />
     <SiteMenu />

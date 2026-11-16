@@ -352,6 +352,7 @@ site-search button:focus-visible,
 .sl-link-button:focus-visible,
 .pagination-links a:focus-visible,
 mobile-starlight-toggle button:focus-visible,
+starlight-menu-button button:focus-visible,
 .sl-markdown-content a:not(:where(.not-content *)):focus-visible {
   outline: 2px solid var(--sl-color-accent);
   outline-offset: 2px;

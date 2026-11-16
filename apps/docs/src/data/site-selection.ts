@@ -42,14 +42,15 @@ export function siteSelectionCss(): string {
 
 /**
  * 在第一次繪製前設定 <html data-site>。順序：網址 ?site= → localStorage → 預設網站。
- * 不在名單裡的 id 一律改用預設網站；localStorage 不能用（私密視窗、封鎖）時直接略過。
+ * 網址上不認得的 id 當作網址沒有這個參數（改讀 localStorage，和範本畫面頁相同）；
+ * localStorage 裡不認得的 id 也略過，改用預設網站。localStorage 不能用（私密視窗、封鎖）時直接略過。
  */
 export function siteInitScript(): string {
   const ids = JSON.stringify(SITE_THEMES.map((s) => s.id));
   const fallback = JSON.stringify(DEFAULT_SITE.id);
   const key = JSON.stringify(SITE_STORAGE_KEY);
   const param = JSON.stringify(SITE_URL_PARAM);
-  return `(function(){var ids=${ids},site=${fallback},key=${key};var fromUrl=null;try{fromUrl=new URLSearchParams(location.search).get(${param})}catch(e){}if(fromUrl!==null){if(ids.indexOf(fromUrl)>=0){site=fromUrl;try{localStorage.setItem(key,site)}catch(e){}}}else{try{var saved=localStorage.getItem(key);if(saved&&ids.indexOf(saved)>=0)site=saved}catch(e){}}document.documentElement.setAttribute('data-site',site)})();`;
+  return `(function(){var ids=${ids},site=${fallback},key=${key};var fromUrl=null;try{fromUrl=new URLSearchParams(location.search).get(${param})}catch(e){}if(fromUrl!==null&&ids.indexOf(fromUrl)>=0){site=fromUrl;try{localStorage.setItem(key,site)}catch(e){}}else{try{var saved=localStorage.getItem(key);if(saved&&ids.indexOf(saved)>=0)site=saved}catch(e){}}document.documentElement.setAttribute('data-site',site)})();`;
 }
 
 /** Starlight `head` 選項用的兩個標籤。 */

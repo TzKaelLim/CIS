@@ -12,7 +12,8 @@
 // - ?view=thumb：縮圖用，不顯示捲軸。
 // - 不給搜尋引擎收錄（noindex），也不在手冊的搜尋索引裡（不是 Starlight 頁面，沒有
 //   data-pagefind-body，另外整頁標 data-pagefind-ignore）。
-// - 沒有 JavaScript 時，範本總覽頁的卡片直接連到這一頁，讀者仍然看得到範本（預設網站、淺色）。
+// - 沒有 JavaScript 時，範本總覽頁的卡片直接連到這一頁，讀者仍然看得到範本的內容（預設網站、淺色；
+//   元件沒有樣式，頁面最上面有一行說明）。
 import '@tzuchi/tokens/tokens.css';
 import 'virtual:tc-site-theme-vars.css';
 import TemplateView from '../../../components/handbook/TemplateView.astro';
@@ -49,6 +50,9 @@ const initScript = `(function(c){var d=document.documentElement,q;try{q=new URLS
     <script is:inline set:html={initScript} />
   </head>
   <body data-pagefind-ignore="all">
+    <noscript>
+      <p class="tc-noscript">範本是用元件畫的，元件需要 JavaScript 才會顯示正確的樣子；下面是沒有樣式的內容。</p>
+    </noscript>
     <TemplateView id={entry.id} />
   </body>
 </html>
@@ -104,6 +108,12 @@ const initScript = `(function(c){var d=document.documentElement,q;try{q=new URLS
   /* 縮圖只露出頁面最上面的部分，不顯示捲軸。 */
   html[data-view='thumb'] {
     overflow: hidden;
+  }
+  .tc-noscript {
+    margin: 0;
+    padding: 12px 16px;
+    border-block-end: 1px solid currentColor;
+    font: 14px/1.6 system-ui, sans-serif;
   }
   /* Astro 的開發工具列只在本機預覽出現；範本畫面裡不要它。 */
   astro-dev-toolbar {
