@@ -40,6 +40,30 @@ test('every component page has the six sections of R-H-08 in order', () => {
 });
 
 /**
+ * Hero previews that may be drawn smaller than 0.75, and why. Everything else is
+ * drawn at 0.75 or larger, so the text inside stays readable (R-H-08, section 1).
+ */
+const SMALL_HERO_SCALE = {
+  // Shows the four content widths next to each other; its labels are drawn at 26px,
+  // so they still read at 13px.
+  container: 0.5,
+};
+
+test('every hero preview is drawn at a readable size', () => {
+  for (const file of readdirSync(pagesDir).filter((f) => f.endsWith('.mdx') && f !== 'index.mdx')) {
+    const id = file.replace(/\.mdx$/, '');
+    const text = readFileSync(join(pagesDir, file), 'utf8');
+    const tag = text.match(/<PreviewTile[^>]*size="hero"[^>]*>/)?.[0] ?? '';
+    const scale = Number(tag.match(/scale=\{([0-9.]+)\}/)?.[1] ?? 1);
+    const minimum = SMALL_HERO_SCALE[id] ?? 0.75;
+    assert.ok(
+      scale >= minimum,
+      `${file}: the hero preview is scaled to ${scale}, below ${minimum}`,
+    );
+  }
+});
+
+/**
  * URLs a source file may contain because the handbook never requests them.
  * Everything else that starts with http:// or https:// fails the test.
  */
