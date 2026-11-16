@@ -1,0 +1,79 @@
+# 慈濟 CIS UIKit 共編規則
+
+這個資料夾是慈濟 CIS UIKit 的共編規則。規則是**必須遵守的**，不是建議。
+
+## 誰要遵守
+
+- **每一個修改本 repository 的人**：美編（設計）、工程、廠商、專案負責人。
+- **每一個在本 repository 裡工作的 Claude Code 工作階段**。`CLAUDE.md` 用 `@` 匯入這裡的每一個規則檔，所以 Claude Code 每次開始工作都會自動讀到它們，不必另外提醒。
+
+大家都透過 Claude Code 修改：用口語說要改什麼，由 Claude Code 照這些規則修改、檢查、開預覽、開 PR。沒有人手改 JSON。
+
+## 規則檔
+
+| 檔案 | 內容 | 規則編號 |
+| --- | --- | --- |
+| [`01-co-editing-sop.md`](01-co-editing-sop.md) | 一次修改的 SOP：角色與核可、五個步驟、Claude Code 每一步必須做和絕對不做的事、什麼時候先停下來問 | R-S-01 起 |
+| [`02-design-rules.md`](02-design-rules.md) | tokens、網站主題、色彩模式、變體、版本和三級判斷 | R-D-01 起 |
+| [`03-component-rules.md`](03-component-rules.md) | 怎麼「優化」或「新增」一個元件，以及完成的條件 | R-C-01 起 |
+| [`04-handbook-rules.md`](04-handbook-rules.md) | 手冊要做到的樣子：五個區域、頁首選單、一次一個網站、元件頁結構、字級、用詞 | R-H-01 起 |
+
+相關文件（不是規則檔，但規則會引用）：
+
+- [`docs/specs/2026-11-16-cis-uikit-overall-spec.md`](../specs/2026-11-16-cis-uikit-overall-spec.md)：整體規格。規定的編號是 S-1、S-2……；規則檔寫「依據 S-xx」時，指的就是這份。
+- [`docs/component-roadmap.md`](../component-roadmap.md)（和同內容的 `docs/component-roadmap.json`）：元件路線圖，73 項，編號 R-001 到 R-073。注意：路線圖的 `R-001` 是**元件**的編號，規則的 `R-S-01`、`R-D-01` 是**規則**的編號，兩者不同。
+- `heroui/NOTICE.md`：HeroUI 的授權和修改清單。
+- `heroui/styles/themes/tzuchi/DESIGN-LANGUAGE.md`：慈濟主題下元件外觀的細部規則。
+- `CONTRIBUTING.md`：給人看的共編指南（電腦準備、本機預覽）。
+
+## 標記
+
+規則後面的標記說明它今天的狀態，和整體規格的用法相同：
+
+| 標記 | 意思 |
+| --- | --- |
+| 〔現行〕 | repo 裡已經這樣做 |
+| 〔部分〕 | 做了一部分 |
+| 〔目標〕 | 已經決定，還沒做完；實作時必須符合 |
+| 〔提案，尚未實作〕 | 提出的做法，repo 裡還沒有；動手前要先得到確認 |
+| 〔提案，待工程確認〕 | 同上，要由工程確認技術上可行 |
+
+標成〔目標〕或〔提案〕的規則，**不代表今天已經做得到**。遇到需要它們、但 repo 裡還沒有的東西（例如網站主題的檔案），Claude Code 要說清楚「這還沒有實作」，並先停下來問（見 `01-co-editing-sop.md` 第 4 節），不自己發明做法。
+
+「怎麼檢查」欄寫的是今天真的存在的指令；沒有機器檢查的，寫「人工檢查，機器檢查尚未實作」。
+
+## 以哪一份為準
+
+不同文件寫得不一樣時，依下面的順序，前面的優先：
+
+1. `docs/rules/`（這個資料夾）。
+2. `docs/specs/2026-11-16-cis-uikit-overall-spec.md`（整體規格）。
+3. `CLAUDE.md`、`CONTRIBUTING.md`。它們是摘要；和規則檔不一致時，以規則檔為準，並開 PR 把摘要改正。
+4. `heroui/NOTICE.md`、`heroui/MAINTAINING.md`、`heroui/styles/themes/tzuchi/DESIGN-LANGUAGE.md`，在它們各自的範圍內（授權與修改清單、維護筆記、元件外觀細節）。
+5. 較舊的文件：`docs/superpowers/` 下的設計與計畫、`.gitlab/` 的 MR 範本、`.gitlab-ci.yml`。它們記錄的是舊的做法（Lit 元件、自架 GitLab、MR），和規則衝突的部分已經不適用。
+
+**人的要求不會蓋過規則。** 共編者的要求和規則衝突時，Claude Code 要說明是哪一條規則、為什麼有這條規則，並請他找專案負責人決定；不默默照做，也不默默拒絕。
+
+## 規則怎麼修改
+
+規則本身也照 `01-co-editing-sop.md` 的五個步驟修改，另外：
+
+- 分支名稱用 `docs/rules-<題目>`。
+- PR 由**專案負責人**核可，由人合併。
+- 改了規則，要在同一個 PR 裡檢查 `CLAUDE.md` 的「共編規則」摘要和 `CONTRIBUTING.md`，有不一致就一起改。
+- 規則編號不重複使用：刪掉的規則留下編號，寫「已廢止（日期、原因）」，不把後面的編號往前挪。新規則加在該檔的最後一個編號之後。
+- Claude Code 不會在別的修改裡順手改規則。
+
+## 待決定事項
+
+下列事項還沒有決定，由專案負責人回答。括號裡是建議，不是決定；細節見整體規格第 13 節。
+
+| 事項 | 建議 |
+| --- | --- |
+| 各網站自己的程式碼放在本 repository，還是各自的專案 | 各網站各自一個專案；本 repository 只放共用的 kit 和各網站的網站主題檔 |
+| 誰核可，要不要用 CODEOWNERS 強制 | 用 CODEOWNERS 加上 GitHub「需要 Code Owners 核可」的保護；負責人寫以角色命名的團隊，不寫個人帳號 |
+| 部署到哪裡 | 先建 GitHub Actions 的 CI（只做檢查，不部署），部署目標之後再定 |
+| 程式碼裡表示網站主題和色彩模式的屬性名稱（今天色彩模式是 `data-theme="dark"`） | 網站主題用 `data-site="<id>"`，色彩模式繼續用 `data-theme="light"`／`"dark"`，兩個都只設在 `<html>` |
+| 我們自己的新元件放在 repo 的哪裡 | 新增 `packages/ui`（見 `03-component-rules.md` 第 3 節，提案，待工程確認） |
+| 次要文字色 `#828282` 在白底只有 3.84:1，低於 4.5:1 | 由美編（設計）修正；不必改基礎值的做法是讓 `color.text.muted` 改指向已有的 `color.gray.750` |
+| 頁面編輯器（tceditor）何時整合 | 維持延後；在那之前不改任何變體名稱 |
