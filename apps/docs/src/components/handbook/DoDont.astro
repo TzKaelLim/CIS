@@ -46,8 +46,8 @@ const LABEL: Record<Row['kind'], string> = { do: '建議', dont: '避免' };
   table {
     inline-size: 100%;
     border-collapse: collapse;
-    font-size: var(--sl-text-sm);
-    line-height: 1.6;
+    font-size: var(--hb-text-body);
+    line-height: var(--hb-line-height);
   }
   th {
     padding: 0.6rem 1rem;
@@ -73,9 +73,9 @@ const LABEL: Record<Row['kind'], string> = { do: '建議', dont: '避免' };
     display: inline-block;
     padding: 0.1rem 0.6rem;
     border-radius: 999px;
-    font-size: var(--sl-text-xs);
+    font-size: var(--hb-text-label);
     font-weight: 600;
-    line-height: 1.6;
+    line-height: var(--hb-line-height);
   }
   /* 綠色和紅色都用 Starlight 的高對比組合：淺色模式深字淺底，深色模式淺字深底。 */
   .do {

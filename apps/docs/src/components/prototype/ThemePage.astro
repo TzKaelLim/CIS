@@ -141,7 +141,7 @@ const mutedFails = checks.some((c) => c.說明.includes('次要文字') && !c.�
     gap: 0.6rem;
   }
   .title {
-    font-size: 1.25rem;
+    font-size: var(--hb-text-category);
     font-weight: 700;
     color: var(--sl-color-white);
   }
@@ -153,7 +153,7 @@ const mutedFails = checks.some((c) => c.說明.includes('次要文字') && !c.�
     margin-block-start: 0.85rem;
   }
   .apply-note {
-    font-size: 0.8rem;
+    font-size: var(--hb-text-label);
     color: var(--sl-color-gray-3);
   }
   .desc,
@@ -171,7 +171,7 @@ const mutedFails = checks.some((c) => c.說明.includes('次要文字') && !c.�
     border-collapse: collapse;
     inline-size: 100%;
     min-inline-size: 560px;
-    font-size: 0.82rem;
+    font-size: var(--hb-text-body);
   }
   .checks th,
   .checks td {

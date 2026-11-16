@@ -16,6 +16,9 @@ import { sectionForPath } from '../../prototype/sections';
 const { sidebar } = Astro.locals.starlightRoute;
 const section = sectionForPath(Astro.url.pathname);
 const filterId = 'tc-sidebar-filter-input';
+// 清單由好幾個分類組成（例如元件區域）時，分類裡的項目就是主要的連結；
+// 只有一個子群組（例如「基礎 Foundations」）時，子群組裡的項目小一號（見 handbook.css）。
+const grouped = sidebar.filter((entry) => entry.type === 'group').length > 1;
 ---
 
 <div class:list={['md:sl-hidden mobile-sections', { divided: sidebar.length > 0 }]}>
@@ -47,7 +50,7 @@ const filterId = 'tc-sidebar-filter-input';
 
 {
   sidebar.length > 0 && (
-    <div class="section-list" data-tc-sidebar-list>
+    <div class:list={['section-list', { grouped }]} data-tc-sidebar-list>
       <SidebarPersister>
         <SidebarSublist sublist={sidebar} />
       </SidebarPersister>
@@ -154,7 +157,7 @@ const filterId = 'tc-sidebar-filter-input';
     background-color: var(--sl-color-black);
     color: var(--sl-color-white);
     font: inherit;
-    font-size: var(--sl-text-sm);
+    font-size: var(--hb-text-ui);
   }
   input::placeholder {
     color: var(--sl-color-gray-3);
@@ -167,7 +170,7 @@ const filterId = 'tc-sidebar-filter-input';
   .filter-status {
     margin: 0;
     color: var(--sl-color-gray-3);
-    font-size: var(--sl-text-xs);
+    font-size: var(--hb-text-label);
   }
   .filter-status:not(:empty) {
     margin-block-start: 0.5rem;

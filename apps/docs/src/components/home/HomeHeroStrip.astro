@@ -66,19 +66,20 @@
 <style is:global>
   /* 首頁的 hero：名稱放大、置中，頁面比較寬（見 src/route-data.ts）。 */
   :root:has(.tc-home-strip) .hero {
-    padding-block: clamp(2.5rem, 8vmin, 5.5rem) 2rem;
+    padding-block: clamp(2rem, 6vmin, 4rem) 1.5rem;
   }
   :root:has(.tc-home-strip) .hero h1 {
-    font-size: clamp(2.6rem, 1rem + 6vw, 5.25rem);
+    font-size: var(--hb-text-hero);
     font-weight: 700;
     letter-spacing: -0.01em;
-    line-height: 1.1;
+    line-height: var(--hb-line-height-hero);
     color: var(--sl-color-white);
   }
   :root:has(.tc-home-strip) .hero .tagline {
     max-inline-size: 40rem;
     margin-inline: auto;
-    font-size: clamp(var(--sl-text-lg), 1rem + 0.6vw, var(--sl-text-2xl));
+    font-size: var(--hb-text-lead);
+    line-height: var(--hb-line-height);
     color: var(--sl-color-gray-2);
     text-wrap: balance;
     /* 中文不在詞中間斷行，只在標點後換行（例如「，」）。 */

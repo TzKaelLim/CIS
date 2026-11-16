@@ -68,7 +68,7 @@ const { steps, label } = Astro.props;
     inset-block-start: -1.2rem;
     inset-inline-start: 1.85rem;
     color: var(--sl-color-gray-3);
-    font-size: 0.9rem;
+    font-size: var(--hb-text-ui);
     line-height: 1.2rem;
   }
   .num {
@@ -81,7 +81,7 @@ const { steps, label } = Astro.props;
     background-color: var(--sl-color-accent-high);
     color: var(--sl-color-black);
     font-weight: 700;
-    font-size: var(--sl-text-sm);
+    font-size: var(--hb-text-ui);
   }
   .body {
     display: grid;
@@ -96,14 +96,14 @@ const { steps, label } = Astro.props;
   .who {
     margin: 0;
     color: var(--sl-color-text-accent);
-    font-size: var(--sl-text-xs);
+    font-size: var(--hb-text-label);
     font-weight: 600;
   }
   .text {
     margin: 0;
     color: var(--sl-color-gray-2);
-    font-size: var(--sl-text-sm);
-    line-height: 1.6;
+    font-size: var(--hb-text-body);
+    line-height: var(--hb-line-height);
   }
 
   /* 寬的時候：一排五格，步驟之間的向右箭頭。 */

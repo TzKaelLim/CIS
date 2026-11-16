@@ -97,10 +97,12 @@ export default defineConfig({
       defaultLocale: 'root',
       locales: { root: { label: '繁體中文', lang: 'zh-TW' } },
       // tokens.css 讓手冊裡的 <tc-*> 範例和 Foundations 頁面用真正的設計 token；
-      // 接著是網站主題的變數，最後是手冊本身的外觀。
+      // 接著是網站主題的變數、手冊的文字大小（type-scale.css，手冊字級的唯一來源），
+      // 最後是手冊本身的外觀。
       customCss: [
         '../../packages/tokens/dist/tokens.css',
         SITE_THEME_VARS_MODULE,
+        './src/styles/type-scale.css',
         './src/styles/handbook.css',
       ],
       components: {
