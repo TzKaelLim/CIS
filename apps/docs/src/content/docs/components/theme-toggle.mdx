@@ -1,6 +1,6 @@
 ---
 title: ThemeToggle
-description: tc-theme-toggle — 深色／淺色主題切換鈕，切換 <html data-theme> 並記憶選擇，所有元件透過 token cascade 自動跟隨。
+description: tc-theme-toggle — 淺色／深色色彩模式切換鈕，切換 <html data-theme> 並記憶選擇，所有元件透過 token cascade 自動跟隨。
 ---
 
 import Demo from '../../../components/Demo.astro';
@@ -16,7 +16,7 @@ import PropsTable from '../../../components/PropsTable.astro';
 </Demo>
 
 :::tip[試試看]
-本手冊右上角的 Starlight 主題切換鈕也會設定同一個 `data-theme`，因此上方所有
+本手冊頁首的 Starlight 淺色／深色選單也會設定同一個 `data-theme`，因此上方所有
 **可互動範例**會即時跟著深淺切換。
 :::
 
@@ -31,7 +31,7 @@ import PropsTable from '../../../components/PropsTable.astro';
 
 ## 防止閃爍（anti-FOUC）
 
-元件在 `connectedCallback` 才套用主題，無法避免整頁載入時的閃爍。請在 `<head>`
+元件在 `connectedCallback` 才套用色彩模式，無法避免整頁載入時的閃爍。請在 `<head>`
 **最前面**加入一段同步 inline script，在首次繪製前就設定好 `data-theme`：
 
 ```html
@@ -78,4 +78,4 @@ import { TcThemeToggle } from '@tzuchi/react';
 
 ## 相關
 
-- [主題與深色模式（Theming）](/foundations/theming/) — 深色色票如何運作、如何擴充。
+- [色彩模式（淺色／深色）](/foundations/theming/) — 深色色票如何運作、如何擴充。

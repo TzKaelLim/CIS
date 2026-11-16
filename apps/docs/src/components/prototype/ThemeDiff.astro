@@ -1,67 +1,110 @@
 ---
 // 設計示範：一個網站主題和預設主題不一樣的顏色（只列有差異的 token）。
+// 淺色、深色各一張表，每張只有兩欄色值：預設 → 這個網站。
 import ColorChip from './ColorChip.astro';
-import { DEFAULT_SITE, MODE_LABEL, getSite, tokenLabel, varName } from '../../prototype/site-themes';
+import {
+  DEFAULT_SITE,
+  MODES,
+  MODE_LABEL,
+  getSite,
+  tokenLabel,
+  varName,
+} from '../../prototype/site-themes';
 
 interface Props {
   siteId: string;
+  /** 右欄的標題；預設是網站名稱。 */
+  targetLabel?: string;
 }
 
 const site = getSite(Astro.props.siteId);
+const targetLabel = Astro.props.targetLabel ?? site.名稱;
+const groups = MODES.map((mode) => ({ mode, rows: site.diff.filter((d) => d.mode === mode) }));
 ---
 
 {
   site.diff.length === 0 ? (
-    <p>這個主題的顏色和預設主題（{DEFAULT_SITE.名稱}）完全相同。</p>
+    <p>這個網站主題的顏色和預設主題（{DEFAULT_SITE.名稱}）完全相同。</p>
   ) : (
-    <div class="table-wrap not-content">
-      <table class="diff">
-        <thead>
-          <tr>
-            <th scope="col">用途</th>
-            <th scope="col">模式</th>
-            <th scope="col">預設值（{DEFAULT_SITE.簡稱}）</th>
-            <th scope="col" aria-hidden="true" />
-            <th scope="col">本主題值（{site.簡稱}）</th>
-          </tr>
-        </thead>
-        <tbody>
-          {site.diff.map((d) => (
-            <tr>
-              <th scope="row">
-                {tokenLabel(d.token)}
-                <code>{varName(d.token)}</code>
-              </th>
-              <td>{MODE_LABEL[d.mode]}</td>
-              <td>
-                <ColorChip hex={d.預設值} />
-              </td>
-              <td class="arrow" aria-hidden="true">
-                →
-              </td>
-              <td>
-                <ColorChip hex={d.本主題值} />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div class="diff-groups not-content">
+      {groups.map(({ mode, rows }) => (
+        <div class="table-wrap">
+          <table class="diff">
+            <caption>
+              {MODE_LABEL[mode]}
+              <span class="count">改了 {rows.length} 個</span>
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col">用途</th>
+                <th scope="col">預設（{DEFAULT_SITE.名稱}）</th>
+                <th scope="col">
+                  <span class="sr-only">改成</span>
+                </th>
+                <th scope="col">{targetLabel}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.length === 0 ? (
+                <tr>
+                  <td colspan="4">{MODE_LABEL[mode]}的顏色和預設主題相同。</td>
+                </tr>
+              ) : (
+                rows.map((d) => (
+                  <tr>
+                    <th scope="row">
+                      {tokenLabel(d.token)}
+                      <code>{varName(d.token)}</code>
+                    </th>
+                    <td>
+                      <ColorChip hex={d.預設值} />
+                    </td>
+                    <td class="arrow" aria-hidden="true">
+                      →
+                    </td>
+                    <td>
+                      <ColorChip hex={d.本主題值} />
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      ))}
     </div>
   )
 }
 
 <style>
+  .diff-groups {
+    display: grid;
+    gap: 1rem;
+    margin-block: 1rem;
+  }
   .table-wrap {
     overflow-x: auto;
-    margin-block: 1rem;
     border: 1px solid var(--sl-color-gray-5);
     border-radius: 0.5rem;
   }
   .diff {
     border-collapse: collapse;
     inline-size: 100%;
-    min-inline-size: 560px;
+    min-inline-size: 420px;
     font-size: 0.82rem;
+  }
+  caption {
+    text-align: start;
+    padding: 0.5rem 0.65rem;
+    font-weight: 700;
+    color: var(--sl-color-white);
+    border-block-end: 1px solid var(--sl-color-gray-5);
+  }
+  .count {
+    margin-inline-start: 0.5rem;
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--sl-color-gray-3);
   }
   th,
   td {
@@ -88,5 +131,6 @@ const site = getSite(Astro.props.siteId);
   .arrow {
     color: var(--sl-color-gray-3);
     padding-inline: 0;
+    inline-size: 1.25rem;
   }
 </style>

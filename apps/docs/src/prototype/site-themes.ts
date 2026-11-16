@@ -34,6 +34,8 @@ export interface SiteTheme {
   /** 一句話描述主色，例如「藍色系」。 */
   色系: string;
   說明: string;
+  /** 一句話介紹，用在總覽頁的網站主題卡片上。 */
+  摘要: string;
   /** 哪些網站或單位使用這個主題。 */
   使用對象: string;
   /** true = 示範用的假設主題，顏色不是正式值。 */
@@ -161,6 +163,7 @@ interface SiteInput {
   簡稱: string;
   色系: string;
   說明: string;
+  摘要: string;
   使用對象: string;
   isDemo: boolean;
   /** 只寫要改的語意 token；值是 `{color.…}` 參照或色碼。省略 = 沿用預設主題。 */
@@ -172,7 +175,12 @@ const DEFAULT_RESOLVED: Record<Mode, SemanticMap> = {
   dark: resolveMode(DEFAULT_REFS.dark),
 };
 
+/** 網站主題的 id 會出現在網址（?site=…）、HTML 屬性和產生的 CSS 裡，所以只允許小寫英數和連字號。 */
+const SITE_ID_PATTERN = /^[a-z][a-z0-9-]{0,31}$/;
+
 function defineSite(input: SiteInput, isDefault = false): SiteTheme {
+  if (!SITE_ID_PATTERN.test(input.id))
+    throw new Error(`網站主題 id「${input.id}」只能用小寫英數和連字號`);
   const resolved = {} as Record<Mode, SemanticMap>;
   const diff: TokenDiff[] = [];
   const demoHexes = new Set<string>();
@@ -197,6 +205,7 @@ function defineSite(input: SiteInput, isDefault = false): SiteTheme {
     簡稱: input.簡稱,
     色系: input.色系,
     說明: input.說明,
+    摘要: input.摘要,
     使用對象: input.使用對象,
     isDemo: input.isDemo,
     isDefault,
@@ -216,6 +225,7 @@ export const SITE_THEMES: readonly SiteTheme[] = [
       簡稱: '入口網',
       色系: '藍色系',
       說明: '預設主題。顏色直接取自 UIKit 正式的色彩設定（設計 token：工程師用的顏色名稱表）；其他網站沒有特別指定的顏色，都沿用這一套。',
+      摘要: '預設主題，藍色系。顏色取自 UIKit 正式的色彩設定。',
       使用對象: '（假設）慈濟基金會官方入口網站，以及還沒有自己主題的網站。名稱待核定。',
       isDemo: false,
     },
@@ -227,6 +237,7 @@ export const SITE_THEMES: readonly SiteTheme[] = [
     簡稱: '環保網',
     色系: '綠色系',
     說明: '示意主題：把主色換成綠色系，用來說明「同一套元件，換一組語意色」的效果。顏色是示意值（非正式）。',
+    摘要: '綠色系的示意主題，只換了品牌相關的顏色。',
     使用對象: '（假設）慈濟環保推廣相關網站。實際名稱與是否採用待核定。',
     isDemo: true,
     overrides: {
@@ -251,7 +262,19 @@ export const SITE_THEMES: readonly SiteTheme[] = [
   }),
 ];
 
+for (const [i, site] of SITE_THEMES.entries()) {
+  if (SITE_THEMES.findIndex((s) => s.id === site.id) !== i)
+    throw new Error(`網站主題 id 重複：${site.id}`);
+}
+
 export const DEFAULT_SITE: SiteTheme = SITE_THEMES.find((s) => s.isDefault) ?? SITE_THEMES[0];
+
+/** 選單、卡片用的名稱；示意主題加註「（示意）」。 */
+export const siteLabel = (site: SiteTheme): string =>
+  site.isDemo ? `${site.名稱}（示意）` : site.名稱;
+
+/** 這個網站主題在手冊裡的說明頁。 */
+export const sitePageUrl = (site: SiteTheme): string => `/themes/${site.id}/`;
 
 export function getSite(id: string): SiteTheme {
   const site = SITE_THEMES.find((s) => s.id === id);

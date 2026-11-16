@@ -1,5 +1,0 @@
-/* 設計示範：網站主題頁要並排 4 個範例，所以只在用到這些元件的頁面把內容區放寬。
-   Starlight 的預設值寫在 cascade layer 裡，這裡沒有 layer，所以會蓋過它。 */
-:root {
-  --sl-content-width: 64rem;
-}

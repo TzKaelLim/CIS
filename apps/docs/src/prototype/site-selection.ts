@@ -1,0 +1,77 @@
+// 設計示範：頁首「網站主題」選單的狀態與顯示規則。
+//
+// 手冊是靜態網站，所以「跟著網站主題變」的內容在建置時就把每個網站各畫一份，
+// 再用 <html data-site="…"> 和這裡產生的 CSS 只顯示目前選擇的那一份。
+// 這些規則和 <head> 裡的小段 script 都由 SITE_THEMES 產生：新增網站不必手寫任何規則。
+// astro.config.mjs 透過 Starlight 的 head 選項把它們放進每一頁的 <head>。
+import { DEFAULT_SITE, SITE_THEMES, sitePageUrl } from './site-themes';
+
+/** localStorage 的 key，記住讀者選的網站主題。 */
+export const SITE_STORAGE_KEY = 'tc-handbook-site';
+/** 網址參數：?site=<id> 會蓋過記住的選擇，並且被記住。 */
+export const SITE_URL_PARAM = 'site';
+
+/**
+ * 「目前選擇的網站是 id」時要套用的選擇器。對每個網站各產生一條；
+ * <html> 沒有 data-site（沒有 JavaScript）或值不在名單裡時，視為選了預設網站。
+ */
+export function selectedSiteSelectors(target: (id: string) => string): string[] {
+  const noKnownSite = `:root${SITE_THEMES.map((s) => `:not([data-site="${s.id}"])`).join('')}`;
+  return [
+    ...SITE_THEMES.map((s) => `:root[data-site="${s.id}"] ${target(s.id)}`),
+    `${noKnownSite} ${target(DEFAULT_SITE.id)}`,
+  ];
+}
+
+/**
+ * 全站共用的顯示規則：
+ * - `.site-only[data-site-only="id"]`：只在選了這個網站時顯示（SiteOnly.astro、PerSite.astro 用）。
+ * - `[data-site-card="id"]`：選了這個網站時加上強調外框（總覽頁的網站卡片用）。
+ */
+export function siteSelectionCss(): string {
+  const shown = selectedSiteSelectors((id) => `.site-only[data-site-only="${id}"]`);
+  const current = selectedSiteSelectors((id) => `[data-site-card="${id}"]`);
+  return [
+    '.site-only{display:none}',
+    // revert：div 回到 block、span 回到 inline，前後段落的間距照 Starlight 原本的規則。
+    `${shown.join(',')}{display:revert}`,
+    `${current.join(',')}{border-color:var(--sl-color-accent);box-shadow:0 0 0 1px var(--sl-color-accent)}`,
+  ].join('\n');
+}
+
+/**
+ * 在第一次繪製前設定 <html data-site>。順序：網址 ?site= → localStorage → 預設網站。
+ * 不在名單裡的 id 一律改用預設網站；localStorage 不能用（私密視窗、封鎖）時直接略過。
+ */
+export function siteInitScript(): string {
+  const ids = JSON.stringify(SITE_THEMES.map((s) => s.id));
+  const fallback = JSON.stringify(DEFAULT_SITE.id);
+  const key = JSON.stringify(SITE_STORAGE_KEY);
+  const param = JSON.stringify(SITE_URL_PARAM);
+  return `(function(){var ids=${ids},site=${fallback},key=${key};var fromUrl=null;try{fromUrl=new URLSearchParams(location.search).get(${param})}catch(e){}if(fromUrl!==null){if(ids.indexOf(fromUrl)>=0){site=fromUrl;try{localStorage.setItem(key,site)}catch(e){}}}else{try{var saved=localStorage.getItem(key);if(saved&&ids.indexOf(saved)>=0)site=saved}catch(e){}}document.documentElement.setAttribute('data-site',site)})();`;
+}
+
+/** Starlight `head` 選項用的兩個標籤。 */
+export function siteHeadTags(): { tag: 'script' | 'style'; content: string }[] {
+  return [
+    { tag: 'script', content: siteInitScript() },
+    { tag: 'style', content: siteSelectionCss() },
+  ];
+}
+
+/** 側欄「網站主題」→「各網站」的連結，一個網站一項。 */
+export function siteSidebarItems(): {
+  label: string;
+  link: string;
+  badge?: { text: string; variant: 'note' | 'caution' };
+}[] {
+  return SITE_THEMES.map((s) => ({
+    label: s.名稱,
+    link: sitePageUrl(s),
+    ...(s.isDefault
+      ? { badge: { text: '預設', variant: 'note' as const } }
+      : s.isDemo
+        ? { badge: { text: '示意', variant: 'caution' as const } }
+        : {}),
+  }));
+}

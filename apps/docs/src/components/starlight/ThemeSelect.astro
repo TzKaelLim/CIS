@@ -1,0 +1,28 @@
+---
+// 取代 Starlight 的 ThemeSelect：先放「網站主題」選單（設計示範），再放 Starlight 原本的
+// 淺色／深色選單。Starlight 在頁首和手機選單裡都用 ThemeSelect，所以兩處都會出現。
+import Default from '@astrojs/starlight/components/ThemeSelect.astro';
+import SiteSelect from '../prototype/SiteSelect.astro';
+---
+
+<div class="site-and-mode">
+  <SiteSelect />
+  <Default />
+</div>
+
+<style>
+  .site-and-mode {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 1rem;
+    min-inline-size: 0;
+  }
+  /* 手機選單：網站主題選單自己一行，名稱比較不會被截斷。 */
+  @media (max-width: 49.99rem) {
+    .site-and-mode {
+      flex: 1 1 100%;
+      padding-block: 0.5rem;
+    }
+  }
+</style>

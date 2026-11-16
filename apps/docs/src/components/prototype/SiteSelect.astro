@@ -1,0 +1,183 @@
+---
+// 設計示範：頁首的「網站主題」選單。選項由 SITE_THEMES 產生，新增網站就會多一個選項。
+//
+// 狀態放在 <html data-site="…">。第一次繪製前由 <head> 裡的 script 設好
+// （src/prototype/site-selection.ts 的 siteInitScript）；這裡只負責讓選單顯示同一個值，
+// 以及讀者改選時更新屬性、記住選擇。沒有 JavaScript 時選單停在預設網站，頁面也顯示預設網站。
+// 它只改變手冊「展示」的內容（色票、範例），不改變手冊本身的外觀。
+import { Icon } from '@astrojs/starlight/components';
+import { DEFAULT_SITE, SITE_THEMES, siteLabel } from '../../prototype/site-themes';
+import { SITE_STORAGE_KEY, SITE_URL_PARAM } from '../../prototype/site-selection';
+---
+
+<tc-site-select data-storage-key={SITE_STORAGE_KEY} data-url-param={SITE_URL_PARAM}>
+  <label class="site-select">
+    <span class="label-text">網站主題</span>
+    <span class="control">
+      <select autocomplete="off">
+        {
+          SITE_THEMES.map((site) => (
+            <option value={site.id} selected={site.id === DEFAULT_SITE.id}>
+              {siteLabel(site)}
+            </option>
+          ))
+        }
+      </select>
+      <Icon name="down-caret" class="caret" />
+    </span>
+  </label>
+</tc-site-select>
+
+<script>
+  class TcSiteSelect extends HTMLElement {
+    private select: HTMLSelectElement | null = null;
+
+    connectedCallback() {
+      this.select = this.querySelector('select');
+      if (!this.select) return;
+      syncSelects();
+      this.select.addEventListener('change', (event) => {
+        if (event.currentTarget instanceof HTMLSelectElement) {
+          applySite(event.currentTarget.value, this.dataset);
+        }
+      });
+    }
+  }
+
+  const knownIds = (): string[] => {
+    const select = document.querySelector<HTMLSelectElement>('tc-site-select select');
+    return select ? Array.from(select.options, (o) => o.value) : [];
+  };
+
+  /** 讓頁面上所有網站主題選單（頁首、手機選單）都顯示 <html data-site> 的值。 */
+  function syncSelects(): void {
+    const current = document.documentElement.dataset.site;
+    document.querySelectorAll<HTMLSelectElement>('tc-site-select select').forEach((select) => {
+      if (current && Array.from(select.options).some((o) => o.value === current)) {
+        select.value = current;
+      }
+    });
+  }
+
+  function applySite(id: string, config: DOMStringMap): void {
+    if (!knownIds().includes(id)) return;
+    document.documentElement.dataset.site = id;
+    try {
+      if (config.storageKey) localStorage.setItem(config.storageKey, id);
+    } catch {
+      // 私密視窗或封鎖網站資料時不能記住，但這一頁照樣切換。
+    }
+    // 網址上有 ?site= 時一併更新，否則重新整理會回到網址上的舊值。
+    const param = config.urlParam;
+    if (param) {
+      const url = new URL(location.href);
+      if (url.searchParams.has(param)) {
+        url.searchParams.set(param, id);
+        history.replaceState(history.state, '', url);
+      }
+    }
+    syncSelects();
+  }
+
+  // 從「上一頁」回來（bfcache）或在別的分頁改選時，跟著更新。
+  const restoreFromStorage = () => {
+    const el = document.querySelector<HTMLElement>('tc-site-select');
+    const key = el?.dataset.storageKey;
+    if (!key) return;
+    try {
+      const saved = localStorage.getItem(key);
+      const fromUrl = el?.dataset.urlParam
+        ? new URLSearchParams(location.search).get(el.dataset.urlParam)
+        : null;
+      if (fromUrl === null && saved && knownIds().includes(saved)) {
+        document.documentElement.dataset.site = saved;
+      }
+    } catch {
+      // 讀不到就維持目前的值。
+    }
+    syncSelects();
+  };
+  window.addEventListener('pageshow', (event) => {
+    if (event.persisted) restoreFromStorage();
+  });
+  window.addEventListener('storage', (event) => {
+    const key = document.querySelector<HTMLElement>('tc-site-select')?.dataset.storageKey;
+    if (event.key === key) restoreFromStorage();
+  });
+
+  customElements.define('tc-site-select', TcSiteSelect);
+</script>
+
+<style>
+  tc-site-select {
+    display: block;
+    min-inline-size: 0;
+    max-inline-size: 100%;
+  }
+  .site-select {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-inline-size: 0;
+    color: var(--sl-color-gray-1);
+  }
+  .label-text {
+    flex: 0 0 auto;
+    font-size: var(--sl-text-sm);
+    white-space: nowrap;
+  }
+  .control {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-inline-size: 0;
+  }
+  select {
+    appearance: none;
+    min-inline-size: 0;
+    /* 名稱太長時截斷並加上「…」；完整名稱在展開的清單裡看得到。 */
+    inline-size: 11rem;
+    max-inline-size: 100%;
+    padding-block: 0.35rem;
+    padding-inline: 0.6rem 1.75rem;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.4rem;
+    background-color: transparent;
+    color: inherit;
+    font: inherit;
+    font-size: var(--sl-text-sm);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+  }
+  select:hover {
+    border-color: var(--sl-color-gray-3);
+  }
+  select:focus-visible {
+    outline: 2px solid var(--sl-color-accent);
+    outline-offset: 2px;
+  }
+  option {
+    background-color: var(--sl-color-bg-nav);
+    color: var(--sl-color-gray-1);
+  }
+  .control :global(.caret) {
+    position: absolute;
+    inset-inline-end: 0.35rem;
+    font-size: 1.1rem;
+    pointer-events: none;
+  }
+  /* 手機選單裡空間比較寬，選單可以拉長。 */
+  @media (max-width: 49.99rem) {
+    tc-site-select {
+      flex: 1 1 100%;
+    }
+    .control {
+      flex: 1 1 auto;
+    }
+    select {
+      inline-size: 100%;
+    }
+  }
+</style>

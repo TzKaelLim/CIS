@@ -1,22 +1,19 @@
 ---
-// 設計示範：把迷你網頁依「網站 × 淺色/深色」排成一排。
-// 不給 siteIds 就畫出全部網站（新增網站會自動多兩格）。
+// 設計示範：一個網站主題的迷你網頁，淺色、深色並排（窄螢幕時上下排）。
+// 一次只畫一個網站；要跟著頁首選單變，請包在 PerSite 裡。
 import SampleUI from './SampleUI.astro';
-import { MODES, SITE_THEMES } from '../../prototype/site-themes';
-import './wide-content.css';
+import { MODES, getSite } from '../../prototype/site-themes';
 
 interface Props {
-  siteIds?: string[];
+  siteId: string;
 }
 
-const { siteIds } = Astro.props;
-const sites = siteIds ? SITE_THEMES.filter((s) => siteIds.includes(s.id)) : SITE_THEMES;
-const cells = sites.flatMap((site) => MODES.map((mode) => ({ siteId: site.id, mode })));
+const site = getSite(Astro.props.siteId);
 ---
 
 <div class="gallery not-content">
-  <div class="grid" data-cols={cells.length >= 4 ? 4 : 2}>
-    {cells.map((c) => <SampleUI siteId={c.siteId} mode={c.mode} />)}
+  <div class="grid">
+    {MODES.map((mode) => <SampleUI siteId={site.id} mode={mode} />)}
   </div>
 </div>
 
@@ -31,18 +28,8 @@ const cells = sites.flatMap((site) => MODES.map((mode) => ({ siteId: site.id, mo
     gap: 1rem;
     align-items: start;
   }
-  .grid[data-cols='4'] {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-  /* 4 欄 → 2 欄 → 1 欄 */
-  @container (max-width: 860px) {
-    .grid[data-cols='4'] {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
   @container (max-width: 460px) {
-    .grid,
-    .grid[data-cols='4'] {
+    .grid {
       grid-template-columns: minmax(0, 1fr);
     }
   }

@@ -1,14 +1,31 @@
 ---
-title: Theming（主題與深色模式）
-description: 深色模式如何運作——只覆寫語意色 token，元件透過 var() cascade 自動換色；含啟用方式、深色色票對照與擴充指引。
+title: 色彩模式（淺色／深色）
+description: 色彩模式（淺色／深色）如何運作——深色只覆寫語意色 token，元件透過 var() cascade 自動換色；含目前網站主題的色票、啟用方式與擴充指引。
 ---
 
 import Demo from '../../../components/Demo.astro';
 import ThemeSwatches from '../../../components/ThemeSwatches.astro';
+import PerSite from '../../../components/prototype/PerSite.astro';
+import CurrentSiteNote from '../../../components/prototype/CurrentSiteNote.astro';
+import ThemeColorTable from '../../../components/prototype/ThemeColorTable.astro';
 
-設計系統內建**淺色（預設）**與**深色**兩套主題。核心原則：**只有語意層（semantic）會換色**。
+設計系統內建**淺色（預設）**與**深色**兩種色彩模式。核心原則：**只有語意層（semantic）會換色**。
 primitive 純色票不可變，元件只引用語意 / 元件層 token，因此深色模式只需在一個 selector 內
 重新對應約 15 個語意色變數，整個元件庫就會透過 `var()` cascade 自動跟隨——**包含 Shadow DOM 內部**。
+
+「色彩模式」和「網站主題」是兩回事：網站主題決定是哪一個網站（慈濟入口網、慈濟環保網…），色彩模式決定淺色或深色，兩者可以自由組合。詳見[網站主題總覽](/themes/)。
+
+## 目前網站主題的色彩（淺色／深色）
+
+:::caution[設計示範（prototype）]
+這一段是設計示範：下表跟著頁首的「網站主題」選單變。環保網的顏色是示意值（非正式）。
+:::
+
+<CurrentSiteNote />
+
+每一列是一個顏色用途（語意色），左邊是淺色模式用的顏色，右邊是深色模式用的顏色。標「這個網站改過」的列，是這個網站主題和預設主題不同的地方。
+
+<PerSite>{(site) => <ThemeColorTable siteId={site.id} />}</PerSite>
 
 ## 啟用方式
 
@@ -38,7 +55,7 @@ primitive 純色票不可變，元件只引用語意 / 元件層 token，因此�
 </Demo>
 
 :::tip
-按右上角手冊主題鈕（或上方切換鈕），本頁所有範例會即時切換深淺。
+按頁首的淺色／深色選單（或上方切換鈕），本頁所有可互動範例會即時切換色彩模式。
 :::
 
 ## 運作原理：三層 cascade
@@ -74,4 +91,4 @@ primitive 純色票不可變，元件只引用語意 / 元件層 token，因此�
 
 引用語意色（`--tc-color-surface-default`、`--tc-color-text-default`、`--tc-color-brand-primary`…）
 而非 primitive 或寫死色碼，元件即自動支援深色。**勿**將 `color-mix(... , white)` 寫死白色作為底色，
-請改用 `var(--tc-color-surface-default)`，使色調隨主題調整。
+請改用 `var(--tc-color-surface-default)`，使色調隨色彩模式調整。

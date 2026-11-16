@@ -1,6 +1,6 @@
 ---
 // 設計示範：網站主題頁的共用版型（入口網、環保網都用這一個）。
-import { Badge } from '@astrojs/starlight/components';
+import { Badge, LinkButton } from '@astrojs/starlight/components';
 import ThemeGallery from './ThemeGallery.astro';
 import ThemeColorTable from './ThemeColorTable.astro';
 import ThemeDiff from './ThemeDiff.astro';
@@ -11,6 +11,7 @@ import {
   contrastChecks,
   getSite,
 } from '../../prototype/site-themes';
+import { SITE_URL_PARAM } from '../../prototype/site-selection';
 
 interface Props {
   siteId: string;
@@ -36,15 +37,21 @@ const mutedFails = checks.some((c) => c.說明.includes('次要文字') && !c.�
   </div>
   <p class="desc">{site.說明}</p>
   <p class="who"><strong>誰在用：</strong>{site.使用對象}</p>
+  <div class="apply">
+    <LinkButton href={`?${SITE_URL_PARAM}=${site.id}`} variant="secondary" icon="right-arrow">
+      在整份手冊套用這個網站主題
+    </LinkButton>
+    <span class="apply-note">手冊其他頁的色票與元件範例會換成{site.簡稱}的樣子；之後也可以在頁首的『網站主題』改回來。</span>
+  </div>
 </div>
 
 <h2 id="samples">淺色與深色</h2>
-<p>同一個迷你網頁，用這個主題的淺色、深色各畫一次。</p>
-<ThemeGallery siteIds={[site.id]} />
+<p>同一個迷你網頁，用這個網站主題的淺色、深色各畫一次。</p>
+<ThemeGallery siteId={site.id} />
 
 <h2 id="contrast">易讀性檢查</h2>
 <p>
-  文字和底色的「對比值」越高越好讀。一般大小的文字要 <strong>4.5 : 1</strong> 以上（WCAG 無障礙標準 AA 級）。「主色」的兩項和主題有關；「次要文字」是所有網站共用的正式顏色{mutedFails ? '，目前未達標，要另外處理；這不是主題造成的。' : '，不受主題影響。'}
+  文字和底色的「對比值」越高越好讀。一般大小的文字要 <strong>4.5 : 1</strong> 以上（WCAG 無障礙標準 AA 級）。「主色」的兩項和網站主題有關；「次要文字」是所有網站共用的正式顏色{mutedFails ? '，目前未達標，要另外處理；這不是網站主題造成的。' : '，不受網站主題影響。'}
 </p>
 <div class="table-wrap not-content">
   <table class="checks">
@@ -81,7 +88,7 @@ const mutedFails = checks.some((c) => c.說明.includes('次要文字') && !c.�
 
 <h2 id="colors">全部語意色</h2>
 <p>
-  「語意色」是依用途命名的顏色（例如「主色」「次要文字」），元件只認這些名字。主題做的事，就是決定每個名字在這個網站用哪個顏色。
+  「語意色」是依用途命名的顏色（例如「主色」「次要文字」），元件只認這些名字。網站主題做的事，就是決定每個名字在這個網站用哪個顏色。
 </p>
 <ThemeColorTable siteId={site.id} />
 
@@ -95,7 +102,7 @@ const mutedFails = checks.some((c) => c.說明.includes('次要文字') && !c.�
       <ThemeDiff siteId={site.id} />
       {site.示意色.length > 0 && (
         <p class="demo-note">
-          <strong>注意：</strong>{site.簡稱}用到的這幾個顏色（{site.示意色.join('、')}）目前<strong>不在基礎色票裡</strong>，是這個示範暫時自訂的示意值。若決定採用，要先把它們加進基礎色票（所有網站共用的那盒顏料），主題再從裡面挑；主題本身不新增顏色。
+          <strong>注意：</strong>{site.簡稱}用到的這幾個顏色（{site.示意色.join('、')}）目前<strong>不在基礎色票裡</strong>，是這個示範暫時自訂的示意值。若決定採用，要先把它們加進基礎色票（所有網站共用的那盒顏料），網站主題再從裡面挑；網站主題本身不新增顏色。
         </p>
       )}
     </>
@@ -105,12 +112,12 @@ const mutedFails = checks.some((c) => c.說明.includes('次要文字') && !c.�
 <h2 id="usage">如何使用</h2>
 <ul>
   <li>
-    <strong>工程師：</strong>在網頁最外層的 <code>&lt;html&gt;</code> 加上 <code>data-site="{site.id}"</code>，元件就會換成這個網站的顏色；淺色／深色沿用現有的 <code>data-theme="light"</code>／<code>"dark"</code>（不寫時跟著訪客的裝置設定）。例如 <code>&lt;html data-site="{site.id}"&gt;</code>，深色再加 <code>data-theme="dark"</code>。<Badge text="提案" variant="caution" /> 屬性名稱尚未定案。
+    <strong>工程師：</strong><Badge text="提案" variant="caution" /> 在網頁最外層的 <code>&lt;html&gt;</code> 加上 <code>data-site="{site.id}"</code>，元件就會換成這個網站的顏色；色彩模式（淺色／深色）沿用現有的 <code>data-theme="light"</code>／<code>"dark"</code>（不寫時跟著訪客的裝置設定）。兩者可以自由組合，例如 <code>&lt;html data-site="{site.id}" data-theme="dark"&gt;</code> 就是{site.簡稱}的深色。屬性名稱是工程細節，還沒定案。
   </li>
   {
     site.isDefault ? (
       <li>
-        <strong>共同編輯者（設計、行政）：</strong>{site.簡稱}是預設主題，改它的顏色，所有沒有自己主題的網站都會一起變。要改請跟 Claude 說：「預設主題的主色改成…」，Claude 會先列出會受影響的網站給你確認。
+        <strong>共同編輯者（設計、行政）：</strong>{site.簡稱}是預設主題，改它的顏色，所有沒有自己網站主題的網站都會一起變。要改請跟 Claude 說：「預設主題的主色改成…」，Claude 會先列出會受影響的網站給你確認。
       </li>
     ) : (
       <li>
@@ -137,6 +144,17 @@ const mutedFails = checks.some((c) => c.說明.includes('次要文字') && !c.�
     font-size: 1.25rem;
     font-weight: 700;
     color: var(--sl-color-white);
+  }
+  .apply {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    margin-block-start: 0.85rem;
+  }
+  .apply-note {
+    font-size: 0.8rem;
+    color: var(--sl-color-gray-3);
   }
   .desc,
   .who {

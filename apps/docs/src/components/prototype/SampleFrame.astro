@@ -13,7 +13,7 @@ const site = getSite(siteId);
 const label = `${site.簡稱}・${MODE_LABEL[mode]}`;
 ---
 
-<figure class="sample-frame not-content" data-site={site.id} data-mode={mode}>
+<figure class="sample-frame not-content" data-sample-site={site.id} data-mode={mode}>
   <figcaption class="label">
     <span class="dot" style={`background:${site[mode]['brand.primary']}`}></span>
     {label}
