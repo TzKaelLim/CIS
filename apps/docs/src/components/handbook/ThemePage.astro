@@ -117,11 +117,11 @@ const mutedFails = checks.some((c) => c.說明.includes('次要文字') && !c.�
   {
     site.isDefault ? (
       <li>
-        <strong>美編（設計）、廠商：</strong>{site.簡稱}是預設網站主題。改它的顏色，所有網站沒有自己改過的地方都會一起變。跟 Claude 說要改什麼，Claude 會先列出用到這個顏色的檔案和頁面，請你確認。
+        <strong>美編（設計）、致遠（廠商）：</strong>{site.簡稱}是預設網站主題。改它的顏色，所有網站沒有自己改過的地方都會一起變。跟 Claude 說要改什麼，Claude 會先列出用到這個顏色的檔案和頁面，請你確認。
       </li>
     ) : (
       <li>
-        <strong>美編（設計）、廠商：</strong>網站主題的正式檔案還沒有實作。想改{site.簡稱}的顏色時，跟 Claude 說要改什麼，Claude 會先停下來，請工程決定做法（見<a href="/docs/contributing/">如何參與修改</a>）。
+        <strong>美編（設計）、致遠（廠商）：</strong>網站主題的正式檔案還沒有實作。想改{site.簡稱}的顏色時，跟 Claude 說要改什麼，Claude 會先停下來，請工程決定做法（見<a href="/docs/contributing/">如何參與修改</a>）。
       </li>
     )
   }
