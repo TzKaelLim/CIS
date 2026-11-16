@@ -1,0 +1,46 @@
+---
+title: 網站主題總覽
+description: 一套 UIKit、多個網站主題——兩個網站放在一起看，哪些顏色相同、哪些不同。
+sidebar:
+  label: 總覽
+  order: 1
+tableOfContents: false
+---
+
+import LayerDiagram from '../../../components/prototype/LayerDiagram.astro';
+import ThemeMatrix from '../../../components/prototype/ThemeMatrix.astro';
+import ThemeGallery from '../../../components/prototype/ThemeGallery.astro';
+
+:::caution[設計示範（prototype）]
+這一區是設計示範，用來討論「多個網站共用一套 UIKit」會長什麼樣子。環保網的顏色是示意值，網站名稱與做法都還待核定。
+:::
+
+## 一套 UIKit、多個主題
+
+所有慈濟網站共用同一套 UIKit：基礎的色票、字級、間距只有一份，按鈕、卡片等元件也只有一份。
+每個網站只多一份自己的「主題」，決定主色、文字、背景、邊框這些用途各用哪個顏色。
+主題和亮色／深色是兩件獨立的事：每個主題都同時有亮色和深色兩組顏色。
+
+<LayerDiagram />
+
+## 各網站的顏色對照
+
+下表是最常被注意到的幾個顏色。每格是色塊加色碼；欄位依網站和亮色、深色排列。
+
+<ThemeMatrix />
+
+## 同一個元件，不同網站
+
+同一個迷你網頁（頂部列、按鈕、連結、文章卡片、成功訊息），元件完全相同，只是換了主題。
+想看單一網站的完整色表，請到 [慈濟入口網](/themes/portal/) 或 [慈濟環保網](/themes/eco/)。
+
+<ThemeGallery />
+
+## 什麼不是主題
+
+:::note[這些情況不要開新主題]
+
+- **版面或樣式不同**（例如按鈕要圓角版和方角版）→ 這是同一個元件的**變體**，所有網站都能挑著用。
+- **要淘汰舊設計**（例如新版卡片取代舊版）→ 這是元件的**版本**，只會有 v1、v2 這樣的升級，不會每個網站各一份。
+- **主題只管顏色**：只有「用途 → 顏色」的對應會因網站而不同。
+:::

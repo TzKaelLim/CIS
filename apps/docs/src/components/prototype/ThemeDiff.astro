@@ -1,0 +1,92 @@
+---
+// 設計示範：一個網站主題和預設主題不一樣的顏色（只列有差異的 token）。
+import ColorChip from './ColorChip.astro';
+import { DEFAULT_SITE, MODE_LABEL, getSite, tokenLabel, varName } from '../../prototype/site-themes';
+
+interface Props {
+  siteId: string;
+}
+
+const site = getSite(Astro.props.siteId);
+---
+
+{
+  site.diff.length === 0 ? (
+    <p>這個主題的顏色和預設主題（{DEFAULT_SITE.名稱}）完全相同。</p>
+  ) : (
+    <div class="table-wrap not-content">
+      <table class="diff">
+        <thead>
+          <tr>
+            <th scope="col">用途</th>
+            <th scope="col">模式</th>
+            <th scope="col">預設值（{DEFAULT_SITE.簡稱}）</th>
+            <th scope="col" aria-hidden="true" />
+            <th scope="col">本主題值（{site.簡稱}）</th>
+          </tr>
+        </thead>
+        <tbody>
+          {site.diff.map((d) => (
+            <tr>
+              <th scope="row">
+                {tokenLabel(d.token)}
+                <code>{varName(d.token)}</code>
+              </th>
+              <td>{MODE_LABEL[d.mode]}</td>
+              <td>
+                <ColorChip hex={d.預設值} />
+              </td>
+              <td class="arrow" aria-hidden="true">
+                →
+              </td>
+              <td>
+                <ColorChip hex={d.本主題值} />
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
+<style>
+  .table-wrap {
+    overflow-x: auto;
+    margin-block: 1rem;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.5rem;
+  }
+  .diff {
+    border-collapse: collapse;
+    inline-size: 100%;
+    min-inline-size: 560px;
+    font-size: 0.82rem;
+  }
+  th,
+  td {
+    padding: 0.4rem 0.65rem;
+    text-align: start;
+    border-block-end: 1px solid var(--sl-color-gray-6);
+    vertical-align: middle;
+  }
+  thead th {
+    background: var(--sl-color-gray-6);
+    font-weight: 600;
+  }
+  tbody th {
+    font-weight: 500;
+  }
+  code {
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 400;
+    background: none;
+    padding: 0;
+    color: var(--sl-color-gray-3);
+  }
+  .arrow {
+    color: var(--sl-color-gray-3);
+    padding-inline: 0;
+  }
+</style>

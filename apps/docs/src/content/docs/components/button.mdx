@@ -5,6 +5,8 @@ description: tc-button — 主要按鈕，filled / outlined / tonal 三種變體
 
 import Demo from '../../../components/Demo.astro';
 import PropsTable from '../../../components/PropsTable.astro';
+import SiteButtonTabs from '../../../components/prototype/SiteButtonTabs.astro';
+import { LinkButton } from '@astrojs/starlight/components';
 
 `<tc-button>` 是主要按鈕，提供三種變體與 form-associated 表單提交。下方為**可互動的真實元件**：
 
@@ -14,6 +16,22 @@ import PropsTable from '../../../components/PropsTable.astro';
   <tc-button variant="tonal">更多</tc-button>
   <tc-button disabled>停用</tc-button>
 </Demo>
+
+## 在各網站的樣子
+
+:::caution[設計示範（prototype）]
+這一段是設計示範：同一個按鈕在不同網站主題下的顏色。環保網的顏色是示意值，網站名稱與做法都還待核定。
+:::
+
+元件只有一份，每個網站只換顏色。點分頁切換網站，每個網站都並排亮色和深色（選過的網站會在其他頁面同步）：
+
+<SiteButtonTabs />
+
+<LinkButton href="/storybook/?path=/docs/components-button--docs" variant="secondary" icon="external">
+  在 Storybook 開啟
+</LinkButton>
+
+這個連結在正式部署的網站才有效；在本機預覽手冊時，Storybook 不在同一個網址下，會打不開。
 
 ## 用法
 

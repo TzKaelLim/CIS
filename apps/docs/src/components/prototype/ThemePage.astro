@@ -1,0 +1,172 @@
+---
+// 設計示範：網站主題頁的共用版型（入口網、環保網都用這一個）。
+import { Badge } from '@astrojs/starlight/components';
+import ThemeGallery from './ThemeGallery.astro';
+import ThemeColorTable from './ThemeColorTable.astro';
+import ThemeDiff from './ThemeDiff.astro';
+import ColorChip from './ColorChip.astro';
+import {
+  DEFAULT_SITE,
+  MODE_LABEL,
+  contrastChecks,
+  getSite,
+} from '../../prototype/site-themes';
+
+interface Props {
+  siteId: string;
+}
+
+const site = getSite(Astro.props.siteId);
+const checks = contrastChecks(site);
+const mode = site.isDemo ? 'dark' : 'light';
+---
+
+<div class="theme-header not-content">
+  <div class="name">
+    <span class="title">{site.名稱}</span>
+    {
+      site.isDefault ? (
+        <Badge text="預設" variant="note" />
+      ) : site.isDemo ? (
+        <Badge text="示意" variant="caution" />
+      ) : (
+        <Badge text="網站主題" variant="default" />
+      )
+    }
+  </div>
+  <p class="desc">{site.說明}</p>
+  <p class="who"><strong>誰在用：</strong>{site.使用對象}</p>
+</div>
+
+<h2 id="samples">亮色與深色</h2>
+<p>同一個迷你網頁，用這個主題的亮色、深色各畫一次。</p>
+<ThemeGallery siteIds={[site.id]} />
+
+<h2 id="contrast">易讀性檢查</h2>
+<p>
+  文字和底色的「對比值」越高越好讀。一般大小的文字要 <strong>4.5 : 1</strong> 以上（WCAG 無障礙標準 AA 級）。
+</p>
+<div class="table-wrap not-content">
+  <table class="checks">
+    <thead>
+      <tr>
+        <th scope="col">檢查項目</th>
+        <th scope="col">模式</th>
+        <th scope="col">文字</th>
+        <th scope="col">底色</th>
+        <th scope="col">對比值</th>
+      </tr>
+    </thead>
+    <tbody>
+      {
+        checks.map((c) => (
+          <tr>
+            <th scope="row">{c.說明}</th>
+            <td>{MODE_LABEL[c.mode]}</td>
+            <td>
+              <ColorChip hex={c.前景} />
+            </td>
+            <td>
+              <ColorChip hex={c.背景} />
+            </td>
+            <td class:list={['ratio', { fail: !c.通過 }]}>
+              {c.ratio.toFixed(2)} : 1 {c.通過 ? '通過' : '未達 4.5'}
+            </td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</div>
+
+<h2 id="colors">全部語意色</h2>
+<p>
+  「語意色」是依用途命名的顏色（例如「主色」「次要文字」），元件只認這些名字。
+  主題做的事，就是決定每個名字在這個網站用哪個顏色。
+</p>
+<ThemeColorTable siteId={site.id} />
+
+{
+  !site.isDefault && (
+    <>
+      <h2 id="diff">與預設主題的差異</h2>
+      <p>
+        只列出和預設主題（{DEFAULT_SITE.名稱}）不同的顏色；沒列出的全部沿用預設主題。
+        {site.isDemo && '環保網的綠色是示意值（非正式），只為了示範效果。'}
+      </p>
+      <ThemeDiff siteId={site.id} />
+    </>
+  )
+}
+
+<h2 id="usage">如何使用</h2>
+<ul>
+  <li>
+    <strong>工程師：</strong>在網頁最外層的 <code>&lt;html&gt;</code> 標上網站和模式，例如
+    <code>&lt;html data-theme="{site.id}" data-mode="{mode}"&gt;</code>
+    ，元件就會自動換成這個主題的顏色。<Badge text="提案" variant="caution" />
+    屬性名稱與寫法尚未定案。
+  </li>
+  <li>
+    <strong>共編者（設計、行政）：</strong>直接跟 Claude 說：「{site.簡稱}的主色改成…」，
+    Claude 會改好顏色、更新這一頁，並附上預覽讓你確認。
+  </li>
+</ul>
+
+<style>
+  .theme-header {
+    padding: 1rem 1.15rem;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.6rem;
+    margin-block: 1rem 1.5rem;
+  }
+  .name {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+  .title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--sl-color-white);
+  }
+  .desc,
+  .who {
+    margin: 0.5rem 0 0;
+    color: var(--sl-color-gray-2);
+  }
+  .table-wrap {
+    overflow-x: auto;
+    margin-block: 1rem;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.5rem;
+  }
+  .checks {
+    border-collapse: collapse;
+    inline-size: 100%;
+    min-inline-size: 560px;
+    font-size: 0.82rem;
+  }
+  .checks th,
+  .checks td {
+    padding: 0.4rem 0.65rem;
+    text-align: start;
+    border-block-end: 1px solid var(--sl-color-gray-6);
+    vertical-align: middle;
+  }
+  .checks thead th {
+    background: var(--sl-color-gray-6);
+    font-weight: 600;
+  }
+  .checks tbody th {
+    font-weight: 500;
+  }
+  .ratio {
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .ratio.fail {
+    color: var(--sl-color-red);
+  }
+</style>

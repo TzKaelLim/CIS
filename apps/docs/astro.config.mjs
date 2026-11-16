@@ -11,8 +11,10 @@ export default defineConfig({
       // pages render with the real design tokens.
       customCss: ['../../packages/tokens/dist/tokens.css'],
       sidebar: [
-        { label: 'Foundations', autogenerate: { directory: 'foundations' } },
-        { label: 'Components', autogenerate: { directory: 'components' } },
+        { label: '基礎 Foundations', autogenerate: { directory: 'foundations' } },
+        // 設計示範（prototype）：每個網站一份主題，頁面順序由各頁的 sidebar.order 決定。
+        { label: '網站主題', autogenerate: { directory: 'themes' } },
+        { label: '元件 Components', autogenerate: { directory: 'components' } },
       ],
     }),
   ],
