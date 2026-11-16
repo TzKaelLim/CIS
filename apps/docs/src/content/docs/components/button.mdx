@@ -17,21 +17,23 @@ import { LinkButton } from '@astrojs/starlight/components';
   <tc-button disabled>停用</tc-button>
 </Demo>
 
+<LinkButton href="/storybook/?path=/docs/components-button--docs" variant="secondary" icon="external">
+  在 Storybook 開啟
+</LinkButton>
+
+Storybook 是工程師逐一檢視元件各種狀態的工具網站，目前只有預設主題（入口網）的淺色和深色。它還沒有和這本手冊放在同一個網址上線，所以現在點了會找不到頁面；上線位置確定後會更新這個連結。
+
 ## 在各網站的樣子
 
 :::caution[設計示範（prototype）]
 這一段是設計示範：同一個按鈕在不同網站主題下的顏色。環保網的顏色是示意值，網站名稱與做法都還待核定。
 :::
 
-元件只有一份，每個網站只換顏色。點分頁切換網站，每個網站都並排亮色和深色（選過的網站會在其他頁面同步）：
+上方可以點的按鈕是真正的元件，用的是預設主題（入口網），會跟著手冊右上角的淺色／深色切換；下面的分頁則是固定配色的示意圖，用來比較不同網站。
+
+元件只有一份，每個網站只換顏色。點上方分頁切換網站；每個分頁左邊是淺色、右邊是深色。你選的網站會被記住，下次打開這一頁時會直接顯示同一個網站。
 
 <SiteButtonTabs />
-
-<LinkButton href="/storybook/?path=/docs/components-button--docs" variant="secondary" icon="external">
-  在 Storybook 開啟
-</LinkButton>
-
-這個連結在正式部署的網站才有效；在本機預覽手冊時，Storybook 不在同一個網址下，會打不開。
 
 ## 用法
 

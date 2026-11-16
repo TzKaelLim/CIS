@@ -1,0 +1,48 @@
+---
+// 設計示範：總覽頁開頭「先講結論」的一段話，數字和網站名稱都由資料產生，
+// 新增網站時不必手改。
+import {
+  DEFAULT_SITE,
+  SEMANTIC_TOKENS,
+  SITE_THEMES,
+  tokenLabel,
+} from '../../prototype/site-themes';
+
+const others = SITE_THEMES.filter((s) => !s.isDefault);
+const changedByAny = new Set(others.flatMap((s) => s.changed));
+const unchangedCount = SEMANTIC_TOKENS.length - changedByAny.size;
+/** 讀者最在意的幾個中性色；只列真的沒被任何主題改過的。 */
+const NEUTRALS = ['text.default', 'surface.default', 'border.default'];
+const sharedNeutrals = NEUTRALS.filter((t) => !changedByAny.has(t)).map(
+  (t) => tokenLabel(t).replace(/（.*）$/, ''),
+);
+const siteName = (s: (typeof SITE_THEMES)[number]) => (s.isDemo ? `${s.簡稱}（示意）` : s.簡稱);
+const hues = SITE_THEMES.map((s) => `${siteName(s)}是${s.色系}`).join('，');
+const counts = others.map((s) => `${siteName(s)}改了 ${s.changed.length} 個`).join('、');
+const neutrals = sharedNeutrals.length > 0 ? `（包括${sharedNeutrals.join('、')}）` : '';
+---
+
+<div class="summary not-content">
+  <p>
+    <strong>先講結論：</strong>{SITE_THEMES.length} 個網站用的是同一套按鈕、卡片和版面，只差在「品牌相關」的顏色：{hues}。
+  </p>
+  <p>
+    全部 {SEMANTIC_TOKENS.length} 個顏色用途裡，{counts}；其餘 {unchangedCount} 個{neutrals}和{DEFAULT_SITE.簡稱}完全一樣。想先看畫面，請跳到〔<a href="#同一個元件不同網站">同一個元件，不同網站</a>〕。
+  </p>
+</div>
+
+<style>
+  .summary {
+    padding: 0.85rem 1.1rem;
+    border: 1px solid var(--sl-color-accent);
+    border-radius: 0.6rem;
+    background: var(--sl-color-accent-low);
+    color: var(--sl-color-white);
+  }
+  .summary p {
+    margin: 0;
+  }
+  .summary p + p {
+    margin-block-start: 0.5rem;
+  }
+</style>

@@ -1,7 +1,7 @@
 // 設計示範（prototype）：「一套 UIKit、多個網站主題」的資料。
 //
 // 每個網站一筆 SiteTheme。預設主題（慈濟入口網）的值在建置時直接從真正的 token
-// 原始檔（primitive + 亮色語意 + 深色覆寫）解析成色碼；其他網站只寫「要改哪些語意色」，
+// 原始檔（primitive + 淺色語意 + 深色覆寫）解析成色碼；其他網站只寫「要改哪些語意色」，
 // 其餘全部沿用預設主題。新增第三個網站 = 在 SITE_THEMES 裡多加一筆 defineSite(...)。
 //
 // 這裡不修改 packages/tokens：示範主題需要的額外綠色階寫在 DEMO_PRIMITIVES，
@@ -12,11 +12,11 @@ import darkJson from '../../../../packages/tokens/src/themes/dark/color.tokens.j
 
 export type Mode = 'light' | 'dark';
 export const MODES: readonly Mode[] = ['light', 'dark'];
-export const MODE_LABEL: Record<Mode, string> = { light: '亮色', dark: '深色' };
+export const MODE_LABEL: Record<Mode, string> = { light: '淺色', dark: '深色' };
 
 /** 語意 token 名稱（不含 `color.` 前綴），例如 `brand.primary`。 */
 export type TokenName = string;
-/** 一個模式（亮色或深色）下，每個語意 token 對應的實際色碼。 */
+/** 一個模式（淺色或深色）下，每個語意 token 對應的實際色碼。 */
 export type SemanticMap = Readonly<Record<TokenName, string>>;
 
 export interface TokenDiff {
@@ -31,6 +31,8 @@ export interface SiteTheme {
   名稱: string;
   /** 側欄與標籤用的短名稱，例如「入口網」。 */
   簡稱: string;
+  /** 一句話描述主色，例如「藍色系」。 */
+  色系: string;
   說明: string;
   /** 哪些網站或單位使用這個主題。 */
   使用對象: string;
@@ -40,18 +42,22 @@ export interface SiteTheme {
   isDefault: boolean;
   light: SemanticMap;
   dark: SemanticMap;
-  /** 與預設主題解析後色碼不同的 token（亮色、深色分開列）。 */
+  /** 與預設主題解析後色碼不同的 token（淺色、深色分開列）。 */
   diff: readonly TokenDiff[];
+  /** 改過的 token（淺色、深色合併、不重複），順序依照原始檔。 */
+  changed: readonly TokenName[];
+  /** 用到、但不在正式基礎色票裡的示意色碼（DEMO_PRIMITIVES）。 */
+  示意色: readonly string[];
 }
 
 /** 每個語意 token 的中文用途，給非工程背景的讀者看。 */
 export const TOKEN_LABEL: Record<TokenName, string> = {
   'brand.primary': '主色',
-  'brand.primary-hover': '主色 hover（滑鼠移上去時）',
-  'brand.surface': '品牌底色（淡色區塊）',
-  'brand.surface-hover': '品牌底色 hover',
+  'brand.primary-hover': '主色（滑鼠移上時；連結文字也用它）',
+  'brand.surface': '品牌底色（襯在內容後的品牌色塊）',
+  'brand.surface-hover': '品牌底色（滑鼠移上時）',
   'neutral.surface': '中性底色',
-  'neutral.surface-hover': '中性底色 hover',
+  'neutral.surface-hover': '中性底色（滑鼠移上時）',
   'text.default': '文字',
   'text.muted': '次要文字',
   'text.disabled': '停用文字',
@@ -119,12 +125,12 @@ function semanticRefs(tree: JsonTree): Record<TokenName, string> {
 
 const DEFAULT_REFS: Record<Mode, Record<TokenName, string>> = {
   light: semanticRefs(lightJson as JsonTree),
-  // 深色只覆寫一部分；沒寫到的（例如 feedback.info）沿用亮色的參照，
+  // 深色只覆寫一部分；沒寫到的（例如 feedback.info）沿用淺色的參照，
   // 但參照會在深色的語意表裡重新解析，所以 info 仍會跟著深色主色走。
   dark: { ...semanticRefs(lightJson as JsonTree), ...semanticRefs(darkJson as JsonTree) },
 };
 
-/** 全部語意 token，順序依照亮色原始檔。 */
+/** 全部語意 token，順序依照淺色原始檔。 */
 export const SEMANTIC_TOKENS: readonly TokenName[] = Object.keys(DEFAULT_REFS.light);
 
 /** 把一個模式的參照表解析成色碼。參照可以指向 primitive，也可以指向另一個語意 token。 */
@@ -153,6 +159,7 @@ interface SiteInput {
   id: string;
   名稱: string;
   簡稱: string;
+  色系: string;
   說明: string;
   使用對象: string;
   isDemo: boolean;
@@ -168,10 +175,13 @@ const DEFAULT_RESOLVED: Record<Mode, SemanticMap> = {
 function defineSite(input: SiteInput, isDefault = false): SiteTheme {
   const resolved = {} as Record<Mode, SemanticMap>;
   const diff: TokenDiff[] = [];
+  const demoHexes = new Set<string>();
   for (const mode of MODES) {
     const overrides = input.overrides?.[mode] ?? {};
-    for (const token of Object.keys(overrides)) {
+    for (const [token, ref] of Object.entries(overrides)) {
       if (!(token in DEFAULT_REFS[mode])) throw new Error(`${input.id}：沒有語意 token ${token}`);
+      const path = ref.slice(1, -1);
+      if (path in DEMO_PRIMITIVES) demoHexes.add(DEMO_PRIMITIVES[path].toUpperCase());
     }
     resolved[mode] = resolveMode({ ...DEFAULT_REFS[mode], ...overrides });
     for (const token of SEMANTIC_TOKENS) {
@@ -180,10 +190,12 @@ function defineSite(input: SiteInput, isDefault = false): SiteTheme {
       if (before !== after) diff.push({ token, mode, 預設值: before, 本主題值: after });
     }
   }
+  const changedSet = new Set(diff.map((d) => d.token));
   return {
     id: input.id,
     名稱: input.名稱,
     簡稱: input.簡稱,
+    色系: input.色系,
     說明: input.說明,
     使用對象: input.使用對象,
     isDemo: input.isDemo,
@@ -191,6 +203,8 @@ function defineSite(input: SiteInput, isDefault = false): SiteTheme {
     light: resolved.light,
     dark: resolved.dark,
     diff,
+    changed: SEMANTIC_TOKENS.filter((token) => changedSet.has(token)),
+    示意色: [...demoHexes],
   };
 }
 
@@ -200,8 +214,9 @@ export const SITE_THEMES: readonly SiteTheme[] = [
       id: 'portal',
       名稱: '慈濟入口網',
       簡稱: '入口網',
-      說明: '預設主題。顏色直接取自 UIKit 正式的設計 token，其他網站沒有特別指定的顏色都沿用這一套。',
-      使用對象: '慈濟基金會官方入口網站，以及還沒有自己主題的網站。',
+      色系: '藍色系',
+      說明: '預設主題。顏色直接取自 UIKit 正式的色彩設定（設計 token：工程師用的顏色名稱表）；其他網站沒有特別指定的顏色，都沿用這一套。',
+      使用對象: '（假設）慈濟基金會官方入口網站，以及還沒有自己主題的網站。名稱待核定。',
       isDemo: false,
     },
     true,
@@ -210,6 +225,7 @@ export const SITE_THEMES: readonly SiteTheme[] = [
     id: 'eco',
     名稱: '慈濟環保網',
     簡稱: '環保網',
+    色系: '綠色系',
     說明: '示意主題：把主色換成綠色系，用來說明「同一套元件，換一組語意色」的效果。顏色是示意值（非正式）。',
     使用對象: '（假設）慈濟環保推廣相關網站。實際名稱與是否採用待核定。',
     isDemo: true,
@@ -301,6 +317,8 @@ export function contrastChecks(site: SiteTheme): ContrastCheck[] {
   const pairs: [string, TokenName, TokenName][] = [
     ['主色按鈕上的文字', 'text.on-brand', 'brand.primary'],
     ['背景上的主色文字', 'brand.primary', 'surface.default'],
+    // 次要文字是所有網站共用的正式 token，不是主題造成的；照實列出，避免讓人以為整頁都合格。
+    ['背景上的次要文字（所有網站共用）', 'text.muted', 'surface.default'],
   ];
   return MODES.flatMap((mode) =>
     pairs.map(([說明, fg, bg]) => {

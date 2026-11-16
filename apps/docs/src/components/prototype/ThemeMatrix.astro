@@ -1,5 +1,5 @@
 ---
-// 設計示範：各網站主要語意色的對照表。欄 = 網站 × 亮色/深色（由 SITE_THEMES 產生），
+// 設計示範：各網站主要語意色的對照表。欄 = 網站 × 淺色/深色（由 SITE_THEMES 產生），
 // 列 = 幾個最常被注意到的顏色。所有網站都一樣的列會變淡並標「相同」。
 import ColorChip from './ColorChip.astro';
 import {
@@ -14,7 +14,7 @@ import './wide-content.css';
 
 const ROWS: { label: string; token: TokenName }[] = [
   { label: '主色', token: 'brand.primary' },
-  { label: '主色 hover', token: 'brand.primary-hover' },
+  { label: '主色（滑鼠移上、連結）', token: 'brand.primary-hover' },
   { label: '品牌底色', token: 'brand.surface' },
   { label: '文字', token: 'text.default' },
   { label: '次要文字', token: 'text.muted' },
@@ -22,6 +22,11 @@ const ROWS: { label: string; token: TokenName }[] = [
   { label: '邊框', token: 'border.default' },
   { label: '焦點框', token: 'border.focus' },
 ];
+
+const others = SITE_THEMES.filter((s) => !s.isDefault);
+const changedNote = others.length
+  ? `；${others.map((s) => `${s.簡稱}一共改了 ${s.changed.length} 個`).join('、')}`
+  : '';
 
 const rows = ROWS.map((row) => ({
   ...row,
@@ -80,7 +85,7 @@ const rows = ROWS.map((row) => ({
   </table>
 </div>
 <p class="matrix-note">
-  標「相同」的列：所有網站都用同一個顏色（主題沒有改它）。顏色有差異的列才是各網站的「個性」。
+  標「相同」的列：所有網站都用同一個顏色（主題沒有改它）。顏色有差異的列才是各網站的「個性」。這張表只列最常見的 {ROWS.length} 個顏色{changedNote}，完整清單見各網站頁的「與預設主題的差異」。
 </p>
 
 <style>
@@ -133,6 +138,18 @@ const rows = ROWS.map((row) => ({
     font-weight: 600;
     min-inline-size: 9rem;
   }
+  /* 手機上左右捲動時，第一欄（顏色用途）固定在左邊，才看得出每列是什麼。 */
+  tbody .name {
+    position: sticky;
+    inset-inline-start: 0;
+    z-index: 1;
+    background: var(--sl-color-bg);
+  }
+  thead .corner {
+    position: sticky;
+    inset-inline-start: 0;
+    z-index: 2;
+  }
   .name .label {
     margin-inline-end: 0.35rem;
   }
@@ -154,7 +171,7 @@ const rows = ROWS.map((row) => ({
     color: var(--sl-color-gray-2);
   }
   tr.same td {
-    opacity: 0.45;
+    opacity: 0.6;
   }
   tr.same .label {
     color: var(--sl-color-gray-3);

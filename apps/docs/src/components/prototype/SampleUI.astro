@@ -1,5 +1,5 @@
 ---
-// 設計示範：一個迷你網頁（頂部列、按鈕、連結、文章卡片、成功訊息），
+// 設計示範：一個迷你網頁（頁首、按鈕、連結、文章卡片、成功訊息），
 // 用指定網站主題的固定色碼畫出來。配色對應真正元件 token 的用法：
 // 按鈕 = button.*、連結 = link.fg（主色 hover）、文章卡片 = article-card.*。
 import SampleFrame from './SampleFrame.astro';
@@ -32,7 +32,7 @@ const site = getSite(siteId);
       <div class="card">
         <div class="headline">社區志工淨灘，一起守護海岸</div>
         <p class="excerpt">週末上午集合，現場提供手套與分類袋，親子都能參加。</p>
-        <div class="meta">2026-11-16・活動報導</div>
+        <div class="meta">2026/11/16・活動報導</div>
       </div>
       <div class="success" role="status">
         <span class="check" aria-hidden="true"></span>

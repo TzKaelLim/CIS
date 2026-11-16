@@ -1,5 +1,5 @@
 ---
-// 設計示範：一個網站主題下的按鈕（filled / outlined / tonal），亮色、深色並排。
+// 設計示範：一個網站主題下的按鈕（filled / outlined / tonal），淺色、深色並排。
 // 配色照 button.tokens.json：filled = 主色底＋主色上的文字；outlined = 主色框線與文字；
 // tonal = 品牌底色＋主色文字。
 import SampleFrame from './SampleFrame.astro';
@@ -22,9 +22,9 @@ const site = getSite(Astro.props.siteId);
           <span class="btn tonal">更多</span>
         </div>
         <div class="names" aria-hidden="true">
-          <span>filled</span>
-          <span>outlined</span>
-          <span>tonal</span>
+          <span>實心 filled</span>
+          <span>外框 outlined</span>
+          <span>淺底 tonal</span>
         </div>
       </SampleFrame>
     ))
@@ -50,6 +50,7 @@ const site = getSite(Astro.props.siteId);
     padding: 0.2rem 0.85rem 0.8rem;
     font-size: 0.68rem;
     color: var(--p-text-muted);
+    text-align: center;
   }
   .btn {
     display: inline-flex;

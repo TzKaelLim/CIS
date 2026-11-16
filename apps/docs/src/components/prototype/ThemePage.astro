@@ -18,7 +18,7 @@ interface Props {
 
 const site = getSite(Astro.props.siteId);
 const checks = contrastChecks(site);
-const mode = site.isDemo ? 'dark' : 'light';
+const mutedFails = checks.some((c) => c.說明.includes('次要文字') && !c.通過);
 ---
 
 <div class="theme-header not-content">
@@ -38,13 +38,13 @@ const mode = site.isDemo ? 'dark' : 'light';
   <p class="who"><strong>誰在用：</strong>{site.使用對象}</p>
 </div>
 
-<h2 id="samples">亮色與深色</h2>
-<p>同一個迷你網頁，用這個主題的亮色、深色各畫一次。</p>
+<h2 id="samples">淺色與深色</h2>
+<p>同一個迷你網頁，用這個主題的淺色、深色各畫一次。</p>
 <ThemeGallery siteIds={[site.id]} />
 
 <h2 id="contrast">易讀性檢查</h2>
 <p>
-  文字和底色的「對比值」越高越好讀。一般大小的文字要 <strong>4.5 : 1</strong> 以上（WCAG 無障礙標準 AA 級）。
+  文字和底色的「對比值」越高越好讀。一般大小的文字要 <strong>4.5 : 1</strong> 以上（WCAG 無障礙標準 AA 級）。「主色」的兩項和主題有關；「次要文字」是所有網站共用的正式顏色{mutedFails ? '，目前未達標，要另外處理；這不是主題造成的。' : '，不受主題影響。'}
 </p>
 <div class="table-wrap not-content">
   <table class="checks">
@@ -81,8 +81,7 @@ const mode = site.isDemo ? 'dark' : 'light';
 
 <h2 id="colors">全部語意色</h2>
 <p>
-  「語意色」是依用途命名的顏色（例如「主色」「次要文字」），元件只認這些名字。
-  主題做的事，就是決定每個名字在這個網站用哪個顏色。
+  「語意色」是依用途命名的顏色（例如「主色」「次要文字」），元件只認這些名字。主題做的事，就是決定每個名字在這個網站用哪個顏色。
 </p>
 <ThemeColorTable siteId={site.id} />
 
@@ -91,10 +90,14 @@ const mode = site.isDemo ? 'dark' : 'light';
     <>
       <h2 id="diff">與預設主題的差異</h2>
       <p>
-        只列出和預設主題（{DEFAULT_SITE.名稱}）不同的顏色；沒列出的全部沿用預設主題。
-        {site.isDemo && '環保網的綠色是示意值（非正式），只為了示範效果。'}
+        只列出和預設主題（{DEFAULT_SITE.名稱}）不同的顏色；沒列出的全部沿用預設主題。{site.isDemo && `${site.簡稱}的顏色是示意值（非正式），只為了示範效果。`}
       </p>
       <ThemeDiff siteId={site.id} />
+      {site.示意色.length > 0 && (
+        <p class="demo-note">
+          <strong>注意：</strong>{site.簡稱}用到的這幾個顏色（{site.示意色.join('、')}）目前<strong>不在基礎色票裡</strong>，是這個示範暫時自訂的示意值。若決定採用，要先把它們加進基礎色票（所有網站共用的那盒顏料），主題再從裡面挑；主題本身不新增顏色。
+        </p>
+      )}
     </>
   )
 }
@@ -102,15 +105,19 @@ const mode = site.isDemo ? 'dark' : 'light';
 <h2 id="usage">如何使用</h2>
 <ul>
   <li>
-    <strong>工程師：</strong>在網頁最外層的 <code>&lt;html&gt;</code> 標上網站和模式，例如
-    <code>&lt;html data-theme="{site.id}" data-mode="{mode}"&gt;</code>
-    ，元件就會自動換成這個主題的顏色。<Badge text="提案" variant="caution" />
-    屬性名稱與寫法尚未定案。
+    <strong>工程師：</strong>在網頁最外層的 <code>&lt;html&gt;</code> 加上 <code>data-site="{site.id}"</code>，元件就會換成這個網站的顏色；淺色／深色沿用現有的 <code>data-theme="light"</code>／<code>"dark"</code>（不寫時跟著訪客的裝置設定）。例如 <code>&lt;html data-site="{site.id}"&gt;</code>，深色再加 <code>data-theme="dark"</code>。<Badge text="提案" variant="caution" /> 屬性名稱尚未定案。
   </li>
-  <li>
-    <strong>共編者（設計、行政）：</strong>直接跟 Claude 說：「{site.簡稱}的主色改成…」，
-    Claude 會改好顏色、更新這一頁，並附上預覽讓你確認。
-  </li>
+  {
+    site.isDefault ? (
+      <li>
+        <strong>共同編輯者（設計、行政）：</strong>{site.簡稱}是預設主題，改它的顏色，所有沒有自己主題的網站都會一起變。要改請跟 Claude 說：「預設主題的主色改成…」，Claude 會先列出會受影響的網站給你確認。
+      </li>
+    ) : (
+      <li>
+        <strong>共同編輯者（設計、行政）：</strong>直接跟 Claude 說：「{site.簡稱}的主色改成…」。改完後這一頁會跟著更新，你可以在這裡確認效果。
+      </li>
+    )
+  }
 </ul>
 
 <style>
@@ -168,5 +175,11 @@ const mode = site.isDemo ? 'dark' : 'light';
   }
   .ratio.fail {
     color: var(--sl-color-red);
+  }
+  .demo-note {
+    padding: 0.6rem 0.85rem;
+    border-inline-start: 3px solid var(--sl-color-orange);
+    background: var(--sl-color-orange-low);
+    border-radius: 0.3rem;
   }
 </style>
