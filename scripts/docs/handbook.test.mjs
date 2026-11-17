@@ -85,6 +85,13 @@ const ALLOWED = [
     pattern: /^https:\/\/github\.com\/TzKaelLim\/CIS$/,
     reason: 'navigation link to this repository',
   },
+  {
+    // The download link in the "connect GitHub in Claude Desktop" tutorial
+    // (apps/docs/src/content/docs/docs/claude-desktop-github.mdx). A navigation link the
+    // reader follows on purpose; the handbook never loads anything from it.
+    pattern: /^https:\/\/claude\.com\/download$/,
+    reason: 'navigation link to the Claude Desktop download page',
+  },
 ];
 
 /** Files whose text ends up in the handbook's pages, styles or scripts. */

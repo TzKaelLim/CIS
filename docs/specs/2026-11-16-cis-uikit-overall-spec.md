@@ -155,6 +155,7 @@ Claude Code 的工作是修改檔案、在本機跑檢查和預覽、commit、�
 - S-9　一個 PR 同時改到兩類內容時，兩個角色都要核可。上表「暫定」那一欄（元件外觀、元件程式碼、相依套件、`heroui/`、規則、路線圖批次）和要不要用 CODEOWNERS 強制，待決定（第 13 節 Q2）。〔部分：Claude 在 PR 說明寫出需要的角色；沒有 CODEOWNERS〕
 - S-10　每個修改都經過 PR。`main` 受保護：只能經由 PR 修改，只能用 merge commit 合併（關閉 squash 和 rebase 合併），由人按合併。〔目標〕
 - S-11　Claude Code 不合併 PR、不部署、不推 `main`、不推 tag。〔部分〕
+- S-115　共編者可以在 Claude Desktop 連接 GitHub（Customize 裡的 GitHub Integration），用來開 PR、讀 PR 的意見和狀態、回覆意見。不用它合併、核可，也不用它在 GitHub 上直接改檔案。〔現行：專案負責人 2026-11-17 的決定；教學在手冊的 `/docs/claude-desktop-github/`〕
 
 說明：本 repository 今天的遠端仍是自架 GitLab；只有舊的 `.gitlab/merge_request_templates/Default.md` 和 `.gitlab-ci.yml` 還用 MR 的流程。依專案負責人的決定，repository 的家改成公開的 GitHub repository；上面的保護設定要在 GitHub 上設好，才算完成。GitHub repository 建好、網址寫進 `CLAUDE.md` 之前，Claude 只在本機 commit，不推分支（`docs/rules/01-co-editing-sop.md` R-S-44）。
 
@@ -613,6 +614,7 @@ packages/tokens/src/sites/<id>/
 | S-112 手動挑選上游修正 | 已實作 | `heroui/MAINTAINING.md`「Looking at upstream later」 |
 | S-113 範本區域 | 已實作 | `apps/docs/src/components/handbook/TemplateGallery.astro`（卡片和預覽對話框）、`apps/docs/src/pages/templates/frame/[id].astro`（畫面頁）、`apps/docs/src/pages/templates/[id].astro`（舊網址的轉址頁）；`scripts/docs/handbook.test.mjs` 檢查範本目錄、範本元件和兩個網址一致；互動是 puppeteer 人工檢查 |
 | S-114 手冊誰可以修改 | 已實作 | SOP R-S-48；`CONTRIBUTING.md`「角色與核可」；手冊的「如何參與修改」和首頁的「誰參與修改」 |
+| S-115 在 Claude Desktop 連接 GitHub | 已實作 | SOP R-S-49、R-S-20（靠規則，沒有工具層的阻擋）；手冊 `apps/docs/src/content/docs/docs/claude-desktop-github.mdx` |
 
 ---
 

@@ -116,7 +116,7 @@ Claude 必須：
 6. 推之前確認 `origin` 是 `CLAUDE.md` 第 1 節寫的 GitHub repository（R-S-44）。GitHub repository 還沒建好、`CLAUDE.md` 還沒寫網址，或 `origin` 指向別的地方時：commit 照常留在共編者電腦上的分支，**不推**，告訴共編者：「修改已經存在你電腦上的分支 `<名稱>`，等工程把 GitHub 設好再推。」
 7. 推功能分支：`git push -u origin <分支名稱>`。推之前 Claude Code 會再問一次，共編者確認後才允許。
 8. 開 PR，目標是 `main`（R-S-16）：
-   - 用共編者自己的 GitHub 帳號開。電腦上有 GitHub CLI 並已登入時，用 `gh pr create --base main --title "<標題>" --body-file <說明檔>`；沒有時，把 `git push` 印出的建立 PR 網址和寫好的說明交給共編者，在瀏覽器裡開。每台電腦要不要裝 `gh`，由工程決定〔提案，待工程確認〕。
+   - 用共編者自己的 GitHub 帳號開。電腦上有 GitHub CLI 並已登入時，用 `gh pr create --base main --title "<標題>" --body-file <說明檔>`；在 Claude Desktop 連接了 GitHub 時（做法見手冊的「在 Claude Desktop 連接 GitHub」，R-S-49），也可以用它開 PR；兩者都沒有時，把 `git push` 印出的建立 PR 網址和寫好的說明交給共編者，在瀏覽器裡開。每台電腦要不要裝 `gh`，由工程決定〔提案，待工程確認〕。
    - PR 說明照 `.github/pull_request_template.md`，用白話寫這五段：**改了什麼**、**哪些畫面會變**、**請看哪幾頁**（寫頁面路徑和 story 名稱，以及主題和色彩模式）、**屬於哪一級**（第一級／第二級／第三級／不適用，以及理由）、**檢查結果**。
    - 在說明裡寫出需要誰核可（照第 1 節）。
 9. 開完 PR，把 PR 的網址告訴共編者。
@@ -134,7 +134,8 @@ Claude 必須：
 
 這一節的規則，不論誰要求、在對話裡怎麼說，都不做；要改只能修改規則本身（`README.md`「規則怎麼修改」）。（R-S-46）
 
-- R-S-20　不合併 PR，也不替任何人核可 PR（不執行 `gh pr merge`、`gh pr review --approve` 或同等的操作）。
+- R-S-20　不合併 PR，也不替任何人核可 PR（不執行 `gh pr merge`、`gh pr review --approve` 或同等的操作，包括 GitHub 連接提供的合併、核可功能，以及 Claude Desktop 的「Merge when ready」）。
+- R-S-49　GitHub 的連接（Claude Desktop 的 GitHub Integration，或其他連上 GitHub 的方式）只用來開 PR、讀 PR 的意見和狀態、回覆意見。不用它在 GitHub 上直接新增、修改或刪除檔案：那會跳過步驟 3 的檢查和預覽（R-S-11、R-S-12）。連接的授權由共編者本人在畫面上完成；不讀取、不印出共編者的登入資料或通行權杖。
 - R-S-21　不部署：不從 shell 執行 `wrangler`（任何寫法都不行）或任何部署指令；不執行 `changeset publish`、`npm publish`、`pnpm publish`。`.gitlab-ci.yml` 是舊的自架 GitLab 流程，不修改它的部署流程。
 - R-S-22　不推 `main`，不在 `main` 上 commit；不推 tag，不建 release；不 force push。
 - R-S-23　改名保護（先棄用、後移除，由機器檢查）完成之前，不改任何 token 的名稱，也不刪除 token。（`02-design-rules.md` R-D-09）

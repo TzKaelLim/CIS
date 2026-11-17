@@ -46,7 +46,7 @@
 2. Node 22.22 以上。目前建議 Node 24，也可以用 Node 26。
 3. 用 corepack 安裝 pnpm：`corepack enable pnpm`。版本由 `package.json` 的 `packageManager` 決定，corepack 會檢查它的雜湊。Node 25 起不再內建 corepack，用 Node 26 時先執行 `npm install -g corepack`。
 4. 安裝 Claude Code。
-5. GitHub CLI（`gh`）可以讓 Claude Code 直接開 PR；每台電腦要不要裝，由工程決定。沒有裝的話，Claude Code 會給你網址，在瀏覽器裡開 PR。
+5. GitHub CLI（`gh`）可以讓 Claude Code 直接開 PR；每台電腦要不要裝，由工程決定。也可以在 Claude Desktop 連接 GitHub，做法見手冊的「在 Claude Desktop 連接 GitHub」（`apps/docs/src/content/docs/docs/claude-desktop-github.mdx`）。兩者都沒有的話，Claude Code 會給你網址，在瀏覽器裡開 PR。
 
 把 repository 複製到你的電腦（clone）可以請工程或 Claude Code 協助。之後在 repository 根目錄執行：
 

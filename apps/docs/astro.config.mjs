@@ -128,6 +128,7 @@ export default defineConfig({
           items: [
             { label: '開始使用', link: '/docs/' },
             { label: '如何參與修改', link: '/docs/contributing/' },
+            { label: '在 Claude Desktop 連接 GitHub', link: '/docs/claude-desktop-github/' },
             { label: '用詞', link: '/docs/glossary/' },
             { label: '基礎 Foundations', autogenerate: { directory: 'foundations' } },
           ],
