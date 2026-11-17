@@ -6,13 +6,13 @@
 
 ## 請看哪幾頁
 
-<!-- 寫頁面路徑，不寫網址：手冊例如 /components/button/，Storybook 寫 story 名稱（例如 Components/Button）。再寫要選的網站主題和色彩模式（淺色／深色）。核可人請照 docs/rules/01-co-editing-sop.md 步驟 5「核可人怎麼看預覽」。 -->
+<!-- 寫頁面路徑，不寫網址：手冊例如 /components/button/，Storybook 寫 story 名稱（例如 Components/Button）。再寫要選的主題和色彩模式（淺色／深色）。核可人請照 docs/rules/01-co-editing-sop.md 步驟 5「核可人怎麼看預覽」。 -->
 
 ## 屬於哪一級
 
 <!-- 怎麼選：docs/rules/02-design-rules.md 第 7 節「PR 的『屬於哪一級』怎麼寫」。 -->
 
-- [ ] 第一級：只有 CSS 的值不同（網站主題覆寫）
+- [ ] 第一級：只有 CSS 的值不同（主題覆寫）
 - [ ] 第二級：內容一樣、排列不同（同一個元件的變體）
 - [ ] 第三級：別的網站沒有的資料或行為（新元件；路線圖編號：）
 - [ ] 不適用

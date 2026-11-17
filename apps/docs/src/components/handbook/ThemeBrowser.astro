@@ -1,10 +1,10 @@
 ---
-// 網站主題總覽頁上方的「左邊清單、右邊大樣本」。
+// 主題總覽頁上方的「左邊清單、右邊大樣本」。
 //
-// - 左邊：每個網站主題一張卡片（名稱、預設／示意標籤、淺色與深色的關鍵色）。點卡片 = 用 ?site=<id>
-//   套用那個網站主題；目前選擇的卡片有外框和「目前選擇」標記（規則由 site-selection.ts 產生）。
-//   清單很長（例如 20 個網站）時，在桌機寬度自己捲動，不會把右邊的樣本推走。
-// - 右邊：入口首頁範本放大顯示，只畫一份，顏色跟著頁首目前選的網站主題和色彩模式。
+// - 左邊：每個主題一張卡片（名稱、預設／示意標籤、淺色與深色的關鍵色）。點卡片 = 用 ?site=<id>
+//   套用那個主題；目前選擇的卡片有外框和「目前選擇」標記（規則由 site-selection.ts 產生）。
+//   清單很長（例如 20 個主題）時，在桌機寬度自己捲動，不會把右邊的樣本推走。
+// - 右邊：入口首頁範本放大顯示，只畫一份，顏色跟著頁首目前選的主題和色彩模式。
 // - 窄螢幕：清單在上（同樣有最大高度、可捲動），樣本在下。
 import { Badge } from '@astrojs/starlight/components';
 import SiteOnly from './SiteOnly.astro';
@@ -31,9 +31,9 @@ const sample = getTemplate('portal-home');
 <div class="tc-theme-browser not-content">
   <section class="list-panel" aria-labelledby="tc-theme-list-title">
     <div class="list-head">
-      <h2 id="tc-theme-list-title">所有網站主題</h2>
+      <h2 id="tc-theme-list-title">所有主題</h2>
       <p>
-        目前有 {SITE_THEMES.length} 個。點一個網站主題，樣本和手冊裡所有的元件、範本都會換成那個網站的顏色；頁首的「網站主題」選單也可以切換。
+        目前有 {SITE_THEMES.length} 個。點一個主題，樣本和手冊裡所有的元件、範本都會換成那個主題的顏色；頁首的「主題」選單也可以切換。
       </p>
     </div>
     <ul class="sites">
@@ -43,7 +43,7 @@ const sample = getTemplate('portal-home');
             <div class="site-head">
               <a class="apply" href={`?${SITE_URL_PARAM}=${site.id}`}>
                 {site.名稱}
-                <span class="sr-only">：套用這個網站主題</span>
+                <span class="sr-only">：套用這個主題</span>
               </a>
               {site.isDefault && <Badge text="預設" variant="note" />}
               {site.isDemo && <Badge text="示意" variant="caution" />}
@@ -87,7 +87,7 @@ const sample = getTemplate('portal-home');
       </h2>
       <p>
         用<a href={templateUrl(sample)}>{sample.名稱}範本</a
-        >當樣本：同一頁、同樣的元件，只換成這個網站主題的顏色。淺色／深色用頁首的色彩模式按鈕（月亮／太陽）切換。
+        >當樣本：同一頁、同樣的元件，只換成這個主題的顏色。淺色／深色用頁首的色彩模式按鈕（月亮／太陽）切換。
       </p>
     </div>
     <TemplateFrame id={sample.id} interactive={false} label={`樣本頁面：${sample.名稱}範本`} />
@@ -175,7 +175,7 @@ const sample = getTemplate('portal-home');
     text-decoration: none;
     overflow-wrap: anywhere;
   }
-  /* 整張卡片都可以點（套用網站主題）；「顏色與說明」連結疊在上面，可以單獨點。 */
+  /* 整張卡片都可以點（套用主題）；「顏色與說明」連結疊在上面，可以單獨點。 */
   .apply::after {
     content: '';
     position: absolute;

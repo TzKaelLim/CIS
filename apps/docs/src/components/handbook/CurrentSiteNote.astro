@@ -1,10 +1,10 @@
 ---
-// 「目前顯示：<網站名>」那一行，放在跟著網站主題變的內容上方。
+// 「目前顯示：<主題名稱>」那一行，放在跟著主題變的內容上方。
 import SiteOnly from './SiteOnly.astro';
 import { SITE_THEMES, siteLabel } from '../../data/site-themes';
 
 interface Props {
-  /** 是否加上「查看所有網站主題」連結。 */
+  /** 是否加上「查看所有主題」連結。 */
   showAllLink?: boolean;
 }
 
@@ -12,8 +12,8 @@ const { showAllLink = true } = Astro.props;
 ---
 
 <p class="current-site-note not-content">
-  <span class="text">目前顯示：<strong>{SITE_THEMES.map((site) => <SiteOnly site={site.id} as="span">{siteLabel(site)}</SiteOnly>)}</strong>。在頁首的「網站主題」可以切換。</span>
-  {showAllLink && <a href="/themes/">查看所有網站主題</a>}
+  <span class="text">目前顯示：<strong>{SITE_THEMES.map((site) => <SiteOnly site={site.id} as="span">{siteLabel(site)}</SiteOnly>)}</strong>。在頁首的「主題」可以切換。</span>
+  {showAllLink && <a href="/themes/">查看所有主題</a>}
 </p>
 
 <style>

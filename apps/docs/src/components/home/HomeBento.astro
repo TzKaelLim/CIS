@@ -1,6 +1,6 @@
 ---
-// 首頁的四張功能卡片（bento 排法）：元件、網站主題、範本、透過 Claude Code 共編。
-// 每張卡片有標題、兩句說明、「前往 →」連結和一小塊真正元件的預覽（跟著網站主題變）。
+// 首頁的四張功能卡片（bento 排法）：元件、主題、範本、透過 Claude Code 共編。
+// 每張卡片有標題、兩句說明、「前往 →」連結和一小塊真正元件的預覽（跟著主題變）。
 // 卡片的連結延伸蓋住整張卡片；預覽是 inert，不能點也不會被螢幕閱讀器唸出來。
 import TemplateThumb from '../handbook/TemplateThumb.astro';
 import SiteOnly from '../handbook/SiteOnly.astro';
@@ -8,7 +8,7 @@ import { COMPONENTS } from '../../data/component-catalog';
 import { TEMPLATES } from '../../data/template-catalog';
 import { SITE_THEMES, siteLabel } from '../../data/site-themes';
 
-/** 網站主題卡片上最多列出幾個網站的色點；其餘用「+N」表示，網站再多也不會撐爆卡片。 */
+/** 主題卡片上最多列出幾個主題的色點；其餘用「+N」表示，主題再多也不會撐爆卡片。 */
 const MAX_SITE_DOTS = 6;
 const siteDots = SITE_THEMES.slice(0, MAX_SITE_DOTS);
 const moreSites = SITE_THEMES.length - siteDots.length;
@@ -20,7 +20,7 @@ const [firstTemplate, ...otherTemplates] = TEMPLATES;
   <div class="intro">
     <h2>同一套規則，<br />做出每一個慈濟網站</h2>
     <p>
-      顏色、文字、按鈕和整頁版面都只有一份。每個網站換上自己的網站主題，就有自己的顏色，排法和用法不用重做。
+      顏色、文字、按鈕和整頁版面都只有一份。每個網站選用一個主題，換了主題就換了顏色，排法和用法不用重做。
     </p>
   </div>
 
@@ -65,9 +65,9 @@ const [firstTemplate, ...otherTemplates] = TEMPLATES;
 
   <article class="card theme">
     <div class="text">
-      <h3>網站主題</h3>
-      <p>一套 UIKit，每個網站一個網站主題，目前有 {SITE_THEMES.length} 個。網站主題只換顏色、圓角、陰影、字級、間距這類外觀數值，元件和版面都不用重做。</p>
-      <a href="/themes/">前往<span class="sr-only">網站主題</span> →</a>
+      <h3>主題</h3>
+      <p>一套 UIKit，每個網站選用一個主題，目前有 {SITE_THEMES.length} 個主題。主題只換顏色、圓角、陰影、字級、間距這類外觀數值，元件和版面都不用重做。</p>
+      <a href="/themes/">前往<span class="sr-only">主題</span> →</a>
     </div>
     <div class="preview theme-preview" inert>
       <p class="now">
@@ -248,7 +248,7 @@ const [firstTemplate, ...otherTemplates] = TEMPLATES;
     outline: none;
   }
 
-  /* 預覽區：真正元件放在 --tc-* 底色上，跟著網站主題和色彩模式變。 */
+  /* 預覽區：真正元件放在 --tc-* 底色上，跟著主題和色彩模式變。 */
   .preview {
     display: grid;
     gap: 0.75rem;

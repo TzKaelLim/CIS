@@ -9,7 +9,7 @@ sidebar:
 import ColorSwatches from '../../../components/ColorSwatches.astro';
 
 色彩分三層：**基礎 Foundations 的色票**（所有網站共用的一盒顏色）→ **語意色**（依用途命名，例如「品牌主色」）→ **元件 token**（每個元件自己的顏色名稱）。
-元件只使用語意色和元件 token，因此換網站主題時，主要是重新指定語意色，不用改元件。
+元件只使用語意色和元件 token，因此換主題時，主要是重新指定語意色，不用改元件。
 
 下列色票直接從設計數值（token）的原始檔（`@tzuchi/tokens`）產生：
 
@@ -18,4 +18,4 @@ import ColorSwatches from '../../../components/ColorSwatches.astro';
 ## 主色（Brand）
 
 基礎色 `color.blue.900` 是主要的品牌色（設計稿裡叫「Primary」，色碼見上方色票）。語意色 `color.brand.primary`（品牌主色）指向它，
-實心按鈕的底色 `button.filled.bg` 再指向 `color.brand.primary`；所以換網站主題或色彩模式時，顏色會一路跟著換。
+實心按鈕的底色 `button.filled.bg` 再指向 `color.brand.primary`；所以換主題或色彩模式時，顏色會一路跟著換。

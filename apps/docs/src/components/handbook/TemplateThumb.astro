@@ -7,7 +7,7 @@
 // - 縮圖不能點、不能用鍵盤選到，也不會被螢幕閱讀器唸出來（pointer-events: none、
 //   tabindex="-1"、aria-hidden，外層再加 inert）；範本的名稱另外寫在卡片的連結上。
 // - loading="lazy"：捲到附近才載入。
-// - 顏色跟著頁首的網站主題和色彩模式變（src/scripts/template-frames.ts 用 postMessage 通知）。
+// - 顏色跟著頁首的主題和色彩模式變（src/scripts/template-frames.ts 用 postMessage 通知）。
 // - 縮放比例由 script 依格子寬度計算；script 執行前先用 0.3 的比例顯示。
 import { THUMB_LAYOUT_WIDTH, getTemplate, templateFrameUrl } from '../../data/template-catalog';
 

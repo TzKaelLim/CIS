@@ -28,7 +28,7 @@ test('the component catalog and the component pages list the same components', a
 });
 
 test('every component page has the six sections of R-H-08 in order', () => {
-  const sections = ['用法', '組成', '該做與不該做', '在目前網站主題下的樣子', '給工程師'];
+  const sections = ['用法', '組成', '該做與不該做', '在目前主題下的樣子', '給工程師'];
   for (const file of readdirSync(pagesDir).filter((f) => f.endsWith('.mdx') && f !== 'index.mdx')) {
     const text = readFileSync(join(pagesDir, file), 'utf8');
     const headings = [...text.matchAll(/^## (.+)$/gm)].map((m) => m[1].trim());

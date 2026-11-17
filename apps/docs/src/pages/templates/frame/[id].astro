@@ -5,14 +5,14 @@
 // 用 iframe 載入它，iframe 有多寬，這一頁的「視窗」就有多寬，所以 <tc-navbar>、<tc-footer>
 // 這些依視窗寬度換版面的元件，會照預覽選的寬度（桌機／平板／手機）排版。
 //
-// - 網站主題和色彩模式：第一次繪製前依網址的 ?site=…&mode=… 設好 <html data-site> 和
+// - 主題和色彩模式：第一次繪製前依網址的 ?site=…&mode=… 設好 <html data-site> 和
 //   <html data-theme>；網址沒有時，讀手冊記住的選擇（同一個網域的 localStorage，只讀不寫），
-//   再沒有就用預設網站和作業系統的色彩模式。之後跟著上一層手冊頁面用 postMessage 送來的值變
-//   （src/scripts/template-frame-messages.ts）。
+//   再沒有就用預設主題和作業系統的色彩模式。不認得的主題 id（例如改名前的舊值 eco）一律略過。
+//   之後跟著上一層手冊頁面用 postMessage 送來的值變（src/scripts/template-frame-messages.ts）。
 // - ?view=thumb：縮圖用，不顯示捲軸。
 // - 不給搜尋引擎收錄（noindex），也不在手冊的搜尋索引裡（不是 Starlight 頁面，沒有
 //   data-pagefind-body，另外整頁標 data-pagefind-ignore）。
-// - 沒有 JavaScript 時，範本總覽頁的卡片直接連到這一頁，讀者仍然看得到範本的內容（預設網站、淺色；
+// - 沒有 JavaScript 時，範本總覽頁的卡片直接連到這一頁，讀者仍然看得到範本的內容（預設主題、淺色；
 //   元件沒有樣式，頁面最上面有一行說明）。
 import '@tzuchi/tokens/tokens.css';
 import 'virtual:tc-site-theme-vars.css';
@@ -68,7 +68,7 @@ const initScript = `(function(c){var d=document.documentElement,q;try{q=new URLS
   const siteIds = (root.dataset.siteIds ?? '').split(',').filter((id) => id !== '');
   const embedded = window.parent !== window;
 
-  // 上一層手冊頁面送來新的網站主題或色彩模式：只接受同一個網域、來自上一層視窗的訊息。
+  // 上一層手冊頁面送來新的主題或色彩模式：只接受同一個網域、來自上一層視窗的訊息。
   window.addEventListener('message', (event) => {
     if (event.origin !== location.origin || event.source !== window.parent) return;
     if (!isFrameLook(event.data)) return;

@@ -1,14 +1,14 @@
 ---
 // 取代 Starlight 的頁首。48px 高，三組：
 // - 左：網站名稱（回首頁）。
-// - 中：區域導覽（文件／元件／範本／網站主題／Storybook），72rem 以上一定在畫面正中間。
-// - 右：32px 的圓形圖示按鈕（搜尋、色彩模式、網站主題、GitHub），最後是「開始使用」。
+// - 中：區域導覽（文件／元件／範本／主題／Storybook），72rem 以上一定在畫面正中間。
+// - 右：32px 的圓形圖示按鈕（搜尋、色彩模式、主題、GitHub），最後是「開始使用」。
 //
 // 寬度：
 // - 50rem 以上：全部照上面排列。左右兩組放在等寬的兩欄裡，中間那組因此在畫面正中間。
 //   60rem 以下區域連結的左右內距縮小；52rem 以下再藏起 Storybook（手機選單裡還有）。
-// - 50rem 以下：網站名稱、搜尋、色彩模式、網站主題和選單按鈕。區域導覽、GitHub、
-//   「開始使用」和網站主題的下拉選單都在手機選單裡（見 Sidebar.astro）。
+// - 50rem 以下：網站名稱、搜尋、色彩模式、主題和選單按鈕。區域導覽、GitHub、
+//   「開始使用」和主題的下拉選單都在手機選單裡（見 Sidebar.astro）。
 import config from 'virtual:starlight/user-config';
 import Search from 'virtual:starlight/components/Search';
 import SectionNav from '../handbook/SectionNav.astro';
@@ -41,7 +41,7 @@ const searchIcon = `--hb-search-icon: ${iconDataUrl('search')};`;
   </div>
   <div class="end print:hidden">
     {
-      /* 沒有 JavaScript 時，色彩模式、網站主題（頁首的選單和手機選單裡的下拉選單）按了也沒有作用，
+      /* 沒有 JavaScript 時，色彩模式、主題（頁首的選單和手機選單裡的下拉選單）按了也沒有作用，
          所以整個藏起來；連結（區域導覽、GitHub、「開始使用」）照常可以用。 */
     }
     <noscript><style is:inline>tc-mode-toggle,tc-site-menu,tc-site-select{display:none!important}</style></noscript>

@@ -1,6 +1,6 @@
 ---
-// 一個網站主題和預設主題不一樣的顏色（只列有差異的 token）。
-// 淺色、深色各一張表，每張只有兩欄色值：預設 → 這個網站。
+// 一個主題和預設主題不一樣的顏色（只列有差異的 token）。
+// 淺色、深色各一張表，每張只有兩欄色值：預設 → 這個主題。
 import ColorChip from './ColorChip.astro';
 import {
   DEFAULT_SITE,
@@ -13,7 +13,7 @@ import {
 
 interface Props {
   siteId: string;
-  /** 右欄的標題；預設是網站名稱。 */
+  /** 右欄的標題；預設是主題名稱。 */
   targetLabel?: string;
 }
 
@@ -24,7 +24,7 @@ const groups = MODES.map((mode) => ({ mode, rows: site.diff.filter((d) => d.mode
 
 {
   site.diff.length === 0 ? (
-    <p>這個網站主題的顏色和預設網站主題（{DEFAULT_SITE.名稱}）完全相同。</p>
+    <p>這個主題的顏色和預設主題（{DEFAULT_SITE.名稱}）完全相同。</p>
   ) : (
     <div class="diff-groups not-content">
       {groups.map(({ mode, rows }) => (
@@ -47,7 +47,7 @@ const groups = MODES.map((mode) => ({ mode, rows: site.diff.filter((d) => d.mode
             <tbody>
               {rows.length === 0 ? (
                 <tr>
-                  <td colspan="4">{MODE_LABEL[mode]}的顏色和預設網站主題相同。</td>
+                  <td colspan="4">{MODE_LABEL[mode]}的顏色和預設主題相同。</td>
                 </tr>
               ) : (
                 rows.map((d) => (

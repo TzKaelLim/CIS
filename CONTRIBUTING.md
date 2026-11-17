@@ -59,8 +59,8 @@ pnpm --filter @tzuchi/tokens build
 ## 一次修改的流程
 
 1. **說要改什麼**：在 repository 目錄開 Claude Code，用口語說要改什麼。例如：「次要文字的灰色太淺了，調深一點」「卡片要多一種『精選』樣式」「把路線圖的 R-010 分頁圓點改成設計中」。設計需求，Claude 會先問你這屬於第幾級（只有顏色等數值不同、同一個元件換排列、還是別的網站沒有的新東西）。
-2. **Claude 修改**：Claude 先抓最新的 `main`，開一條新分支（`tokens/…`、`docs/…`、`components/…`、`theme/<網站>-…`），照 `docs/rules/` 修改，並一起更新所有用到它的地方。
-3. **Claude 檢查並開預覽**：Claude 在你的電腦上跑檢查（tokens 的建置和檢查、HeroUI 慈濟主題 `variables.css` 的同步、測試和格式），開本機預覽，告訴你要看哪幾頁、要選哪個網站主題和色彩模式。你確認，或請 Claude 再改。
+2. **Claude 修改**：Claude 先抓最新的 `main`，開一條新分支（`tokens/…`、`docs/…`、`components/…`、`theme/<主題>-…`），照 `docs/rules/` 修改，並一起更新所有用到它的地方。
+3. **Claude 檢查並開預覽**：Claude 在你的電腦上跑檢查（tokens 的建置和檢查、HeroUI 慈濟主題 `variables.css` 的同步、測試和格式），開本機預覽，告訴你要看哪幾頁、要選哪個主題和色彩模式。你確認，或請 Claude 再改。
 4. **確認後開 PR**：你明確說「可以 commit」或「好，開 PR」後，Claude commit、推分支並開 PR。推之前 Claude Code 會問你一次，請確認後再允許。PR 說明用白話寫：改了什麼、哪些畫面會變、請看哪幾頁、屬於哪一級、檢查結果。
 5. **核可與合併**：負責的角色在 GitHub 上看過並核可，再由有合併權限的人合併。Claude Code 不合併、不部署、不推 `main`、不推 tag。
 
@@ -79,14 +79,14 @@ pnpm --filter @tzuchi/tokens build
   → Claude 開 `tokens/muted-text-contrast`，建議讓 `color.text.muted` 改指向已有的較深灰色（改語意色，不改基礎值），算出新的對比、跑檢查、開預覽，告訴你要看哪幾頁的淺色和深色。
 - 「卡片要多一種『精選』樣式，用在首頁最上面那一則。」
   → Claude 問你這是第二級（同一個元件的變體）嗎，確認名稱依用途命名（「精選」`featured`），再看路線圖的 Card 那一列。
-- 「環保網的按鈕要比入口網更圓。」
-  → Claude 判斷是第一級（只有 CSS 值不同），並告訴你：網站主題的檔案還沒有實作，要先請工程確認做法。
+- 「Green Natural 的按鈕要比 Default 更圓。」
+  → Claude 判斷是第一級（只有 CSS 值不同），並告訴你：Default 以外主題的檔案還沒有實作，要先請工程確認做法。
 
 **工程**
 
 - 「幫我把所有推之前的檢查跑一遍，告訴我哪裡沒過。」
-- 「Storybook 的 Theme 選單要拆成『網站主題』和『色彩模式』兩個。」
-  → 這要改 `heroui/` 的原始檔（`LOCAL CHANGE`）。你是工程，Claude 說明影響的檔案，得到你明確同意後，開 `build/storybook-site-and-mode-toolbars`，改完把修改記進 `heroui/NOTICE.md`。
+- 「Storybook 的 Theme 選單要拆成『主題』和『色彩模式』兩個。」
+  → 這要改 `heroui/` 的原始檔（`LOCAL CHANGE`）。你是工程，Claude 說明影響的檔案，得到你明確同意後，開 `build/storybook-theme-and-mode-toolbars`，改完把修改記進 `heroui/NOTICE.md`。
 - 「想把 Style Dictionary 升級，先幫我查新版本發布滿 14 天沒有，列出要改哪些檔案，先不要動。」
 
 **廠商**

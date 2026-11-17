@@ -2,7 +2,7 @@
 // 元件頁上方的「分類 · 英文名」都由這份資料產生。新增一個元件 = 在 COMPONENTS 加一筆，
 // 並在 src/content/docs/components/ 放同名的 .mdx 頁面（astro.config.mjs 會檢查兩邊一致）。
 //
-// preview 是卡片上的小預覽：用真正的 <tc-*> 元件寫成的 HTML，會跟著頁首的網站主題和
+// preview 是卡片上的小預覽：用真正的 <tc-*> 元件寫成的 HTML，會跟著頁首的主題和
 // 色彩模式變色。不要放外部圖片或網址；需要圖片的地方用 PLACEHOLDER_MEDIA 這類色塊代替。
 
 export type CategoryId = 'action' | 'form' | 'content' | 'navigation' | 'layout' | 'other';
@@ -47,7 +47,7 @@ export interface ComponentEntry {
   preview: ComponentPreview;
 }
 
-/** 代替圖片的色塊：跟著網站主題的品牌底色走，不需要載入外部圖片。 */
+/** 代替圖片的色塊：跟著目前主題的品牌底色走，不需要載入外部圖片。 */
 const PLACEHOLDER_MEDIA = (slot: string, ratio = '16/10'): string =>
   `<div slot="${slot}" style="aspect-ratio:${ratio};background:linear-gradient(135deg,var(--tc-color-brand-surface-hover),var(--tc-color-brand-surface))"></div>`;
 

@@ -1,15 +1,15 @@
 ---
-// 頁首的「網站主題」：圓形圖示按鈕，按下去打開一個小選單，列出所有網站（SITE_THEMES）。
-// 新增網站就會多一個選項；網站很多時（10 到 20 個）選單有最大高度，可以捲動。
+// 頁首的「主題」：圓形圖示按鈕，按下去打開一個小選單，列出所有主題（SITE_THEMES）。
+// 新增主題就會多一個選項；主題很多時（10 到 20 個）選單有最大高度，可以捲動。
 //
-// - 按鈕右下角的小圓點是目前網站的主色，不打開選單也看得出選了哪個網站。
-// - 按鈕的名稱（給螢幕閱讀器）是「網站主題：<目前的網站名稱>」。
-// - 小圓點和名稱裡的網站名稱每個網站各畫一份，由 <head> 裡的 .site-only 規則只顯示目前的那一份
+// - 按鈕右下角的小圓點是目前主題的主色，不打開選單也看得出選了哪個主題。
+// - 按鈕的名稱（給螢幕閱讀器）是「主題：<目前的主題名稱>」。
+// - 小圓點和名稱裡的主題名稱每個主題各畫一份，由 <head> 裡的 .site-only 規則只顯示目前的那一份
 //   （src/data/site-selection.ts），所以第一次繪製就是對的，不會閃一下。
 // - 選了之後的處理（data-site、localStorage、?site=）和手機選單裡的下拉選單相同，
 //   都在 src/scripts/site-choice.ts。
 //
-// 鍵盤：Enter／空白鍵或上下鍵打開選單並移到目前的網站；上下鍵移動、Home／End 到頭尾；
+// 鍵盤：Enter／空白鍵或上下鍵打開選單並移到目前的主題；上下鍵移動、Home／End 到頭尾；
 // Enter／空白鍵選擇；Esc 關閉並回到按鈕；Tab 關閉並離開選單。點選單外面（包括點進範本預覽的
 // iframe）也會關閉。
 //
@@ -19,7 +19,7 @@ import { DEFAULT_SITE, SITE_THEMES, type SiteTheme } from '../../data/site-theme
 import { SITE_STORAGE_KEY, SITE_URL_PARAM } from '../../data/site-selection';
 
 interface Props {
-  /** 選單清單的 id；同一頁有兩個網站主題選單時要不同。 */
+  /** 選單清單的 id；同一頁有兩個主題選單時要不同。 */
   id?: string;
 }
 
@@ -42,8 +42,8 @@ const dotStyle = (site: SiteTheme): string =>
     aria-controls={menuId}
   >
     <HeaderIcon name="palette" />
-    {/* 名稱「網站主題：<名稱>」寫在同一行，中間才不會多出空格。 */}
-    <span class="sr-only">網站主題：{SITE_THEMES.map((site) => <span class="site-only" data-site-only={site.id}>{site.名稱}</span>)}</span>
+    {/* 名稱「主題：<名稱>」寫在同一行，中間才不會多出空格。 */}
+    <span class="sr-only">主題：{SITE_THEMES.map((site) => <span class="site-only" data-site-only={site.id}>{site.名稱}</span>)}</span>
     {
       SITE_THEMES.map((site) => (
         <span class="site-only current-dot" data-site-only={site.id} style={dotStyle(site)} />
@@ -51,8 +51,8 @@ const dotStyle = (site: SiteTheme): string =>
     }
   </button>
   <div class="popover" hidden>
-    <p class="menu-title" aria-hidden="true">網站主題</p>
-    <div class="items" id={menuId} role="menu" aria-label="網站主題">
+    <p class="menu-title" aria-hidden="true">主題</p>
+    <div class="items" id={menuId} role="menu" aria-label="主題">
       {
         SITE_THEMES.map((site) => (
           <button
@@ -205,7 +205,7 @@ const dotStyle = (site: SiteTheme): string =>
   .trigger {
     position: relative;
   }
-  /* 按鈕右下角：目前網站的主色。 */
+  /* 按鈕右下角：目前主題的主色。 */
   .current-dot {
     position: absolute;
     inset-block-end: 5px;
@@ -238,7 +238,7 @@ const dotStyle = (site: SiteTheme): string =>
     font-size: var(--hb-text-label);
     font-weight: 500;
   }
-  /* 網站多的時候（10 到 20 個）在選單裡捲動。 */
+  /* 主題多的時候（10 到 20 個）在選單裡捲動。 */
   .items {
     display: flex;
     flex-direction: column;

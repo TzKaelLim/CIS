@@ -1,11 +1,11 @@
 ---
 // 取代 Starlight 的側欄。側欄的內容已經在 src/route-data.ts 換成「只有目前區域」；
 // 這裡另外加上：
-// - 手機選單最上方的區域導覽（首頁／文件／元件／範本／網站主題），桌機寬度不顯示，
+// - 手機選單最上方的區域導覽（首頁／文件／元件／範本／主題），桌機寬度不顯示，
 //   因為頁首已經有了。
 // - 「元件」區域的「搜尋元件…」篩選框：輸入時即時篩選下方清單。需要 JavaScript，
 //   所以預設隱藏，script 執行後才顯示。
-// - 手機選單最下方：網站主題的下拉選單（MobileMenuFooter，見 ThemeSelect.astro），
+// - 手機選單最下方：主題的下拉選單（MobileMenuFooter，見 ThemeSelect.astro），
 //   以及頁首在手機寬度放不下的「開始使用」和 GitHub 連結。色彩模式在頁首的圓形按鈕。
 import MobileMenuFooter from 'virtual:starlight/components/MobileMenuFooter';
 import SidebarPersister from '@astrojs/starlight/components/SidebarPersister.astro';

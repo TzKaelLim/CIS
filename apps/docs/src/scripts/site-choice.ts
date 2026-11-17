@@ -1,14 +1,17 @@
-// 讀者選的網站主題：頁首的「網站主題」選單（SiteMenu.astro）和手機選單裡的下拉選單
-// （SiteSelect.astro）共用這段程式，兩個控制項才會一直顯示同一個網站。
+// 讀者選的主題：頁首的「主題」選單（SiteMenu.astro）和手機選單裡的下拉選單
+// （SiteSelect.astro）共用這段程式，兩個控制項才會一直顯示同一個主題。
 //
 // 狀態放在 <html data-site="…">，第一次繪製前由 <head> 裡的 script 設好
 // （src/data/site-selection.ts 的 siteInitScript）。這裡只負責讀者改選時更新屬性、記住選擇、
 // 更新網址上的 ?site=，再通知所有控制項重新顯示。
 //
-// 設定（localStorage 的 key、網址參數、網站 id 清單）寫在控制項的 data-* 屬性上，
-// 這樣瀏覽器不必載入網站主題的整份資料。
+// 設定（localStorage 的 key、網址參數、主題 id 清單）寫在控制項的 data-* 屬性上，
+// 這樣瀏覽器不必載入主題的整份資料。
+//
+// 不認得的 id（例如改名前留下的舊值 eco）一律略過：applySite 不套用，restoreFromStorage
+// 也不採用，畫面維持 <head> script 設好的值（不認得時就是預設主題）。
 
-/** 網站主題改變時在 document 上發出的事件。 */
+/** 主題改變時在 document 上發出的事件。 */
 export const SITE_CHANGE_EVENT = 'tc-site-change';
 
 interface SiteConfig {
@@ -27,19 +30,19 @@ function readConfig(): SiteConfig | null {
   };
 }
 
-/** 目前選的網站 id（沒有 JavaScript 時 <html> 沒有 data-site）。 */
+/** 目前選的主題 id（沒有 JavaScript 時 <html> 沒有 data-site）。 */
 export const currentSite = (): string | undefined => document.documentElement.dataset.site;
 
 const notify = (): void => {
   document.dispatchEvent(new CustomEvent(SITE_CHANGE_EVENT));
 };
 
-/** 網站主題改變時（這一頁、別的分頁或從「上一頁」回來）呼叫 callback。 */
+/** 主題改變時（這一頁、別的分頁或從「上一頁」回來）呼叫 callback。 */
 export function onSiteChange(callback: () => void): void {
   document.addEventListener(SITE_CHANGE_EVENT, callback);
 }
 
-/** 套用讀者選的網站：更新 <html data-site>、記住選擇、更新網址上的 ?site=。 */
+/** 套用讀者選的主題：更新 <html data-site>、記住選擇、更新網址上的 ?site=。 */
 export function applySite(id: string): void {
   const config = readConfig();
   if (!config || !config.ids.includes(id)) return;

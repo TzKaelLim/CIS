@@ -1,4 +1,4 @@
-// 手冊的五個區域（首頁、文件、元件、範本、網站主題）。
+// 手冊的五個區域（首頁、文件、元件、範本、主題）。
 //
 // 頁首的區域導覽、側欄「只顯示目前區域」、上一頁／下一頁不跨區域，全部由這個清單決定。
 // astro.config.mjs 的側欄設定也用這裡的 label 當最上層群組名稱，兩邊才對得起來。
@@ -23,7 +23,7 @@ export const SECTIONS: readonly Section[] = [
   { id: 'docs', label: '文件', href: '/docs/', prefixes: ['/docs/', '/foundations/'] },
   { id: 'components', label: '元件', href: '/components/', prefixes: ['/components/'] },
   { id: 'templates', label: '範本', href: '/templates/', prefixes: ['/templates/'] },
-  { id: 'themes', label: '網站主題', href: '/themes/', prefixes: ['/themes/'] },
+  { id: 'themes', label: '主題', href: '/themes/', prefixes: ['/themes/'] },
 ];
 
 /** 補上結尾斜線，`/components` 和 `/components/` 視為同一頁。 */

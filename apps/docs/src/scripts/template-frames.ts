@@ -1,7 +1,7 @@
 // 手冊頁面這一邊的範本 iframe：
 //
 // - startFrameSync()：讓頁面上每一個範本 iframe（[data-tc-template-frame]）跟著頁首的
-//   網站主題（<html data-site>）和色彩模式（<html data-theme>）變。iframe 載入後會送 READY，
+//   主題（<html data-site>）和色彩模式（<html data-theme>）變。iframe 載入後會送 READY，
 //   這裡回一則 LOOK；之後 <html> 的這兩個屬性一變，就送 LOOK 給全部的 iframe，不必重新載入。
 // - fitThumbs()：縮圖（[data-tc-thumb="<排版寬度>"]）裡的 iframe 固定用那個寬度排版，
 //   再依縮圖格子的寬度整塊縮小；iframe 的高度跟著放大，縮小後剛好填滿格子。
@@ -9,7 +9,7 @@ import { FRAME_LOOK, FRAME_READY, isFrameMessage, type FrameLook } from './templ
 
 export const FRAME_SELECTOR = 'iframe[data-tc-template-frame]';
 
-/** 目前頁首選的網站主題和色彩模式。 */
+/** 目前頁首選的主題和色彩模式。 */
 export function currentLook(): FrameLook {
   const root = document.documentElement;
   return {

@@ -3,8 +3,8 @@
 // 兩邊在同一個網域，所以收訊息時一律檢查 event.origin === location.origin，
 // 畫面頁另外檢查訊息來自它的上一層視窗；格式不對的訊息直接略過。
 //
-// - 畫面頁載入後送 READY 給上一層；上一層回一則 LOOK（目前的網站主題和色彩模式）。
-// - 讀者在頁首切換網站主題或色彩模式時，上一層送 LOOK 給頁面上每一個範本 iframe。
+// - 畫面頁載入後送 READY 給上一層；上一層回一則 LOOK（目前的主題和色彩模式）。
+// - 讀者在頁首切換主題或色彩模式時，上一層送 LOOK 給頁面上每一個範本 iframe。
 // - 焦點在 iframe 裡時按 Esc，畫面頁送 ESCAPE，讓上一層關掉預覽對話框。
 
 export const FRAME_READY = 'tc-template-frame:ready';

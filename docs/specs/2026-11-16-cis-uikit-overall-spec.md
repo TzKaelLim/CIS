@@ -3,7 +3,7 @@
 - 日期：2026-11-16
 - 狀態：草稿，待專案負責人審閱
 - 範圍：本 repository 的全部內容（design tokens、HeroUI 與慈濟主題、手冊、Storybook、共編流程）
-- 依據：專案負責人 2026-11-16 的決定，以及本 repository 在 commit `2f88f353` 的檔案，加上和本文同一批的修改（`CLAUDE.md`、`CONTRIBUTING.md`、`docs/rules/`、PR 範本等）。兩者不一致時，以專案負責人的決定為準，並在第 14 節列出現有檔案要改的地方。第 12 節的現況對照表反映這一批修改合併之後的狀態。
+- 依據：專案負責人 2026-11-16 的決定（2026-11-17 另有一條用詞決定，見第 2 節），以及本 repository 在 commit `2f88f353` 的檔案，加上和本文同一批的修改（`CLAUDE.md`、`CONTRIBUTING.md`、`docs/rules/`、PR 範本等）。兩者不一致時，以專案負責人的決定為準，並在第 14 節列出現有檔案要改的地方。第 12 節的現況對照表反映這一批修改合併之後的狀態。
 - 引用方式：本文每一條規定都有編號（S-1、S-2……）。SOP 規則文件和 PR 說明引用規定時，寫編號即可。
 
 ### 標記的意思
@@ -22,14 +22,14 @@
 
 ## 0. 結論
 
-- **一套 kit，給所有慈濟網站用**：名稱是「慈濟 CIS UIKit」。慈濟入口網、慈濟環保網、年報網等網站共用同一套，不會一個網站一套（S-1）。
+- **一套 kit，給所有慈濟網站用**：名稱是「慈濟 CIS UIKit」。慈濟的各個網站（例如新聞、電子書、年報網）共用同一套，不會一個網站一套（S-1）。
 - **唯一來源是 tokens**：顏色、字級、間距、圓角、陰影都寫在 `packages/tokens/src/` 的 JSON 檔裡。CSS 變數、HeroUI 的慈濟主題、手冊、Storybook 都由程式從它產生，不在任何地方手抄數值（S-3 到 S-5；手冊今天還有一部分沒做到）。
 - **元件以 HeroUI v3 為基礎**：HeroUI 的原始碼放在 `heroui/`，只能以記錄過的 `LOCAL CHANGE` 修改。我們自己的元件不放進 `heroui/`，本文提議另開一個自己的套件（第 8.5 節，待工程確認）。
 - **大家都透過 Claude Code 改**：美編（設計）、工程、廠商都用口語告訴 Claude Code 要改什麼，沒有人手改 JSON。一次修改五個步驟，最後一定是開 PR、由負責的角色核可、由人合併。Claude Code 不合併、不部署、不推 `main`、不推 tag（S-10 到 S-20）。
-- **網站之間的差異分三級處理**：只有 CSS 值不同 → 網站主題；內容相同、排列不同 → 同一個元件的變體；資料或行為不同 → 新元件。不可以為某個網站複製一份元件（S-50 到 S-55）。
-- **「網站主題」和「色彩模式」是兩件事**：網站主題是「哪個網站」，色彩模式是「淺色或深色」，兩者可以自由組合。「主題」這個詞只用來指網站（S-40）。
-- **今天已經有的**：預設網站（慈濟入口網）的淺色與深色 tokens、HeroUI 的慈濟主題（68 個元件覆寫檔）、Storybook、新版手冊（五個區域、頁首的網站主題選單和色彩模式按鈕；元件頁介紹的仍是凍結的 Lit 元件）、本機預覽腳本、14 天的套件版本冷卻期。
-- **今天還沒有的**：網站設定檔（`sites/<id>/`；手冊裡的慈濟環保網只是示意）、改名保護、我們自己的元件套件、GitHub Actions 的 CI、部署目標。這些在本文都標成〔目標〕或〔提案〕。
+- **網站之間的差異分三級處理**：只有 CSS 值不同 → 主題；內容相同、排列不同 → 同一個元件的變體；資料或行為不同 → 新元件。不可以為某個網站複製一份元件（S-50 到 S-55）。
+- **「主題」和「色彩模式」是兩件事**：主題是一組有名字的外觀設定（今天有 Default；Green Natural 是示意），一個網站選用一個主題；色彩模式是「淺色或深色」。兩者可以自由組合。「主題」這個詞只用來指這種有名字的外觀（S-40）。
+- **今天已經有的**：預設主題 Default 的淺色與深色 tokens、HeroUI 的慈濟主題（68 個元件覆寫檔）、Storybook、新版手冊（五個區域、頁首的主題選單和色彩模式按鈕；元件頁介紹的仍是凍結的 Lit 元件）、本機預覽腳本、14 天的套件版本冷卻期。
+- **今天還沒有的**：Default 以外各個主題的檔案（`sites/<id>/`；手冊裡的 Green Natural 主題只是示意）、改名保護、我們自己的元件套件、GitHub Actions 的 CI、部署目標。這些在本文都標成〔目標〕或〔提案〕。
 - **元件缺口**：和 Astryx 的 116 個元件家族比對，HeroUI 部分對應 24 項、完全沒有 49 項，共 73 項。部分對應的「優化」，沒有的「新增」；內容網站大多用不到的也收進來，但放在待辦清單（S-70 到 S-74）。
 - **要專案負責人回答的**在第 13 節，每一項都附了建議。
 
@@ -57,12 +57,12 @@
 
 | 名詞 | 意思 | 不要和什麼混用 |
 | --- | --- | --- |
-| 慈濟 CIS UIKit | 本 repository 提供的整套東西：tokens、元件、手冊、Storybook。所有慈濟網站共用一套 | 不說「入口網 UIKit」「環保網 UIKit」 |
+| 慈濟 CIS UIKit | 本 repository 提供的整套東西：tokens、元件、手冊、Storybook。所有慈濟網站共用一套 | 不在名稱前面加單一網站的名字（不說「某某網 UIKit」） |
 | 基礎 Foundations | 所有網站共用的基本色階和數值刻度，例如 `color.blue.900`、`space.16`、`radius.md`。放在 `packages/tokens/src/primitive/`。只能新增，不能修改 | 程式裡叫 primitive |
 | 語意色 | 說明用途的顏色，例如「品牌主色」`color.brand.primary`、「次要文字」`color.text.muted`。指向某個基礎色。放在 `packages/tokens/src/semantic/` | 程式裡叫 semantic |
 | 元件 token | 某個元件專用的值，例如按鈕的圓角 `button.radius`。每個元件 token 只在 `packages/tokens/src/component/` 定義一次 | — |
-| 網站主題 | 「哪一個網站」的外觀，例如慈濟入口網、慈濟環保網、年報網。只寫和預設不同的值 | 「主題」這個詞**只**用在這裡 |
-| 預設網站主題 | 慈濟入口網。今天 `packages/tokens/src/` 的值就是它 | — |
+| 主題 | 一組有名字的外觀設定。今天有 Default（預設）和 Green Natural（示意）。一個網站選用一個主題；Default 以外的主題只寫和 Default 不同的值 | 「主題」這個詞**只**用在這裡；主題的名稱不用網站的名稱 |
+| 預設主題 | Default。今天 `packages/tokens/src/` 的值就是它；網站沒有指定主題時就用它 | 不是 HeroUI 原廠的 `default` 主題（`heroui/styles/themes/default/`，Storybook 工具列的 Light／Dark） |
 | 色彩模式 | 淺色或深色 | **不可**叫「主題」「深色主題」 |
 | 變體 variant | 同一個元件的幾種設計或選項，例如卡片的「一般」「精選」 | 不是新元件，也不是版本 |
 | 版本 | 元件不相容的重新設計，只用整數：v1、v2 | 設計上沒有 v1.2.3；套件的發行號碼是工程的事，目前沒有使用 |
@@ -70,17 +70,19 @@
 | 優化 | HeroUI 已經「部分對應」的元件，在它的基礎上補齊或延伸 | — |
 | 新增 | HeroUI 完全沒有的元件，加進 kit | — |
 | 待辦清單 | 決定要做、但不排進目前批次的項目 | — |
-| 網站設定檔 | 一個網站的名稱和各元件預設變體（提案，第 6.5 節） | — |
+| 網站設定檔 | 一個網站的名稱和各元件的預設變體，檔名 `site.json`（提案，第 6.5 節） | — |
 | 手冊 | 給一般讀者看的設計手冊，Astro + Starlight，在 `apps/docs` | — |
 | Storybook | 給工程師看的元件展示，在 `heroui/storybook`。也叫「元件展示頁」 | — |
-| 慈濟主題 | HeroUI 裡預設網站主題的實作，程式名 `tzuchi`（淺色）／`tzuchi-dark`（深色），在 `heroui/styles/themes/tzuchi/`。它把網站和色彩模式併在一個名稱裡（第 7 節） | 這是「主題」一詞唯一允許的程式名例外；文件裡寫「HeroUI 慈濟主題」 |
-| 主題變數 | HeroUI 的 CSS 變數（例如 `--accent`、`--surface`），由慈濟主題設定值 | 不是網站主題 |
+| 慈濟主題 | HeroUI 裡 Default 主題的實作，程式名 `tzuchi`（淺色）／`tzuchi-dark`（深色），在 `heroui/styles/themes/tzuchi/`。它把主題和色彩模式併在一個名稱裡（第 7 節） | 這是 HeroUI 的名詞，也是「主題」一詞唯一允許的程式名例外；文件裡寫「HeroUI 慈濟主題」 |
+| 主題變數 | HeroUI 的 CSS 變數（例如 `--accent`、`--surface`），由慈濟主題設定值 | 不是 Default、Green Natural 這種主題 |
 | 唯一來源 | `packages/tokens/src/**/*.tokens.json`。其他地方的值都由它產生 | — |
 | `LOCAL CHANGE` | 對 `heroui/` 裡 HeroUI 原始檔的修改。每一處都要加註解，並列入 `heroui/NOTICE.md` | — |
 | PR | GitHub 的 pull request：一次修改的審查與合併單位 | 不再說 MR |
 | 核可 | 負責的角色看過 PR 並同意 | 核可不等於合併 |
 | 合併 | 把 PR 併進 `main`。只由人做，用 merge commit | — |
 | 本機預覽 | 在自己電腦上開手冊或 Storybook，只有自己看得到（127.0.0.1） | — |
+
+用詞決定（2026-11-17，專案負責人）：「網站主題」一律改叫「主題」。主題是一組有名字的外觀，主題的名稱不用網站的名稱：原本的預設主題叫 **Default**，另一個示意的主題叫 **Green Natural**（仍是示意）。一個網站選用一個主題，沒有指定時用 Default。程式裡的 id 是 `default`、`green-natural`。淺色、深色仍然叫「色彩模式」。
 
 ---
 
@@ -95,8 +97,8 @@
 │    primitive/        基礎 Foundations（色階、刻度、字型）                       │
 │    semantic/         語意色、語意字級                                           │
 │    component/        元件 token（每個只定義一次）                               │
-│    themes/dark/      預設網站的深色模式                                         │
-│    sites/<id>/       各網站的網站主題與設定檔        ← 提案，尚未實作            │
+│    themes/dark/      Default 主題的深色模式                                     │
+│    sites/<id>/       各主題的值與設定檔              ← 提案，尚未實作            │
 │          │                                                                     │
 │          │ build.mjs（Style Dictionary）                                        │
 │          ▼                                                                     │
@@ -117,7 +119,7 @@
 └────────────────────────────────────────────────────────────────────────────────┘
           │
           ▼  各網站使用（安裝方式、網站程式碼放哪裡：待決定，第 13 節）
-   慈濟入口網、慈濟環保網、年報網 ……
+   慈濟的各個網站 ……（每個網站選用一個主題）
 ```
 
 - S-1　慈濟 CIS UIKit 是一套，給所有慈濟網站共用。不為單一網站另做一套 kit，也不在 repo 裡為某個網站複製一份元件。〔目標〕
@@ -161,16 +163,16 @@ Claude Code 的工作是修改檔案、在本機跑檢查和預覽、commit、�
 
 一次修改有五個步驟：
 
-1. **說要改什麼**：共編者在 repo 目錄開 Claude Code，用口語說要改什麼。例如「把次要文字色調深一點」「環保網的按鈕圓角要更圓」「卡片要有一種『精選』樣式」。
+1. **說要改什麼**：共編者在 repo 目錄開 Claude Code，用口語說要改什麼。例如「把次要文字色調深一點」「Green Natural 主題的按鈕圓角要更圓」「卡片要有一種『精選』樣式」。
 2. **Claude 修改**：Claude 從最新的 `main` 開一條新分支，修改，並一起更新所有用到它的地方（HeroUI 慈濟主題、手冊、Storybook）。
-3. **Claude 檢查並開預覽**：Claude 跑檢查，開本機預覽，告訴共編者要看哪幾頁、切到哪個網站主題和色彩模式。
+3. **Claude 檢查並開預覽**：Claude 跑檢查，開本機預覽，告訴共編者要看哪幾頁、切到哪個主題和色彩模式。
 4. **確認後開 PR**：共編者確認後，Claude commit、推分支、開 PR。PR 用白話寫：改了什麼、哪些畫面會變、要看哪幾頁。
 5. **核可與合併**：負責的角色核可，由人合併。
 
 規定：
 
 - S-12　開始修改前，Claude 先抓遠端最新的 `main`，從它開新分支；不在 `main` 上修改，也不沿用別人的分支。〔現行〕
-- S-13　分支名稱用「類別/英文簡稱」：`tokens/<簡稱>`（tokens）、`docs/<簡稱>`（手冊、文件、路線圖；規則本身用 `docs/rules-<簡稱>`）、`components/<簡稱>`（元件）、`theme/<網站 id>-<簡稱>`（某個網站的網站主題）、`build/<簡稱>`（建置與工具，工程同意後才開）；看別人的 PR 用 `review/<PR 編號>`，不推。「簡稱」是這次修改的英文簡稱，不是網站主題。〔現行（規則）：`docs/rules/01-co-editing-sop.md` R-S-08〕
+- S-13　分支名稱用「類別/英文簡稱」：`tokens/<簡稱>`（tokens）、`docs/<簡稱>`（手冊、文件、路線圖；規則本身用 `docs/rules-<簡稱>`）、`components/<簡稱>`（元件）、`theme/<主題 id>-<簡稱>`（某個主題）、`build/<簡稱>`（建置與工具，工程同意後才開）；看別人的 PR 用 `review/<PR 編號>`，不推。「簡稱」是這次修改的英文簡稱，不是主題的 id。〔現行（規則）：`docs/rules/01-co-editing-sop.md` R-S-08〕
 - S-14　設計需求（外觀、排列、新功能）在動手前，Claude 先問共編者這是第幾級（第 8.2 節），並把答案和理由寫進 PR 說明。〔現行（規則）：R-D-30、PR 範本〕
 - S-15　Claude 修改時一起更新所有用到它的地方；任何一處沒改到而會壞掉，就不算完成。〔現行〕
 - S-16　推分支前，Claude 必須跑完並通過下列檢查；有失敗就先修好，或向共編者說明原因，不推失敗的分支。〔現行〕
@@ -186,10 +188,10 @@ Claude Code 的工作是修改檔案、在本機跑檢查和預覽、commit、�
   ```
 
   改到 `heroui/` 時加跑 `pnpm run heroui:storybook:build`；`pnpm run docs:build` 先建 tokens 再建手冊（經過 `scripts/dev/astro.mjs`）；第一次建手冊前先 `pnpm --filter @tzuchi/components build`，因為今天的手冊頁還載入凍結的 Lit 元件（細節見 R-S-11）。不要跑 `@heroui/react`、`@heroui/styles`、`@heroui/storybook` 的 `lint`（一定會因缺少套件而失敗，見 `heroui/NOTICE.md` 的「Known state inherited from upstream」），改跑它們的 `typecheck`。
-- S-17　Claude 告訴共編者要看哪幾頁時，同時說要切到哪個網站主題、哪個色彩模式。改到網站主題或色彩相關的值時，淺色和深色都要看。〔現行（規則）：R-S-13〕
+- S-17　Claude 告訴共編者要看哪幾頁時，同時說要切到哪個主題、哪個色彩模式。改到主題或色彩相關的值時，淺色和深色都要看。〔現行（規則）：R-S-13〕
 - S-18　共編者沒確認，Claude 不 commit、不推分支。推之前 Claude Code 會再問一次，共編者確認後才允許。〔現行〕
 - S-19　commit 訊息用英文 conventional commits（例如 `feat(tokens): …`）；commit 訊息和 PR 標題不用 `publish` 這個字（`.claude/settings.json` 的規則會擋下整個指令）。〔現行〕
-- S-20　PR 說明用白話，固定五段：「改了什麼」「哪些畫面會變」「請看哪幾頁（含網站主題與色彩模式）」「屬於哪一級（第一級／第二級／第三級／不適用）、為什麼」「檢查結果」。預覽截圖只給共編者在自己電腦上看，不附在 PR 上（能不能附只截頁面內容的截圖，待決定 Q11）。PR 範本在 `.github/pull_request_template.md`。核可人在自己電腦上用 Claude Code 開 PR 的預覽（`docs/rules/01-co-editing-sop.md` R-S-43）。〔現行（規則）〕
+- S-20　PR 說明用白話，固定五段：「改了什麼」「哪些畫面會變」「請看哪幾頁（含主題與色彩模式）」「屬於哪一級（第一級／第二級／第三級／不適用）、為什麼」「檢查結果」。預覽截圖只給共編者在自己電腦上看，不附在 PR 上（能不能附只截頁面內容的截圖，待決定 Q11）。PR 範本在 `.github/pull_request_template.md`。核可人在自己電腦上用 Claude Code 開 PR 的預覽（`docs/rules/01-co-editing-sop.md` R-S-43）。〔現行（規則）〕
 - S-21　Claude 用共編者自己的帳號推分支和開 PR〔現行（規則）〕。開 PR 的工具（例如 GitHub CLI `gh`）要不要在每台電腦安裝，由工程決定〔提案，待工程確認〕。
 - S-22　CI 還沒有。GitHub Actions 的 CI 建好之前，S-16 的本機檢查就是唯一的關卡；CI 建好後，CI 沒通過的 PR 不能合併。〔目標〕
 - S-23　`drill/*` 分支只在本機演練用，不推。〔現行〕
@@ -208,14 +210,14 @@ Claude Code 的工作是修改檔案、在本機跑檢查和預覽、commit、�
 
 - S-24　基礎 Foundations 是所有網站共用的刻度，只新增，不修改既有的值。要換顏色，就新增一個基礎色（需要的話），再讓語意色或元件 token 指向它。〔目標〕
 - S-25　語意色和元件 token 都用參照指向下一層（`{color.blue.900}`），不寫死色碼。〔部分〕
-- S-26　每個元件 token 只在 `packages/tokens/src/component/` 定義一次；網站主題和色彩模式只覆寫既有的名稱，不另外定義。〔部分〕
+- S-26　每個元件 token 只在 `packages/tokens/src/component/` 定義一次；主題和色彩模式只覆寫既有的名稱，不另外定義。〔部分〕
 - S-27　新增 token、修改值，照第 5 節的流程做即可。〔現行〕
 
 說明：今天 `src/component/` 的 33 個檔案是照舊的 Lit `tc-*` 元件命名的（例如 `breadcrumb`、`divider`、`progress`），和 HeroUI 的元件名（`breadcrumbs`、`separator`、`progress-bar`）不完全一樣；對照寫在 `heroui/NOTICE.md`。在改名保護完成前（S-31）不改這些名稱。
 
 ### 6.2 色彩模式的 token
 
-- S-28　預設網站的深色模式只覆寫語意色和陰影（`packages/tokens/src/themes/dark/`），不重新定義基礎值；深色的顏色值必須是指向基礎色的參照，不寫死色碼。這由 `packages/tokens/check.mjs` 檢查。〔現行〕
+- S-28　Default 主題的深色模式只覆寫語意色和陰影（`packages/tokens/src/themes/dark/`），不重新定義基礎值；深色的顏色值必須是指向基礎色的參照，不寫死色碼。這由 `packages/tokens/check.mjs` 檢查。〔現行〕
 - S-29　淺色與深色的值同時在一份 `tokens.css` 裡，由同一次建置產生。〔現行〕
 
 ### 6.3 命名
@@ -230,54 +232,54 @@ Claude Code 的工作是修改檔案、在本機跑檢查和預覽、commit、�
 
 說明：這個做法來自頁面編輯器（tceditor）repository 裡 2026-10-21 的共編機制設計（名稱登記 `token-names.json`），本 repo 還沒有任何一部分。
 
-### 6.5 網站設定檔（提案，尚未實作）
+### 6.5 主題的檔案（提案，尚未實作）
 
-今天 repo 裡只有預設網站主題（慈濟入口網）和它的深色模式。其他網站的檔案照下面的規則加：
+今天 repo 裡只有 Default 主題和它的深色模式。其他主題的檔案照下面的規則加（資料夾 `sites/<id>/` 是提案時定的路徑，保留不改；`packages/tokens/src/themes/` 已經用在深色模式，`<id>` 是主題的 id）：
 
 ```
 packages/tokens/src/sites/<id>/
   theme.light.json    淺色模式下，和預設不同的值
   theme.dark.json     深色模式下，和預設不同的值
-  site.json           網站名稱，以及各元件的預設變體
+  site.json           主題名稱，以及各元件的預設變體
 ```
 
 `site.json` 的形狀（示意）：
 
 ```json
 {
-  "id": "eco",
-  "name": "慈濟環保網",
+  "id": "green-natural",
+  "name": "Green Natural",
   "defaultVariants": { "card": "featured" }
 }
 ```
 
-- S-34　網站主題的檔案只寫和預設不同的值；沒寫到的，一律退回預設。〔提案，尚未實作〕
-- S-35　網站主題只能覆寫已經存在的 token 名稱，不能新增名稱。建置時發現不存在的名稱，就失敗。〔提案，尚未實作〕
-- S-36　網站主題先覆寫語意色；只有某個元件仍然需要不同時，才覆寫那個元件的元件 token。網站主題不覆寫基礎 Foundations。〔目標：順序是專案負責人的決定；檔案的位置是提案，尚未實作〕
-- S-37　網站主題的值也用參照指向基礎 Foundations。需要一個基礎裡沒有的顏色或數值時，先把它加進基礎（S-24，由美編（設計）核可），再在網站主題裡指向它。〔提案，尚未實作〕
-- S-38　網站在淺色模式改了一個顏色，就必須在 `theme.dark.json` 寫出這個顏色在深色模式的值，由機器檢查兩邊的名稱一致。否則深色模式會退回預設網站的顏色。〔提案，尚未實作〕
-- S-39　`<id>` 用小寫英文和連字號（例如 `eco`、`annual-report`），定了就不改，因為網站的程式碼會用它。〔提案，尚未實作〕
+- S-34　主題的檔案只寫和預設不同的值；沒寫到的，一律退回預設。〔提案，尚未實作〕
+- S-35　主題只能覆寫已經存在的 token 名稱，不能新增名稱。建置時發現不存在的名稱，就失敗。〔提案，尚未實作〕
+- S-36　主題先覆寫語意色；只有某個元件仍然需要不同時，才覆寫那個元件的元件 token。主題不覆寫基礎 Foundations。〔目標：順序是專案負責人的決定；檔案的位置是提案，尚未實作〕
+- S-37　主題的值也用參照指向基礎 Foundations。需要一個基礎裡沒有的顏色或數值時，先把它加進基礎（S-24，由美編（設計）核可），再在主題裡指向它。〔提案，尚未實作〕
+- S-38　主題在淺色模式改了一個顏色，就必須在 `theme.dark.json` 寫出這個顏色在深色模式的值，由機器檢查兩邊的名稱一致。否則深色模式會退回 Default 主題的顏色。〔提案，尚未實作〕
+- S-39　`<id>` 用小寫英文和連字號（例如 `green-natural`、`annual-report`），定了就不改，因為網站的程式碼會用它來選主題。〔提案，尚未實作〕
 
 ---
 
-## 7. 網站主題與色彩模式
+## 7. 主題與色彩模式
 
-- S-40　「主題」只用來指網站主題。淺色、深色叫「色彩模式」，不叫「主題」「深色主題」。〔目標〕
-- S-41　網站主題和色彩模式互相獨立，可以自由組合：任何一個網站主題都有淺色和深色。〔目標〕
-- S-42　預設網站主題是慈濟入口網，沒有指定網站時就用它。〔現行〕
-- S-43　網站主題和色彩模式都只設在 `<html>` 上，不設在頁面裡的其他元素。〔現行〕
-- S-44　在程式碼裡用哪兩個屬性名稱表示網站主題和色彩模式，待決定（第 13 節 Q4）。〔提案，待工程確認〕
-- S-45　網站主題要能影響 HeroUI 元件，`generate.mjs` 必須為每個網站、每個色彩模式產生一組主題變數；元件覆寫檔仍然只讀主題變數（第 3 節的限制）。〔提案，待工程確認〕
-- S-46　網站一次只套一個網站主題；同一頁不混用兩個網站的外觀。〔目標〕
+- S-40　「主題」只用來指一組有名字的外觀設定（今天有 Default；Green Natural 是示意）；一個網站選用一個主題。主題的名稱不用網站的名稱。淺色、深色叫「色彩模式」，不叫「主題」「深色主題」。〔目標〕
+- S-41　主題和色彩模式互相獨立，可以自由組合：任何一個主題都有淺色和深色。〔目標〕
+- S-42　預設主題是 Default，網站沒有指定主題時就用它。〔現行〕
+- S-43　主題和色彩模式都只設在 `<html>` 上，不設在頁面裡的其他元素。〔現行〕
+- S-44　在程式碼裡用哪兩個屬性名稱表示主題和色彩模式，待決定（第 13 節 Q4）。〔提案，待工程確認〕
+- S-45　主題要能影響 HeroUI 元件，`generate.mjs` 必須為每個主題、每個色彩模式產生一組 HeroUI 主題變數；元件覆寫檔仍然只讀主題變數（第 3 節的限制）。〔提案，待工程確認〕
+- S-46　一頁一次只套一個主題；同一頁不混用兩個主題的外觀。〔目標〕
 
 今天的情況（事實）：
 
 | 地方 | 用的屬性 | 問題 |
 | --- | --- | --- |
-| `packages/tokens/dist/tokens.css` | `data-theme="dark"`、`data-theme="light"`，沒設時跟隨作業系統 | 只有色彩模式，沒有網站 |
-| HeroUI 慈濟主題 `variables.css` | `data-theme="tzuchi"`、`data-theme="tzuchi-dark"` | 把網站和色彩模式併在一個值裡；不跟隨作業系統 |
+| `packages/tokens/dist/tokens.css` | `data-theme="dark"`、`data-theme="light"`，沒設時跟隨作業系統 | 只有色彩模式，沒有主題 |
+| HeroUI 慈濟主題 `variables.css` | `data-theme="tzuchi"`、`data-theme="tzuchi-dark"` | 把主題和色彩模式併在一個值裡；不跟隨作業系統 |
 | Storybook 的工具列 | 一個 Theme 選單：慈濟、慈濟 Dark、Light、Dark | 把色彩模式叫 Theme；還混著 HeroUI 原廠的兩種外觀 |
-| 手冊 `apps/docs` | 色彩模式用 Starlight 的 `data-theme="light"`／`"dark"`；網站主題用 `data-site="<id>"`（照 Q4 的建議，只是提案）；兩個都設在 `<html>` | 網站主題的屬性名稱還沒決定（Q4）；今天只有預設網站主題是正式的，另一個（環保網）是示意 |
+| 手冊 `apps/docs` | 色彩模式用 Starlight 的 `data-theme="light"`／`"dark"`；主題用 `data-site="<id>"`（照 Q4 的建議，只是提案）；兩個都設在 `<html>` | 主題的屬性名稱還沒決定（Q4）；今天只有 Default 主題是正式的，另一個（Green Natural）是示意 |
 
 ---
 
@@ -297,14 +299,14 @@ packages/tokens/src/sites/<id>/
 
 | 級 | 情況 | 例子 | 怎麼做 |
 | --- | --- | --- | --- |
-| 第一級 | 只有 CSS 的值不同：顏色、圓角、陰影、邊框、字級、間距 | 環保網的主色是綠色、按鈕更圓 | 網站主題：先覆寫語意色；只有某個元件仍然需要不同時，才覆寫它的元件 token |
+| 第一級 | 只有 CSS 的值不同：顏色、圓角、陰影、邊框、字級、間距 | 某個網站想要綠色的主色、更圓的按鈕 | 主題：網站選用（或新增）一個主題，先覆寫語意色；只有某個元件仍然需要不同時，才覆寫它的元件 token |
 | 第二級 | 內容一樣，結構或排列不同 | 圖在上 vs 圖在左；只有文字 vs 圖示加文字 | 共用元件的一個變體，並在網站設定檔設這個網站的預設變體 |
 | 第三級 | 資料或行為不同，也就是別的網站沒有的東西 | 年報網的「年度數據比較」 | 新元件：通用的直接進 kit；綁定單一網站業務的，留在那個網站自己的專案，等第二個網站也需要時再移進 kit |
 
 - S-50　設計需求依第一級、第二級、第三級的順序判斷，能用低一級解決就不用高一級。〔目標〕
 - S-51　Claude 必須問共編者這個需求是第幾級，並把結論寫進 PR 說明（S-14）。共編者不確定時，Claude 依上表說明理由並建議一級，由共編者決定。〔現行（規則）：R-D-30〕
-- S-52　不可以為某個網站複製一份元件（例如「環保網的按鈕」）。需要不同，就用第一級或第二級；真的是新東西，才是第三級。〔目標〕
-- S-53　某個網站不用某個元件時，什麼都不用做：不必為它寫網站主題，也不必設預設變體。〔目標〕
+- S-52　不可以為某個網站複製一份元件（例如「某個網站專用的按鈕」）。需要不同，就用第一級或第二級；真的是新東西，才是第三級。〔目標〕
+- S-53　某個網站不用某個元件時，什麼都不用做：不必在主題裡為這個元件寫值，也不必設預設變體。〔目標〕
 - S-54　第三級的新元件，通用的（第二個網站可能也會用）直接進 kit；只屬於一個網站業務的，留在那個網站的專案裡，不進 kit。等第二個網站需要時，再移進 kit，移進時依 kit 的規則（變體、token、手冊）整理。〔目標〕
 - S-55　網站自己的專案放在哪裡（本 repo 或另外的 repo），待決定（第 13 節 Q1）。〔提案，尚未實作〕
 
@@ -359,7 +361,7 @@ packages/tokens/src/sites/<id>/
   2. 程式放在第 8.5 節的位置；改到 `heroui/` 的地方都有 `LOCAL CHANGE` 和清單記錄。
   3. 顏色只來自主題變數；需要的元件 token 在 `packages/tokens/src/component/` 定義一次。
   4. 變體依用途命名，每個選項 4 到 5 個值以內。
-  5. 在預設網站主題和每一個已有的網站主題下，淺色和深色都正常。
+  5. 在 Default 主題和每一個已有的主題下，淺色和深色都正常。
   6. 無障礙：文字對比至少 4.5:1、鍵盤可以操作並看得到焦點、互動元素都有可讀的名稱（第 11.4 節）。
   7. 介面文字用繁體中文；不發出任何第三方請求。
   8. Storybook 有 stories，涵蓋每個變體和主要狀態（停用、錯誤、載入中等適用的狀態）。
@@ -384,8 +386,8 @@ packages/tokens/src/sites/<id>/
 
 ### 9.1 現況（事實）
 
-- `apps/docs` 是 Astro 5.18.2 + Starlight 0.34.8。手冊分成首頁、文件、元件、範本、網站主題五個區域：3 個基礎頁、22 個元件頁、範本總覽（4 個範本，每個在對話框裡預覽，第 9.8 節）和 2 個網站主題頁。
-- 頁首（`apps/docs/src/components/starlight/Header.astro`）有「網站主題」選單（`apps/docs/src/components/handbook/SiteMenu.astro`；手機選單裡是 `SiteSelect.astro` 的下拉選單）和「色彩模式」按鈕（`ColorModeToggle.astro`，淺色和深色兩者切換）。網站主題的資料在 `apps/docs/src/data/site-themes.ts`：只有預設網站主題（慈濟入口網）是正式的，慈濟環保網是示意（顏色寫在手冊裡，不在 `packages/tokens`）。
+- `apps/docs` 是 Astro 5.18.2 + Starlight 0.34.8。手冊分成首頁、文件、元件、範本、主題五個區域：3 個基礎頁、22 個元件頁、範本總覽（4 個範本，每個在對話框裡預覽，第 9.8 節）和 2 個主題頁。
+- 頁首（`apps/docs/src/components/starlight/Header.astro`）有「主題」選單（`apps/docs/src/components/handbook/SiteMenu.astro`；手機選單裡是 `SiteSelect.astro` 的下拉選單）和「色彩模式」按鈕（`ColorModeToggle.astro`，淺色和深色兩者切換）。主題的資料在 `apps/docs/src/data/site-themes.ts`：只有 Default 主題是正式的，Green Natural 主題是示意（顏色寫在手冊裡，不在 `packages/tokens`）。
 - 元件頁照第 9.5 節的六段排列，但介紹的仍是凍結的 Lit `tc-*` 元件；Storybook 還沒有這些元件的頁面。
 - 手冊頁面不載入第三方資源（`scripts/docs/handbook.test.mjs` 檢查原始檔）。
 - `pnpm run docs:build` 建置 tokens 和手冊；它是推之前的檢查之一（S-16）。
@@ -394,7 +396,7 @@ packages/tokens/src/sites/<id>/
 
 ### 9.2 五個區域
 
-- S-75　手冊分五個區域：**首頁**、**文件**、**元件**、**範本**、**網站主題**。頁首有這五個區域的導覽；側欄只顯示目前所在區域的頁面。〔現行；範本區域沒有側欄（S-113）〕
+- S-75　手冊分五個區域：**首頁**、**文件**、**元件**、**範本**、**主題**。頁首有這五個區域的導覽；側欄只顯示目前所在區域的頁面。〔現行；範本區域沒有側欄（S-113）〕
 
 | 區域 | 內容 |
 | --- | --- |
@@ -402,28 +404,28 @@ packages/tokens/src/sites/<id>/
 | 文件 | 基礎 Foundations、語意色、字級、間距等設計原則；用詞說明 |
 | 元件 | 元件總覽和每個元件一頁（第 9.5 節） |
 | 範本 | 用元件組成的頁面範例：一頁總覽，每個範本在對話框裡預覽（第 9.8 節） |
-| 網站主題 | 網站主題總覽，以及每個網站一頁：名稱、和預設不同的地方、各元件的預設變體 |
+| 主題 | 主題總覽，以及每個主題一頁：名稱、和預設不同的地方、各元件的預設變體 |
 
 ### 9.3 頁首的選單
 
-- S-76　頁首有「網站主題」選單和「色彩模式」按鈕；頁首的排列見手冊規則 R-H-02。〔現行〕
-- S-77　「網站主題」選單列出所有網站，預設是慈濟入口網；「色彩模式」按鈕在淺色和深色之間切換，讀者按過之前跟隨作業系統。兩者互相獨立。〔現行；這是專案負責人指定的做法，Q12 的「跟隨系統」只在讀者按過之前有效〕
-- S-78　選單和按鈕的用詞照第 2 節：叫「網站主題」和「色彩模式」，不叫「Theme」或「主題」。〔現行〕
+- S-76　頁首有「主題」選單和「色彩模式」按鈕；頁首的排列見手冊規則 R-H-02。〔現行〕
+- S-77　「主題」選單列出所有主題，預設是 Default，按鈕的名稱（給螢幕閱讀器）是「主題：<目前的主題名稱>」；「色彩模式」按鈕在淺色和深色之間切換，讀者按過之前跟隨作業系統。兩者互相獨立。〔現行；這是專案負責人指定的做法，Q12 的「跟隨系統」只在讀者按過之前有效〕
+- S-78　選單和按鈕的用詞照第 2 節：叫「主題」和「色彩模式」，不叫「Theme」「網站主題」或「外觀」。〔現行〕
 
-### 9.4 一次只看一個網站
+### 9.4 一次只看一個主題
 
-- S-79　每一頁都只顯示頁首選定的那一個網站主題。〔現行〕
-- S-80　假設未來有 10 到 20 個網站主題：內容不可以排成每個網站一個分頁、一欄或一個框。要看別的網站，就在頁首切換。〔現行〕
-- S-81　「網站主題」區域的總覽可以列出所有網站（清單或表格，一個網站一列），每個網站各有自己的一頁；這是目錄，不是並排比較。〔現行〕
+- S-79　每一頁都只顯示頁首選定的那一個主題。〔現行〕
+- S-80　假設未來有 10 到 20 個主題：內容不可以排成每個主題一個分頁、一欄或一個框。要看別的主題，就在頁首切換。〔現行〕
+- S-81　「主題」區域的總覽可以列出所有主題（清單或表格，一個主題一列），每個主題各有自己的一頁；這是目錄，不是並排比較。〔現行〕
 
 ### 9.5 元件頁的結構
 
-- S-82　給一般讀者的元件頁，依序有這六段：〔部分：22 個元件頁都有這六段；第 5 段的預設變體要等網站設定檔，淺色、深色並排的範例只有按鈕頁有；第 6 段沒有 Storybook 連結，因為 Storybook 還沒有這些元件的頁面；「該做與不該做」是草稿，待美編（設計）確認〕
-  1. **預覽**：真的元件，不是截圖，用目前選定的網站主題和色彩模式顯示。
+- S-82　給一般讀者的元件頁，依序有這六段：〔部分：22 個元件頁都有這六段；第 5 段各網站的預設變體要等網站設定檔，淺色、深色並排的範例只有按鈕頁有；第 6 段沒有 Storybook 連結，因為 Storybook 還沒有這些元件的頁面；「該做與不該做」是草稿，待美編（設計）確認〕
+  1. **預覽**：真的元件，不是截圖，用目前選定的主題和色彩模式顯示。
   2. **用法**：什麼時候用、什麼時候不用。
   3. **組成**：元件由哪些部分組成。
   4. **該做與不該做**。
-  5. **在目前網站主題下的樣子**：這個網站的預設變體和與預設不同的地方。
+  5. **在目前主題下的樣子**：這個主題的預設變體和與預設不同的地方。
   6. **給工程師**：屬性、程式範例、連到 Storybook 的對應頁。
 
 ### 9.6 字級
@@ -447,13 +449,13 @@ packages/tokens/src/sites/<id>/
 ### 9.7 內容規則
 
 - S-84　手冊對外公開，只放設計內容。共編流程、電腦準備放在 repo 的 `CONTRIBUTING.md`。〔部分：電腦準備只在 `CONTRIBUTING.md`；手冊的「如何參與修改」頁有角色、五個步驟和三級判斷的摘要，要不要保留這一頁待專案負責人決定〕
-- S-85　手冊顯示的色票和數值由 tokens 產生（S-5），淺色和深色的值都要看得到。〔部分：預設網站主題的色票從 tokens 的原始 JSON 算出來，淺色和深色都看得到，但還不是讀建置產物；示意的環保網用手冊裡自訂的綠色〕
+- S-85　手冊顯示的色票和數值由 tokens 產生（S-5），淺色和深色的值都要看得到。〔部分：Default 主題的色票從 tokens 的原始 JSON 算出來，淺色和深色都看得到，但還不是讀建置產物；示意的 Green Natural 主題用手冊裡自訂的綠色〕
 - S-86　手冊頁面不發出任何第三方請求（S-98）；範例圖片放在 repo 裡。〔現行〕
 - S-87　手冊的本機預覽只用 `pnpm run docs:dev`（127.0.0.1:4321）。〔現行〕
 
 ### 9.8 範本區域
 
-- S-113　範本區域只有一頁總覽，沒有側欄：標題、「示意」提示框、分類篩選、範本卡片格線。卡片的縮圖是範本本身；滑鼠移上或用鍵盤選到時疊上名稱、兩行說明和「預覽」。按卡片打開預覽對話框：名稱、分類、「示意」、寬度切換（桌機 1280／平板 768／手機 390 px）、網站主題選單和色彩模式按鈕、上一個／下一個、關閉，下方列出使用的元件。範本在 iframe 裡用選的寬度排版，跟著頁首的網站主題和色彩模式變。打開時網址加上 `?t=<id>`，可以分享，「上一頁」會關閉；舊網址 `/templates/<id>/` 轉到這裡。細節見手冊規則 R-H-17 到 R-H-19。〔現行〕
+- S-113　範本區域只有一頁總覽，沒有側欄：標題、「示意」提示框、分類篩選、範本卡片格線。卡片的縮圖是範本本身；滑鼠移上或用鍵盤選到時疊上名稱、兩行說明和「預覽」。按卡片打開預覽對話框：名稱、分類、「示意」、寬度切換（桌機 1280／平板 768／手機 390 px）、主題選單和色彩模式按鈕、上一個／下一個、關閉，下方列出使用的元件。範本在 iframe 裡用選的寬度排版，跟著頁首的主題和色彩模式變。打開時網址加上 `?t=<id>`，可以分享，「上一頁」會關閉；舊網址 `/templates/<id>/` 轉到這裡。細節見手冊規則 R-H-17 到 R-H-19。〔現行〕
 
 ---
 
@@ -465,7 +467,7 @@ packages/tokens/src/sites/<id>/
   - 已關掉遙測、新功能通知和錯誤回報；HeroUI 的標誌、外部連結、React Scan 和 Google Fonts 都已移除（記錄在 `heroui/NOTICE.md`）。
   - 有無障礙檢查外掛（`@storybook/addon-a11y`），但沒有設成必須通過的關卡。
   - `heroui/react/src` 裡 16 個 story 檔和 `heroui/storybook/.storybook` 裡 4 個展示檔，仍從 HeroUI 的圖片主機（`heroui-assets.nyc3.cdn.digitaloceanspaces.com`、`img.heroui.chat`）載入圖片（上游原本就有）。
-- S-89　Storybook 的工具列要改成兩個獨立的選單：「網站主題」和「色彩模式」，和手冊一致。HeroUI 原廠的淺色／深色外觀可以留給工程比對，但要和慈濟的網站主題分開標示。〔提案，待工程確認〕
+- S-89　Storybook 的工具列要改成兩個獨立的選單：「主題」和「色彩模式」，和手冊一致。HeroUI 原廠的淺色／深色外觀可以留給工程比對，但要和我們的主題（今天只有 Default）分開標示。〔提案，待工程確認〕
 - S-90　我們自己的元件（第 8.5 節）也放進同一個 Storybook，每個變體和主要狀態各有 story。〔提案，待工程確認〕
 - S-91　Storybook 不新增任何外部資源；既有從第三方載入的圖片，改成 repo 裡的圖片（待辦）。〔部分〕
 - S-92　Storybook 和手冊什麼時候、部署到哪裡，待決定（第 13 節 Q3）。在那之前，只有本機預覽。〔目標〕
@@ -527,7 +529,7 @@ packages/tokens/src/sites/<id>/
 
 | 規定 | 狀態 | 證明或缺什麼 |
 | --- | --- | --- |
-| S-1 一套 kit | 尚未實作 | 今天只有預設網站；沒有其他網站，也沒有防止複製的檢查 |
+| S-1 一套 kit | 尚未實作 | 今天只有 Default 主題；沒有其他正式的主題，也沒有防止複製的檢查 |
 | S-2 固定用詞 | 部分 | 規則：`docs/rules/02-design-rules.md` R-D-01 到 R-D-03；手冊照這套用詞（`apps/docs/src/content/docs/docs/glossary.mdx`）；但 Storybook 工具列叫 Theme；舊的 `.gitlab/` 範本和 `.gitlab-ci.yml` 用 MR |
 | S-3 單向資料流 | 已實作 | `packages/tokens/build.mjs`、`heroui/styles/themes/tzuchi/generate.mjs` |
 | S-4 variables.css 不手改 | 已實作 | `generate.mjs`；SOP R-S-10、R-S-11 和步驟 4 的同步檢查；`.gitlab-ci.yml` 的 build job |
@@ -542,7 +544,7 @@ packages/tokens/src/sites/<id>/
 | S-14、S-51 問第幾級並寫進 PR | 已實作（規則） | `docs/rules/02-design-rules.md` R-D-30 和第 7 節的問題；PR 範本的「屬於哪一級」 |
 | S-15 一起更新用到的地方 | 已實作（規則） | SOP R-S-09、R-S-45 |
 | S-16 推之前的檢查 | 已實作 | SOP R-S-11；`packages/tokens/check.mjs`；`scripts/dev/lib.test.mjs`；`scripts/docs/handbook.test.mjs`；root `package.json` 的 `docs:build` |
-| S-17 說明要看的網站主題與色彩模式 | 已實作（規則） | SOP R-S-13；PR 範本的「請看哪幾頁」 |
+| S-17 說明要看的主題與色彩模式 | 已實作（規則） | SOP R-S-13；PR 範本的「請看哪幾頁」 |
 | S-18 確認後才 commit、推之前再問 | 已實作 | SOP R-S-14；`.claude/settings.json` 的 `ask: git push*` |
 | S-19 commit 訊息 | 已實作 | SOP R-S-15；`.claude/settings.json` 的 `Bash(* publish*)` |
 | S-20 PR 範本 | 已實作 | `.github/pull_request_template.md`（舊的 `.gitlab/` 範本留著，不再引用） |
@@ -559,14 +561,14 @@ packages/tokens/src/sites/<id>/
 | S-31 不改名、不刪除 | 已實作（規則） | R-D-09、R-S-23；沒有機器檢查 |
 | S-32 一次套用命名規範 | 尚未實作 | 命名規範尚未提出 |
 | S-33 改名保護 | 尚未實作 | 沒有名稱登記檔，也沒有檢查 |
-| S-34 到 S-39 網站設定檔 | 尚未實作 | 沒有 `packages/tokens/src/sites/` |
-| S-40 主題只指網站 | 部分 | 見 S-2 |
+| S-34 到 S-39 主題的檔案 | 尚未實作 | 沒有 `packages/tokens/src/sites/` |
+| S-40 主題只指有名字的外觀 | 部分 | 見 S-2 |
 | S-41 自由組合 | 尚未實作 | 今天只有 `tzuchi`／`tzuchi-dark` 一組 |
-| S-42 預設是慈濟入口網 | 已實作 | `packages/tokens/src/` 的值；Storybook 預設開在 `tzuchi`（`heroui/storybook/.storybook/addons/theme/constants.ts`） |
+| S-42 預設是 Default | 已實作 | `packages/tokens/src/` 的值；Storybook 預設開在 `tzuchi`（`heroui/storybook/.storybook/addons/theme/constants.ts`） |
 | S-43 只設在 `<html>` | 已實作（規則） | R-D-16；`heroui/styles/themes/tzuchi/index.css` 的說明 |
 | S-44 屬性名稱 | 尚未實作 | 待決定（Q4） |
-| S-45 每個網站產生主題變數 | 尚未實作 | `generate.mjs` 只產生 `tzuchi`、`tzuchi-dark` |
-| S-46 一次一個網站主題 | 部分 | 手冊一次只顯示頁首選的那一個網站主題（`apps/docs/src/components/handbook/SiteOnly.astro`、`apps/docs/src/data/site-selection.ts`）；網站本身還沒有網站主題 |
+| S-45 每個主題產生主題變數 | 尚未實作 | `generate.mjs` 只產生 `tzuchi`、`tzuchi-dark` |
+| S-46 一次一個主題 | 部分 | 手冊一次只顯示頁首選的那一個主題（`apps/docs/src/components/handbook/SiteOnly.astro`、`apps/docs/src/data/site-selection.ts`）；還沒有網站實際選用主題 |
 | S-47 LOCAL CHANGE | 已實作 | `heroui/NOTICE.md` 的修改清單 |
 | S-48 外觀用覆寫檔 | 已實作 | `heroui/styles/themes/tzuchi/components/index.css`（68 個覆寫檔） |
 | S-49 Lit 凍結 | 已實作 | SOP R-S-30；root `package.json` 的 `build`、`test` 只跑 `@tzuchi/tokens` |
@@ -575,13 +577,13 @@ packages/tokens/src/sites/<id>/
 | S-56 變體依用途命名 | 尚未實作 | 還沒有我們自己新增的變體 |
 | S-57、S-58 變體名稱不改 | 已實作（規則） | R-D-21、R-S-24 |
 | S-59 4 到 5 個值 | 尚未實作 | — |
-| S-60 網站預設變體 | 尚未實作 | 沒有 `site.json` |
+| S-60 主題的預設變體 | 尚未實作 | 沒有 `site.json` |
 | S-61、S-62 版本 | 尚未實作 | — |
 | S-63 發行號碼未使用 | 已實作 | 所有套件都是 `private`；`@tzuchi/tokens` 是 `0.0.0` |
 | S-64 到 S-66 元件放哪裡 | 尚未實作 | 沒有 `packages/ui` |
 | S-67 到 S-69 優化、新增、完成條件 | 尚未實作 | — |
 | S-70 到 S-74 路線圖 | 已實作 | `docs/component-roadmap.md`、`docs/component-roadmap.json`（73 列；兩檔一致只靠人工檢查） |
-| S-75 到 S-83 手冊結構、選單、元件頁、字級 | 部分 | 五個區域：`apps/docs/astro.config.mjs`、`apps/docs/src/data/sections.ts`、`apps/docs/src/route-data.ts`；選單：`apps/docs/src/components/starlight/ThemeSelect.astro`、`apps/docs/src/components/handbook/SiteSelect.astro`；元件頁的六段：`scripts/docs/handbook.test.mjs` 檢查標題順序；字級：`apps/docs/src/styles/type-scale.css`。缺：元件頁的預設變體（沒有網站設定檔）、Storybook 的對應頁；網站主題的屬性 `data-site` 是提案（Q4） |
+| S-75 到 S-83 手冊結構、選單、元件頁、字級 | 部分 | 五個區域：`apps/docs/astro.config.mjs`、`apps/docs/src/data/sections.ts`、`apps/docs/src/route-data.ts`；選單：`apps/docs/src/components/starlight/ThemeSelect.astro`、`apps/docs/src/components/handbook/SiteSelect.astro`；元件頁的六段：`scripts/docs/handbook.test.mjs` 檢查標題順序；字級：`apps/docs/src/styles/type-scale.css`。缺：元件頁的預設變體（沒有網站設定檔）、Storybook 的對應頁；主題的屬性 `data-site` 是提案（Q4） |
 | S-84 手冊只放設計內容 | 部分 | 電腦準備和完整的共編流程在 `CONTRIBUTING.md` 和 `docs/rules/`；手冊的 `apps/docs/src/content/docs/docs/contributing.mdx` 是流程的摘要，要不要保留待專案負責人決定 |
 | S-85 色票由 tokens 產生 | 部分 | `apps/docs/src/components/ColorSwatches.astro`、`ThemeSwatches.astro` 讀原始 JSON |
 | S-86 手冊零第三方請求 | 已實作 | 範例圖片改成色塊；`scripts/docs/handbook.test.mjs` 擋下 `apps/docs/src` 裡允許清單以外的外部網址；建置後的 `apps/docs/dist` 沒有外部請求（人工檢查） |
@@ -618,7 +620,7 @@ packages/tokens/src/sites/<id>/
 
 **Q1　網站自己的程式碼放哪裡？**
 選項：放進本 repository；或每個網站一個自己的專案。
-建議：**每個網站各自一個專案**，本 repository 只放共用的 kit 和各網站的網站主題檔（S-34）。理由：kit 是公開的，網站的業務程式和設定不一定能公開；各網站的上線時程不同；第三級中只屬於一個網站的元件本來就留在網站專案裡（S-54）。
+建議：**每個網站各自一個專案**，本 repository 只放共用的 kit 和各個主題的檔案（S-34）。理由：kit 是公開的，網站的業務程式和設定不一定能公開；各網站的上線時程不同；第三級中只屬於一個網站的元件本來就留在網站專案裡（S-54）。
 
 **Q2　誰核可？要不要用 CODEOWNERS 強制？**
 已決定的只有兩條：token 名稱與值、命名規則、手冊設計內容由美編（設計）核可；建置、CI、工具由工程核可。第 4 節表格「暫定」那一欄（元件外觀、元件程式碼、相依套件、`heroui/`、規則與本文、路線圖批次）要專案負責人確認。
@@ -627,9 +629,9 @@ packages/tokens/src/sites/<id>/
 **Q3　部署到哪裡？**
 建議：**先建 GitHub Actions 的 CI（只做檢查，不部署），部署目標之後再定**。部署時手冊和 Storybook 放在同一個網站（Storybook 在 `/storybook/` 之下），同一個 commit 一起建置，避免一新一舊。部署用的金鑰只給 `main` 的部署工作使用。在那之前只有本機預覽。`.gitlab-ci.yml` 和它的部署流程，等 GitHub 的 CI 建好後移除。
 
-**Q4　程式碼裡網站主題和色彩模式的屬性名稱？**
-今天：`tokens.css` 用 `data-theme="dark"`／`"light"`（沒設時跟隨作業系統）；HeroUI 慈濟主題用 `data-theme="tzuchi"`／`"tzuchi-dark"`，把網站和色彩模式併在一起。
-建議：**網站主題用 `data-site="<id>"`，色彩模式繼續用 `data-theme="light"`／`"dark"`**（沒設時跟隨作業系統），兩個都只設在 `<html>`。理由：`tokens.css` 和 HeroUI 上游都已經把 `data-theme="dark"` 當成深色，改動最少；網站和色彩模式分成兩個屬性，才能自由組合（S-41）。代價：慈濟主題的選擇器、Storybook 工具列和頁面編輯器（tceditor）都要跟著改，工程要先確認 HeroUI 原廠外觀（default 主題）的選擇器不會蓋過慈濟主題。
+**Q4　程式碼裡主題和色彩模式的屬性名稱？**
+今天：`tokens.css` 用 `data-theme="dark"`／`"light"`（沒設時跟隨作業系統）；HeroUI 慈濟主題用 `data-theme="tzuchi"`／`"tzuchi-dark"`，把主題和色彩模式併在一起。
+建議：**主題用 `data-site="<id>"`，色彩模式繼續用 `data-theme="light"`／`"dark"`**（沒設時跟隨作業系統），兩個都只設在 `<html>`。理由：`tokens.css` 和 HeroUI 上游都已經把 `data-theme="dark"` 當成深色，改動最少；主題和色彩模式分成兩個屬性，才能自由組合（S-41）。代價：慈濟主題的選擇器、Storybook 工具列和頁面編輯器（tceditor）都要跟著改，工程要先確認 HeroUI 原廠外觀（`heroui/styles/themes/default/`，HeroUI 自己的 default 主題，不是我們的 Default）的選擇器不會蓋過慈濟主題。
 
 **Q5　我們自己的元件放在 repo 的哪裡？**
 建議：照第 8.5 節，**新增 `packages/ui`**，優化 HeroUI 元件時依 S-65 的順序，`heroui/` 只在外面做不到時才改。待工程確認。
@@ -643,7 +645,7 @@ packages/tokens/src/sites/<id>/
 
 **Q8　基礎值抄錯時怎麼更正？**
 S-24 規定基礎只新增、不修改。但如果某個基礎值當初就抄錯（和設計稿不符），新增一個再全部改指過去會很繞。
-建議：**允許「更正」作為例外**：PR 要寫明原本的設計稿值、受影響的語意色和元件、所有網站主題下的畫面，由美編（設計）核可。除了更正，一律照 S-24。
+建議：**允許「更正」作為例外**：PR 要寫明原本的設計稿值、受影響的語意色和元件、所有主題下的畫面，由美編（設計）核可。除了更正，一律照 S-24。
 
 **Q9　舊版 v1 什麼時候可以移除？**
 建議：照 S-62，**確認沒有網站和頁面資料使用後才移除**；改名保護（S-33）建好後，用同一套「先棄用、後移除」的檢查。
@@ -692,5 +694,5 @@ S-24 規定基礎只新增、不修改。但如果某個基礎值當初就抄錯
 | `apps/docs/src/content/docs/index.mdx` | 刪掉「以 Lit Web Components 為單一來源」的說法 | S-3 |
 | `apps/docs/src/content/docs/foundations/theming.mdx` | 「淺色與深色兩套主題」改成「色彩模式」 | S-40 |
 | `apps/docs/src/content/docs/components/*.mdx`（5 頁） | 範例圖片改成 repo 裡的圖片〔已完成：改成色塊〕 | S-86 |
-| `heroui/storybook/.storybook/addons/theme/constants.ts` | 工具列拆成網站主題和色彩模式（`LOCAL CHANGE`） | S-89 |
+| `heroui/storybook/.storybook/addons/theme/constants.ts` | 工具列拆成主題和色彩模式（`LOCAL CHANGE`） | S-89 |
 | `packages/tokens/package.json`、`apps/docs/package.json`、root `package.json` | `^` 範圍改成精確版本 | S-94 |

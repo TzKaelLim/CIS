@@ -2,7 +2,7 @@
  * 手冊本身的外觀（Starlight 的 --sl-* 變數與版面）。
  *
  * - 強調色是慈濟品牌藍，數值抄自正式 token（packages/tokens 的 color.blue.*），寫成固定值：
- *   手冊外觀不跟著頁首的「網站主題」變，只有頁面裡的元件範例會變。
+ *   手冊外觀不跟著頁首的「主題」變，只有頁面裡的元件範例會變。
  * - 中性色用不帶藍味的灰，深色背景取自 token 的 gray-980／gray-950。
  * - 這個檔案沒有放進 cascade layer，所以會蓋過 Starlight 在 layer 裡的預設值；
  *   因此深色（:root）和淺色（:root[data-theme='light']）兩組都要寫。
@@ -29,12 +29,12 @@
   --sl-color-hairline: var(--sl-color-gray-6);
   --sl-color-hairline-shade: var(--sl-color-gray-6);
 
-  /* 頁面元素共用的圓角與預覽格底色。預覽格用元件的 surface token，才會跟著網站主題；
+  /* 頁面元素共用的圓角與預覽格底色。預覽格用元件的 surface token，才會跟著主題；
      深色用 surface.default（比頁面背景亮一階），淺色用 surface.subtle（比白色暗一階）。 */
   --tc-handbook-radius: 14px;
   --tc-handbook-tile: var(--tc-color-surface-default);
   --tc-handbook-tile-border: var(--sl-color-gray-6);
-  /* 首頁、網站主題頁的大面板（比頁面背景亮一階的中性灰，不跟網站主題變）。 */
+  /* 首頁、主題頁的大面板（比頁面背景亮一階的中性灰，不跟主題變）。 */
   --tc-handbook-panel: #1f1f22;
 }
 
@@ -90,7 +90,7 @@
   font-size: var(--hb-text-ui);
   line-height: var(--hb-line-height-ui);
 }
-/* 只有一般連結旁的單一子群組（例如「基礎 Foundations」「各網站」）才算子項目；
+/* 只有一般連結旁的單一子群組（例如「基礎 Foundations」「各主題」）才算子項目；
    清單由好幾個分類組成時（元件區域，.grouped 見 Sidebar.astro），分類裡的元件就是主要的連結。 */
 #starlight__sidebar .section-list:not(.grouped) .top-level ul a {
   font-size: var(--hb-text-sub);
@@ -283,7 +283,7 @@ header.header {
   }
 }
 
-/* 頁首的圓形圖示按鈕（搜尋、色彩模式、網站主題、GitHub）：32px，滑鼠移上時有淡底色。 */
+/* 頁首的圓形圖示按鈕（搜尋、色彩模式、主題、GitHub）：32px，滑鼠移上時有淡底色。 */
 .hb-icon-button {
   display: inline-flex;
   align-items: center;

@@ -1,5 +1,5 @@
 ---
-// 一個網站主題的全部語意色（淺色、深色）。和預設網站主題不同的列會標出來。
+// 一個主題的全部語意色（淺色、深色）。和預設主題不同的列會標出來。
 import ColorChip from './ColorChip.astro';
 import { SEMANTIC_TOKENS, getSite, tokenLabel, varName } from '../../data/site-themes';
 
@@ -27,7 +27,7 @@ const changed = new Set(site.diff.map((d) => d.token));
           <tr class:list={{ changed: changed.has(token) }}>
             <th scope="row">
               {tokenLabel(token)}
-              {changed.has(token) && <span class="tag">這個網站改過</span>}
+              {changed.has(token) && <span class="tag">這個主題改過</span>}
             </th>
             <td>
               <code>{varName(token)}</code>

@@ -1,10 +1,13 @@
-// 讓手冊裡「真正的 <tc-*> 元件」跟著頁首的「網站主題」選單變色。
+// 讓手冊裡「真正的 <tc-*> 元件」跟著頁首的「主題」選單變色。
 //
-// tokens.css 在 :root 宣告預設網站（入口網）的語意色，並在 [data-theme='dark'] 換成深色。
-// 這裡替每個「非預設」網站產生兩條規則，只寫和預設網站不同的語意色：
+// tokens.css 在 :root 宣告預設主題（Default）的語意色，並在 [data-theme='dark'] 換成深色。
+// 這裡替每個「非預設」主題產生兩條規則，只寫和 Default 不同的語意色：
 //
-//   html[data-site="eco"] { --tc-color-brand-primary: #…; … }
-//   html[data-site="eco"][data-theme="dark"] { … }
+//   html[data-site="green-natural"] { --tc-color-brand-primary: #…; … }
+//   html[data-site="green-natural"][data-theme="dark"] { … }
+//
+// data-site 是不認得的值（例如改名前的舊值 eco）時，沒有一條規則符合，元件就用 tokens.css
+// 的預設值，也就是 Default。
 //
 // 規則寫在 <html>（也就是 :root）上，所以 tokens.css 裡參照語意色的元件 token
 // （例如 --tc-link-fg: var(--tc-color-brand-primary-hover)）會在 :root 重新計算，元件不用改。
@@ -23,7 +26,7 @@ function declarations(site: SiteTheme, mode: 'light' | 'dark', tokens: readonly 
 
 export function siteThemeVarsCss(): string {
   const blocks: string[] = [
-    '/* 由 src/data/site-theme-vars.ts 依 site-themes.ts 產生，請勿手動修改。預設以外的網站主題都是示意值（非正式）；data-site 屬性名稱是提案（Q4）。 */',
+    '/* 由 src/data/site-theme-vars.ts 依 site-themes.ts 產生，請勿手動修改。預設以外的主題都是示意值（非正式）；data-site 屬性名稱是提案（Q4）。 */',
   ];
   for (const site of SITE_THEMES) {
     if (site.isDefault) continue;

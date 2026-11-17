@@ -16,11 +16,11 @@
 
 最重要的規則（完整版在 `docs/rules/`）：
 
-1. **必須**從遠端最新的 `main` 開新分支再改：`tokens/<簡稱>`、`docs/<簡稱>`、`components/<簡稱>`、`theme/<網站 id>-<簡稱>`；不在 `main` 上改（R-S-07、R-S-08）。
+1. **必須**從遠端最新的 `main` 開新分支再改：`tokens/<簡稱>`、`docs/<簡稱>`、`components/<簡稱>`、`theme/<主題 id>-<簡稱>`；不在 `main` 上改（R-S-07、R-S-08）。
 2. **必須**在動手前問設計需求屬於第一級、第二級、第三級還是不適用，並寫進 PR（R-D-30）。
-3. **必須**一起更新所有用到它的地方，跑完檢查，開本機預覽，並說出要看的頁面、網站主題和色彩模式（R-S-09 到 R-S-13）。
+3. **必須**一起更新所有用到它的地方，跑完檢查，開本機預覽，並說出要看的頁面、主題和色彩模式（R-S-09 到 R-S-13）。
 4. **必須**等共編者明確確認才 commit；推功能分支、開 PR，PR 照 `.github/pull_request_template.md` 用白話寫五段（R-S-14 到 R-S-16）。
-5. **必須**照固定用詞：「主題」只指網站主題；淺色／深色叫色彩模式；人員只寫職稱，唯一的例外是手冊裡用廠商的公司名稱「致遠」（專案負責人的決定）（R-D-01 到 R-D-03、R-D-34）。
+5. **必須**照固定用詞：「主題」只指 Default、Green Natural 這種有名字的外觀設定（一個網站選用一個主題）；淺色／深色叫色彩模式；人員只寫職稱，唯一的例外是手冊裡用廠商的公司名稱「致遠」（專案負責人的決定）（R-D-01 到 R-D-03、R-D-34）。
 6. **必須**做到無障礙：文字對比至少 4.5:1、鍵盤操作看得到焦點、互動元素有標籤；介面文字用繁體中文（R-D-14、R-C-14 到 R-C-18）。
 7. **不可**合併或核可 PR、部署、推 `main`、推 tag、force push；不論誰要求都不做（R-S-20 到 R-S-22、R-S-46）。
 8. **不可**在改名保護完成前改名或刪除 token；**不可**改名或刪除用過的變體名稱；**不可**為某個網站複製一份元件（R-S-23 到 R-S-25）。
@@ -37,16 +37,16 @@
 
 GitHub repository：`https://github.com/TzKaelLim/CIS`（公開）。`origin` 不是這個網址時，Claude 不推分支，先問工程（R-S-44）。
 
-| 目錄                                                                        | 內容                                                                                                                                                                                                                                 |
-| --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `packages/tokens`                                                           | **tokens 的唯一來源**。`src/**/*.tokens.json`（DTCG 格式）由 Style Dictionary（`build.mjs`）產生 `dist/tokens.css` 等檔案；`check.mjs` 檢查產物                                                                                      |
-| `heroui/`                                                                   | vendored 的 HeroUI v3 原始碼和慈濟主題（`heroui/styles/themes/tzuchi`，`variables.css` 由 `generate.mjs` 從 tokens 產生）。修改規則見 `heroui/NOTICE.md`                                                                             |
-| `heroui/storybook`                                                          | 給工程師看的元件展示頁（Storybook）                                                                                                                                                                                                  |
-| `apps/docs`                                                                 | 給一般讀者看的手冊（Astro Starlight）：首頁、文件、元件、範本、網站主題五個區域，頁首有網站主題選單和色彩模式按鈕。手冊的資料在 `src/data/`，手冊用的元件在 `src/components/handbook/`；做到哪裡見 `docs/rules/04-handbook-rules.md` |
-| `docs/rules`                                                                | 共編規則（上面已匯入）                                                                                                                                                                                                               |
-| `scripts/ci`                                                                | 舊的自架 GitLab CI 用的腳本                                                                                                                                                                                                          |
-| `scripts/dev`                                                               | 本機預覽的啟動腳本（只綁 127.0.0.1）                                                                                                                                                                                                 |
-| `packages/components`、`packages/react`、`apps/storybook`、`apps/demo-html` | 舊的 Lit Web Components，**已凍結，不修改**；root 的 `build`、`test` 不包含它們                                                                                                                                                      |
+| 目錄                                                                        | 內容                                                                                                                                                                                                                         |
+| --------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `packages/tokens`                                                           | **tokens 的唯一來源**。`src/**/*.tokens.json`（DTCG 格式）由 Style Dictionary（`build.mjs`）產生 `dist/tokens.css` 等檔案；`check.mjs` 檢查產物                                                                              |
+| `heroui/`                                                                   | vendored 的 HeroUI v3 原始碼和慈濟主題（`heroui/styles/themes/tzuchi`，`variables.css` 由 `generate.mjs` 從 tokens 產生）。修改規則見 `heroui/NOTICE.md`                                                                     |
+| `heroui/storybook`                                                          | 給工程師看的元件展示頁（Storybook）                                                                                                                                                                                          |
+| `apps/docs`                                                                 | 給一般讀者看的手冊（Astro Starlight）：首頁、文件、元件、範本、主題五個區域，頁首有主題選單和色彩模式按鈕。手冊的資料在 `src/data/`，手冊用的元件在 `src/components/handbook/`；做到哪裡見 `docs/rules/04-handbook-rules.md` |
+| `docs/rules`                                                                | 共編規則（上面已匯入）                                                                                                                                                                                                       |
+| `scripts/ci`                                                                | 舊的自架 GitLab CI 用的腳本                                                                                                                                                                                                  |
+| `scripts/dev`                                                               | 本機預覽的啟動腳本（只綁 127.0.0.1）                                                                                                                                                                                         |
+| `packages/components`、`packages/react`、`apps/storybook`、`apps/demo-html` | 舊的 Lit Web Components，**已凍結，不修改**；root 的 `build`、`test` 不包含它們                                                                                                                                              |
 
 常用指令（在 repository 根目錄執行）：
 
@@ -76,7 +76,7 @@ Astro 的指令一律經過 `scripts/dev/astro.mjs` 或 `scripts/dev/docs.mjs`�
 | 不部署、不執行 `wrangler` 或任何 `publish`；`.gitlab-ci.yml` 是舊的自架 GitLab 流程                                                        | R-S-21                                                               |
 | 不刪除、不改名 token；基礎 Foundations 只新增                                                                                              | R-D-06、R-D-09 到 R-D-11                                             |
 | 變體名稱不可改，新變體依用途命名                                                                                                           | R-D-21 到 R-D-23                                                     |
-| 網站主題與色彩模式只設在 `<html>`（今天是 `data-theme="tzuchi"`／`"tzuchi-dark"`）                                                         | R-D-16                                                               |
+| 主題與色彩模式只設在 `<html>`（今天是 `data-theme="tzuchi"`／`"tzuchi-dark"`）                                                             | R-D-16                                                               |
 | `heroui/` 的修改標 `LOCAL CHANGE` 並列入 `heroui/NOTICE.md`（JSON 不能加註解，只記在清單裡）；改之前先問工程；我們的新元件不放進 `heroui/` | `03-component-rules.md` 第 3 節                                      |
 | `heroui/MAINTAINING.md` 不隨 Storybook 提供，但一樣公開                                                                                    | R-S-28                                                               |
 | `drill/*` 分支不推                                                                                                                         | R-S-31                                                               |

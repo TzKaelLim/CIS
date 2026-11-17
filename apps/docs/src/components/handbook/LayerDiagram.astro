@@ -1,18 +1,18 @@
 ---
-// 三層示意圖（基礎共用 → 網站主題每個網站一份 → 元件共用）。
-// 網站名稱排成會自動換行的小標籤，網站再多也只是多幾行。
+// 三層示意圖（基礎共用 → 主題，每個網站選用一個 → 元件共用）。
+// 主題名稱排成會自動換行的小標籤，主題再多也只是多幾行。
 import { SITE_THEMES } from '../../data/site-themes';
 ---
 
-<div class="layers not-content" role="img" aria-label="三層示意：基礎共用，網站主題每個網站一份，元件共用">
+<div class="layers not-content" role="img" aria-label="三層示意：基礎共用，主題每個網站選用一個，元件共用">
   <div class="layer shared">
     <div class="title">基礎 Foundations <span class="who">所有網站共用一份</span></div>
     <div class="desc">色票、字級、間距、圓角。像一盒顏料：每個網站拿到的是同一盒。</div>
   </div>
   <div class="arrow" aria-hidden="true">↓ 語意色從基礎裡挑值</div>
   <div class="layer per-site">
-    <div class="title">網站主題 <span class="who">每個網站一份</span></div>
-    <div class="desc">決定語意色（主色、文字、背景、邊框…）在這個網站各用哪個基礎色；需要時也調整圓角、陰影、字級、間距。每個網站主題都有淺色、深色兩組（色彩模式）。</div>
+    <div class="title">主題 <span class="who">每個網站選用一個</span></div>
+    <div class="desc">決定語意色（主色、文字、背景、邊框…）在這個主題裡各用哪個基礎色；需要時也調整圓角、陰影、字級、間距。每個主題都有淺色、深色兩組（色彩模式）。</div>
     <div class="sites">
       {
         SITE_THEMES.map((site) => (
@@ -26,10 +26,10 @@ import { SITE_THEMES } from '../../data/site-themes';
       }
     </div>
   </div>
-  <div class="arrow" aria-hidden="true">↓ 元件照網站主題上色</div>
+  <div class="arrow" aria-hidden="true">↓ 元件照主題上色</div>
   <div class="layer shared">
     <div class="title">元件 Components <span class="who">所有網站共用一份</span></div>
-    <div class="desc">按鈕、卡片、導覽列…只做一次。換網站時元件不用改，顏色自動跟著網站主題。</div>
+    <div class="desc">按鈕、卡片、導覽列…只做一次。換主題時元件不用改，顏色自動跟著主題。</div>
   </div>
 </div>
 

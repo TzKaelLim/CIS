@@ -169,7 +169,7 @@
         "tailwind": "aspect-video、aspect-square、aspect-[4/3]、object-cover"
       },
       "tailwind_can_do": true,
-      "component_tokens": "不需要（判斷）；若美編希望各網站主題能改比例，再新增",
+      "component_tokens": "不需要（判斷）；若美編希望各主題能改比例，再新增",
       "status": "未開始",
       "duplicate_of": null,
       "notes": null

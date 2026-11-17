@@ -10,7 +10,7 @@
 //   有 JavaScript 時，點卡片、按 Enter 或空白鍵打開預覽對話框。
 //
 // 預覽對話框（<dialog>，showModal()）
-// - 上方：名稱、分類、「示意」、寬度切換（桌機／平板／手機）、網站主題選單和色彩模式按鈕
+// - 上方：名稱、分類、「示意」、寬度切換（桌機／平板／手機）、主題選單和色彩模式按鈕
 //   （和頁首的是同一套：對話框打開時頁首按不到，所以在這裡也放一份）、「上一個」「下一個」
 //   （只在目前篩選出來的範本之間切換）、關閉。
 // - 寬度：讀者還沒選過時，打開時選放得下的最大寬度（縮小後至少 70%），所以手機上預設是「手機」。
@@ -127,7 +127,7 @@ const previewJson = JSON.stringify(previewData).replace(/</g, '\\u003c');
           }
         </div>
         <div class="right">
-          <div class="look" role="group" aria-label="預覽的網站主題和色彩模式">
+          <div class="look" role="group" aria-label="預覽的主題和色彩模式">
             <SiteMenu id="tc-preview-site-menu-list" />
             <ColorModeToggle />
           </div>
@@ -855,7 +855,7 @@ const previewJson = JSON.stringify(previewData).replace(/</g, '\\u003c');
     align-items: center;
     gap: 0.5rem;
   }
-  /* 網站主題和色彩模式：和頁首的按鈕一樣，右邊用一條細線和「上一個」「下一個」分開。 */
+  /* 主題和色彩模式：和頁首的按鈕一樣，右邊用一條細線和「上一個」「下一個」分開。 */
   .look {
     display: flex;
     align-items: center;
@@ -958,7 +958,7 @@ const previewJson = JSON.stringify(previewData).replace(/</g, '\\u003c');
     white-space: nowrap;
   }
 
-  /* 窄的對話框：寬度切換、網站主題和色彩模式排到第二行。 */
+  /* 窄的對話框：寬度切換、主題和色彩模式排到第二行。 */
   @media (max-width: 68rem) {
     .top {
       grid-template-columns: minmax(0, 1fr) auto;
@@ -969,7 +969,7 @@ const previewJson = JSON.stringify(previewData).replace(/</g, '\\u003c');
     .widths {
       justify-self: start;
     }
-    /* 第一行：名稱和上一個／下一個／關閉；第二行：寬度切換和網站主題／色彩模式。 */
+    /* 第一行：名稱和上一個／下一個／關閉；第二行：寬度切換和主題／色彩模式。 */
     .right {
       display: contents;
     }
