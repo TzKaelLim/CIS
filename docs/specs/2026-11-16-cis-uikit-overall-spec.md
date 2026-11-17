@@ -150,6 +150,7 @@ Claude Code 的工作是修改檔案、在本機跑檢查和預覽、commit、�
 
 - S-6　文件、PR 和 repo 裡的任何檔案，只寫角色（美編（設計）、工程、廠商、專案負責人），不寫個人姓名。〔目標〕
 - S-7　token 的名稱與值、命名規則、手冊的設計內容，由美編（設計）核可。〔部分：只是約定，沒有機器強制〕
+- S-114　手冊（`apps/docs`）的內容，美編（設計）、工程和廠商都可以修改，流程和其他修改一樣。誰核可不變（S-7）。〔現行：專案負責人 2026-11-17 的決定〕
 - S-8　建置、CI 和工具的修改，由工程核可。〔部分：只是約定，沒有機器強制〕
 - S-9　一個 PR 同時改到兩類內容時，兩個角色都要核可。上表「暫定」那一欄（元件外觀、元件程式碼、相依套件、`heroui/`、規則、路線圖批次）和要不要用 CODEOWNERS 強制，待決定（第 13 節 Q2）。〔部分：Claude 在 PR 說明寫出需要的角色；沒有 CODEOWNERS〕
 - S-10　每個修改都經過 PR。`main` 受保護：只能經由 PR 修改，只能用 merge commit 合併（關閉 squash 和 rebase 合併），由人按合併。〔目標〕
@@ -611,6 +612,7 @@ packages/tokens/src/sites/<id>/
 | S-111 NOTICE 與 MAINTAINING 分工 | 已實作 | `heroui/NOTICE.md`、`heroui/MAINTAINING.md` |
 | S-112 手動挑選上游修正 | 已實作 | `heroui/MAINTAINING.md`「Looking at upstream later」 |
 | S-113 範本區域 | 已實作 | `apps/docs/src/components/handbook/TemplateGallery.astro`（卡片和預覽對話框）、`apps/docs/src/pages/templates/frame/[id].astro`（畫面頁）、`apps/docs/src/pages/templates/[id].astro`（舊網址的轉址頁）；`scripts/docs/handbook.test.mjs` 檢查範本目錄、範本元件和兩個網址一致；互動是 puppeteer 人工檢查 |
+| S-114 手冊誰可以修改 | 已實作 | SOP R-S-48；`CONTRIBUTING.md`「角色與核可」；手冊的「如何參與修改」和首頁的「誰參與修改」 |
 
 ---
 

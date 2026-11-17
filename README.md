@@ -74,6 +74,8 @@ pnpm lint                             # eslint 和 prettier --check
 4. 你確認之後，Claude Code 才存成 commit、推分支、開 PR。
 5. 負責的角色核可，再由有權限的人合併。Claude Code 不合併、不核可、不部署。
 
+手冊（`apps/docs`）的內容，美編（設計）、工程和廠商都可以修改，流程相同。
+
 完整的說明在 [`CONTRIBUTING.md`](CONTRIBUTING.md)。這個 repository 是公開的：不寫姓名、電子郵件、內部主機名稱、本機路徑或任何祕密。
 
 ## 用詞
