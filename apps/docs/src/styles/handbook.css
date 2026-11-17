@@ -72,6 +72,23 @@
   --sl-content-width: 76rem;
 }
 
+/* 右側的「本頁目錄」欄：Starlight 預設和左側欄一樣寬（18.75rem），對短短的中文標題來說太寬，
+   改成 14rem。省下的寬度留在內文左邊。兩個寬度相加仍然是 100%（算式照 Starlight 的
+   TwoColumnContent.astro，只把側欄寬度換成 --hb-toc-width）。 */
+@media (min-width: 72rem) {
+  :root {
+    --hb-toc-width: 14rem;
+  }
+  .right-sidebar-container {
+    width: calc(var(--hb-toc-width) + (100% - var(--sl-content-width) - var(--hb-toc-width)) / 2);
+  }
+  :root[data-has-sidebar][data-has-toc] .main-pane {
+    width: calc(
+      var(--sl-content-width) + (100% - var(--sl-content-width) - var(--hb-toc-width)) / 2
+    );
+  }
+}
+
 /* 側欄：一般字重的清單，目前頁面用淡品牌色底標示。 */
 #starlight__sidebar .sidebar-content {
   gap: 1rem;
