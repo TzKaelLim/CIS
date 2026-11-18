@@ -97,6 +97,12 @@ const ALLOWED = [
     pattern: /^https:\/\/cli\.github\.com$/,
     reason: 'navigation link to the GitHub CLI download page',
   },
+  {
+    // The official GitHub CLI releases page, where the same tutorial sends Mac readers
+    // for the installer; also a navigation link only.
+    pattern: /^https:\/\/github\.com\/cli\/cli\/releases\/latest$/,
+    reason: 'navigation link to the GitHub CLI releases page',
+  },
 ];
 
 /** Files whose text ends up in the handbook's pages, styles or scripts. */
