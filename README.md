@@ -22,7 +22,7 @@
 | 知道必須遵守哪些規則                | [`docs/rules/`](docs/rules/README.md)：共編流程、設計規則、元件規則、手冊規則                                                    |
 | 知道整體的設計和還沒決定的事        | [`docs/specs/2026-11-16-cis-uikit-overall-spec.md`](docs/specs/2026-11-16-cis-uikit-overall-spec.md)                             |
 | 知道要做哪些元件、做到哪裡          | [`docs/component-roadmap.md`](docs/component-roadmap.md)                                                                         |
-| 讓 Claude 替你開 PR、讀核可人的意見 | 手冊的「在 Claude Desktop 連接 GitHub」（[原始檔](apps/docs/src/content/docs/docs/claude-desktop-github.mdx)）：五分鐘的設定教學 |
+| 讓 Claude 替你開 PR、讀核可人的意見 | 手冊的「在 Claude Desktop 連接 GitHub」（[原始檔](apps/docs/src/content/docs/docs/claude-desktop-github.mdx)）：十分鐘的設定教學 |
 | 用 Claude Code 在這裡工作           | [`CLAUDE.md`](CLAUDE.md)：Claude Code 每次開始工作都會自動讀它                                                                   |
 
 ## 目錄

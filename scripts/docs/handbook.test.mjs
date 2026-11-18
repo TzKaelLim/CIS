@@ -82,7 +82,7 @@ const ALLOWED = [
   {
     // The header's "GitHub repository" link (apps/docs/src/data/repository.ts). It is a
     // navigation link the reader may follow in a new tab; the handbook never loads anything from it.
-    pattern: /^https:\/\/github\.com\/TzKaelLim\/CIS$/,
+    pattern: /^https:\/\/github\.com\/tzuchi-digital\/CIS$/,
     reason: 'navigation link to this repository',
   },
   {
@@ -91,6 +91,11 @@ const ALLOWED = [
     // reader follows on purpose; the handbook never loads anything from it.
     pattern: /^https:\/\/claude\.com\/download$/,
     reason: 'navigation link to the Claude Desktop download page',
+  },
+  {
+    // The GitHub CLI download link in the same tutorial; also a navigation link only.
+    pattern: /^https:\/\/cli\.github\.com$/,
+    reason: 'navigation link to the GitHub CLI download page',
   },
 ];
 

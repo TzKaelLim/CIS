@@ -155,7 +155,7 @@ Claude Code 的工作是修改檔案、在本機跑檢查和預覽、commit、�
 - S-9　一個 PR 同時改到兩類內容時，兩個角色都要核可。上表「暫定」那一欄（元件外觀、元件程式碼、相依套件、`heroui/`、規則、路線圖批次）和要不要用 CODEOWNERS 強制，待決定（第 13 節 Q2）。〔部分：Claude 在 PR 說明寫出需要的角色；沒有 CODEOWNERS〕
 - S-10　每個修改都經過 PR。`main` 受保護：只能經由 PR 修改，只能用 merge commit 合併（關閉 squash 和 rebase 合併），由人按合併。〔目標〕
 - S-11　Claude Code 不合併 PR、不部署、不推 `main`、不推 tag。〔部分〕
-- S-115　共編者可以在 Claude Desktop 連接 GitHub（Customize 裡的 GitHub Integration），用來開 PR、讀 PR 的意見和狀態、回覆意見。不用它合併、核可，也不用它在 GitHub 上直接改檔案。〔現行：專案負責人 2026-11-17 的決定；教學在手冊的 `/docs/claude-desktop-github/`〕
+- S-115　共編者在自己的電腦上用 Claude Desktop 修改，開 PR、讀 PR 的意見和狀態、回覆意見靠 GitHub CLI（`gh`）。Claude Desktop 的 GitHub Integration 是給雲端工作階段用的，這個流程不用它。不用 Claude 合併、核可，也不在 GitHub 上直接改檔案。〔現行：專案負責人 2026-11-18 的決定；教學在手冊的 `/docs/claude-desktop-github/`〕
 
 說明：本 repository 今天的遠端仍是自架 GitLab；只有舊的 `.gitlab/merge_request_templates/Default.md` 和 `.gitlab-ci.yml` 還用 MR 的流程。依專案負責人的決定，repository 的家改成公開的 GitHub repository；上面的保護設定要在 GitHub 上設好，才算完成。GitHub repository 建好、網址寫進 `CLAUDE.md` 之前，Claude 只在本機 commit，不推分支（`docs/rules/01-co-editing-sop.md` R-S-44）。
 
@@ -194,7 +194,7 @@ Claude Code 的工作是修改檔案、在本機跑檢查和預覽、commit、�
 - S-18　共編者沒確認，Claude 不 commit、不推分支。推之前 Claude Code 會再問一次，共編者確認後才允許。〔現行〕
 - S-19　commit 訊息用英文 conventional commits（例如 `feat(tokens): …`）；commit 訊息和 PR 標題不用 `publish` 這個字（`.claude/settings.json` 的規則會擋下整個指令）。〔現行〕
 - S-20　PR 說明用白話，固定五段：「改了什麼」「哪些畫面會變」「請看哪幾頁（含主題與色彩模式）」「屬於哪一級（第一級／第二級／第三級／不適用）、為什麼」「檢查結果」。預覽截圖只給共編者在自己電腦上看，不附在 PR 上（能不能附只截頁面內容的截圖，待決定 Q11）。PR 範本在 `.github/pull_request_template.md`。核可人在自己電腦上用 Claude Code 開 PR 的預覽（`docs/rules/01-co-editing-sop.md` R-S-43）。〔現行（規則）〕
-- S-21　Claude 用共編者自己的帳號推分支和開 PR〔現行（規則）〕。開 PR 的工具（例如 GitHub CLI `gh`）要不要在每台電腦安裝，由工程決定〔提案，待工程確認〕。
+- S-21　Claude 用共編者自己的帳號推分支和開 PR〔現行（規則）〕。GitHub 的登入只用 GitHub CLI（`gh`）這一種：每台共編的電腦都安裝 `gh`，由共編者本人用瀏覽器登入，推分支和開 PR 都用這個登入（S-115）〔現行：專案負責人 2026-11-18 的決定〕。
 - S-22　CI 還沒有。GitHub Actions 的 CI 建好之前，S-16 的本機檢查就是唯一的關卡；CI 建好後，CI 沒通過的 PR 不能合併。〔目標〕
 - S-23　`drill/*` 分支只在本機演練用，不推。〔現行〕
 
@@ -550,7 +550,7 @@ packages/tokens/src/sites/<id>/
 | S-18 確認後才 commit、推之前再問 | 已實作 | SOP R-S-14；`.claude/settings.json` 的 `ask: git push*` |
 | S-19 commit 訊息 | 已實作 | SOP R-S-15；`.claude/settings.json` 的 `Bash(* publish*)` |
 | S-20 PR 範本 | 已實作 | `.github/pull_request_template.md`（舊的 `.gitlab/` 範本留著，不再引用） |
-| S-21 用共編者帳號開 PR | 已實作（規則） | SOP R-S-16（`gh pr create` 或瀏覽器）；GitHub repository 尚未建立，`origin` 仍指向舊的 GitLab（R-S-44） |
+| S-21 用共編者帳號開 PR | 已實作（規則） | SOP R-S-16（`gh pr create`）、R-S-49；GitHub repository 尚未建立，`origin` 仍指向舊的 GitLab（R-S-44） |
 | S-22 CI | 尚未實作 | GitHub Actions 沒有；`.gitlab-ci.yml` 是舊的自架 GitLab 流程，不是今後的做法 |
 | S-23 drill 分支不推 | 已實作（規則） | SOP R-S-31 |
 | S-24 基礎只新增 | 已實作（規則） | `docs/rules/02-design-rules.md` R-D-06；沒有機器檢查 |
@@ -614,7 +614,7 @@ packages/tokens/src/sites/<id>/
 | S-112 手動挑選上游修正 | 已實作 | `heroui/MAINTAINING.md`「Looking at upstream later」 |
 | S-113 範本區域 | 已實作 | `apps/docs/src/components/handbook/TemplateGallery.astro`（卡片和預覽對話框）、`apps/docs/src/pages/templates/frame/[id].astro`（畫面頁）、`apps/docs/src/pages/templates/[id].astro`（舊網址的轉址頁）；`scripts/docs/handbook.test.mjs` 檢查範本目錄、範本元件和兩個網址一致；互動是 puppeteer 人工檢查 |
 | S-114 手冊誰可以修改 | 已實作 | SOP R-S-48；`CONTRIBUTING.md`「角色與核可」；手冊的「如何參與修改」和首頁的「誰參與修改」 |
-| S-115 在 Claude Desktop 連接 GitHub | 已實作 | SOP R-S-49、R-S-20（靠規則，沒有工具層的阻擋）；手冊 `apps/docs/src/content/docs/docs/claude-desktop-github.mdx` |
+| S-115 在 Claude Desktop 連接 GitHub（用 `gh`） | 已實作 | SOP R-S-49、R-S-20；`.claude/settings.json` 擋下 `gh pr merge` 和 `gh pr review --approve`；手冊 `apps/docs/src/content/docs/docs/claude-desktop-github.mdx` |
 
 ---
 
