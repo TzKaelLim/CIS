@@ -1,0 +1,136 @@
+---
+// 一個主題和預設主題不一樣的顏色（只列有差異的 token）。
+// 淺色、深色各一張表，每張只有兩欄色值：預設 → 這個主題。
+import ColorChip from './ColorChip.astro';
+import {
+  DEFAULT_SITE,
+  MODES,
+  MODE_LABEL,
+  getSite,
+  tokenLabel,
+  varName,
+} from '../../data/site-themes';
+
+interface Props {
+  siteId: string;
+  /** 右欄的標題；預設是主題名稱。 */
+  targetLabel?: string;
+}
+
+const site = getSite(Astro.props.siteId);
+const targetLabel = Astro.props.targetLabel ?? site.名稱;
+const groups = MODES.map((mode) => ({ mode, rows: site.diff.filter((d) => d.mode === mode) }));
+---
+
+{
+  site.diff.length === 0 ? (
+    <p>這個主題的顏色和預設主題（{DEFAULT_SITE.名稱}）完全相同。</p>
+  ) : (
+    <div class="diff-groups not-content">
+      {groups.map(({ mode, rows }) => (
+        <div class="table-wrap">
+          <table class="diff">
+            <caption>
+              {MODE_LABEL[mode]}
+              <span class="count">改了 {rows.length} 個</span>
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col">用途</th>
+                <th scope="col">預設（{DEFAULT_SITE.名稱}）</th>
+                <th scope="col">
+                  <span class="sr-only">改成</span>
+                </th>
+                <th scope="col">{targetLabel}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.length === 0 ? (
+                <tr>
+                  <td colspan="4">{MODE_LABEL[mode]}的顏色和預設主題相同。</td>
+                </tr>
+              ) : (
+                rows.map((d) => (
+                  <tr>
+                    <th scope="row">
+                      {tokenLabel(d.token)}
+                      <code>{varName(d.token)}</code>
+                    </th>
+                    <td>
+                      <ColorChip hex={d.預設值} />
+                    </td>
+                    <td class="arrow" aria-hidden="true">
+                      →
+                    </td>
+                    <td>
+                      <ColorChip hex={d.本主題值} />
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+<style>
+  .diff-groups {
+    display: grid;
+    gap: 1rem;
+    margin-block: 1rem;
+  }
+  .table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.5rem;
+  }
+  .diff {
+    border-collapse: collapse;
+    inline-size: 100%;
+    min-inline-size: 420px;
+    font-size: var(--hb-text-body);
+  }
+  caption {
+    text-align: start;
+    padding: 0.5rem 0.65rem;
+    font-weight: 700;
+    color: var(--sl-color-white);
+    border-block-end: 1px solid var(--sl-color-gray-5);
+  }
+  .count {
+    margin-inline-start: 0.5rem;
+    font-size: var(--hb-text-label);
+    font-weight: 500;
+    color: var(--sl-color-gray-3);
+  }
+  th,
+  td {
+    padding: 0.4rem 0.65rem;
+    text-align: start;
+    border-block-end: 1px solid var(--sl-color-gray-6);
+    vertical-align: middle;
+  }
+  thead th {
+    background: var(--sl-color-gray-6);
+    font-weight: 600;
+  }
+  tbody th {
+    font-weight: 500;
+  }
+  code {
+    display: block;
+    font-size: var(--hb-text-label);
+    font-weight: 400;
+    background: none;
+    padding: 0;
+    color: var(--sl-color-gray-3);
+  }
+  .arrow {
+    color: var(--sl-color-gray-3);
+    padding-inline: 0;
+    inline-size: 1.25rem;
+  }
+</style>

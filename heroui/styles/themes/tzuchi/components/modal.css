@@ -1,0 +1,131 @@
+/* -------------------------------------------------------------------------------------------------
+ * Tzu Chi theme — Modal
+ *
+ * WHAT THIS CHANGES (everything else is HeroUI's, on purpose)
+ *   · dialog radius     min(32px, --radius-3xl) → 24px under this theme → 16px (--tc-modal-radius)
+ *   · dialog elevation  --overlay-shadow → Tzu Chi elevation.4, the level the modal spec picks.
+ *                       LIGHT ONLY: ../generate.mjs deliberately omits --tzuchi-modal-shadow
+ *                       in the dark theme (DARK_OMIT), so the fallback applies there and the
+ *                       dialog keeps HeroUI's 1px inset hairline — a black drop shadow is
+ *                       invisible on a near-black page and the hairline is the only edge
+ *   · heading weight    500 (font-medium) → 700 (typography.subtitle); 16px/1.5 already matched
+ *   · body type         14px/1.43 in --muted → 16px/1.6 in the dialog's own foreground
+ *                       (tc-modal's .body paints with --tc-modal-fg = text.default, not muted)
+ *   · region rhythm     header→body 8px → 16px;  header/body→footer 20px → 24px
+ *   · footer            wraps its action row (tc); the 8px gap already matched
+ *   · close trigger     a bare glyph at rest instead of a permanent --default chip;
+ *                       every hover / pressed / focus / disabled treatment is left to upstream
+ *   · enter motion      250ms ease-out-quad / 150ms ease-out → motion.duration.base +
+ *                       motion.easing.standard
+ *
+ * KEPT AS HEROUI (see the report for the reasoning)
+ *   dialog padding (24px both sides), close-trigger position (both designs land on the same
+ *   optical centre, 28px in from the corner), backdrop colour, focus ring, disabled opacity,
+ *   header gap / icon slot, the size scale, and tc's fixed 560px × 85vh box.
+ *
+ * VARIANT MAPPING
+ *   tc-modal is a single, un-varianted dialog — no size, scroll, placement or backdrop variants,
+ *   and its only booleans (dismissible, no-close) are behavioural. So every rule below is
+ *   variant-agnostic and holds across HeroUI's whole matrix:
+ *     size      xs · sm · md · lg · cover · full   ← tc has one 560px box; see report
+ *     scroll    inside · outside                   ← tc always scrolls inside (overflow:auto)
+ *     placement auto · top · center · bottom       ← tc is UA-centred only
+ *     variant   opaque · blur · transparent        ← tc has one scrim, = HeroUI's opaque
+ *   The single exception is `--full`, which upstream deliberately strips of radius and shadow;
+ *   the shell rule excludes it so that stays true.
+ *
+ * Reviewed: no changes. Verified against the compiled Storybook CSS
+ * (storybook-static/assets/iframe--2qJGi4C.css), modal.tsx / close-button.tsx's slot/className
+ * composition, modal.styles.ts / close-button.styles.ts, themes/{default,tzuchi}/variables.css and
+ * packages/tokens/dist/tokens.css: every selector exists and is actually emitted (including
+ * `.modal__close-trigger.close-button--default`, which only appears together because
+ * ModalCloseTrigger merges the `modal__close-trigger` slot class onto CloseButtonRoot's own
+ * `close-button close-button--default`); every rule is scoped by `[data-theme^="tzuchi"]`
+ * individually, including both branches of the two comma-separated rules, so nothing leaks into
+ * upstream's own themes; no `--tc-color-*` or colour-valued component token is referenced, and no
+ * hex/rgb/hsl/oklch literal appears (only `transparent`, which is allowed); `--tw-shadow` really is
+ * the property `.modal__dialog`'s `shadow-overlay` utility compiles to (confirmed in the built CSS:
+ * `--tw-shadow:var(--overlay-shadow)` feeding the shared `box-shadow: var(--tw-inset-shadow), …,
+ * var(--tw-shadow)` shorthand), so overriding it is the correct mechanism, and `:not(.modal__dialog
+ * --full)` correctly excludes the `--full` size, which sets its own `--tw-shadow:0 0 #0000` and
+ * `border-radius:0`; the close-trigger `:not(:hover, [data-hovered="true"], :active,
+ * [data-pressed="true"])` guard uses the exact attribute names `close-button.css` itself checks, so
+ * it truly goes inert the moment any of those states is active, and none of `status-focused` /
+ * `status-disabled` / `status-pending` touch `background-color`, so focus, disabled and pending all
+ * stay exactly as upstream renders them; the motion overrides set `--tw-animation-duration` (which
+ * `animate-in`'s shorthand checks before `--tw-duration`) and `--tw-ease`, both of which win their
+ * cascade by specificity against the base rules' own `--tw-duration` / `--tw-ease`, while
+ * `prefers-reduced-motion`'s `animation:none` rule still wins outright since it is untouched; every
+ * declared value round-trips to the exact tokens.css figures the header comment claims
+ * (`--tc-modal-radius`→`--tc-radius-lg`=16px, `--tc-font-weight-bold`=700, `--tc-font-size-16`=16px,
+ * `--tc-line-height-relaxed`=1.6, `--tc-space-16`=16px, `--tc-space-24`=24px,
+ * `--tc-motion-duration-base`=200ms, `--tc-motion-easing-standard`=cubic-bezier(0.2,0,0,1),
+ * `--tc-elevation-4`=the two literals cited); and `--overlay-foreground` is on the allowed HeroUI
+ * theme-variable list and does resolve to the same gray-900/gray-100 pair as
+ * `--tc-color-text-default` in both modes. `--tzuchi-modal-shadow` is confirmed necessary:
+ * `themes/tzuchi/variables.css`'s dark block never redeclares `--overlay-shadow`, so it falls through
+ * to `themes/default/variables.css`'s `[data-theme$="-dark"]` block — the inset white hairline — and
+ * `--tc-elevation-4` / `--tc-modal-shadow` are light literals in tokens.css that only flip under
+ * `[data-theme="dark"]` or an OS-level `prefers-color-scheme` media query, neither of which
+ * `tzuchi-dark` reliably matches. No HeroUI variant, size, breakpoint or state is broken or hidden.
+ * ---------------------------------------------------------------------------------------------- */
+
+/* Shell — Tzu Chi's 16px corner and elevation.4 drop shadow.
+ * --tw-shadow is the custom property upstream's own .modal__dialog rule declares, so setting it
+ * (rather than box-shadow) keeps Tailwind's inset/ring composition intact.
+ * `--full` is excluded so it keeps upstream's rounded-none / shadow-none. */
+[data-theme^="tzuchi"] .modal__dialog:not(.modal__dialog--full) {
+  border-radius: var(--tc-modal-radius, var(--tc-radius-lg, 16px));
+  --tw-shadow: var(--tzuchi-modal-shadow, var(--overlay-shadow));
+}
+
+/* Heading — typography.subtitle is bold; its 16px/1.5 already matches `text-base`. */
+[data-theme^="tzuchi"] .modal__heading {
+  font-weight: var(--tc-font-weight-bold, 700);
+}
+
+/* Body — typography.body, painted in the dialog's own foreground rather than --muted. */
+[data-theme^="tzuchi"] .modal__body {
+  font-size: var(--tc-font-size-16, 16px);
+  line-height: var(--tc-line-height-relaxed, 1.6);
+  color: var(--overlay-foreground);
+}
+
+/* Region rhythm — tc-modal: header margin-block-end 16px, footer margin-block-start 24px. */
+[data-theme^="tzuchi"] .modal__header + .modal__body {
+  margin-block-start: var(--tc-space-16, 16px);
+}
+
+[data-theme^="tzuchi"] .modal__header + .modal__footer,
+[data-theme^="tzuchi"] .modal__body + .modal__footer {
+  margin-block-start: var(--tc-space-24, 24px);
+}
+
+/* Footer — tc-modal's action row wraps when it runs out of room. */
+[data-theme^="tzuchi"] .modal__footer {
+  flex-wrap: wrap;
+}
+
+/* Close trigger — tc-modal's close is a bare glyph that only fills on hover/press.
+ * The :not() list is what keeps upstream's hover, pressed, focus-visible, disabled and pending
+ * treatments untouched: this rule simply stops applying the moment any of them is active. */
+[data-theme^="tzuchi"]
+  .modal__close-trigger.close-button--default:not(
+    :hover,
+    [data-hovered="true"],
+    :active,
+    [data-pressed="true"]
+  ) {
+  background-color: transparent;
+}
+
+/* Enter motion — motion.duration.base + motion.easing.standard.
+ * `animate-in` reads both of these out of its own `animation` shorthand
+ * (animation: enter var(--tw-animation-duration, var(--tw-duration, .15s)) var(--tw-ease, ease) …),
+ * so feeding the custom properties leaves `motion-reduce:animate-none` — which zeroes the
+ * animation-name — still winning, and leaves the exit animations at their upstream 100ms. */
+[data-theme^="tzuchi"] .modal__backdrop[data-entering="true"],
+[data-theme^="tzuchi"] .modal__container[data-entering="true"] {
+  --tw-animation-duration: var(--tc-motion-duration-base, 200ms);
+  --tw-ease: var(--tc-motion-easing-standard, cubic-bezier(0.2, 0, 0, 1));
+}

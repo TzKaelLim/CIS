@@ -1,14 +1,23 @@
 ---
-title: Typography
-description: 字級階層，對應 Figma Typography。
+title: 字體
+description: 字級的種類和用途。
+sidebar:
+  label: 字體
+  order: 2
 ---
 
 import TypeScale from '../../../components/TypeScale.astro';
 
-字級以語意 token（`typography.*`）表達，每個角色是一個 DTCG `typography` composite，
-編譯為單一 CSS `font` shorthand 變數（含 line-height）。下列每一行皆以實際的
-`var(--tc-typography-*)` 渲染：
+字級是有名字的設計數值，每一種用途（例如大標題、內文）一個名字，包含字的大小、粗細和行高。下面每一行都用真正的設計數值顯示：
 
 <TypeScale />
 
-字型家族預設 `Noto Sans TC` + 系統 fallback，可由 `--tc-font-family-base` 覆寫。
+字型預設用 Noto Sans TC；電腦上沒有這個字型時，改用系統內建的字型。
+
+## 給工程師
+
+以下是給工程師的技術說明，美編（設計）、網站的編輯和致遠（廠商）可以略過。
+
+字級以語意 token（`typography.*`）表達，每個用途是一個 DTCG `typography` composite，
+編譯為單一 CSS `font` shorthand 變數（含 line-height）。上面每一行都以實際的
+`var(--tc-typography-*)` 顯示。字型家族預設 `Noto Sans TC` 加系統的後備字型（fallback），可由 `--tc-font-family-base` 覆寫。

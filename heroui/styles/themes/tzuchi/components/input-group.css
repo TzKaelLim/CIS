@@ -1,0 +1,452 @@
+/*
+ * Tzu Chi theme — InputGroup
+ * ---------------------------------------------------------------------------
+ * Base:   styles/components/input-group.css — `.input-group`,
+ *         `.input-group__input` (shared by the Input and the TextArea slot),
+ *         `.input-group__prefix`, `.input-group__suffix`,
+ *         `.input-group--primary`, `.input-group--secondary`,
+ *         `.input-group--full-width`.
+ * Model:  there is no `tc-input-group`. InputGroup is the HeroUI home of the
+ *         prefix / suffix slots that `tc-input` renders itself, so the model is
+ *         tc-input's `.control`:
+ *           packages/components/src/input/tc-input.styles.ts:24-35
+ *             `.control { display:flex; align-items:center; gap: --tc-space-8;
+ *                         padding: --tc-space-8 --tc-space-20 }`
+ *           :47-57  inner `<input> { font: --tc-typography-body }` (400 16px/1.6)
+ *           :95-101 `::slotted([slot="prefix"]), ::slotted([slot="suffix"])`
+ *                   — inline-flex, text-muted, no size of their own.
+ *         gap-audit/input.md:38, :87-88 records exactly this hand-off:
+ *         "prefix / suffix slots + their 8px gap … HeroUI puts affixes in
+ *         InputGroup, a sibling component with its own override file."
+ *         gap-audit/README.md:135 lists InputGroup as one of the field-family
+ *         members that had not yet been aligned to Input's 43.6px / 20px shell.
+ *         Cross-checked against the pass-1/2 overrides input.css, textarea.css
+ *         and search-field.css so all four field shells are one geometry.
+ *
+ * VARIANT MAPPING
+ *   tc-input's `.control` with slots   <->  .input-group / .input-group--primary
+ *   — no tc equivalent —               <->  .input-group--secondary (neutral
+ *        `--default` fill; it inherits every rule below because they all hang
+ *        off the shared BEM classes, and it keeps the theme-wide 1px
+ *        `--field-border`: every Tzu Chi field is bordered). Spec D13.
+ *   tc `:host { display: block }`      <->  .input-group--full-width (untouched;
+ *                                           HeroUI makes full width opt-in)
+ *
+ * WHAT THIS CHANGES — the field shell only: height, density, type, invalid edge.
+ * Radius (8px via --field-radius), border width (1px), border / background /
+ * text / placeholder colour, the flattened field shadow, the focus ring, the
+ * focus border (input-group.css:36 already repaints it, unlike SearchField),
+ * the disabled opacity and cursor and the font family all already resolve to
+ * the Tzu Chi values through themes/tzuchi/variables.css. None of it is
+ * repeated here (spec N5, D1, D21).
+ *
+ *   1. HEIGHT    `min-h-9` (36px) becomes the field floor 43.6px — R41/R49,
+ *      the same expression search-field.css:102-105 uses and the same number
+ *      input.css and tc's `.control` land on (1 + 8 + 25.6 + 8 + 1).
+ *   2. TYPE      the value is 16px/1.6 at every width; HeroUI's `text-base
+ *      sm:text-sm` steps down to 14px/20px from 40rem up — R2, and §1's
+ *      mechanical "no 14px step" rule.
+ *   3. AFFIX TYPE the prefix / suffix text ("https://", "USD", ".com") moves
+ *      off the shell's `text-sm` onto the value's own 16px/1.6, so affix and
+ *      value share a baseline — §1 (14px role moves to 16px), R2, and R19's
+ *      "give its row-mate the same metrics" principle.
+ *   4. DENSITY   the shell's inline inset becomes 20px — R50. On the input it
+ *      shows on the sides with no affix; HeroUI's own (0,3,0) `ps-0` / `pe-0`
+ *      rules (input-group.css:73-80) keep the input flush against an affix.
+ *      The affix itself then carries the inset: 20px to the shell edge and 8px
+ *      to the value — R53, tc `.control`'s 20px padding plus its 8px gap.
+ *   5. TEXTAREA  the TextArea slot's 38px floor becomes the 96px Tzu Chi text
+ *      box plus its 8px block padding = 112px — R55. The group's own 1px
+ *      borders add the last 2px, so the composed shell is the 114px the
+ *      standalone themed Textarea is (textarea.css:61-64).
+ *   6. INVALID   the border turns `--danger` and survives hover — R68, R69.
+ *      Upstream points it at `--color-field-border-invalid`, a variable no
+ *      theme or stylesheet in styles/ defines (same upstream bug SearchField
+ *      had; gap-audit/search-field.md:141-146), so the declaration is invalid
+ *      at computed-value time and the edge falls back to currentColor.
+ *
+ *   7. FOCUS RING (Pass 4) HeroUI's 2px `--focus` ring becomes tc's 3px pale
+ *      halo, and a focused invalid group gets it in `--danger`. §11 I1 / §12 Q2
+ *      is settled: tc-input.styles.ts:42-44 is the Tzu Chi field focus, and the
+ *      ring this file used to keep under D21 was mechanical. Input, SearchField
+ *      and InputGroup still focus identically — all three the Tzu Chi way.
+ *
+ * KEPT DELIBERATELY
+ *   · The prefix / suffix hairline divider (input-group.css:119, :145) and
+ *     their `--field-placeholder` text colour. tc draws no divider but also
+ *     paints its slots text-muted; the divider is HeroUI's own look and the
+ *     spec gives no rule for it (rule 6, restraint).
+ *   · Block padding (8px, already `py-2` — R51), the border radius, the
+ *     autofill handling, the `:has(textarea)` start-alignment and its
+ *     padding-top, `items-center`, the 150ms transitions (R131 already),
+ *     disabled (R85/D2) and every `--secondary` fill (D13).
+ *
+ * CASCADE NOTES (hand-derived, spec N7)
+ *   · `[data-theme^="tzuchi"] .input-group` (0,2,0) beats the base (0,1,0) for
+ *     min-block-size. `min-block-size` and `min-height` cascade together
+ *     (logical / physical mapping), and this file is imported after
+ *     @heroui/styles in the same "components" layer.
+ *   · `.input-group__input` (0,2,0) beats both the base (0,1,0) and its
+ *     `sm:` twin (also (0,1,0), inside a media query — media queries carry no
+ *     specificity), so 16px survives above 40rem.
+ *   · It is deliberately WEAKER than `.input-group:has([data-slot=
+ *     "input-group-prefix"]) .input-group__input` (0,3,0), so `ps-0` / `pe-0`
+ *     still win next to an affix. That is the intended result.
+ *   · The invalid rule is (0,3,0): it clears the base (0,2,0) outright and
+ *     ALSO clears `.input-group--secondary[data-invalid="true"]` outright —
+ *     that selector is one class + one attribute in a single compound
+ *     (input-group.css:192-196) = (0,2,0), not a tie. (NumberField's
+ *     equivalent secondary rule genuinely IS a (0,3,0) tie, because it is a
+ *     two-class descendant compound; the two components are not the same
+ *     shape and were mis-equated in an earlier draft of this note.) The hover
+ *     mirror is (0,5,0) against the base hover rule's (0,3,0) — R69's trap:
+ *     without it, hovering an invalid, unfocused group repaints the edge
+ *     `--field-border-hover`.
+ *   · The invalid rule is declared after the focus rule it must survive
+ *     (base input-group.css:33-38, (0,3,0)), so a focused invalid group keeps
+ *     the danger edge, as tc-input does (tc-input.styles.ts:65-69).
+ *   · Utility classes the stories add to a slot (`pe-0`, `pe-2`, `px-3`) live
+ *     in the utilities layer and still beat everything here, by design.
+ *
+ * Reviewed: selectors, scoping, colour rule, token mode-independence, and
+ * cascade math re-derived by hand against the live base CSS, styles.ts slot
+ * names and the real story markup (unit fields-a). One factual error was
+ * found and fixed: the cascade note claimed the invalid rule "ties" with
+ * `.input-group--secondary[data-invalid="true"]` at (0,3,0); that selector is
+ * actually (0,2,0) (one class + one attribute in a single compound, not a
+ * descendant chain), so this file's (0,3,0) invalid rule beats it outright,
+ * with no reliance on source order. No other change — every declaration,
+ * selector and kept-as-is claim checked out against `input-group.css`,
+ * `input-group.styles.ts` and `input-group.stories.tsx`.
+ *
+ * Pass 4 (2026-09-20): added the Tzu Chi focus halo (item 7 above). It is
+ * applied by overriding Tailwind's --tw-ring-shadow layer, never by declaring
+ * `box-shadow`, so `shadow-field` and the inset layers survive — which is also
+ * why R74's objection to re-declaring `box-shadow` no longer stands in the way.
+ * The shell's own `border-color: var(--field-border-focus)` on focus is
+ * untouched: base input-group.css:36 already sets it.
+ *
+ * Pass 4 reviewed: diffed against the pre-Pass-4 file — only item 7's two
+ * :has()-guarded rules were added; nothing else moved. Specificity re-derived:
+ * mirroring both base :has() forms under the theme attribute gives (0,4,0)
+ * against the base's (0,3,0); the invalid variant, keyed on :focus-within
+ * since the shell itself is not focusable, is also (0,4,0) and wins on source
+ * order over the halo above it, and outright over the base's invalid-focus
+ * ring (0,3,0). Injection-verified live in both themes on the plain and the
+ * invalid+focused group, including the TextArea slot. No corrections needed.
+ *
+ * Pass 5 (2026-09-20): four layout/state fixes raised by the screenshot QA of
+ * this family, all of them side effects of the 16px value type and the theme's
+ * "every field is bordered" rule meeting HeroUI's affix markup.
+ *   a. OVERFLOW  `.input-group__input` gets `min-inline-size: 0`. It is a flex
+ *      item, so its automatic minimum size is its min-content width; at 16px
+ *      that is 187px in a 280px shell whose affixes now take 45 + 66, so a text
+ *      suffix (".com", "USD") was pushed onto and past the shell's right
+ *      border. HeroUI's base gives it `flex-1` with no `min-w-0`
+ *      (base input-group.css:70), and upstream never noticed because its 14px
+ *      text keeps the sum under the shell width.
+ *   b. DIVIDER LENGTH  the affixes get `align-self: stretch` so their hairline
+ *      spans the shell instead of being as tall as whatever they contain
+ *      (16px icon / 24px Kbd / 25.6px text / 36px button / 40px badge inside
+ *      the same 43.6px field). `block-size: auto` goes with it because the base
+ *      pins them `h-full` (base input-group.css:115, :141) and `height: 100%`
+ *      is not `auto`, so on its own `align-self: stretch` is inert — measured:
+ *      still 16px / 25.6px with stretch alone, 41.6px with both. It is guarded
+ *      by `:not(:has(textarea))`: in the column composer stretching a prefix to
+ *      the full row width would re-centre its "Add Context" button, and (c)
+ *      removes that layout's hairlines anyway.
+ *   c. TEXTAREA  in a group that contains the TextArea slot the affix hairline
+ *      is suppressed (width 0). That layout stacks prefix / textarea / suffix
+ *      in a column, so the prefix's trailing line floats in the middle of the
+ *      top row and the suffix's leading line becomes a ~50px tick pinned inside
+ *      the composer's left border — two orphan marks that read as rendering
+ *      artefacts. The lines exist only because Tzu Chi sets
+ *      `--border-width-field: 1px`; upstream draws none at all.
+ *   d. DIVIDER COLOUR  the hairline now tracks the shell's own edge in the two
+ *      states that repaint it: `--field-border-focus` on focus (base
+ *      input-group.css:36) and `--danger` when invalid (this file, above).
+ *      The base pins it at `--field-border` (base input-group.css:119, :145),
+ *      so a red-bordered field used to carry two grey lines inside it. Hover is
+ *      deliberately NOT included — out of this pass's scope.
+ *
+ * Pass 5 cascade notes
+ *   · (a) is (0,2,0) on `.input-group__input`; nothing else declares a minimum
+ *     inline size on it, and it does not disturb the (0,3,0) `ps-0` / `pe-0`
+ *     affix rules this file relies on.
+ *   · (b) is (0,4,0) — theme attribute + `.input-group` + `:not(:has())`
+ *     (whose most specific argument is one attribute selector) + the affix
+ *     class — against the base's (0,1,0) `h-full`.
+ *   · (c) is (0,4,0) against the base's own textarea branch (0,3,0)
+ *     (base input-group.css:125-128, :151-154), which only re-aligns the affix.
+ *   · (d) mirrors the base's two `:has()` focus forms under the theme
+ *     attribute, giving (0,5,0) on the affix; the plain invalid rule is (0,4,0)
+ *     and is therefore repeated with the same `:has()` mirror at (0,6,0), so a
+ *     focused invalid group keeps the danger hairline instead of losing it to
+ *     the focus rule on specificity. Verified live: focused+invalid renders red
+ *     in both themes.
+ *   · Colours are `--field-border-focus` and `--danger`, both HeroUI theme
+ *     variables; the only other values added are 0, `auto` and `stretch`.
+ *
+ * Pass 5 verified by injection in both themes on --with-icon-prefix-and-text-
+ * suffix, --with-text-suffix, --all-variations, --with-text-area, --invalid
+ * (plain and focused), --variants, --disabled, --with-badge-suffix and
+ * --password-with-toggle: the suffix sits 20px inside the edge, every divider
+ * is 41.6px, the composer has no orphan lines, and no variant, size or state
+ * lost anything.
+ *
+ * Pass 5 reviewed (2026-09-20): diffed against the live theme file — only
+ * items (a)-(d) were added, nothing reordered or reformatted. Re-derived every
+ * new selector's specificity by hand against the cited base rules; confirmed
+ * `.input-group__input` has no other min-inline-size declaration to collide
+ * with, and that the `:not(:has(textarea))` / `:has(textarea)` pair is
+ * mutually exclusive so no field can match both the stretch rule and the
+ * suppression rule. Re-verified live by css: injection in both themes on
+ * --with-text-suffix (suffix now 212px+66px = 280px, no overflow), --all-
+ * variations (every divider 41.59px, uniform across icon/Kbd/button/badge
+ * affixes), --with-text-area (no orphan hairlines, light and dark), --invalid
+ * with the field both unfocused and :focus-within (shell and divider both
+ * stay --danger; halo never repaints it blue), and --disabled (shell and
+ * dividers unaffected). Only HeroUI theme variables and 0/auto/stretch are
+ * used; no color literal, no --tc-color-*, no !important, no physical
+ * property, no premature comment close. No corrections needed.
+ */
+
+[data-theme^="tzuchi"] {
+  /* ---------------------------------------------------------------- shell -- */
+  .input-group {
+    /* R41 / R49 — the field height formula: a 16px/1.6 line box + 2x8px block
+       padding + 2x1px border = 43.6px. HeroUI's `min-h-9` (36px) only fits its
+       own 14px/20px text. Floored, not fixed, so an affix taller than the value
+       (or a TextArea) can still grow the shell. */
+    min-block-size: calc(
+      var(--tc-font-size-16, 16px) * var(--tc-line-height-relaxed, 1.6) + 2 *
+        var(--tc-space-8, 8px) + 2 * var(--field-border-width, 1px)
+    );
+
+    /* Pass 4 — tc-input.styles.ts:42-44: focus paints the border AND lays a
+       3px halo in color.brand.surface-hover over it. --accent-soft-hover is
+       that tint in both modes (blue-200 / blue-700).
+       MECHANISM: `status-focused-field` is Tailwind's `ring-2 ring-focus`,
+       which sets --tw-ring-shadow; the base composes `box-shadow` from
+       var(--tw-inset-shadow), var(--tw-inset-ring-shadow),
+       var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow),
+       so overriding that one layer swaps the ring for the halo and leaves the
+       `shadow-field` and inset layers intact. --tw-ring-offset-width is already
+       0 in `focus-field-ring`, so no offset band survives.
+       SPECIFICITY: the base focus rule (input-group.css:33-38) is
+       `.input-group:has([data-slot="input-group-input"]:focus)` — (0,1,0) for
+       the class plus (0,2,0) for `:has()`'s most specific argument = (0,3,0).
+       Mirroring both of its `:has()` forms under the theme attribute makes
+       this (0,4,0), clearing it outright. The two forms are kept separate
+       rather than folded into one `:has(a, b)` so the selector stays a literal
+       mirror of the base's. */
+    &:has([data-slot="input-group-input"]:focus),
+    &:has([data-slot="input-group-textarea"]:focus) {
+      --tw-ring-shadow: 0 0 0 3px var(--accent-soft-hover);
+    }
+
+    /* R68 — tc-input.styles.ts:65-69: the border itself carries the error, and
+       it survives hover AND focus. HeroUI's 1px danger outline
+       (`status-invalid-field`) is left on top: it survives forced-colors mode
+       and is what thickens into the focused danger ring. */
+    &[data-invalid="true"] {
+      border-color: var(--danger);
+
+      /* Pass 4 — tc-input.styles.ts:71-73: a focused invalid field takes the
+         danger halo. The shell is not itself focusable, so `:focus-within` is
+         the state that matches, exactly as HeroUI's own `invalid-field-ring`
+         uses it. (0,4,0) — a tie with the halo rule above that source order
+         settles in this rule's favour (it is declared later), and outright
+         above the base's invalid-focus ring (0,3,0). */
+      &:focus-within,
+      &[data-focus-within="true"] {
+        --tw-ring-shadow: 0 0 0 3px var(--danger);
+      }
+
+      /* R69 — the hover-vs-invalid trap, same fix as input.css:74-82,
+         textarea.css:94-101 and search-field.css:137-142. */
+      @media (hover: hover) {
+        &:hover:not(:focus-within),
+        &[data-hovered="true"]:not([data-focus-within="true"]) {
+          border-color: var(--danger);
+        }
+      }
+    }
+  }
+
+  /* ------------------------------------------------- affix divider state -- */
+  /* Pass 5 (d) — the hairline is part of the field's edge, so it takes the
+     edge's colour whenever the shell repaints it. Mirrors the base's two
+     `:has()` focus forms (base input-group.css:33-38) under the theme
+     attribute: (0,5,0) on the affix against the base's (0,1,0)
+     `border-inline-end-color` / `border-inline-start-color`
+     (base input-group.css:119, :145). Logical longhands only, so the one edge
+     that is actually drawn is the one repainted. */
+  .input-group:has([data-slot="input-group-input"]:focus),
+  .input-group:has([data-slot="input-group-textarea"]:focus) {
+    .input-group__prefix {
+      border-inline-end-color: var(--field-border-focus);
+    }
+
+    .input-group__suffix {
+      border-inline-start-color: var(--field-border-focus);
+    }
+  }
+
+  /* R68's companion — the shell's invalid edge is `--danger` (above), so the
+     hairline inside it is too. (0,4,0). */
+  .input-group[data-invalid="true"] {
+    .input-group__prefix {
+      border-inline-end-color: var(--danger);
+    }
+
+    .input-group__suffix {
+      border-inline-start-color: var(--danger);
+    }
+  }
+
+  /* The focus rule above is (0,5,0) and would otherwise repaint the hairline
+     blue inside a focused invalid group, whose shell stays red. Repeating the
+     danger colour behind the same `:has()` mirror makes it (0,6,0) and settles
+     it on specificity, not import order — the same trap R69 documents for the
+     shell border. */
+  .input-group[data-invalid="true"]:has([data-slot="input-group-input"]:focus),
+  .input-group[data-invalid="true"]:has([data-slot="input-group-textarea"]:focus) {
+    .input-group__prefix {
+      border-inline-end-color: var(--danger);
+    }
+
+    .input-group__suffix {
+      border-inline-start-color: var(--danger);
+    }
+  }
+
+  /* ----------------------------------------------------------------- text -- */
+  .input-group__input {
+    /* Pass 5 (a) — the input is a flex item, so its automatic minimum size is
+       its min-content width (187px at 16px in the stock stories). With the
+       affixes now 20px+8px wide on each side, 45 + 187 + 66 overflowed the
+       280px shell by 18px and a text suffix was pushed onto the border. Base
+       input-group.css:70 is `flex-1` with no `min-w-0`, so nothing let it
+       shrink. Logical form of Tailwind's `min-w-0`. */
+    min-inline-size: 0;
+
+    /* R50 — tc `.control` pads 20px inline; the 8px block padding already
+       matches HeroUI's `py-2` (R51), so it is not restated. This 20px only
+       takes effect on a side with no affix: `ps-0` / `pe-0`
+       (input-group.css:73-80) are (0,3,0) and keep the value flush against a
+       prefix or suffix, which is exactly tc's model — the slot, not the input,
+       carries the inset there. */
+    padding-inline: var(--tc-space-20, 20px);
+
+    /* R2 — tc's inner input is `font: var(--tc-typography-body)` = 400 16px/1.6,
+       one size at every width, where HeroUI's `text-base sm:text-sm` shrinks to
+       14px/20px above 40rem. Longhands, not the `font` shorthand, so the
+       inherited (already Tzu Chi) family and the 400 weight survive. */
+    font-size: var(--tc-font-size-16, 16px);
+    line-height: var(--tc-line-height-relaxed, 1.6);
+  }
+
+  .input-group__input[data-slot="input-group-textarea"] {
+    /* R55 — the Tzu Chi text box is 96px (tc-textarea.styles.ts:49). Here the
+       element carries the block padding but NOT the border (the group has it),
+       so only the padding is added back; the group's 2x1px border makes the
+       composed shell 114px, the same as the standalone themed Textarea
+       (textarea.css:61-64). HeroUI's floor is a 38px slit.
+       `resize: vertical` is already set by the base (input-group.css:111). */
+    min-block-size: calc(
+      var(--tc-textarea-min-height, 96px) + 2 * var(--tc-space-8, 8px)
+    );
+  }
+
+  /* -------------------------------------------------------------- affixes -- */
+  /* Pass 5 (b) — the affix divider spans the shell. The base asks for it with
+     `h-full` (base input-group.css:115, :141), but `height: 100%` never
+     resolves: `.input-group` only ever has a `min-height`, so each affix was
+     only as tall as its own content and the same 43.6px field showed five
+     different hairlines (16 / 24 / 25.6 / 36 / 40px). `align-self: stretch`
+     alone cannot fix it either — stretch applies only when the cross size
+     computes to `auto`, and `100%` does not — so `block-size: auto` releases
+     the base's `h-full` first. Measured after both: 41.59px, the shell's inner
+     height, on every affix.
+     The guard keeps the TextArea composer out: there the group is a column, so
+     stretching would make the prefix full-width and re-centre its button.
+     (0,4,0) — the `:not(:has())` argument is a single attribute selector. */
+  .input-group:not(:has([data-slot="input-group-textarea"])) {
+    .input-group__prefix,
+    .input-group__suffix {
+      align-self: stretch;
+      block-size: auto;
+    }
+  }
+
+  /* Pass 5 (c) — in the TextArea composer the affixes stack above and below
+     the text box, so their inline hairline has nothing to divide: it floats in
+     the middle of the toolbar row (prefix) and hugs the shell's inside edge
+     (suffix). Suppress the one edge each affix actually draws; every other
+     border was already `none` in the base. (0,4,0) against the base's own
+     textarea branch (0,3,0), which only re-aligns them. */
+  .input-group:has([data-slot="input-group-textarea"]) {
+    .input-group__prefix {
+      border-inline-end-width: 0;
+    }
+
+    .input-group__suffix {
+      border-inline-start-width: 0;
+    }
+  }
+
+  .input-group__prefix,
+  .input-group__suffix {
+    /* §1 + R2 + R19 — the shell's `text-sm` (14px/20px) is the only reason an
+       affix label renders smaller than the value it annotates. Tzu Chi has no
+       14px step, and an affix sits on the value's baseline, so it takes the
+       value's own metrics. Weight and colour are untouched: the base leaves the
+       inherited 400 and paints `--field-placeholder`, which is tc's
+       `::slotted([slot="prefix"]) { color: text-muted }`. */
+    font-size: var(--tc-font-size-16, 16px);
+    line-height: var(--tc-line-height-relaxed, 1.6);
+  }
+
+  .input-group__prefix,
+  .input-group__suffix {
+    /* Pass 6 (2026-09-20, reported by the owner: "input group icon 有偏移").
+       Pass 3 wrote R53 here — 20px to the shell edge, 8px to the value — copied
+       from tc-input's `.control` (padding 20px, gap 8px). But tc-input draws NO
+       divider beside its prefix, so there the asymmetry is invisible. HeroUI
+       draws one (the affix's border-inline-*, visible under this theme because
+       --field-border is), which turns the affix into a BOX — and a 16px icon in
+       a 20px | 8px box sits 6px off its centre. HeroUI's own padding is
+       symmetric (`px-3`, 12px | 12px); pass 3 is what broke it.
+       Symmetric again, on the Tzu Chi 16px step: content is centred in its cell
+       whatever it is (icon, "$", "USD", "https://"). */
+    padding-inline: var(--tc-space-16, 16px);
+  }
+
+  /* An affix that holds a BUTTON (copy, password toggle) carries the button's own
+     ring of space around its glyph — 36px box, 16px glyph — so the cell adds only
+     4px. HeroUI's stories also put `pe-0` on such a suffix (a utility, which
+     out-ranks this layer on purpose: the consumer's call); with 4px the glyph stays
+     within 2px of centre either way. */
+  .input-group__prefix:has(> .button),
+  .input-group__suffix:has(> .button) {
+    padding-inline: var(--tc-space-4, 4px);
+  }
+}
+
+/* Pass 5, integrator (2026-09-20) — found on the final visual check, not by QA.
+   Beside an affix the base zeroes the value's inline padding (`ps-0` / `pe-0`,
+   base input-group.css:73-80), because upstream's affix divider is transparent
+   (--field-border). Under this theme the divider is a visible 1px line, so the
+   value started flush against it ("|name@email.com", "|10") while the affix's own
+   content kept its 8px. Give the value the same 8px on the side that faces an
+   affix — tc-input's `.control` gap — so the hairline sits in the MIDDLE of a
+   16px gutter. (0,4,0) against the base's (0,3,0); `min-inline-size: 0` above
+   lets the value give the 8px back, so nothing can overflow. */
+[data-theme^="tzuchi"] .input-group:has([data-slot="input-group-prefix"]) .input-group__input {
+  padding-inline-start: var(--tc-space-8, 8px);
+}
+
+[data-theme^="tzuchi"] .input-group:has([data-slot="input-group-suffix"]) .input-group__input {
+  padding-inline-end: var(--tc-space-8, 8px);
+}

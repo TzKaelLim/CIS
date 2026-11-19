@@ -1,0 +1,152 @@
+---
+// 一個迷你網頁（頁首、按鈕、連結、文章卡片、成功訊息），
+// 用指定主題的固定色碼畫出來。配色對應真正元件 token 的用法：
+// 按鈕 = button.*、連結 = link.fg（主色 hover）、文章卡片 = article-card.*。
+import SampleFrame from './SampleFrame.astro';
+import { getSite, type Mode } from '../../data/site-themes';
+
+interface Props {
+  siteId: string;
+  mode: Mode;
+}
+
+const { siteId, mode } = Astro.props;
+const site = getSite(siteId);
+---
+
+<SampleFrame siteId={siteId} mode={mode}>
+  <div class="mini">
+    <div class="bar">
+      <span class="logo" aria-hidden="true"></span>
+      <span class="site">{site.名稱}</span>
+      <span class="nav">首頁　活動　關於</span>
+    </div>
+    <div class="body">
+      <div class="actions">
+        <span class="btn filled">立即報名</span>
+        <span class="btn outlined">了解更多</span>
+      </div>
+      <p class="text">
+        想先看看日期？<span class="link">查看活動行事曆</span>
+      </p>
+      <div class="card">
+        <div class="headline">社區志工淨灘，一起守護海岸</div>
+        <p class="excerpt">週末上午集合，現場提供手套與分類袋，親子都能參加。</p>
+        <div class="meta">2026/11/16・活動報導</div>
+      </div>
+      <div class="success" role="status">
+        <span class="check" aria-hidden="true"></span>
+        報名成功，確認信已寄出。
+      </div>
+    </div>
+  </div>
+</SampleFrame>
+
+<style>
+  .mini {
+    background: var(--p-surface-subtle);
+  }
+  .bar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.55rem 0.75rem;
+    background: var(--p-brand);
+    color: var(--p-on-brand);
+  }
+  .logo {
+    inline-size: 1rem;
+    block-size: 1rem;
+    border-radius: 50%;
+    border: 2px solid currentColor;
+    flex: 0 0 auto;
+  }
+  .site {
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .nav {
+    margin-inline-start: auto;
+    font-size: var(--hb-sample-text-xs);
+    opacity: 0.9;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-inline-size: 0;
+  }
+  .body {
+    display: grid;
+    gap: 0.7rem;
+    padding: 0.85rem 0.75rem 0.9rem;
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.8rem;
+    border-radius: 0.4rem;
+    font-weight: 600;
+    font-size: var(--hb-sample-text-sm);
+    border: 1.5px solid transparent;
+  }
+  .filled {
+    background: var(--p-brand);
+    color: var(--p-on-brand);
+  }
+  .outlined {
+    border-color: var(--p-brand);
+    color: var(--p-brand);
+  }
+  .text {
+    margin: 0;
+    color: var(--p-text);
+  }
+  .link {
+    color: var(--p-brand-hover);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .card {
+    padding: 0.7rem 0.75rem;
+    border-radius: 0.5rem;
+    background: var(--p-surface);
+    border: 1px solid var(--p-border);
+  }
+  .headline {
+    font-weight: 700;
+    color: var(--p-brand);
+  }
+  .excerpt {
+    margin: 0.25rem 0 0.35rem;
+    color: var(--p-text);
+    font-size: var(--hb-sample-text-sm);
+  }
+  .meta {
+    font-size: var(--hb-sample-text-xs);
+    color: var(--p-text-muted);
+  }
+  .success {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.45rem 0.6rem;
+    border-radius: 0.4rem;
+    border: 1px solid var(--p-success);
+    border-inline-start-width: 4px;
+    background: var(--p-surface);
+    color: var(--p-text);
+    font-size: var(--hb-sample-text-sm);
+  }
+  .check {
+    inline-size: 0.55rem;
+    block-size: 0.85rem;
+    border: solid var(--p-success);
+    border-width: 0 2.5px 2.5px 0;
+    transform: rotate(45deg) translateY(-2px);
+    flex: 0 0 auto;
+  }
+</style>

@@ -1,0 +1,46 @@
+---
+// 「Storybook」連結按鈕。Storybook 是工程師逐一檢查元件狀態的工具網站（heroui/storybook），
+// 連結假設它和手冊放在同一個網址底下的 /storybook/；部署位置還沒決定（整體規格 Q3），
+// 所以本機預覽點了會找不到頁面（說明在 /docs/ 的「給工程師」和元件總覽）。
+import { Icon } from '@astrojs/starlight/components';
+
+interface Props {
+  /** Storybook 裡的路徑，例如 `/docs/components-button--docs`。省略 = Storybook 首頁。 */
+  path?: string;
+  /** 按鈕文字。 */
+  label?: string;
+}
+
+const { path, label = 'Storybook' } = Astro.props;
+const href = path ? `/storybook/?path=${path}` : '/storybook/';
+---
+
+<a class="storybook-link" href={href}>
+  <span>{label}</span>
+  <Icon name="external" size="0.9em" />
+</a>
+
+<style>
+  .storybook-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.4rem 0.9rem;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 999px;
+    color: var(--sl-color-white);
+    font-size: var(--hb-text-ui);
+    font-weight: 500;
+    line-height: var(--hb-line-height-ui);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .storybook-link:hover {
+    border-color: var(--sl-color-gray-3);
+    background-color: var(--sl-color-gray-6);
+  }
+  .storybook-link:focus-visible {
+    outline: 2px solid var(--sl-color-accent);
+    outline-offset: 2px;
+  }
+</style>

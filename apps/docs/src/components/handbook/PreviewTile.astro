@@ -1,0 +1,88 @@
+---
+// 預覽格：圓角的淡色底，裡面放真正的 <tc-*> 元件，置中顯示。
+//
+// - 內容可以從 slot 放進來，或用 html 傳一段 HTML（元件目錄的卡片預覽）。
+// - scale < 1 時，內容先用「預覽格寬度 ÷ scale」的寬度排版，再整塊縮小放回來，
+//   所以導覽列、頁尾這類很寬的元件也不會超出預覽格。
+// - card（元件總覽的卡片）的高度固定，超出高度的部分會被裁掉。
+// - hero（元件頁上方的大預覽）至少有固定的高度，內容比較高時預覽格會跟著長高，
+//   不會被裁掉（例如手機寬度下排成一欄的頁尾）。縮小用 CSS zoom，排版的高度才會跟著縮小。
+// - interactive={false}（預設）時整塊設為 inert：不能點、不能用鍵盤選到，
+//   也不會被螢幕閱讀器唸出來（卡片的名稱另外寫在連結上）。
+// - 底色和文字色用 --tc-* token，所以預覽會跟著頁首的主題和色彩模式一起變。
+interface Props {
+  html?: string;
+  scale?: number;
+  /** card：卡片用（16:10）；hero：元件頁上方的大預覽（比較矮、比較寬）。 */
+  size?: 'card' | 'hero';
+  interactive?: boolean;
+  class?: string;
+}
+
+const { html, scale = 1, size = 'card', interactive = false, class: className } = Astro.props;
+if (!(scale > 0 && scale <= 1)) throw new Error(`PreviewTile 的 scale 要在 0 和 1 之間：${scale}`);
+---
+
+<div class:list={['tc-preview-tile', 'not-content', size, className]}>
+  <div class="stage" style={`--tc-preview-scale:${scale}`} inert={!interactive}>
+    {html ? <Fragment set:html={html} /> : <slot />}
+  </div>
+</div>
+
+<script>
+  import '@tzuchi/components';
+</script>
+
+<style>
+  .tc-preview-tile {
+    position: relative;
+    container-type: inline-size;
+    overflow: hidden;
+    aspect-ratio: 16 / 10;
+    border: 1px solid var(--tc-handbook-tile-border, var(--sl-color-gray-6));
+    border-radius: var(--tc-handbook-radius, 14px);
+    background-color: var(--tc-handbook-tile, var(--tc-color-surface-subtle));
+    color: var(--tc-color-text-default);
+  }
+  .tc-preview-tile.hero {
+    display: flex;
+    align-items: center;
+    aspect-ratio: auto;
+    min-block-size: clamp(14rem, 34vw, 22rem);
+  }
+  /* hero 的內容在一般排版裡，預覽格的高度跟著內容；zoom 縮小時排版的寬度會變成
+     「預覽格寬度 ÷ scale」，高度也一起縮小，所以不必再算寬度或位移。 */
+  .tc-preview-tile.hero .stage {
+    position: relative;
+    inset: auto;
+    flex: 1 1 auto;
+    inline-size: auto;
+    min-inline-size: 0;
+    transform: none;
+    zoom: var(--tc-preview-scale);
+  }
+  .stage {
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    box-sizing: border-box;
+    inline-size: calc(100% / var(--tc-preview-scale));
+    padding: 1.5rem;
+    transform-origin: 0 0;
+    transform: scale(var(--tc-preview-scale)) translateY(-50%);
+    font-family: var(--tc-font-family-base);
+  }
+  :global([dir='rtl']) .stage {
+    transform-origin: 100% 0;
+  }
+  /* inert 的預覽不需要游標變成手指或文字游標。 */
+  .stage[inert] {
+    pointer-events: none;
+    user-select: none;
+  }
+</style>

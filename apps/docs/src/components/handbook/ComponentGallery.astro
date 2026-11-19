@@ -1,0 +1,88 @@
+---
+// 元件總覽頁的內容：每個分類一個區塊（標題、說明、卡片格線）。資料來自
+// src/data/component-catalog.ts，新增元件不需要改這個檔案。
+import ComponentCard from './ComponentCard.astro';
+import { COMPONENTS, componentsByCategory } from '../../data/component-catalog';
+
+const groups = componentsByCategory();
+---
+
+<div class="tc-gallery not-content">
+  <p class="count">目前有 {COMPONENTS.length} 個元件，分成 {groups.length} 類。</p>
+  {
+    groups.map(({ category, items }) => (
+      <section class="category" aria-labelledby={`category-${category.id}`}>
+        <div class="category-head">
+          <h2 id={`category-${category.id}`}>{category.名稱}</h2>
+          <p>{category.說明}</p>
+        </div>
+        <ul class="grid">
+          {items.map((entry) => (
+            <li>
+              <ComponentCard entry={entry} />
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))
+  }
+</div>
+
+<style>
+  .tc-gallery {
+    display: flex;
+    flex-direction: column;
+    /* 欄數依內容區的寬度決定（不是視窗寬度），側欄開著也排得剛好。 */
+    container-type: inline-size;
+  }
+  .count {
+    margin: 0 0 0.5rem;
+    color: var(--sl-color-gray-3);
+    font-size: var(--hb-text-body);
+    text-align: center;
+  }
+  .category {
+    padding-block: 2rem 0.25rem;
+    border-block-start: 1px solid var(--sl-color-hairline);
+  }
+  .category:first-of-type {
+    margin-block-start: 1.5rem;
+  }
+  .category-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 1rem;
+    margin-block-end: 1rem;
+  }
+  h2 {
+    margin: 0;
+    color: var(--sl-color-white);
+    font-size: var(--hb-text-category);
+    font-weight: 600;
+    line-height: var(--hb-line-height-headings);
+  }
+  .category-head p {
+    margin: 0;
+    color: var(--sl-color-gray-3);
+    font-size: var(--hb-text-body);
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.75rem 1.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  @container (min-width: 30rem) {
+    .grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @container (min-width: 50rem) {
+    .grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+</style>

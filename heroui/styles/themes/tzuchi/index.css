@@ -1,0 +1,15 @@
+/*
+ * Tzu Chi theme — same shape as ../default/: variables + component customizations.
+ * Select with <html data-theme="tzuchi"> or <html data-theme="tzuchi-dark">.
+ *
+ * Requires @tzuchi/tokens/tokens.css to be loaded first (the variables below
+ * reference its --tc-* primitives), and must be imported AFTER @heroui/styles
+ * and WITHOUT a wrapping layer(), so the two imports land in the top-level
+ * `theme` and `components` layers next to HeroUI's own.
+ */
+
+/* Theme variables (generated from @tzuchi/tokens — see ./generate.mjs) */
+@import "./variables.css" layer(theme);
+
+/* Component customizations for the Tzu Chi theme */
+@import "./components/index.css" layer(components);

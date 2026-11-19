@@ -1,0 +1,88 @@
+---
+// 首頁 hero 下方的一排裝飾：幾小塊真正的 <tc-*> 元件，會跟著頁首選的主題和色彩模式變色。
+// 只是裝飾，所以整塊 inert、aria-hidden：不能點、不會被 Tab 選到，也不會被螢幕閱讀器唸出來。
+// 這個檔案也放了首頁 hero 的全域樣式（只在用到它的首頁載入）。
+---
+
+<div class="tc-home-strip not-content" inert aria-hidden="true">
+  <div class="piece">
+    <tc-button variant="filled">送出</tc-button>
+    <tc-button variant="outlined">取消</tc-button>
+  </div>
+  <div class="piece chips">
+    <tc-chip selected>全部</tc-chip>
+    <tc-chip>慈善</tc-chip>
+    <tc-chip>環保</tc-chip>
+  </div>
+  <div class="piece wide">
+    <tc-search-bar placeholder="搜尋活動"></tc-search-bar>
+  </div>
+  <div class="piece">
+    <tc-badge tone="brand">志工招募</tc-badge>
+    <tc-badge tone="success" dot>報名中</tc-badge>
+  </div>
+</div>
+
+<script>
+  import '@tzuchi/components';
+</script>
+
+<style>
+  .tc-home-strip {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-block: 0 1rem;
+    pointer-events: none;
+    user-select: none;
+  }
+  .piece {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--tc-handbook-tile-border);
+    border-radius: 16px;
+    background-color: var(--tc-color-surface-default);
+    color: var(--tc-color-text-default);
+    font-family: var(--tc-font-family-base);
+  }
+  /* 膠囊標籤原尺寸比按鈕大，縮小一點讓幾塊看起來一樣大。 */
+  .chips tc-chip {
+    zoom: 0.85;
+  }
+  .wide tc-search-bar {
+    inline-size: 15rem;
+  }
+  /* 手機寬度只留前兩塊，避免裝飾佔掉整個畫面。 */
+  @media (max-width: 50rem) {
+    .piece:nth-child(n + 3) {
+      display: none;
+    }
+  }
+</style>
+
+<style is:global>
+  /* 首頁的 hero：名稱放大、置中，頁面比較寬（見 src/route-data.ts）。 */
+  :root:has(.tc-home-strip) .hero {
+    padding-block: clamp(2rem, 6vmin, 4rem) 1.5rem;
+  }
+  :root:has(.tc-home-strip) .hero h1 {
+    font-size: var(--hb-text-hero);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: var(--hb-line-height-hero);
+    color: var(--sl-color-white);
+  }
+  :root:has(.tc-home-strip) .hero .tagline {
+    max-inline-size: 40rem;
+    margin-inline: auto;
+    font-size: var(--hb-text-lead);
+    line-height: var(--hb-line-height);
+    color: var(--sl-color-gray-2);
+    text-wrap: balance;
+    /* 中文不在詞中間斷行，只在標點後換行（例如「，」）。 */
+    word-break: keep-all;
+  }
+</style>

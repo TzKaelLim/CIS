@@ -1,0 +1,148 @@
+---
+// 範本：電子書庫。書籍與出版品的書架：依類別瀏覽封面，接著閱讀上次看到的那一本。
+import '../../styles/templates.css';
+import SiteNavbar from '../template-parts/SiteNavbar.astro';
+import SiteFooter from '../template-parts/SiteFooter.astro';
+
+const TONES = ['', 'tone-b', 'tone-c'];
+const BOOKS = [
+  { title: '靜思語選輯', subtitle: '心寬念純' },
+  { title: '每日一叮嚀', subtitle: '世間祥和在於心' },
+  { title: '慈濟月刊', subtitle: '2026 年 11 月號' },
+  { title: '環保小學堂', subtitle: '給孩子的繪本' },
+  { title: '志工手記', subtitle: '二十個陪伴的故事' },
+  { title: '人間菩提', subtitle: '開示選集' },
+  { title: '慈濟月刊', subtitle: '2026 年 10 月號' },
+  { title: '竹筒歲月', subtitle: '圖文繪本' },
+];
+---
+
+<div class="tpl ebook-library">
+  <SiteNavbar current="人文" />
+
+  <header class="page-head">
+    <div class="tpl-container head-inner">
+      <div class="head-copy">
+        <h1 class="tpl-h1">電子書庫</h1>
+        <p class="tpl-muted">靜思語、月刊與繪本，線上免費閱讀。</p>
+      </div>
+      <tc-search-bar placeholder="搜尋書名或作者"></tc-search-bar>
+    </div>
+  </header>
+
+  <section class="tpl-section">
+    <div class="tpl-container shelf">
+      <tc-tabs value="all">
+        <tc-tab value="all">全部</tc-tab>
+        <tc-tab value="jingsi">靜思語</tc-tab>
+        <tc-tab value="monthly">慈濟月刊</tc-tab>
+        <tc-tab value="picture">繪本</tc-tab>
+      </tc-tabs>
+      <div class="tpl-grid-4 books">
+        {
+          BOOKS.map((book, i) => (
+            <tc-book-card ratio="portrait">
+              <div slot="cover" class:list={['tpl-photo', TONES[i % 3]]} style="aspect-ratio:3/4" aria-hidden="true" />
+              <span slot="title">{book.title}</span>
+              <span slot="subtitle">{book.subtitle}</span>
+            </tc-book-card>
+          ))
+        }
+      </div>
+      <div class="tpl-center">
+        <tc-pagination total="6" page="1"></tc-pagination>
+      </div>
+    </div>
+  </section>
+
+  <section class="tpl-section continue">
+    <div class="tpl-container">
+      <div class="tpl-section-head">
+        <h2 class="tpl-h2">繼續閱讀</h2>
+        <tc-button variant="tonal">開啟閱讀器</tc-button>
+      </div>
+      <div class="reader">
+        <tc-ebook-toolbar book-title="靜思語選輯">
+          <tc-icon-button label="搜尋"><tc-icon name="search"></tc-icon></tc-icon-button>
+          <tc-icon-button label="目錄"><tc-icon name="menu"></tc-icon></tc-icon-button>
+        </tc-ebook-toolbar>
+        <div class="pages">
+          <div class="page">
+            <p class="tpl-eyebrow">第三章・知足</p>
+            <p class="saying">「知足的人雖然睡在地上，也如同處在天堂。」</p>
+            <p class="tpl-muted">翻到下一頁，繼續閱讀這一章。</p>
+          </div>
+          <div class="tpl-photo tone-b page-art" aria-hidden="true"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <SiteFooter />
+</div>
+
+<style>
+  .page-head {
+    background: var(--tc-color-brand-surface);
+  }
+  .head-inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px 40px;
+    padding-block: 40px;
+  }
+  .head-copy {
+    display: grid;
+    gap: 8px;
+  }
+  .head-copy .tpl-h1 {
+    color: var(--tc-color-brand-primary);
+  }
+  .head-inner tc-search-bar {
+    inline-size: min(100%, 440px);
+  }
+  .shelf {
+    display: grid;
+    gap: 32px;
+  }
+  .books tc-book-card {
+    display: block;
+  }
+  .continue {
+    background: var(--tc-color-surface-subtle);
+  }
+  .reader {
+    overflow: hidden;
+    border: 1px solid var(--tc-color-border-default);
+    border-radius: 16px;
+    background: var(--tc-color-surface-default);
+  }
+  .pages {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 32px;
+    padding: 40px;
+  }
+  .page {
+    display: grid;
+    align-content: center;
+    gap: 16px;
+  }
+  .saying {
+    color: var(--tc-color-text-default);
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.5;
+  }
+  .page-art {
+    aspect-ratio: 4 / 3;
+  }
+  @container tpl (max-width: 720px) {
+    .pages {
+      grid-template-columns: 1fr;
+      padding: 24px;
+    }
+  }
+</style>

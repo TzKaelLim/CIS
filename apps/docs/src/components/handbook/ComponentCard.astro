@@ -1,0 +1,85 @@
+---
+// 元件總覽頁的一張卡片：上面是預覽格（真正的元件縮小顯示），下面是中文名、英文名和用途。
+// 整張卡片都可以點（名稱上的連結延伸蓋住整張卡片），鍵盤選到時整張卡片有外框。
+import PreviewTile from './PreviewTile.astro';
+import { componentUrl, type ComponentEntry } from '../../data/component-catalog';
+
+interface Props {
+  entry: ComponentEntry;
+}
+
+const { entry } = Astro.props;
+---
+
+<article class="card">
+  <PreviewTile html={entry.preview.html} scale={entry.preview.scale} />
+  {entry.preview.schematic && <span class="schematic">示意圖</span>}
+  <h3>
+    <a href={componentUrl(entry)}>
+      {entry.中文名}
+      <span class="en" lang="en">{entry.英文名}</span>
+    </a>
+  </h3>
+  <p>{entry.用途}</p>
+</article>
+
+<style>
+  .card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+  .card :global(.tc-preview-tile) {
+    margin-block-end: 0.5rem;
+    transition: border-color 0.15s ease;
+  }
+  .card:hover :global(.tc-preview-tile) {
+    border-color: var(--sl-color-gray-4);
+  }
+  .schematic {
+    position: absolute;
+    inset-block-start: 0.6rem;
+    inset-inline-end: 0.6rem;
+    padding: 0.1rem 0.5rem;
+    border-radius: 999px;
+    background-color: var(--sl-color-gray-6);
+    color: var(--sl-color-gray-2);
+    font-size: var(--hb-text-label);
+  }
+  h3 {
+    margin: 0;
+    font-size: var(--hb-text-ui);
+    font-weight: 600;
+    line-height: var(--hb-line-height-ui);
+  }
+  a {
+    color: var(--sl-color-white);
+    text-decoration: none;
+  }
+  /* 連結延伸到整張卡片。 */
+  a::after {
+    content: '';
+    position: absolute;
+    inset: -0.5rem;
+    border-radius: calc(var(--tc-handbook-radius, 14px) + 0.5rem);
+  }
+  a:focus-visible {
+    outline: none;
+  }
+  a:focus-visible::after {
+    outline: 2px solid var(--sl-color-accent);
+    outline-offset: 0;
+  }
+  .en {
+    margin-inline-start: 0.4rem;
+    color: var(--sl-color-gray-3);
+    font-weight: 400;
+  }
+  p {
+    margin: 0;
+    color: var(--sl-color-gray-3);
+    font-size: var(--hb-text-body);
+    line-height: var(--hb-line-height);
+  }
+</style>

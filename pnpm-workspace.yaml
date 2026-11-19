@@ -1,3 +1,30 @@
 packages:
   - 'packages/*'
   - 'apps/*'
+  # Vendored HeroUI v3 source (see heroui/NOTICE.md). Kept in its own directory,
+  # in upstream's relative layout, because packages/react is already taken.
+  - 'heroui/*'
+
+# Mirrors upstream's allow-list for the vendored packages' native dependencies.
+onlyBuiltDependencies:
+  - '@swc/core'
+  - esbuild
+  - unrs-resolver
+
+# 新版本要發布滿 14 天（20160 分鐘）才會被選用，防範被植入惡意程式的新版。
+# 只在本機更新 lockfile 時把關；CI 和檢查用 --frozen-lockfile 不重新檢查，審 PR 時要看 lockfile 的 diff。
+# 安全修正不滿 14 天時，用 minimumReleaseAgeExclude 指定精確版本，由工程核可並註明 GHSA 編號。
+minimumReleaseAge: 20160
+
+overrides:
+  # GHSA-587h-7wmj-h5pm（high）、GHSA-r825-w8mm-5pxw：vite 7.3.5 的漏洞，7.3.7（2026-10-06 發布）修正。
+  # HeroUI 的 vitest 等 peer 也解析到 vite 7，用 override 讓 lockfile 只剩 7.3.7。
+  'vite@>=7.0.0 <7.3.7': '7.3.7'
+
+# pnpm 把上面的 vite override 也套用到其他套件的 peerDependencies：lockfile 裡 vitefu、
+# @storybook/builder-vite、@vitest/mocker 等宣告的 vite peer 都被改寫成 7.3.7。手冊（astro 帶的
+# vite 6）和 Lit Storybook（vite 5）因此出現假的 unmet peer 警告；實際解析的版本沒有錯。
+# 這裡把它們原本的範圍放回來，消掉誤報。升 astro 7（vite 8）時重新檢查這兩段。
+peerDependencyRules:
+  allowedVersions:
+    vite: '5 || 6 || 7 || 8'

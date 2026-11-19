@@ -1,0 +1,36 @@
+---
+// 一個色塊加上色碼。
+interface Props {
+  hex: string;
+}
+
+const { hex } = Astro.props;
+---
+
+<span class="color-chip">
+  <span class="chip" style={`background:${hex}`}></span>
+  <code class="hex">{hex}</code>
+</span>
+
+<style>
+  .color-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    white-space: nowrap;
+  }
+  .chip {
+    inline-size: 1.5rem;
+    block-size: 1.5rem;
+    flex: 0 0 auto;
+    border-radius: 0.3rem;
+    /* 中灰邊線：白色或近黑的色塊在任何頁面底色上都看得出邊界 */
+    border: 1px solid rgba(127, 127, 127, 0.55);
+  }
+  .hex {
+    font-size: var(--hb-text-label);
+    background: none;
+    padding: 0;
+    color: inherit;
+  }
+</style>

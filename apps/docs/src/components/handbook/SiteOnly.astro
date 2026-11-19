@@ -1,0 +1,18 @@
+---
+// 只在頁首選了這個主題時才顯示的內容。
+// 每個主題的版本都在建置時畫好，顯示或隱藏由 <head> 裡產生的 CSS 決定
+// （src/data/site-selection.ts 的 siteSelectionCss）。
+import { getSite } from '../../data/site-themes';
+
+interface Props {
+  site: string;
+  /** 放在一段文字裡時用 span。 */
+  as?: 'div' | 'span';
+}
+
+const { site, as: Tag = 'div' } = Astro.props;
+// 不存在的 id 在建置時就報錯，避免內容永遠不會出現。
+getSite(site);
+---
+
+<Tag class="site-only" data-site-only={site}><slot /></Tag>

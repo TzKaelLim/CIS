@@ -1,0 +1,147 @@
+---
+// 範本：文章列表。新聞或文章的列表頁：依分類篩選、逐則瀏覽，內容多時分頁。
+import '../../styles/templates.css';
+import SiteNavbar from '../template-parts/SiteNavbar.astro';
+import SiteFooter from '../template-parts/SiteFooter.astro';
+
+const FILTERS = ['全部', '國際賑災', '社區關懷', '環保推廣', '志工故事'];
+const ARTICLES = [
+  {
+    tag: '國際賑災',
+    title: '跨國援助物資抵達災區，志工協助發放熱食與毛毯',
+    excerpt: '災後第三天，第一批物資順利送達。志工分成三組，在臨時收容中心發放熱食、毛毯與衛生用品。',
+    date: '2026-11-14',
+    tone: '',
+  },
+  {
+    tag: '社區關懷',
+    title: '陪伴不缺席：每週一次的獨居長者訪視',
+    excerpt: '志工每週固定拜訪社區裡的獨居長者，量血壓、聊聊天，也協助整理環境。',
+    date: '2026-11-10',
+    tone: 'tone-b',
+  },
+  {
+    tag: '環保推廣',
+    title: '回收寶特瓶變毛毯，一條毛毯要用掉 70 支瓶子',
+    excerpt: '環保站志工示範分類回收的步驟，說明回收物如何再生成為賑災用的毛毯。',
+    date: '2026-11-06',
+    tone: 'tone-c',
+  },
+  {
+    tag: '志工故事',
+    title: '退休後的第二人生：一位資深志工的二十年',
+    excerpt: '從第一次參加社區打掃，到帶領新進志工，他說最大的收穫是「被需要」。',
+    date: '2026-11-02',
+    tone: '',
+  },
+];
+const POPULAR = [
+  { title: '如何成為慈濟志工？', meta: '常見問題' },
+  { title: '年度慈善工作報告', meta: '2026-10-30' },
+  { title: '急難救助申請方式', meta: '服務說明' },
+];
+---
+
+<div class="tpl article-list">
+  <SiteNavbar current="慈善" />
+
+  <header class="page-head">
+    <div class="tpl-container head-inner">
+      <nav class="tpl-breadcrumb" aria-label="麵包屑（示意）">
+        <tc-link href="#" variant="subtle">首頁</tc-link>
+        <span aria-hidden="true">/</span>
+        <span>慈善新聞</span>
+      </nav>
+      <h1 class="tpl-h1">慈善新聞</h1>
+      <p class="tpl-muted">慈濟在各地的慈善行動與志工故事。</p>
+      <tc-search-bar placeholder="搜尋慈善新聞"></tc-search-bar>
+    </div>
+  </header>
+
+  <section class="tpl-section">
+    <div class="tpl-container tpl-with-aside">
+      <div class="main">
+        <div class="tpl-row filters">
+          {FILTERS.map((label, i) => <tc-chip selected={i === 0}>{label}</tc-chip>)}
+        </div>
+        <ul class="articles">
+          {
+            ARTICLES.map((item) => (
+              <li>
+                <tc-article-card orientation="horizontal">
+                  <div slot="media" class:list={['tpl-photo', item.tone]} aria-hidden="true" />
+                  <tc-badge slot="badge" tone="brand">{item.tag}</tc-badge>
+                  <span slot="headline">{item.title}</span>
+                  <span slot="excerpt">{item.excerpt}</span>
+                  <span slot="meta">{item.date}</span>
+                </tc-article-card>
+              </li>
+            ))
+          }
+        </ul>
+        <div class="tpl-center">
+          <tc-pagination total="12" page="1"></tc-pagination>
+        </div>
+      </div>
+      <aside class="aside">
+        <tc-list-panel label="熱門文章">
+          {
+            POPULAR.map((item) => (
+              <article class="tpl-list-item">
+                <strong>{item.title}</strong>
+                <span>{item.meta}</span>
+              </article>
+            ))
+          }
+        </tc-list-panel>
+        <tc-list-panel label="訂閱電子報" variant="plain">
+          <div class="subscribe">
+            <p class="tpl-muted">每月一封，收到最新的慈善消息。</p>
+            <tc-button variant="filled">立即訂閱</tc-button>
+          </div>
+        </tc-list-panel>
+      </aside>
+    </div>
+  </section>
+
+  <SiteFooter />
+</div>
+
+<style>
+  .page-head {
+    background: var(--tc-color-surface-subtle);
+    border-block-end: 1px solid var(--tc-color-border-default);
+  }
+  .head-inner {
+    display: grid;
+    gap: 12px;
+    padding-block: 40px;
+  }
+  .head-inner tc-search-bar {
+    inline-size: min(100%, 520px);
+    margin-block-start: 8px;
+  }
+  .main {
+    display: grid;
+    gap: 28px;
+  }
+  .filters {
+    gap: 8px;
+  }
+  .articles {
+    display: grid;
+    gap: 20px;
+  }
+  .articles tc-article-card {
+    display: block;
+  }
+  .aside {
+    display: grid;
+    gap: 24px;
+  }
+  .subscribe {
+    display: grid;
+    gap: 12px;
+    justify-items: start;
+  }
+</style>

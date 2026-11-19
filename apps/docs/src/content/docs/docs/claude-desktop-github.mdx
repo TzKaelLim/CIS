@@ -1,0 +1,222 @@
+---
+title: 在 Claude Desktop 連接 GitHub
+description: 十分鐘的快速教學：從打開終端機開始，安裝 Claude Desktop 和 GitHub 的命令列工具 gh，用瀏覽器登入一次，之後就可以請 Claude 替你開修改申請、讀核可人的意見。
+---
+
+import { Tabs, TabItem, Steps } from '@astrojs/starlight/components';
+
+**先講結論**：安裝 Claude Desktop，再安裝 GitHub 的命令列工具 `gh`，用瀏覽器登入一次，就完成了。不需要自己建立密碼或通行權杖。每台電腦只要做一次。
+
+這一頁寫給美編（設計）、致遠（廠商）和工程，沒用過終端機也可以照著做。看不懂的詞可以查[用詞](/docs/glossary/)；整個修改流程見[如何參與修改](/docs/contributing/)。
+
+## 開始之前
+
+- 你有 GitHub 帳號，而且已經被加進這個 repository（`tzuchi-digital/CIS`）。還沒有的話，請工程把你加進去。
+- 你有可以登入 Claude 的帳號。沒有的話，請問工程。
+- repository 已經複製到你的電腦上。準備的方法在 repository 的 `CONTRIBUTING.md`「電腦準備」。
+
+下面的步驟分 Mac 和 Windows。選一次你的電腦，整頁都會跟著切換。
+
+## 1. 安裝 Claude Desktop 並登入
+
+到 [Claude Desktop 的下載頁](https://claude.com/download)，下載你的電腦用的版本。
+
+<Tabs syncKey="os">
+  <TabItem label="Mac">
+    打開下載的檔案，把 Claude 的圖示拖進「應用程式」資料夾，再從「應用程式」打開 Claude。
+  </TabItem>
+  <TabItem label="Windows">
+    打開下載的安裝程式，照畫面的指示裝好，再從開始功能表打開 Claude。
+  </TabItem>
+</Tabs>
+
+打開之後，用你的 Claude 帳號登入。
+
+## 2. 打開終端機
+
+終端機是一個用打字下指令的視窗。接下來的安裝和登入都在這裡做。
+
+<Tabs syncKey="os">
+  <TabItem label="Mac">
+    <Steps>
+
+    1. 按 <kbd>Command ⌘</kbd> + <kbd>空白鍵</kbd>，畫面中間會出現搜尋列。
+    2. 輸入「終端機」（英文系統輸入 `Terminal`），按 <kbd>Enter</kbd>。
+    3. 出現一個可以打字的視窗，就是終端機。
+
+    </Steps>
+
+    也可以從 Finder 打開：「應用程式」→「工具程式」→「終端機」。
+
+  </TabItem>
+  <TabItem label="Windows">
+    <Steps>
+
+    1. 按鍵盤上的 <kbd>Windows</kbd> 鍵（或按畫面下方的「開始」）。
+    2. 輸入 `PowerShell`，選「Windows PowerShell」，按 <kbd>Enter</kbd>。
+    3. 出現一個可以打字的藍色或黑色視窗，就是終端機。
+
+    </Steps>
+
+  </TabItem>
+</Tabs>
+
+**怎麼執行一行指令**：這一頁的指令右上角都有複製按鈕。按複製，回到終端機貼上（Mac 按 <kbd>Command ⌘</kbd> + <kbd>V</kbd>，Windows 按 <kbd>Ctrl</kbd> + <kbd>V</kbd>），再按 <kbd>Enter</kbd>。一次只貼一行。
+
+## 3. 安裝 gh
+
+`gh` 是 GitHub 官方的命令列工具。Claude 在你的電腦上推分支、開修改申請、讀核可人的意見，靠的就是它。
+
+<Tabs syncKey="os">
+  <TabItem label="Mac">
+    <Steps>
+
+    1. 打開 [GitHub CLI 的官方下載頁](https://github.com/cli/cli/releases/latest)，往下捲到「Assets」。
+    2. 下載檔名結尾是 `macOS_universal.pkg` 的那一個。
+    3. 打開下載的檔案，照安裝程式的指示按「繼續」和「安裝」，過程中會問你這台 Mac 的登入密碼。
+
+    </Steps>
+
+    **macOS 說無法驗證這個安裝程式、不讓你打開？** 這個安裝程式目前沒有 Apple 的簽章，所以會被擋下來。確認檔案是從上面的官方下載頁下載的，再打開「系統設定」→「隱私權與安全性」，往下捲到「安全性」，在這個檔案的那一列按「強制打開」。不確定的話，請工程協助。
+
+    已經有 Homebrew 的話，也可以不下載安裝程式，改在終端機執行：
+
+    ```sh
+    brew install gh
+    ```
+
+  </TabItem>
+  <TabItem label="Windows">
+    <Steps>
+
+    1. 在終端機執行下面這一行：
+
+       ```sh wrap
+       winget install --id GitHub.cli --source winget
+       ```
+
+    2. 畫面跳出「你要允許這個 App 變更你的裝置嗎？」時，按「是」。
+    3. 看到安裝成功的訊息之後，**關掉終端機，照步驟 2 重新打開一個**。不重新打開，終端機會找不到 `gh`。
+
+    </Steps>
+
+    終端機說找不到 `winget` 的話，改到 [GitHub CLI 的網站](https://cli.github.com)按「Download for Windows」，打開下載的安裝程式裝好，再重新打開終端機。
+
+  </TabItem>
+</Tabs>
+
+**確認裝好了**：在終端機執行下面這一行。
+
+```sh
+gh --version
+```
+
+出現像 `gh version 2.105.0` 這樣的版本號碼，就是裝好了（數字不一樣沒有關係）。出現「找不到 `gh`」之類的訊息，先把終端機關掉重開，再試一次。
+
+## 4. 登入 GitHub
+
+登入的過程是：終端機給你一組代碼，你到瀏覽器貼上代碼並按同意，終端機就登入了。整個過程不需要在終端機輸入密碼。
+
+<Steps>
+
+1. 在終端機執行下面這一行：
+
+   ```sh wrap
+   gh auth login --hostname github.com --git-protocol https --web --clipboard
+   ```
+
+2. 終端機問 `Authenticate Git with your GitHub credentials? (Y/n)`。直接按 <kbd>Enter</kbd>。
+
+   這一題是問「推分支時要不要也用這個登入」，答案是要。沒有出現這一題的話，直接看下一步。
+
+3. 終端機顯示一組八個字的一次性代碼，並說已經複製好了，像這樣：
+
+   ```text wrap
+   ! One-time code (ABCD-1234) copied to clipboard
+   Press Enter to open https://github.com/login/device in your browser...
+   ```
+
+   按 <kbd>Enter</kbd>，瀏覽器會自動打開 GitHub 的頁面。
+
+4. 在瀏覽器裡：
+   - 還沒登入 GitHub 的話，先用**你自己的** GitHub 帳號登入。
+   - 頁面請你確認帳號時，確認是你自己的帳號，按 **Continue**。
+   - 在八個格子裡貼上代碼（Mac 按 <kbd>Command ⌘</kbd> + <kbd>V</kbd>，Windows 按 <kbd>Ctrl</kbd> + <kbd>V</kbd>），按 **Continue**。貼不上的話，照終端機顯示的代碼自己打。
+   - 頁面列出 GitHub CLI 要求的權限，按綠色的 **Authorize github**。
+   - GitHub 可能會再請你輸入密碼或驗證碼，確認是你本人。
+   - 看到「Congratulations, you're all set!」，就可以關掉這個分頁。
+
+5. 回到終端機。看到下面這樣的訊息，就是登入成功了：
+
+   ```text wrap
+   ✓ Authentication complete.
+   - gh config set -h github.com git_protocol https
+   ✓ Configured git protocol
+   ✓ Logged in as 你的帳號
+   ```
+
+6. 最後執行下面這一行。它確保推分支時用的是同一個登入，執行後不會顯示任何訊息，這是正常的。
+
+   ```sh
+   gh auth setup-git
+   ```
+
+</Steps>
+
+## 5. 確認登入成功
+
+在終端機執行：
+
+```sh
+gh auth status
+```
+
+畫面像下面這樣，第二行出現你的 GitHub 帳號名稱，就完成了：
+
+```text wrap
+github.com
+  ✓ Logged in to github.com account 你的帳號 (keyring)
+  - Active account: true
+  - Git operations protocol: https
+```
+
+終端機現在可以關掉了。
+
+## 完成之後可以做什麼
+
+在 Claude Desktop 上方切到 Code（`</>` 圖示），選 UIKit 的資料夾，用平常說話的方式說：
+
+- 「幫我把這次的修改開成修改申請。」
+- 「我的修改申請現在是什麼狀態？」
+- 「PR #12 的核可人留了什麼意見？一條一條告訴我。」
+- 「幫我回覆 PR #12 的第一則留言：按鈕的顏色已經改回來了。」
+
+Claude 開修改申請之前，仍然會先跑檢查、開預覽、等你明確說可以，這些步驟不會因為裝了 `gh` 而省略。
+
+Claude **不做**下面三件事：
+
+- 不合併修改申請。合併由有權限的人來做。
+- 不替任何人核可修改申請。
+- 不直接在 GitHub 上改檔案。修改一律在你電腦上的 UIKit 資料夾裡做，因為檢查和預覽都在那裡跑。
+
+## 常見問題
+
+**終端機說找不到 `gh`。** 安裝之後要重新打開終端機才找得到。把終端機關掉，照步驟 2 再打開一個，執行 `gh --version` 確認。還是找不到，就重做步驟 3。
+
+**按了 Enter，瀏覽器沒有自動打開。** 自己打開瀏覽器，在網址列輸入 `github.com/login/device`，再照步驟 4 貼上代碼。
+
+**瀏覽器說代碼錯誤或過期。** 代碼只能用一次，放太久也會失效。回到終端機，同時按 <kbd>Ctrl</kbd> + <kbd>C</kbd> 停掉目前的登入，再從步驟 4 的第一行重做。
+
+**Customize 裡的 GitHub Integration 要不要連？** 不需要。那個連接是給「在雲端執行的工作」用的；我們的修改都在自己電腦上的資料夾裡做，用不到它。連了也不會讓 Claude 在你的電腦上多出開修改申請的能力。
+
+**Claude 說沒有權限，或找不到這個 repository。** 有兩個可能：你還沒有被加進 repository；或步驟 4 登入的不是你平常用的 GitHub 帳號。先執行 `gh auth status` 看是哪一個帳號，不對的話重新做步驟 4；帳號沒錯的話，請工程確認權限。
+
+**想換帳號或登出。** 在終端機執行下面這一行，之後要用，再做一次步驟 4。
+
+```sh
+gh auth logout
+```
+
+**畫面上出現「Merge when ready」，可以按嗎？** 不要按。合併要等負責的角色核可之後，由有權限的人來做。
+
+**為什麼不讓 Claude 直接在 GitHub 上改檔案？** 直接改會跳過在你電腦上跑的檢查和預覽，而這些檢查是目前合併前唯一的關卡。所以修改一律在你電腦上的資料夾裡做，確認之後再送出。

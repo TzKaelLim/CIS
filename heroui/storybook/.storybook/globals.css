@@ -1,0 +1,46 @@
+@import "../styles/globals.css";
+
+:root {
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  --font-sans:
+    ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+    "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+:root,
+.light,
+.default,
+[data-theme="light"],
+[data-theme="default"] {
+  --background: lab(96.5432% -0.0000596046 0);
+  --foreground: lab(8.34178% 0.607349 -2.12998);
+}
+
+html,
+body {
+  font-family: var(--font-sans);
+}
+
+.dark,
+[data-theme="dark"] {
+  --background: lab(1.54547% 0.178337 -0.64671);
+  --foreground: lab(98.9676% -0.0000298023 -0.0000119209);
+}
+
+/*
+ * LOCAL CHANGE: --font-sans no longer starts with Inter, because the Google Fonts link
+ * that loaded it was removed from preview-head.html (no third-party requests).
+ *
+ * LOCAL CHANGE: the three overrides above are unlayered, so they would beat any
+ * theme (themes live in @layer theme). Hand them back to the layered value for
+ * the Tzu Chi themes, which define their own page colours and font.
+ */
+[data-theme^="tzuchi"] {
+  --background: revert-layer;
+  --foreground: revert-layer;
+  --font-sans: revert-layer;
+}

@@ -1,10 +1,80 @@
 ---
-title: Grid
-description: tc-grid — 響應式 CSS Grid 版面容器，支援固定欄數與 auto-fit/minmax 自動填滿兩種模式。
+title: 格線
+description: 把內容排成整齊的幾欄，螢幕變窄時自動換行。
 ---
 
 import Demo from '../../../components/Demo.astro';
 import PropsTable from '../../../components/PropsTable.astro';
+import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
+import PreviewTile from '../../../components/handbook/PreviewTile.astro';
+import DoDont from '../../../components/handbook/DoDont.astro';
+import StorybookNote from '../../../components/handbook/StorybookNote.astro';
+import SiteLook from '../../../components/handbook/SiteLook.astro';
+
+<ComponentMeta id="grid" />
+
+<PreviewTile size="hero">
+  <div style="display:grid;gap:10px;inline-size:100%;font-family:var(--tc-font-family-base)">
+    <p style="margin:0;color:var(--tc-color-text-default);font-size:13px;font-weight:600">固定欄數：4 欄（手機 2 欄）</p>
+    <tc-grid columns="4" mobile-columns="2" gap="12">
+      <div style="display:grid;place-items:center;min-block-size:48px;border-radius:8px;background:var(--tc-color-brand-surface);color:var(--tc-color-brand-primary);font-weight:600">1</div>
+      <div style="display:grid;place-items:center;min-block-size:48px;border-radius:8px;background:var(--tc-color-brand-surface);color:var(--tc-color-brand-primary);font-weight:600">2</div>
+      <div style="display:grid;place-items:center;min-block-size:48px;border-radius:8px;background:var(--tc-color-brand-surface);color:var(--tc-color-brand-primary);font-weight:600">3</div>
+      <div style="display:grid;place-items:center;min-block-size:48px;border-radius:8px;background:var(--tc-color-brand-surface);color:var(--tc-color-brand-primary);font-weight:600">4</div>
+    </tc-grid>
+    <p style="margin:8px 0 0;color:var(--tc-color-text-default);font-size:13px;font-weight:600">自動填滿：每欄至少 140px，放得下幾欄就排幾欄</p>
+    <tc-grid min-col-width="140px" gap="12">
+      <div style="display:grid;place-items:center;min-block-size:48px;border-radius:8px;background:var(--tc-color-brand-surface);color:var(--tc-color-brand-primary);font-weight:600">A</div>
+      <div style="display:grid;place-items:center;min-block-size:48px;border-radius:8px;background:var(--tc-color-brand-surface);color:var(--tc-color-brand-primary);font-weight:600">B</div>
+      <div style="display:grid;place-items:center;min-block-size:48px;border-radius:8px;background:var(--tc-color-brand-surface);color:var(--tc-color-brand-primary);font-weight:600">C</div>
+      <div style="display:grid;place-items:center;min-block-size:48px;border-radius:8px;background:var(--tc-color-brand-surface);color:var(--tc-color-brand-primary);font-weight:600">D</div>
+      <div style="display:grid;place-items:center;min-block-size:48px;border-radius:8px;background:var(--tc-color-brand-surface);color:var(--tc-color-brand-primary);font-weight:600">E</div>
+    </tc-grid>
+  </div>
+</PreviewTile>
+
+## 用法
+
+格線把同一種內容排成整齊的幾欄，例如一排文章卡片、一組書籍封面或幾個重點數字。它有兩種排法：「固定欄數」由你決定桌機排幾欄，螢幕變窄到平板以下時自動改成比較少的欄數（預設一欄）；「自動填滿」只設定每一欄最少要多寬，畫面寬就多排幾欄、窄就少排幾欄，適合數量不固定的內容。格線本身看不見，也不限制內容的最大寬度，那是「[版心容器](/components/container/)」的工作，所以格線通常放在版心容器裡面。
+
+## 組成
+
+| 部位     | 說明                                                                                                         |
+| -------- | ------------------------------------------------------------------------------------------------------------ |
+| 格線容器 | 佔滿它所在位置的整個寬度，把裡面的東西排成欄和列。                                                           |
+| 欄       | 固定欄數時是幾欄（桌機預設 12 欄，平板以下另外設定，預設 1 欄）；自動填滿時由每欄的最小寬度和畫面寬度決定。   |
+| 格子     | 放進格線的每一個項目佔一格，依放進去的順序，從左到右、從上到下排。                                           |
+| 間距     | 格子之間的距離，從間距刻度選（例如 16、24），欄和列之間一樣寬。                                              |
+| 對齊     | 同一列的格子預設拉成一樣高；也可以改成靠上、置中或靠下。                                                     |
+
+## 該做與不該做
+
+:::caution[草稿]
+這一節是草稿，待美編（設計）確認。
+:::
+
+<DoDont
+  rows={[
+    { kind: 'do', text: '每一格放同一種東西（例如都是文章卡片），讀者比較容易一格一格比較和瀏覽。' },
+    { kind: 'do', text: '內容的數量會變動時（例如最新消息），用「自動填滿」並設定每欄的最小寬度，不必為每種螢幕另外設計。' },
+    { kind: 'do', text: '設計時也畫出手機版：固定欄數在平板以下預設會變成一欄，小的項目（例如書籍封面）可以改成兩欄。' },
+    { kind: 'do', text: '格子之間的間距從間距刻度選，同一個網站的格線用一樣的間距。' },
+    { kind: 'dont', text: '不要用格線把有先後順序的內容排成多欄，又期待讀者由上往下讀：格線是從左到右、一列一列排的。' },
+    { kind: 'dont', text: '不要在手機上排太多欄；欄太窄時文字會一直斷行，圖片也會太小。' },
+  ]}
+/>
+
+## 在目前主題下的樣子
+
+<SiteLook />
+
+格線的欄數和間距目前所有主題都一樣；上方預覽裡的色塊會跟著頁首的「主題」和「色彩模式」一起變。
+
+## 給工程師
+
+以下是給工程師的安裝與 API 說明，美編（設計）、網站的編輯和致遠（廠商）可以略過。
+
+<StorybookNote tag="tc-grid" />
 
 `<tc-grid>` 是 layout 原語：以單一預設插槽包裹直接子元素，套用 CSS Grid。預設為**固定欄數**模式（`columns`，預設 12），於平板斷點（768px）以下收合為 `mobile-columns`（預設 1）欄以利閱讀。設定 `min-col-width` 後改用 **auto-fit/minmax** 自動填滿模式（此時 `columns` 不生效）。下方為**可互動的真實元件**：
 
@@ -19,7 +89,7 @@ import PropsTable from '../../../components/PropsTable.astro';
   </tc-grid>
 </Demo>
 
-## 自動填滿模式（auto-fit / minmax）
+### 自動填滿模式（auto-fit / minmax）
 
 設定 `min-col-width`（CSS 長度，如 `240px`）後，版面以 `repeat(auto-fit, minmax(min-col-width, 1fr))` 自動依容器寬度增減欄數，無需斷點。此模式優先於 `columns`：
 
@@ -33,11 +103,11 @@ import PropsTable from '../../../components/PropsTable.astro';
   </tc-grid>
 </Demo>
 
-## 間距（gap）
+### 間距（gap）
 
 `gap` 接受 space token 名稱（如 `"16"`、`"24"`，對應 `--tc-space-*`）或任意 CSS 長度（如 `2rem`）。未設定時採用 `--tc-grid-gap-default`（預設 `--tc-space-16`）。
 
-## 行動裝置欄數（mobile-columns）
+### 行動裝置欄數（mobile-columns）
 
 固定欄數模式下，平板斷點（768px）以下會收合為 `mobile-columns` 欄（預設 1）。例如桌機 4 欄、行動 2 欄：
 
@@ -49,8 +119,6 @@ import PropsTable from '../../../components/PropsTable.astro';
     <div style="background:#eaf0ff;color:#1b2d58;border-radius:8px;padding:16px;text-align:center">4</div>
   </tc-grid>
 </Demo>
-
-## 用法
 
 ### 純 HTML
 
@@ -83,13 +151,13 @@ import { TcGrid } from '@tzuchi/react';
 </TcGrid>;
 ```
 
-## API
+### API
 
 下表自 Custom Elements Manifest 自動產生：
 
 <PropsTable tag="tc-grid" />
 
-## 無障礙（Accessibility）
+### 無障礙（Accessibility）
 
 - `tc-grid` 為純視覺版面容器，不引入 ARIA 角色，子元素的語意與順序維持原樣（DOM 順序即視覺順序）。
 - 固定欄數模式於小螢幕自動收合為 `mobile-columns`，避免欄位過窄影響可讀性。

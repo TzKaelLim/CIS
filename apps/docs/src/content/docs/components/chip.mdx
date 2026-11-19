@@ -1,12 +1,73 @@
 ---
-title: Chip
-description: tc-chip — 膠囊形標籤籌碼，支援前置圖示、可切換選取與可移除。
+title: 膠囊標籤
+description: 可以點選、切換或移除的小標籤，常用在篩選。
 ---
 
 import Demo from '../../../components/Demo.astro';
 import PropsTable from '../../../components/PropsTable.astro';
+import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
+import PreviewTile from '../../../components/handbook/PreviewTile.astro';
+import DoDont from '../../../components/handbook/DoDont.astro';
+import StorybookNote from '../../../components/handbook/StorybookNote.astro';
+import SiteLook from '../../../components/handbook/SiteLook.astro';
 
-`<tc-chip>` 是膠囊形的 tonal 標籤籌碼，採用品牌淺底（brand surface）配品牌主色文字（brand primary）。可作為動作型（assist）或篩選型（filter）標籤，支援前置圖示、可切換選取與可移除。下方為**可互動的真實元件**：
+<ComponentMeta id="chip" />
+
+<PreviewTile size="hero" interactive>
+  <tc-chip>全部</tc-chip>
+  <tc-chip selected>慈善</tc-chip>
+  <tc-chip>醫療</tc-chip>
+  <tc-chip>
+    <span slot="leading" aria-hidden="true">★</span>精選
+  </tc-chip>
+  <tc-chip removable ontc-remove="this.remove();">教育</tc-chip>
+  <tc-chip disabled>人文（停用）</tc-chip>
+</PreviewTile>
+
+## 用法
+
+膠囊標籤是一顆顆圓角的小標籤，讓讀者點選來篩選內容，例如只看「慈善」類的文章；點一下選取，再點一下取消，好幾顆可以同時選取。加上尾端的 × 時，也可以用來列出讀者已經選好、可以一個個拿掉的條件。如果只是標示分類或狀態、讀者不需要點，請改用「徽章」；一次只能選一個時，請改用「單選鈕」；送出、報名這類動作請用「按鈕」。
+
+## 組成
+
+| 部位     | 說明                                                                                     |
+| -------- | ---------------------------------------------------------------------------------------- |
+| 容器     | 膠囊形，用淡淡的品牌底色。選取時底色加深，並多一圈主色外框。                             |
+| 文字     | 必填。短短幾個字，例如「慈善」。標籤不會換行，字越多標籤就越長。                         |
+| 前置圖示 | 可省略。放在文字前面的小圖示，用來補充文字。                                             |
+| 移除鈕   | 可省略。尾端的 ×，按下去表示要拿掉這個標籤；螢幕閱讀器會唸「移除」。                     |
+| 焦點框   | 用鍵盤選到標籤時出現的外框，讓不用滑鼠的人知道目前在哪裡。                               |
+| 停用狀態 | 整顆變淡，不能點、不能選取，也不能移除。                                                 |
+
+## 該做與不該做
+
+:::caution[草稿]
+這一節是草稿，待美編（設計）確認。
+:::
+
+<DoDont
+  rows={[
+    { kind: 'do', text: '標籤文字保持兩、三個字，例如「慈善」「醫療」。標籤不會換行，字太多會變得很長，一排放不下幾顆。' },
+    { kind: 'do', text: '同一組篩選標籤排在一起，並在前面寫出這組在篩選什麼，例如「分類：」。' },
+    { kind: 'do', text: '有 × 的標籤用在讀者自己加上的條件，例如搜尋結果上方列出的篩選條件。按下 × 之後要由網站把它拿掉，請和工程確認。' },
+    { kind: 'dont', text: '不要把只用來看、不能點的分類標示做成膠囊標籤；請用「徽章」。膠囊標籤看起來可以點，讀者會去點它。' },
+    { kind: 'dont', text: '不要用膠囊標籤做送出、前往下一步這類動作；請用「按鈕」。' },
+  ]}
+/>
+
+## 在目前主題下的樣子
+
+<SiteLook />
+
+上方的大預覽會跟著頁首的「主題」和「色彩模式」一起變；這個元件還沒有淺色、深色並排的範例。
+
+## 給工程師
+
+以下是給工程師的安裝與 API 說明，美編（設計）、網站的編輯和致遠（廠商）可以略過。
+
+<StorybookNote tag="tc-chip" />
+
+`<tc-chip>` 是膠囊形的 tonal 標籤，採用品牌淺底（brand surface）配品牌主色文字（brand primary）。可作為動作型（assist）或篩選型（filter）標籤，支援前置圖示、可切換選取與可移除。下方為**可互動的真實元件**：
 
 <Demo>
   <tc-chip>連結</tc-chip>
@@ -14,8 +75,6 @@ import PropsTable from '../../../components/PropsTable.astro';
   <tc-chip removable>增加</tc-chip>
   <tc-chip disabled>停用</tc-chip>
 </Demo>
-
-## 用法
 
 ### 純 HTML
 
@@ -37,7 +96,7 @@ import { TcChip } from '@tzuchi/react';
 </TcChip>;
 ```
 
-## 前置圖示
+### 前置圖示
 
 透過 `slot="leading"` 放入前置圖示：
 
@@ -47,9 +106,9 @@ import { TcChip } from '@tzuchi/react';
   </tc-chip>
 </Demo>
 
-## 可移除
+### 可移除
 
-`removable` 會在尾端顯示關閉鈕。點擊關閉鈕或於籌碼上按 `Delete` / `Backspace` 會派發 `tc-remove`，且**不會**切換選取狀態：
+`removable` 會在尾端顯示關閉鈕。點擊關閉鈕或於膠囊標籤上按 `Delete` / `Backspace` 會發出 `tc-remove`，且**不會**切換選取狀態：
 
 <Demo>
   <tc-chip
@@ -58,15 +117,15 @@ import { TcChip } from '@tzuchi/react';
   >按我移除</tc-chip>
 </Demo>
 
-## API
+### API
 
 下表自 Custom Elements Manifest 自動產生：
 
 <PropsTable tag="tc-chip" />
 
-## 無障礙（Accessibility）
+### 無障礙（Accessibility）
 
-- 籌碼本體為 `role="button"`，可切換 `selected` 時以 `aria-pressed` 反映狀態。
-- 鍵盤：`Enter` / `Space` 切換選取；`removable` 時 `Delete` / `Backspace` 派發 `tc-remove`。
+- 膠囊標籤本體為 `role="button"`，可切換 `selected` 時以 `aria-pressed` 反映狀態。
+- 鍵盤：`Enter` / `Space` 切換選取；`removable` 時 `Delete` / `Backspace` 發出 `tc-remove`。
 - `:focus-visible` 焦點環使用 `--tc-focus-ring-*` token。
 - `disabled` 以 `aria-disabled` 標示並移出 Tab 順序（非 `pointer-events:none`）。

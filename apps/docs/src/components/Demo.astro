@@ -26,4 +26,14 @@
     background: var(--tc-color-surface-default, var(--sl-color-gray-7, #fff));
     color: var(--tc-color-text-default, inherit);
   }
+  /* Keep wide examples inside the box on narrow screens, so they never make the
+     whole page scroll sideways: fixed-width fields shrink to the box, and rows
+     that never wrap (tabs, pagination) scroll inside their own element. The box
+     itself keeps overflow visible, so an opened dropdown list is not clipped. */
+  .tc-demo > :global(*) {
+    max-inline-size: 100%;
+  }
+  .tc-demo :global(:is(tc-tabs, tc-pagination)) {
+    overflow-x: auto;
+  }
 </style>

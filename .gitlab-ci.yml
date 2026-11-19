@@ -1,0 +1,187 @@
+# 舊的自架 GitLab 的 CI/CD（不是今後的做法，見 docs/specs/2026-11-16-cis-uikit-overall-spec.md 第 14 節）：把 HeroUI Storybook 部署到 Cloudflare Pages。
+#
+#   build                tokens build + check → scripts/ 的單元測試（test:scripts）→ 確認 variables.css
+#                        與 tokens 同步 → storybook build → grep 產物，擋下呼叫外部 API 的 story →
+#                        附上 HeroUI 的 LICENSE、NOTICE.md；產物 heroui/storybook/storybook-static/
+#                        留成 artifact
+#   deploy:staging       protected 的非 main 分支 → Pages 專案 tzuchi-uikit 的 Preview 環境，
+#                        alias 固定為 staging（https://staging.<pages 網域>）
+#   deploy:not-protected 沒受保護的分支：只印一句「所以沒部署」，讓 pipeline 頁面說清楚
+#   deploy:production    main → 同一個 Pages 專案的 Production 環境
+#                        （這個檔案和 heroui/ 併進 main 之前，main 上不會有 pipeline）
+#
+# 自架 GitLab 用不了 Cloudflare 的 Git 整合（只支援 github.com／gitlab.com），所以由 CI 呼叫
+# wrangler 直接上傳（Direct Upload）。「staging」是 Cloudflare Pages 的 Preview 環境，不是 GitLab
+# 分支：每個符合條件的分支 push 都會蓋掉同一個 staging alias。
+#
+# CLOUDFLARE_API_TOKEN／CLOUDFLARE_ACCOUNT_ID 來自 tzuchi group（id 8）的 CI/CD 變數
+# （masked + protected，environment_scope "*"），本專案不另設。protected 變數只注入 protected
+# branch 的 pipeline，所以要上 staging 的分支必須逐條設成 protected branch（目前只有
+# spike/heroui-v3，允許 force-push）。刻意不用 wildcard：拿得到帳號級 token 的 ref 要能數得出來。
+# 注意這些變數會注入 protected branch 的每一個 job，包括跑上千個 npm 套件的 build——
+# YAML 擋不掉，token 的 Cloudflare 權限請維持最小（Account → Cloudflare Pages → Edit）。
+#
+# 不放進來的：Lit 元件的瀏覽器測試（需要 Chrome，node image 沒有）、lint、typecheck —
+# 它們跟部署 Storybook 無關，要加請開獨立的 job。
+
+stages:
+  - build
+  - deploy
+
+default:
+  # Node 24 LTS：符合 engines（>=22.22.0）、仍內建 corepack（Node 25 起不再隨附），
+  # 而且 wrangler 4 要求 Node >= 22 —— image 不可降到 node:20。
+  image: node:24
+  # 必須標 docker：另一台 shared runner 是 macOS shell executor，會接未標 tag 的 job 並忽略 image
+  tags:
+    - docker
+
+variables:
+  # 放在 $CI_PROJECT_DIR 下才能被 cache 帶走（pnpm 的 store 設定在 build job 裡，npm 看到它會警告）
+  npm_config_cache: $CI_PROJECT_DIR/.npm
+  COREPACK_HOME: $CI_PROJECT_DIR/.corepack
+  # runner 在每個 job 開頭會 git clean 掉上一個 job 留下的未追蹤檔，而且預設逐行印出：光是
+  # .pnpm-store/ 的幾萬個檔案就把第一次 deploy job 的 log 撐爆 4 MiB 上限，wrangler 的輸出全被截掉。
+  # 安靜刪除，並保留三個純快取目錄（content-addressable，留著只會讓下一個 job 更快）。
+  GIT_CLEAN_FLAGS: -ffdxq -e .pnpm-store/ -e .npm/ -e .corepack/
+  # corepack 在非 TTY 本來就不會問，明確關掉下載確認以防萬一
+  COREPACK_ENABLE_DOWNLOAD_PROMPT: '0'
+  # Cloudflare Pages 專案名稱（要與 Cloudflare 上的專案一致）
+  CF_PAGES_PROJECT: tzuchi-uikit
+  # 釘到 patch：deploy job 的環境裡有帳號級的 Cloudflare token，不讓 npx 每次抓一個沒人看過的新版
+  # 來跑；升版就是一個可 review 的 commit。（同群組其他專案用浮動的 @4／@latest，這裡刻意不跟。）
+  WRANGLER_VERSION: '4.136.1'
+
+# 只跑 branch pipeline（這個 repo 沒有 tag／MR pipeline 的需求）
+workflow:
+  rules:
+    - if: $CI_COMMIT_BRANCH
+
+build:
+  stage: build
+  interruptible: true
+  # 實測：冷啟動（無 cache）131 秒、cache 命中 80 秒；15 分鐘是冷啟動的 7 倍
+  timeout: 15 minutes
+  variables:
+    # pnpm 10 讀 npm_config_*；升到 pnpm 11 要改成 pnpm_config_store_dir，否則 store 會靜靜跑回
+    # 預設路徑、cache 形同虛設。只放在這個 job：deploy job 的 npx 不認得它，會印警告。
+    npm_config_store_dir: $CI_PROJECT_DIR/.pnpm-store
+  cache:
+    # 固定 key：pnpm store 是 content-addressable，舊 store 照樣可用、缺的才下載。
+    # 若改成以 pnpm-lock.yaml 當 key，每次動 lockfile 都會回到空 store（GitLab 的 fallback_keys
+    # 只會拉別的 job 推上去的 key，這裡沒有那種 job）。
+    key: pnpm-store-v1
+    paths:
+      - .pnpm-store/
+      - .corepack/
+  before_script:
+    # 只裝 pnpm 的 shim，不接管 npm／npx
+    - corepack enable pnpm
+    # 安裝 package.json 的 packageManager 釘住的 pnpm 版本
+    - corepack install
+    - pnpm --version
+    - pnpm install --frozen-lockfile
+  script:
+    # tokens：build + check.mjs（純 Node，不需要瀏覽器）
+    - pnpm --filter @tzuchi/tokens test
+    - pnpm run test:scripts
+    # 主題變數是從 tokens 生成後 commit 進來的；不同步就紅，不要部署到過期的主題
+    - pnpm run heroui:theme
+    - git diff --exit-code -- heroui/styles/themes/tzuchi/variables.css
+    # @heroui/react、@heroui/styles 的 exports 指向 src/，Storybook 直接吃原始碼，不必先 build 它們
+    - pnpm run heroui:storybook:build
+    - test -f heroui/storybook/storybook-static/index.html
+    # 這兩個網域只出現在已刪掉的 3 個 story（會把讀者打的字送出去），重新出現就擋下。
+    # 要在複製 NOTICE.md 之前檢查：NOTICE.md 自己會寫出這兩個網域。
+    - >-
+      if grep -rlE 'swapi\.py4e\.com|pokeapi\.co' heroui/storybook/storybook-static;
+      then echo '出現呼叫外部 API 的 story，見 heroui/NOTICE.md'; exit 1; fi
+    # Apache-2.0 §4：公開的樣品室附上 HeroUI 的授權和修改清單
+    - cp heroui/LICENSE heroui/NOTICE.md heroui/storybook/storybook-static/
+  artifacts:
+    name: storybook-$CI_COMMIT_SHORT_SHA
+    paths:
+      - heroui/storybook/storybook-static/
+    # 只有同一條 pipeline 的 deploy job 會用它，幾分鐘內就用完
+    expire_in: 1 day
+
+.deploy:
+  stage: deploy
+  needs:
+    - build
+  # 同時只跑一個 deploy。預設 process mode 是 unordered，連續 push 時較舊的 commit 可能後跑；
+  # 已用 API 把這個 resource group 設成 newest_first（YAML 設不了）。
+  resource_group: deploy
+  timeout: 10 minutes
+  variables:
+    WRANGLER_SEND_METRICS: 'false'
+    # wrangler 的機器可讀輸出（ND-JSON），scripts/ci/pages-deploy-env.mjs 從這裡讀部署結果
+    WRANGLER_OUTPUT_FILE_PATH: $CI_PROJECT_DIR/wrangler-output.ndjson
+  cache:
+    key: npx-wrangler-$WRANGLER_VERSION
+    paths:
+      - .npm/
+  script:
+    # rules 已經只挑 protected branch，這裡是第二道：群組變數被拿掉或改成非 "*" scope 時要紅在對的地方
+    - |
+      if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+        echo "CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID 沒有注入。它們是 tzuchi group（id 8）的 protected 變數："
+        echo "  1. 群組 Settings → CI/CD → Variables 裡兩個變數是否還在、scope 是否仍是 *"
+        echo "  2. 分支 $CI_COMMIT_BRANCH 是否仍在本專案的 Protected branches 裡"
+        exit 1
+      fi
+    # 第一次跑會建立 Pages 專案（production branch = main）；之後每次都因「已存在」失敗，吞掉。
+    # 不遮 stderr：token 權限不足之類的真正錯誤要留在 log 裡，不然下一步的「專案不存在」會誤導人。
+    - npx -y wrangler@$WRANGLER_VERSION pages project create "$CF_PAGES_PROJECT" --production-branch=main || true
+    # --branch 是 Cloudflare 端的標籤，不必等於 git 分支：等於 production branch 就是正式部署，其餘是預覽。
+    # --commit-message 只放 short SHA：wrangler 對含中文的 commit 訊息會踩 Cloudflare API 8000111
+    # （60donation／60impact 都踩過），完整訊息在 GitLab 上看即可。
+    - >-
+      npx -y wrangler@$WRANGLER_VERSION pages deploy heroui/storybook/storybook-static
+      --project-name="$CF_PAGES_PROJECT"
+      --branch="$CF_PAGES_BRANCH"
+      --commit-hash="$CI_COMMIT_SHA"
+      --commit-message="$CI_COMMIT_SHORT_SHA"
+      --commit-dirty=true
+    # 讀 wrangler 的結構化輸出：斷言真的落在預期的環境（production branch 被改掉時 main 會悄悄變成
+    # preview），並把實際網址寫進 dotenv 給 environment.url —— pages.dev 名稱全球共用，被佔用時
+    # Cloudflare 會加後綴（link-portal → link-portal-f1i），所以不猜、只用 Cloudflare 回報的值。
+    - node scripts/ci/pages-deploy-env.mjs "$CF_PAGES_ENVIRONMENT"
+  artifacts:
+    reports:
+      dotenv: deploy.env
+
+deploy:staging:
+  extends: .deploy
+  rules:
+    - if: $CI_COMMIT_BRANCH != "main" && $CI_COMMIT_REF_PROTECTED == "true"
+  variables:
+    CF_PAGES_BRANCH: staging
+    CF_PAGES_ENVIRONMENT: preview
+  environment:
+    name: staging
+    url: $PAGES_URL
+
+# rules 不命中的 job 不會出現在 pipeline 裡，沒受保護的分支看起來就像「綠了、應該部署了」；
+# 用一個幾秒的 job 把原因寫在 pipeline 頁面上。
+deploy:not-protected:
+  stage: deploy
+  needs:
+    - job: build
+      artifacts: false
+  rules:
+    - if: $CI_COMMIT_BRANCH != "main" && $CI_COMMIT_REF_PROTECTED != "true"
+  script:
+    - echo "分支 $CI_COMMIT_BRANCH 不是 protected branch，拿不到群組的 Cloudflare 變數，所以沒有部署到 staging。"
+    - echo "要讓它上 staging：Settings → Repository → Protected branches 加上這條分支（允許 force-push），再 push 一次。"
+
+deploy:production:
+  extends: .deploy
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+  variables:
+    CF_PAGES_BRANCH: main
+    CF_PAGES_ENVIRONMENT: production
+  environment:
+    name: production
+    url: $PAGES_URL

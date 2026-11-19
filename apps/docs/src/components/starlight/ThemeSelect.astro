@@ -1,0 +1,22 @@
+---
+// 取代 Starlight 的 ThemeSelect。Starlight 只在手機選單（MobileMenuFooter）用到它
+// （手冊的頁首不用它，見 Header.astro）。
+//
+// 這裡只放「主題」的下拉選單（有看得到的標籤）。Starlight 原本的淺色／深色／自動選單
+// 不再出現：色彩模式由頁首的圓形按鈕切換（ColorModeToggle.astro），手機寬度的頁首也有它。
+import SiteSelect from '../handbook/SiteSelect.astro';
+---
+
+<div class="site-pref">
+  <SiteSelect />
+</div>
+
+<style>
+  .site-pref {
+    display: flex;
+    align-items: center;
+    flex: 1 1 100%;
+    min-inline-size: 0;
+    padding-block: 0.5rem;
+  }
+</style>

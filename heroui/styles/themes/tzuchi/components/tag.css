@@ -1,0 +1,207 @@
+/* ------------------------------------------------------------------------------------------------
+ * Tag — Tzu Chi shape, density, type and the interactive half of tc-chip
+ * ------------------------------------------------------------------------------------------------
+ * Destination: styles/themes/tzuchi/components/tag.css (layer: components, imported after
+ * ../../../components/close-button.css, tag-group.css and tag.css).
+ *
+ * tc-chip is ONE component covering what HeroUI splits in two: the static tonal label (Chip) and
+ * the interactive pill (Tag). Pass 1 put tc-chip's static look on Chip (./chip.css); this file
+ * gives Tag the SAME box — pill radius, 1px border, 4px/12px padding, 20px/1.5 type — so a Chip and
+ * an unselected Tag are the same pill, then adds the half Chip could not carry.
+ *
+ * WHAT THIS CHANGES (shape, density, type, states — colour only where tc has a rule)
+ *   shape     radius 12px (rounded-xl, = --radius * 1.5) -> pill via --tc-chip-radius; plus the
+ *             1px transparent border that is part of tc-chip's box and the hook `selected` flips
+ *   density   padding 4px/8px -> 4px/12px. gap is already 4px, so it is left alone
+ *   type      12px/16px -> 20px/1.5 (typography.tab-sm). weight 500 already matched
+ *   sizes     sm 20px -> 34px, md 24px -> 40px, lg 32px -> 48px — the same three steps ./chip.css
+ *             produced, so Chip and Tag line up at every size
+ *   icon      fixed 12px -> 1em: 20px at the default size, which is --tc-size-icon-sm exactly,
+ *             i.e. what tc-chip sizes its leading slot to, and it tracks --sm like ./chip.css does
+ *   selected  tc's second affordance added — the border joins the label colour. The FILL stays
+ *             HeroUI's --accent-soft (tc's one-step-darker fill is the step HeroUI reserves for
+ *             selected + hover; see the report)
+ *   remove    a 24px --default chip with a 12px glyph -> tc's bare 20px round button whose glyph
+ *             fills it, transparent at rest. hover, pressed, focus and disabled stay upstream's
+ *   motion    only background-color and border-color move to 150ms motion.easing.standard, so the
+ *             new selected border fades in with the fill; color / scale / opacity / box-shadow keep
+ *             HeroUI's original 100ms timing (tc-chip only ever names background-color and
+ *             border-color — retiming the other four was pass-draft scope creep, corrected below)
+ *
+ * tc  <->  HeroUI MAPPING
+ *   tc-chip (resting tonal pill)   ~   <Tag> unselected — SHAPE transferred, COLOUR deliberately
+ *                                     not: HeroUI keeps a Tag neutral until it is selected, and
+ *                                     both of its variants are needed. See the report.
+ *   tc-chip[selected]              ->  .tag[data-selected="true"] — its --accent-soft fill and
+ *                                     --accent-soft-foreground label ARE tc-chip's resting palette
+ *                                     (brand.surface / brand.primary), as ./chip.css established
+ *   tc-chip[removable] .remove     ->  .tag__remove-button (a CloseButton)
+ *   tc-chip[disabled]              ->  .tag[data-disabled="true"] — already 0.38 + not-allowed
+ *   tc-chip :focus-visible         ->  .tag:focus-visible — already a 2px ring at 2px offset
+ *   tc-chip (single size)          ->  .tag--md, HeroUI's default size
+ *   no tc counterpart              ->  .tag--sm, .tag--lg — same scale steps as ./chip.css
+ *   no tc counterpart              ->  variant "default" and "surface" — shape only, colours kept
+ *
+ * KEPT (already matching, or no tc counterpart): gap 4px, cursor pointer, select-none, focus ring
+ * (width, offset and --focus colour all arrive from ../variables.css), disabled opacity and
+ * cursor, the empty pressed state, elevation (neither has any), and both variants' own colours.
+ * TagGroup itself needs no file — tc has no chip-group component to compare its gaps against.
+ * Full property-by-property account: ../gap-audit/tag-group.md
+ *
+ * Reviewed: verified every selector against tag.css / tag-group.css / close-button.css / tag.tsx /
+ * tag-group.tsx / close-button.tsx / tagVariants / closeButtonVariants (the final composed class
+ * list on the remove button really is "close-button close-button--default tag__remove-button"),
+ * the [data-theme^="tzuchi"] scoping, box-sizing: border-box (Tailwind preflight via
+ * `@import "tailwindcss"` in styles/index.css), the cascade math (specificity + same-layer/later
+ * import) for every rule against every size/variant/state it must beat, comment safety (no
+ * premature "*" "/"), and that no --tc-color-* / component-colour / shadow token or literal colour
+ * is referenced (every --tc-* used resolves to a dimension/number in tokens.css, mode-independent
+ * in both the :root and [data-theme="dark"] blocks). Both story ids exist in index.json and the
+ * with-remove-button story's first TagGroup renders its RemoveButton unconditionally (onRemove is
+ * set, no children-render-prop override), so all eight assertions hold with reveal: none.
+ * One fix: the motion rule's transition-duration / transition-timing-function applied uniformly to
+ * all six listed properties, silently re-timing color/scale/opacity/box-shadow from HeroUI's
+ * original 100ms to 150ms even though tc-chip only specifies background-color and border-color.
+ * Corrected to give each property its own duration/timing so only the two tc actually names change.
+ *
+ * Pass 5 (2026-09-20): the `surface` variant gets a resting border in --border. In tzuchi-dark its
+ * fill (--surface, gray-950 #1c1c1e) sits on a #161618 page — a ~1.09:1 step — and the 1px border
+ * this file gives every Tag is transparent, so the pills had no edge to fall back on and the row read
+ * as four bare labels floating on the page while the `default` row right above it showed proper
+ * pills. HeroUI's base declares no border-color on .tag--surface at all (styles/components/tag.css:
+ * 82-91, background and text only), so the transparent border came from this file's own box rule.
+ * Only border-color is declared: the 1px width, the pill radius, the padding, the type, the fills and
+ * every state rule stay as they were, in both variants and at all three sizes. Specificity (0,2,0),
+ * placed after the .tag box rule (also (0,2,0)) so it wins on source order, and deliberately BELOW
+ * the selected rule's (0,2,0)+attribute = (0,3,0) — so a selected surface tag still flips its border
+ * to currentColor, the tc-chip selection affordance, and only the resting state changes. Verified in
+ * tzuchi (white pill, #bdbdbd hairline on the gray-50 page) and tzuchi-dark (#6b6b6e hairline), with
+ * the selected pill re-probed at border-top-color = the accent-soft-foreground in both. --border is a
+ * HeroUI theme variable resolved per mode by ../variables.css. No story renders a `surface` tag at
+ * --sm or --lg, but the rule is size-independent and the 1px border width was probed as identical at
+ * all three sizes, so nothing size-specific can be affected.
+ *
+ * Pass 5 reviewed (2026-09-20): diffed against the pre-Pass-5 file — only the `.tag--surface`
+ * border-color rule plus this header paragraph differ. Re-rendered --variants in tzuchi-dark
+ * myself and confirmed a visible edge on the surface pills; re-rendered --disabled in tzuchi
+ * (untested by the fixer, who only covered --variants and --sizes for this item) — it uses the
+ * default variant only, so the new rule does not fire and the disabled row is unaffected, no
+ * regression. The specificity ordering against the selected rule was re-derived by hand and
+ * holds: (0,2,0) here loses to the selected rule's (0,3,0) regardless of source order. No
+ * changes needed.
+ * ------------------------------------------------------------------------------------------------ */
+
+/* -- Box: tc-chip's pill -------------------------------------------------------------------------
+ * (0,2,0) also outranks .tag--sm / --md / --lg (0,1,0), so the two sizes that must still differ
+ * are restated below; --md deliberately is not, because md IS the tc chip. */
+
+[data-theme^="tzuchi"] .tag {
+  border: 1px solid transparent;
+  border-radius: var(--tc-chip-radius, 9999px);
+  padding-block: var(--tc-space-4, 4px);
+  padding-inline: var(--tc-space-12, 12px);
+  font-size: var(--tc-font-size-20, 20px);
+  line-height: var(--tc-line-height-normal, 1.5);
+}
+
+[data-theme^="tzuchi"] .tag--sm {
+  padding-inline: var(--tc-space-8, 8px);
+  font-size: var(--tc-font-size-16, 16px);
+}
+
+[data-theme^="tzuchi"] .tag--lg {
+  padding-block: var(--tc-space-8, 8px);
+  padding-inline: var(--tc-space-16, 16px);
+}
+
+/* -- Surface variant: a resting edge ---------------------------------------------------------------
+ * The `surface` fill is one step from the page in dark (#1c1c1e on #161618), so the variant needs the
+ * border to be a pill at all. The width already comes from the box rule above; only the colour is
+ * named here, at (0,2,0) and after that rule. The selected rule below is (0,3,0) and still wins, so
+ * a selected surface tag keeps the currentColor edge. */
+
+[data-theme^="tzuchi"] .tag--surface {
+  border-color: var(--border);
+}
+
+/* -- Leading icon ---------------------------------------------------------------------------------
+ * tc-chip sizes its leading slot to --tc-size-icon-sm (20px). 1em lands on exactly that at the
+ * default size and keeps --sm proportional — the same behaviour ./chip.css gets for free from
+ * Iconify's own 1em default, which HeroUI's fixed `size-3` here would otherwise break. */
+
+[data-theme^="tzuchi"] .tag svg {
+  inline-size: 1em;
+  block-size: 1em;
+}
+
+/* -- Selected -------------------------------------------------------------------------------------
+ * tc-chip keeps the tonal fill when selected and adds a border in the label colour
+ * (--tc-chip-fg, which is also the text colour). currentColor says exactly that, and it stays
+ * right in both Tag variants because HeroUI's own selected rule paints the label
+ * --accent-soft-foreground in both. */
+
+[data-theme^="tzuchi"] .tag:is([data-selected="true"], [aria-selected="true"]) {
+  border-color: currentColor;
+}
+
+/* -- Motion -----------------------------------------------------------------------------------
+ * tc fades background-color and border-color over motion.duration.fast with
+ * motion.easing.standard. border-color has to join HeroUI's list or the new selected border snaps
+ * in while the fill fades. The other four properties HeroUI already transitions (color, scale,
+ * opacity, box-shadow) are not part of tc-chip's spec, so their original duration/timing-function
+ * (--ease-smooth / --ease-out, both HeroUI's own theme variables, at 100ms) are restated unchanged
+ * — transition-duration and transition-timing-function are positional lists matched to
+ * transition-property, so the whole list has to be repeated, but only the background-color and
+ * border-color entries actually change value.
+ * Guarded on BOTH reduced-motion switches HeroUI ships — the media query and the
+ * `data-reduce-motion` attribute — because this rule would otherwise out-cascade the
+ * `motion-reduce:transition-none` the base file relies on. */
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-theme^="tzuchi"] .tag:not(:is([data-reduce-motion="true"], [data-reduce-motion="true"] *)) {
+    transition-property: color, scale, opacity, background-color, border-color, box-shadow;
+    transition-duration:
+      100ms, 100ms, 100ms, var(--tc-motion-duration-fast, 150ms), var(--tc-motion-duration-fast, 150ms),
+      100ms;
+    transition-timing-function:
+      var(--ease-smooth), var(--ease-smooth), var(--ease-smooth), var(--tc-motion-easing-standard, ease),
+      var(--tc-motion-easing-standard, ease), var(--ease-out);
+  }
+}
+
+/* -- Remove button --------------------------------------------------------------------------------
+ * tc-chip's remove is a bare 20px round button whose glyph fills it, sitting 4px after the label —
+ * which the .tag's own 4px gap already provides, so no margin is needed. HeroUI's 24px box with
+ * 4px padding and a 12px glyph becomes 20px with no padding. The 24px `touch-target` ::after is
+ * kept: it now overhangs by only 2px, well inside the list's 6px gap. */
+
+[data-theme^="tzuchi"] .tag__remove-button {
+  inline-size: var(--tc-size-icon-sm, 20px);
+  block-size: var(--tc-size-icon-sm, 20px);
+  padding: 0;
+  border-radius: var(--tc-radius-full, 9999px);
+}
+
+/* Transparent at rest, like tc. The :not() list hands hover and pressed straight back to
+ * close-button.css, and status-focused / status-disabled / status-pending never touch
+ * background-color — the same guard ./modal.css uses on the dialog's close trigger. */
+
+[data-theme^="tzuchi"]
+  .tag__remove-button.close-button--default:not(
+    :hover,
+    [data-hovered="true"],
+    :active,
+    [data-pressed="true"]
+  ) {
+  background-color: transparent;
+}
+
+/* tc's glyph fills the button. This must come AFTER the `.tag svg` rule above, which is equally
+ * specific, and it drops close-button.css's -2px inline / 2px block optical margins — they were
+ * sized for a 16px glyph inside a padded 24px button. */
+
+[data-theme^="tzuchi"] .tag__remove-button svg {
+  inline-size: 100%;
+  block-size: 100%;
+  margin: 0;
+}

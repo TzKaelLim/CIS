@@ -2,19 +2,25 @@
   "name": "tzuchi-uikit",
   "private": true,
   "type": "module",
-  "packageManager": "pnpm@10.26.1",
+  "packageManager": "pnpm@10.26.1+sha512.664074abc367d2c9324fdc18037097ce0a8f126034160f709928e9e9f95d98714347044e5c3164d65bd5da6c59c6be362b107546292a8eecb7999196e5ce58fa",
   "engines": {
-    "node": ">=20",
+    "node": ">=22.22.0",
     "pnpm": ">=9"
   },
   "scripts": {
-    "build": "turbo run build",
+    "build": "turbo run build --filter=@tzuchi/tokens",
     "typecheck": "tsc -b",
-    "test": "turbo run test",
+    "test": "turbo run test --filter=@tzuchi/tokens",
     "lint": "eslint . && prettier --check .",
     "format": "prettier --write .",
-    "verify:pkg": "turbo run verify:pkg",
-    "changeset": "changeset"
+    "verify:pkg": "turbo run verify:pkg --filter=@tzuchi/tokens",
+    "changeset": "changeset",
+    "heroui:theme": "node heroui/styles/themes/tzuchi/generate.mjs",
+    "heroui:storybook": "node scripts/dev/storybook.mjs",
+    "docs:dev": "node scripts/dev/docs.mjs",
+    "docs:build": "pnpm --filter @tzuchi/tokens build && node scripts/dev/astro.mjs build",
+    "test:scripts": "node --test \"scripts/**/*.test.mjs\"",
+    "heroui:storybook:build": "pnpm --filter @heroui/storybook build"
   },
   "devDependencies": {
     "typescript": "^5.7.0",

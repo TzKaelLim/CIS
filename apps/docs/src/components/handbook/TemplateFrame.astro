@@ -1,0 +1,148 @@
+---
+// 範本的大預覽：一個像瀏覽器視窗的外框，裡面是整頁範本（真正的 <tc-*> 元件）。
+//
+// - 桌機寬度（視窗 768px 以上）：<tc-navbar>、<tc-footer> 依「視窗寬度」決定用桌機版，
+//   但外框比視窗窄。所以範本至少用 LAYOUT_MIN_PX 的寬度排版，外框比這窄時整塊等比例縮小
+//   （和 TemplateThumb 同一種做法），導覽列的字不會被擠成直排。
+// - 手機寬度：範本用手機版面排版。外框比 PHONE_MIN_PX 窄時（例如 390 寬的手機，外框只有 358px），
+//   用 PHONE_MIN_PX 排版再等比例縮小：<tc-navbar> 的手機版至少要 406px，直接用外框的寬度排版時，
+//   右邊的選單按鈕會被切掉。
+// - 沒有 JavaScript 時：用外框的寬度排版，不縮小。
+//
+// - interactive（預設 true）：可以點頁籤、按鈕；範本裡的 href="#" 連結不會跳走。
+// - 外框（標題列）用手冊的 --sl-* 顏色；裡面的範本用 --tc-* token，跟著主題和色彩模式變。
+import TemplateView from './TemplateView.astro';
+import { getTemplate } from '../../data/template-catalog';
+
+interface Props {
+  id: string;
+  interactive?: boolean;
+  /** 標題列上的文字，預設「範本預覽：<名稱>」。 */
+  label?: string;
+  class?: string;
+}
+
+const { id, interactive = true, label, class: className } = Astro.props;
+const entry = getTemplate(id);
+const title = label ?? `範本預覽：${entry.名稱}`;
+---
+
+<tc-template-frame class:list={['tc-template-frame', 'not-content', className]}>
+  <figure role="group" aria-label={title}>
+    <figcaption class="bar">
+      <span class="dots" aria-hidden="true"><span></span><span></span><span></span></span>
+      <span class="title">{title}</span>
+    </figcaption>
+    <div class="viewport" inert={!interactive}>
+      <div class="stage">
+        <TemplateView id={id} />
+      </div>
+    </div>
+  </figure>
+</tc-template-frame>
+
+<script>
+  /** 範本在桌機寬度至少用多寬排版（px）；外框比這窄時等比例縮小。 */
+  const LAYOUT_MIN_PX = 1080;
+  /** 範本在手機寬度至少用多寬排版（px）；<tc-navbar> 的手機版需要 406px（凍結的元件，不能改）。 */
+  const PHONE_MIN_PX = 420;
+  /** <tc-navbar> 從這個視窗寬度開始用桌機版（packages/components 的 media query）。 */
+  const DESKTOP_QUERY = '(min-width: 768px)';
+
+  class TcTemplateFrame extends HTMLElement {
+    #observer: ResizeObserver | undefined;
+    #mql: MediaQueryList | undefined;
+    #onChange = (): void => this.#fit();
+
+    connectedCallback() {
+      // 範本裡的連結都是 href="#"（示意），點了不要跳回頁面頂端。
+      this.addEventListener('click', (event) => {
+        const anchor = event
+          .composedPath()
+          .find((node): node is HTMLAnchorElement => node instanceof HTMLAnchorElement);
+        if (anchor && anchor.getAttribute('href') === '#') event.preventDefault();
+      });
+      const viewport = this.querySelector<HTMLElement>('.viewport');
+      const stage = this.querySelector<HTMLElement>('.stage');
+      if (!viewport || !stage) return;
+      this.#mql = window.matchMedia(DESKTOP_QUERY);
+      this.#mql.addEventListener('change', this.#onChange);
+      this.#observer = new ResizeObserver(this.#onChange);
+      this.#observer.observe(viewport);
+      this.#observer.observe(stage);
+      this.#fit();
+    }
+
+    disconnectedCallback() {
+      this.#observer?.disconnect();
+      this.#mql?.removeEventListener('change', this.#onChange);
+    }
+
+    #fit(): void {
+      const viewport = this.querySelector<HTMLElement>('.viewport');
+      const stage = this.querySelector<HTMLElement>('.stage');
+      if (!viewport || !stage) return;
+      const available = viewport.clientWidth;
+      const layout = Math.max(available, this.#mql?.matches ? LAYOUT_MIN_PX : PHONE_MIN_PX);
+      const scale = available > 0 ? available / layout : 1;
+      stage.style.inlineSize = `${layout}px`;
+      stage.style.transform = scale < 1 ? `scale(${scale})` : '';
+      // transform 不影響版面，所以外框的高度要自己算。
+      const height = `${Math.ceil(stage.offsetHeight * scale)}px`;
+      if (viewport.style.blockSize !== height) viewport.style.blockSize = height;
+    }
+  }
+  if (!customElements.get('tc-template-frame')) {
+    customElements.define('tc-template-frame', TcTemplateFrame);
+  }
+</script>
+
+<style>
+  .tc-template-frame {
+    display: block;
+  }
+  figure {
+    margin: 0;
+    overflow: hidden;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 16px;
+    background-color: var(--tc-color-surface-default);
+  }
+  .bar {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.55rem 0.9rem;
+    border-block-end: 1px solid var(--sl-color-gray-5);
+    background-color: var(--sl-color-gray-6);
+    color: var(--sl-color-gray-2);
+    font-size: var(--hb-text-label);
+  }
+  .dots {
+    display: inline-flex;
+    gap: 0.35rem;
+  }
+  .dots span {
+    inline-size: 0.6rem;
+    block-size: 0.6rem;
+    border-radius: 999px;
+    background-color: var(--sl-color-gray-4);
+  }
+  .title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .viewport {
+    position: relative;
+    overflow: hidden;
+    /* 裡面的範本可能比外框寬（縮小前），不要讓它撐開外層的格線欄位。 */
+    contain: inline-size;
+  }
+  .stage {
+    transform-origin: 0 0;
+  }
+  .viewport[inert] {
+    user-select: none;
+  }
+</style>

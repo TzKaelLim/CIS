@@ -1,0 +1,1022 @@
+---
+// 範本總覽頁的內容：分類篩選標籤、範本卡片格線，以及打開範本的預覽對話框。
+//
+// 卡片
+// - 整張卡片是一個連結（.hit 蓋住整張卡片），縮圖是 iframe（TemplateThumb.astro），不在連結裡面。
+// - 滑鼠移上或用鍵盤選到時，縮圖變暗，疊上名稱、兩行說明和「預覽」按鈕。
+// - 沒有滑鼠（@media (hover: none)）或手機寬度（一欄）時，名稱、「分類 · 示意」和「預覽」按鈕
+//   改放在縮圖下方。
+// - 沒有 JavaScript 時，卡片就是連到範本畫面頁（/templates/frame/<id>/）的普通連結；
+//   有 JavaScript 時，點卡片、按 Enter 或空白鍵打開預覽對話框。
+//
+// 預覽對話框（<dialog>，showModal()）
+// - 上方：名稱、分類、「示意」、寬度切換（桌機／平板／手機）、主題選單和色彩模式按鈕
+//   （和頁首的是同一套：對話框打開時頁首按不到，所以在這裡也放一份）、「上一個」「下一個」
+//   （只在目前篩選出來的範本之間切換）、關閉。
+// - 寬度：讀者還沒選過時，打開時選放得下的最大寬度（縮小後至少 70%），所以手機上預設是「手機」。
+// - 中間：iframe 用選的寬度載入範本畫面頁，對話框比那個寬度窄時整塊縮小；範本在 iframe 裡上下捲動。
+// - 下方：「使用的元件」，連到各元件頁。
+// - 打開時焦點在關閉按鈕上（螢幕閱讀器先唸出對話框的標題）。
+// - Esc、關閉按鈕、點對話框外面都會關閉；關閉後焦點回到目前範本的卡片；打開時頁面不能捲動。
+// - 打開的範本不在目前的篩選結果裡時（例如網址同時有 ?category= 和 ?t=），篩選改回「全部」。
+// - 網址：打開時加上 ?t=<id>（pushState），關閉時拿掉；按瀏覽器的「上一頁」會關閉；
+//   直接打開 /templates/?t=<id> 會打開那個範本（不認得的 id 不理會）。
+// - 網址 ?category=<分類 id> 會直接選好那一類。
+import { Badge } from '@astrojs/starlight/components';
+import TemplateThumb from './TemplateThumb.astro';
+import HeaderIcon from './HeaderIcon.astro';
+import SiteMenu from './SiteMenu.astro';
+import ColorModeToggle from './ColorModeToggle.astro';
+import {
+  PREVIEW_WIDTHS,
+  TEMPLATES,
+  TEMPLATE_PREVIEW_PARAM,
+  getTemplateCategory,
+  templateFrameUrl,
+  usedTemplateCategories,
+} from '../../data/template-catalog';
+import { componentUrl, getComponent } from '../../data/component-catalog';
+
+const categories = usedTemplateCategories();
+const [defaultWidth] = PREVIEW_WIDTHS;
+
+/** 預覽對話框需要的資料（JSON，放在頁面裡給 script 讀）。 */
+const previewData = TEMPLATES.map((entry) => ({
+  id: entry.id,
+  名稱: entry.名稱,
+  分類: getTemplateCategory(entry.分類).名稱,
+  frame: templateFrameUrl(entry),
+  components: entry.使用的元件.map((id) => {
+    const c = getComponent(id);
+    return { name: c.中文名, url: componentUrl(c) };
+  }),
+}));
+const previewJson = JSON.stringify(previewData).replace(/</g, '\\u003c');
+---
+
+<tc-template-gallery class="tc-template-gallery not-content" data-param={TEMPLATE_PREVIEW_PARAM}>
+  <div class="filters" role="group" aria-label="依分類篩選範本" hidden>
+    <button type="button" class="chip" data-filter="" aria-pressed="true">全部</button>
+    {
+      categories.map((c) => (
+        <button type="button" class="chip" data-filter={c.id} aria-pressed="false">
+          {c.名稱}
+        </button>
+      ))
+    }
+  </div>
+  <p class="status" role="status">目前有 {TEMPLATES.length} 個範本。</p>
+  <ul class="grid">
+    {
+      TEMPLATES.map((entry) => {
+        const category = getTemplateCategory(entry.分類).名稱;
+        const descId = `tc-template-desc-${entry.id}`;
+        return (
+          <li class="card" data-category={entry.分類} data-template={entry.id}>
+            <div class="media">
+              <TemplateThumb id={entry.id} />
+              <div class="overlay" aria-hidden="true">
+                <span class="o-name">{entry.名稱}</span>
+                <span class="o-meta">{category} · 示意</span>
+                <span class="o-desc" id={descId}>
+                  {entry.說明}
+                </span>
+                <span class="o-button">預覽</span>
+              </div>
+            </div>
+            <div class="below" aria-hidden="true">
+              <span class="b-text">
+                <span class="b-name">{entry.名稱}</span>
+                <span class="b-meta">{category} · 示意</span>
+              </span>
+              <span class="b-button">預覽</span>
+            </div>
+            <a
+              class="hit"
+              href={templateFrameUrl(entry)}
+              data-template-link={entry.id}
+              aria-label={`預覽範本：${entry.名稱}（${category}，示意）`}
+              aria-describedby={descId}
+            />
+          </li>
+        );
+      })
+    }
+  </ul>
+
+  <dialog class="preview" aria-labelledby="tc-preview-title">
+    <div class="panel">
+      <div class="top">
+        <div class="ident">
+          <h2 id="tc-preview-title" class="title"></h2>
+          <span class="category"></span>
+          <Badge text="示意" variant="caution" />
+        </div>
+        <div class="widths" role="group" aria-label="預覽寬度">
+          {
+            PREVIEW_WIDTHS.map((w) => (
+              <button
+                type="button"
+                data-width={w.px}
+                aria-pressed={w.id === defaultWidth.id ? 'true' : 'false'}
+              >
+                {w.名稱}
+                <span class="px">{w.px}</span>
+              </button>
+            ))
+          }
+        </div>
+        <div class="right">
+          <div class="look" role="group" aria-label="預覽的主題和色彩模式">
+            <SiteMenu id="tc-preview-site-menu-list" />
+            <ColorModeToggle />
+          </div>
+          <div class="actions">
+            <span class="count" aria-hidden="true"></span>
+            <button type="button" class="nav prev">
+              <HeaderIcon name="chevron-left" size={18} />
+              <span class="nav-label">上一個</span>
+            </button>
+            <button type="button" class="nav next">
+              <span class="nav-label">下一個</span>
+              <HeaderIcon name="chevron-right" size={18} />
+            </button>
+            <button type="button" class="hb-icon-button close" aria-label="關閉預覽" autofocus>
+              <HeaderIcon name="close" />
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="body">
+        <div class="stage"></div>
+      </div>
+      <div class="foot">
+        <span class="foot-label" id="tc-preview-components">使用的元件</span>
+        <ul class="components" aria-labelledby="tc-preview-components"></ul>
+        <span class="scale"></span>
+      </div>
+      <p class="sr-only announce" aria-live="polite"></p>
+    </div>
+  </dialog>
+
+  <script type="application/json" class="preview-data" set:html={previewJson} />
+</tc-template-gallery>
+
+<script>
+  import { FRAME_ESCAPE, isFrameMessage } from '../../scripts/template-frame-messages';
+  import { FRAME_SELECTOR, currentLook, startFrameSync } from '../../scripts/template-frames';
+
+  interface PreviewTemplate {
+    id: string;
+    名稱: string;
+    分類: string;
+    frame: string;
+    components: { name: string; url: string }[];
+  }
+
+  const isRecord = (value: unknown): value is Record<string, unknown> =>
+    typeof value === 'object' && value !== null;
+
+  function isPreviewTemplate(value: unknown): value is PreviewTemplate {
+    return (
+      isRecord(value) &&
+      typeof value.id === 'string' &&
+      typeof value.名稱 === 'string' &&
+      typeof value.分類 === 'string' &&
+      typeof value.frame === 'string' &&
+      Array.isArray(value.components) &&
+      value.components.every(
+        (c) => isRecord(c) && typeof c.name === 'string' && typeof c.url === 'string',
+      )
+    );
+  }
+
+  /** 打開時頁面不能捲動；保留捲軸的位置，版面不會左右跳。 */
+  const SCROLL_LOCK_CLASS = 'tc-scroll-locked';
+
+  class TcTemplateGallery extends HTMLElement {
+    #templates: PreviewTemplate[] = [];
+    #current: PreviewTemplate | undefined;
+    #width = 1280;
+    /** 讀者按過寬度切換之後，就不再自動選寬度。 */
+    #widthChosen = false;
+    #applyFilter: ((filter: string, announce: boolean) => void) | undefined;
+    /** 這次打開時有沒有 pushState；有的話關閉時用 history.back() 回到打開前的那一筆。 */
+    #pushed = false;
+    #param = 't';
+
+    connectedCallback() {
+      this.#param = this.dataset.param ?? 't';
+      this.#setUpFilters();
+      this.#setUpPreview();
+    }
+
+    #setUpFilters(): void {
+      const group = this.querySelector<HTMLElement>('.filters');
+      const status = this.querySelector<HTMLElement>('.status');
+      const chips = [...this.querySelectorAll<HTMLButtonElement>('button[data-filter]')];
+      const items = [...this.querySelectorAll<HTMLElement>('li[data-category]')];
+      if (!group || !status) return;
+
+      const apply = (filter: string, announce: boolean) => {
+        let shown = 0;
+        for (const item of items) {
+          const visible = filter === '' || item.dataset.category === filter;
+          item.hidden = !visible;
+          if (visible) shown += 1;
+        }
+        for (const chip of chips) {
+          chip.setAttribute('aria-pressed', String(chip.dataset.filter === filter));
+        }
+        const chip = chips.find((c) => c.dataset.filter === filter);
+        const label = filter === '' ? '全部' : (chip?.textContent?.trim() ?? '');
+        if (announce || filter !== '') status.textContent = `${label}：${shown} 個範本。`;
+      };
+
+      for (const chip of chips) {
+        chip.addEventListener('click', () => apply(chip.dataset.filter ?? '', true));
+      }
+      this.#applyFilter = apply;
+
+      let initial = '';
+      try {
+        initial = new URLSearchParams(location.search).get('category') ?? '';
+      } catch {
+        initial = '';
+      }
+      if (!chips.some((c) => c.dataset.filter === initial)) initial = '';
+      apply(initial, false);
+      group.hidden = false;
+    }
+
+    #setUpPreview(): void {
+      const dialog = this.querySelector<HTMLDialogElement>('dialog.preview');
+      const dataEl = this.querySelector<HTMLScriptElement>('script.preview-data');
+      if (!dialog || !dataEl) return;
+      try {
+        const parsed: unknown = JSON.parse(dataEl.textContent ?? '[]');
+        this.#templates = Array.isArray(parsed) ? parsed.filter(isPreviewTemplate) : [];
+      } catch {
+        this.#templates = [];
+      }
+      if (this.#templates.length === 0) return;
+      startFrameSync();
+
+      // 卡片：點一下、Enter 或空白鍵打開預覽。按著 Ctrl／⌘／Shift 或用中鍵點時，照連結原本的行為
+      // （在新分頁打開範本畫面頁）。
+      for (const link of this.querySelectorAll<HTMLAnchorElement>('a[data-template-link]')) {
+        const id = link.dataset.templateLink ?? '';
+        link.setAttribute('role', 'button');
+        link.setAttribute('aria-haspopup', 'dialog');
+        link.addEventListener('click', (event) => {
+          if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
+            return;
+          event.preventDefault();
+          this.#open(id, 'push');
+        });
+        link.addEventListener('keydown', (event) => {
+          if (event.key !== ' ') return;
+          event.preventDefault();
+          this.#open(id, 'push');
+        });
+      }
+
+      // 寬度切換。
+      const widthButtons = [...dialog.querySelectorAll<HTMLButtonElement>('button[data-width]')];
+      for (const button of widthButtons) {
+        button.addEventListener('click', () => {
+          this.#widthChosen = true;
+          this.#setWidth(Number(button.dataset.width) || 1280);
+          this.#fit();
+        });
+      }
+      this.#width = Number(widthButtons[0]?.dataset.width) || 1280;
+
+      dialog.querySelector('.prev')?.addEventListener('click', () => this.#step(-1));
+      dialog.querySelector('.next')?.addEventListener('click', () => this.#step(1));
+      dialog.querySelector('.close')?.addEventListener('click', () => dialog.close());
+      // 點對話框外面（::backdrop 也算對話框本身）就關閉。
+      dialog.addEventListener('click', (event) => {
+        if (event.target === dialog) dialog.close();
+      });
+      dialog.addEventListener('close', () => this.#onClose());
+
+      // 焦點在範本（iframe）裡時按 Esc：範本畫面頁轉告這裡。
+      window.addEventListener('message', (event) => {
+        if (event.origin !== location.origin || !isFrameMessage(event.data, FRAME_ESCAPE)) return;
+        const frame = dialog.querySelector<HTMLIFrameElement>(FRAME_SELECTOR);
+        if (dialog.open && frame && event.source === frame.contentWindow) dialog.close();
+      });
+
+      // 「上一頁」「下一頁」：網址上有 ?t= 就打開那個範本，沒有就關閉。
+      window.addEventListener('popstate', () => {
+        const id = this.#idFromUrl();
+        if (id) {
+          this.#open(id, 'none');
+        } else if (dialog.open) {
+          this.#pushed = false;
+          dialog.close();
+        }
+      });
+
+      const body = dialog.querySelector<HTMLElement>('.body');
+      if (body) new ResizeObserver(() => this.#fit()).observe(body);
+
+      const initial = this.#idFromUrl();
+      if (initial) this.#open(initial, 'none');
+    }
+
+    #idFromUrl(): string | undefined {
+      let id: string | null = null;
+      try {
+        id = new URLSearchParams(location.search).get(this.#param);
+      } catch {
+        id = null;
+      }
+      return this.#templates.some((t) => t.id === id) ? (id ?? undefined) : undefined;
+    }
+
+    #urlWith(id: string | undefined): URL {
+      const url = new URL(location.href);
+      if (id) url.searchParams.set(this.#param, id);
+      else url.searchParams.delete(this.#param);
+      return url;
+    }
+
+    /** 目前篩選出來（看得到）的範本，照卡片的順序。 */
+    #visibleIds(): string[] {
+      return [...this.querySelectorAll<HTMLElement>('li[data-template]')]
+        .filter((li) => !li.hidden)
+        .map((li) => li.dataset.template ?? '');
+    }
+
+    #setWidth(width: number): void {
+      this.#width = width;
+      for (const b of this.querySelectorAll<HTMLButtonElement>('dialog.preview button[data-width]')) {
+        b.setAttribute('aria-pressed', String(Number(b.dataset.width) === width));
+      }
+    }
+
+    /** 讀者還沒選過寬度時：選放得下的最大寬度（縮小後至少 70%），都放不下就用最窄的。 */
+    #autoWidth(): void {
+      if (this.#widthChosen) return;
+      const body = this.querySelector<HTMLElement>('dialog.preview .body');
+      if (!body) return;
+      const style = getComputedStyle(body);
+      const available =
+        body.clientWidth - parseFloat(style.paddingInlineStart) - parseFloat(style.paddingInlineEnd);
+      const widths = [...this.querySelectorAll<HTMLButtonElement>('dialog.preview button[data-width]')]
+        .map((b) => Number(b.dataset.width))
+        .filter((w) => w > 0)
+        .sort((a, b) => b - a);
+      if (available <= 0 || widths.length === 0) return;
+      const fitting = widths.find((w) => available / w >= 0.7);
+      this.#setWidth(fitting ?? widths[widths.length - 1] ?? 1280);
+    }
+
+    #open(id: string, history: 'push' | 'replace' | 'none'): void {
+      const dialog = this.querySelector<HTMLDialogElement>('dialog.preview');
+      const entry = this.#templates.find((t) => t.id === id);
+      if (!dialog || !entry) return;
+      // 範本不在目前的篩選結果裡：篩選改回「全部」，計數和「上一個」「下一個」才對得上。
+      const card = this.querySelector<HTMLElement>(`li[data-template="${CSS.escape(id)}"]`);
+      if (card?.hidden) this.#applyFilter?.('', true);
+      this.#show(entry);
+      if (!dialog.open) {
+        document.documentElement.classList.add(SCROLL_LOCK_CLASS);
+        dialog.showModal();
+        this.#autoWidth();
+      }
+      if (history === 'push') {
+        window.history.pushState({ tcTemplatePreview: id }, '', this.#urlWith(id));
+        this.#pushed = true;
+      } else if (history === 'replace') {
+        window.history.replaceState(window.history.state, '', this.#urlWith(id));
+      }
+      this.#fit();
+    }
+
+    #step(delta: number): void {
+      const ids = this.#visibleIds();
+      if (ids.length === 0 || !this.#current) return;
+      const index = ids.indexOf(this.#current.id);
+      const next =
+        index < 0
+          ? delta > 0
+            ? 0
+            : ids.length - 1
+          : (index + delta + ids.length) % ids.length;
+      const id = ids[next];
+      if (id) this.#open(id, 'replace');
+      const entry = this.#templates.find((t) => t.id === id);
+      const announce = this.querySelector<HTMLElement>('.announce');
+      if (announce && entry) {
+        announce.textContent = `${entry.名稱}，第 ${next + 1} 個，共 ${ids.length} 個`;
+      }
+    }
+
+    #show(entry: PreviewTemplate): void {
+      const dialog = this.querySelector<HTMLDialogElement>('dialog.preview');
+      if (!dialog) return;
+      this.#current = entry;
+      const set = (selector: string, text: string) => {
+        const el = dialog.querySelector<HTMLElement>(selector);
+        if (el) el.textContent = text;
+      };
+      set('.title', entry.名稱);
+      set('.category', entry.分類);
+
+      const ids = this.#visibleIds();
+      const index = ids.indexOf(entry.id);
+      set('.count', index >= 0 ? `${index + 1} / ${ids.length}` : '');
+      const single = ids.length <= 1 && index >= 0;
+      for (const button of dialog.querySelectorAll<HTMLButtonElement>('.nav')) {
+        button.disabled = single;
+      }
+
+      // 每次換一個新的 iframe：改舊 iframe 的 src 會在瀏覽紀錄多一筆，「上一頁」就不會關閉對話框。
+      const stage = dialog.querySelector<HTMLElement>('.stage');
+      if (stage) {
+        const look = currentLook();
+        const src = new URL(entry.frame, location.origin);
+        src.searchParams.set('site', look.site);
+        src.searchParams.set('mode', look.mode);
+        const frame = document.createElement('iframe');
+        frame.src = `${src.pathname}${src.search}`;
+        frame.title = `範本預覽：${entry.名稱}`;
+        frame.dataset.tcTemplateFrame = '';
+        stage.replaceChildren(frame);
+      }
+
+      const list = dialog.querySelector<HTMLElement>('.components');
+      if (list) {
+        list.replaceChildren(
+          ...entry.components.map((c) => {
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = c.url;
+            a.textContent = c.name;
+            li.append(a);
+            return li;
+          }),
+        );
+      }
+    }
+
+    /** 依對話框的大小縮放 iframe：寬度比選的寬度窄時整塊縮小，高度填滿。 */
+    #fit(): void {
+      const dialog = this.querySelector<HTMLDialogElement>('dialog.preview');
+      const body = dialog?.querySelector<HTMLElement>('.body');
+      const stage = dialog?.querySelector<HTMLElement>('.stage');
+      const frame = stage?.querySelector<HTMLIFrameElement>('iframe');
+      if (!dialog?.open || !body || !stage || !frame) return;
+      const style = getComputedStyle(body);
+      const availableWidth =
+        body.clientWidth - parseFloat(style.paddingInlineStart) - parseFloat(style.paddingInlineEnd);
+      const availableHeight =
+        body.clientHeight - parseFloat(style.paddingBlockStart) - parseFloat(style.paddingBlockEnd);
+      if (availableWidth <= 0 || availableHeight <= 0) return;
+      const scale = Math.min(1, availableWidth / this.#width);
+      stage.style.inlineSize = `${Math.floor(this.#width * scale)}px`;
+      stage.style.blockSize = `${Math.floor(availableHeight)}px`;
+      frame.style.inlineSize = `${this.#width}px`;
+      frame.style.blockSize = `${Math.ceil(availableHeight / scale)}px`;
+      frame.style.transform = scale < 1 ? `scale(${scale})` : '';
+      const scaleText = dialog.querySelector<HTMLElement>('.scale');
+      if (scaleText) {
+        scaleText.textContent =
+          scale < 1
+            ? `${this.#width} px 寬，縮小為 ${Math.round(scale * 100)}%`
+            : `${this.#width} px 寬，原尺寸`;
+      }
+    }
+
+    #onClose(): void {
+      document.documentElement.classList.remove(SCROLL_LOCK_CLASS);
+      const dialog = this.querySelector<HTMLDialogElement>('dialog.preview');
+      // 關閉後不再載入範本。
+      dialog?.querySelector('.stage')?.replaceChildren();
+      if (this.#idFromUrl()) {
+        if (this.#pushed) {
+          this.#pushed = false;
+          window.history.back();
+        } else {
+          window.history.replaceState(window.history.state, '', this.#urlWith(undefined));
+        }
+      }
+      // 焦點回到目前範本的卡片（換過範本時就是換到的那一張）。
+      const id = this.#current?.id;
+      const card = [...this.querySelectorAll<HTMLAnchorElement>('a[data-template-link]')].find(
+        (a) => a.dataset.templateLink === id && !a.closest('li')?.hidden,
+      );
+      card?.focus();
+    }
+  }
+  if (!customElements.get('tc-template-gallery')) {
+    customElements.define('tc-template-gallery', TcTemplateGallery);
+  }
+</script>
+
+<style is:global>
+  html.tc-scroll-locked {
+    overflow: hidden;
+    scrollbar-gutter: stable;
+  }
+</style>
+
+<style>
+  .tc-template-gallery {
+    display: flex;
+    flex-direction: column;
+    container-type: inline-size;
+  }
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.4rem;
+    margin-block-end: 0.75rem;
+  }
+  .filters[hidden] {
+    display: none;
+  }
+  .chip {
+    padding: 0.4rem 1rem;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    background: none;
+    color: var(--sl-color-gray-2);
+    font: inherit;
+    font-size: var(--hb-text-ui);
+    line-height: var(--hb-line-height-ui);
+    cursor: pointer;
+  }
+  .chip:hover {
+    color: var(--sl-color-white);
+    background-color: var(--sl-color-gray-6);
+  }
+  .chip[aria-pressed='true'] {
+    border-color: var(--sl-color-gray-5);
+    background-color: var(--sl-color-gray-6);
+    color: var(--sl-color-white);
+    font-weight: 600;
+  }
+  .chip:focus-visible {
+    outline: 2px solid var(--sl-color-accent);
+    outline-offset: 2px;
+  }
+  .status {
+    margin: 0 0 1.75rem;
+    color: var(--sl-color-gray-3);
+    font-size: var(--hb-text-body);
+    text-align: center;
+  }
+
+  /* ── 卡片格線：寬 3 欄、中 2 欄、手機 1 欄 ── */
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .grid > li[hidden] {
+    display: none;
+  }
+  @container (min-width: 32rem) {
+    .grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @container (min-width: 60rem) {
+    .grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    border-radius: var(--tc-handbook-radius);
+  }
+  .media {
+    position: relative;
+    border-radius: var(--tc-handbook-radius);
+    overflow: hidden;
+  }
+  /* 縮圖、疊層、連結各自一層，iframe 才不會畫到疊層上面。 */
+  .media :global(.tc-template-thumb) {
+    z-index: 0;
+    transition: border-color 0.15s ease;
+  }
+  .card:hover .media :global(.tc-template-thumb) {
+    border-color: var(--sl-color-gray-4);
+  }
+
+  /* 滑鼠移上或鍵盤選到時：縮圖變暗，疊上名稱、說明和「預覽」。顏色不跟手冊的色彩模式變：
+     白字永遠放在暗的疊層上。 */
+  .overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-start;
+    gap: 0.25rem;
+    padding: 1.25rem;
+    border-radius: inherit;
+    /* 下面（文字所在的地方）比較暗，縮圖裡的大標題才不會和疊層的文字混在一起。 */
+    background-image: linear-gradient(
+      to top,
+      rgba(12, 12, 14, 0.94) 0%,
+      rgba(12, 12, 14, 0.88) 55%,
+      rgba(12, 12, 14, 0.66) 100%
+    );
+    z-index: 1;
+    color: #ffffff;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    pointer-events: none;
+  }
+  .card:hover .overlay,
+  .card:has(.hit:focus-visible) .overlay {
+    opacity: 1;
+  }
+  .o-name {
+    font-size: var(--hb-text-h3);
+    font-weight: 600;
+    line-height: var(--hb-line-height-headings);
+  }
+  .o-meta {
+    color: rgba(255, 255, 255, 0.78);
+    font-size: var(--hb-text-label);
+  }
+  .o-desc {
+    display: -webkit-box;
+    margin-block-start: 0.25rem;
+    overflow: hidden;
+    color: rgba(255, 255, 255, 0.92);
+    font-size: var(--hb-text-body);
+    line-height: var(--hb-line-height);
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+  .o-button {
+    display: inline-flex;
+    align-items: center;
+    block-size: 2rem;
+    margin-block-start: 0.75rem;
+    padding-inline: 0.875rem;
+    border-radius: 999px;
+    background-color: #ffffff;
+    color: #18181b;
+    font-size: var(--hb-text-ui);
+    font-weight: 500;
+  }
+
+  /* 縮圖下方的名稱和按鈕：只在沒有滑鼠或手機寬度時顯示。 */
+  .below {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+  .b-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    min-inline-size: 0;
+  }
+  .b-name {
+    color: var(--sl-color-white);
+    font-size: var(--hb-text-ui);
+    font-weight: 600;
+    line-height: var(--hb-line-height-ui);
+  }
+  .b-meta {
+    color: var(--sl-color-gray-3);
+    font-size: var(--hb-text-label);
+  }
+  .b-button {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    block-size: 2rem;
+    padding-inline: 0.875rem;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 999px;
+    color: var(--sl-color-white);
+    font-size: var(--hb-text-ui);
+    font-weight: 500;
+  }
+  .card:hover .b-button {
+    background-color: var(--sl-color-gray-6);
+  }
+  @media (hover: none) {
+    .overlay {
+      display: none;
+    }
+    .below {
+      display: flex;
+    }
+  }
+  @container (max-width: 31.99rem) {
+    .overlay {
+      display: none;
+    }
+    .below {
+      display: flex;
+    }
+  }
+
+  /* 整張卡片可以點；焦點框畫在整張卡片外面。 */
+  .hit {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    border-radius: var(--tc-handbook-radius);
+  }
+  .hit:focus-visible {
+    outline: 2px solid var(--sl-color-accent);
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .overlay,
+    .media :global(.tc-template-thumb) {
+      transition: none;
+    }
+  }
+
+  /* ── 預覽對話框 ── */
+  .preview {
+    box-sizing: border-box;
+    inline-size: calc(100vw - 48px);
+    block-size: calc(100dvh - 48px);
+    max-inline-size: none;
+    max-block-size: none;
+    margin: auto;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 16px;
+    background-color: var(--sl-color-black);
+    color: var(--sl-color-white);
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35);
+  }
+  .preview::backdrop {
+    background-color: rgba(0, 0, 0, 0.55);
+  }
+  .panel {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    block-size: 100%;
+  }
+  .top {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    grid-template-areas: 'ident widths actions';
+    align-items: center;
+    gap: 0.5rem 0.75rem;
+    padding: 0.5rem 0.75rem 0.5rem 1.25rem;
+    border-block-end: 1px solid var(--sl-color-hairline-light);
+  }
+  .ident {
+    grid-area: ident;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-inline-size: 0;
+  }
+  .title {
+    margin: 0;
+    overflow: hidden;
+    color: var(--sl-color-white);
+    font-size: var(--hb-text-h3);
+    font-weight: 600;
+    line-height: var(--hb-line-height-headings);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .category {
+    flex: 0 0 auto;
+    color: var(--sl-color-gray-3);
+    font-size: var(--hb-text-ui);
+  }
+  .ident :global(.sl-badge) {
+    flex: 0 0 auto;
+  }
+  .widths {
+    grid-area: widths;
+    display: inline-flex;
+    gap: 2px;
+    padding: 2px;
+    border-radius: 999px;
+    background-color: var(--sl-color-gray-6);
+  }
+  .widths button {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.3rem;
+    block-size: 2rem;
+    padding: 0.375rem 0.75rem;
+    border: 0;
+    border-radius: 999px;
+    background: none;
+    color: var(--sl-color-gray-2);
+    font: inherit;
+    font-size: var(--hb-text-ui);
+    font-weight: 500;
+    line-height: 1.25rem;
+    cursor: pointer;
+  }
+  .widths button:hover {
+    color: var(--sl-color-white);
+  }
+  .widths button[aria-pressed='true'] {
+    background-color: var(--sl-color-black);
+    color: var(--sl-color-white);
+    font-weight: 600;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+  }
+  .px {
+    color: var(--sl-color-gray-3);
+    font-size: var(--hb-text-label);
+    font-weight: 400;
+  }
+  .right {
+    grid-area: actions;
+    justify-self: end;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  /* 主題和色彩模式：和頁首的按鈕一樣，右邊用一條細線和「上一個」「下一個」分開。 */
+  .look {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding-inline-end: 0.5rem;
+    border-inline-end: 1px solid var(--sl-color-hairline-light);
+  }
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
+  .count {
+    margin-inline-end: 0.375rem;
+    color: var(--sl-color-gray-3);
+    font-size: var(--hb-text-label);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .nav {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.125rem;
+    block-size: 2rem;
+    padding-inline: 0.5rem;
+    border: 0;
+    border-radius: 999px;
+    background: none;
+    color: var(--sl-color-white);
+    font: inherit;
+    font-size: var(--hb-text-ui);
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .nav:hover:not(:disabled) {
+    background-color: var(--sl-color-gray-6);
+  }
+  .nav:disabled {
+    color: var(--sl-color-gray-4);
+    cursor: default;
+  }
+  .widths button:focus-visible,
+  .nav:focus-visible,
+  .components a:focus-visible {
+    outline: 2px solid var(--sl-color-accent);
+    outline-offset: 2px;
+  }
+  .body {
+    display: flex;
+    justify-content: center;
+    padding: 1rem;
+    overflow: hidden;
+    background-color: var(--tc-handbook-panel);
+  }
+  .stage {
+    position: relative;
+    flex: 0 0 auto;
+    overflow: hidden;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 10px;
+    background-color: var(--tc-color-surface-default);
+  }
+  .stage :global(iframe) {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    display: block;
+    border: 0;
+    transform-origin: 0 0;
+  }
+  .foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 0.75rem;
+    padding: 0.625rem 1.25rem;
+    border-block-start: 1px solid var(--sl-color-hairline-light);
+    font-size: var(--hb-text-ui);
+  }
+  .foot-label {
+    color: var(--sl-color-gray-3);
+    font-weight: 600;
+  }
+  .components {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .components :global(a) {
+    color: var(--sl-color-text-accent);
+  }
+  .scale {
+    margin-inline-start: auto;
+    color: var(--sl-color-gray-3);
+    font-size: var(--hb-text-label);
+    white-space: nowrap;
+  }
+
+  /* 窄的對話框：寬度切換、主題和色彩模式排到第二行。 */
+  @media (max-width: 68rem) {
+    .top {
+      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-areas:
+        'ident actions'
+        'widths look';
+    }
+    .widths {
+      justify-self: start;
+    }
+    /* 第一行：名稱和上一個／下一個／關閉；第二行：寬度切換和主題／色彩模式。 */
+    .right {
+      display: contents;
+    }
+    .actions {
+      grid-area: actions;
+      justify-self: end;
+    }
+    .look {
+      grid-area: look;
+      justify-self: end;
+      padding-inline-end: 0;
+      border-inline-end: 0;
+    }
+  }
+  /* 手機：對話框佔滿整個畫面，「上一個」「下一個」只留箭頭。 */
+  @media (max-width: 40rem) {
+    .preview {
+      inline-size: 100vw;
+      block-size: 100dvh;
+      border: 0;
+      border-radius: 0;
+    }
+    .top {
+      padding-inline-start: 1rem;
+    }
+    .nav {
+      justify-content: center;
+      min-inline-size: 2rem;
+      padding-inline: 0.375rem;
+    }
+    .nav-label {
+      position: absolute;
+      inline-size: 1px;
+      block-size: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+    .body {
+      padding: 0.5rem;
+    }
+    .px,
+    .scale {
+      display: none;
+    }
+    .foot {
+      padding-inline: 1rem;
+    }
+  }
+</style>

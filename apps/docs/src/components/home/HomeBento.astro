@@ -1,0 +1,402 @@
+---
+// 首頁的四張功能卡片（bento 排法）：元件、主題、範本、透過 Claude Code 共編。
+// 每張卡片有標題、兩句說明、「前往 →」連結和一小塊真正元件的預覽（跟著主題變）。
+// 卡片的連結延伸蓋住整張卡片；預覽是 inert，不能點也不會被螢幕閱讀器唸出來。
+import TemplateThumb from '../handbook/TemplateThumb.astro';
+import SiteOnly from '../handbook/SiteOnly.astro';
+import { COMPONENTS } from '../../data/component-catalog';
+import { TEMPLATES } from '../../data/template-catalog';
+import { SITE_THEMES, siteLabel } from '../../data/site-themes';
+
+/** 主題卡片上最多列出幾個主題的色點；其餘用「+N」表示，主題再多也不會撐爆卡片。 */
+const MAX_SITE_DOTS = 6;
+const siteDots = SITE_THEMES.slice(0, MAX_SITE_DOTS);
+const moreSites = SITE_THEMES.length - siteDots.length;
+const [firstTemplate, ...otherTemplates] = TEMPLATES;
+---
+
+<div class="tc-bento-wrap not-content">
+<div class="tc-bento">
+  <div class="intro">
+    <h2>同一套規則，<br />做出每一個慈濟網站</h2>
+    <p>
+      顏色、文字、按鈕和整頁版面都只有一份。每個網站選用一個主題，換了主題就換了顏色，排法和用法不用重做。
+    </p>
+  </div>
+
+  <article class="card comp">
+    <div class="text">
+      <h3>元件</h3>
+      <p>目前有 {COMPONENTS.length} 個元件，例如按鈕、搜尋列、文章卡片和頁尾。每一個都附上用法、該做與不該做。</p>
+      <a href="/components/">前往<span class="sr-only">元件</span> →</a>
+    </div>
+    <div class="preview components-preview" inert>
+      <div class="row">
+        <tc-badge tone="brand">新消息</tc-badge>
+        <tc-badge tone="success" dot>進行中</tc-badge>
+        <tc-chip selected>慈善</tc-chip>
+        <tc-chip>醫療</tc-chip>
+      </div>
+      <div class="row">
+        <tc-button variant="filled">送出</tc-button>
+        <tc-button variant="outlined">取消</tc-button>
+      </div>
+      <tc-search-bar placeholder="搜尋"></tc-search-bar>
+    </div>
+  </article>
+
+  <article class="card tmpl">
+    <div class="text">
+      <h3>範本</h3>
+      <p>用元件組好的整頁版面：入口首頁、文章列表、文章內頁和電子書庫。做新網頁時照著排，再換上自己的內容。</p>
+      <a href="/templates/">前往<span class="sr-only">範本</span> →</a>
+    </div>
+    <div class="templates-preview">
+      {firstTemplate && <TemplateThumb id={firstTemplate.id} ratio="fill" class="main-thumb" />}
+      <div class="pair">
+        {
+          otherTemplates
+            .slice(0, 2)
+            .map((t) => <TemplateThumb id={t.id} ratio="3 / 4" />)
+        }
+      </div>
+    </div>
+  </article>
+
+  <article class="card theme">
+    <div class="text">
+      <h3>主題</h3>
+      <p>一套 UIKit，每個網站選用一個主題，目前有 {SITE_THEMES.length} 個主題。主題只換顏色、圓角、陰影、字級、間距這類外觀數值，元件和版面都不用重做。</p>
+      <a href="/themes/">前往<span class="sr-only">主題</span> →</a>
+    </div>
+    <div class="preview theme-preview" inert>
+      <p class="now">
+        目前顯示：{SITE_THEMES.map((s) => <SiteOnly site={s.id} as="span">{siteLabel(s)}</SiteOnly>)}
+      </p>
+      <div class="row">
+        <tc-button variant="filled">了解更多</tc-button>
+        <tc-link href="#">活動訊息</tc-link>
+      </div>
+      <ul class="dots">
+        {
+          siteDots.map((s) => (
+            <li data-site-card={s.id} title={s.名稱}>
+              <span class="dot" style={`background:${s.light['brand.primary']}`} />
+              <span class="dot" style={`background:${s.light['brand.surface']}`} />
+              <span class="dot-name">{s.簡稱}</span>
+            </li>
+          ))
+        }
+        {moreSites > 0 && <li class="more">+{moreSites}</li>}
+      </ul>
+    </div>
+  </article>
+
+  <article class="card claude">
+    <div class="text">
+      <h3>透過 Claude Code 共編</h3>
+      <p>不會寫程式也能改：用平常說話的方式告訴 Claude 要改什麼。看過預覽、確認之後才會送出修改申請，由負責的角色核可，再由有合併權限的人合併。</p>
+      <a href="/docs/contributing/">前往<span class="sr-only">如何參與修改</span> →</a>
+    </div>
+    <div class="preview claude-preview">
+      <ol class="steps">
+        <li>
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12Z" /></svg>
+          </span>
+          <span>說需求</span>
+        </li>
+        <li>
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z" /><circle cx="12" cy="12" r="3" /></svg>
+          </span>
+          <span>看預覽</span>
+        </li>
+        <li>
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7" /></svg>
+          </span>
+          <span>確認送出</span>
+        </li>
+      </ol>
+      <div class="chat" aria-hidden="true">
+        <span class="bubble">把次要文字的顏色調深一點，給我看預覽。</span>
+        <span class="result" inert><tc-button variant="filled">送出</tc-button></span>
+      </div>
+    </div>
+  </article>
+</div>
+</div>
+
+<script>
+  import '@tzuchi/components';
+</script>
+
+<style>
+  .tc-bento-wrap {
+    container-type: inline-size;
+    margin-block: 3rem 1rem;
+  }
+  .tc-bento {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  @container (min-width: 40rem) {
+    .tc-bento {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-areas:
+        'intro intro'
+        'comp theme'
+        'tmpl claude';
+    }
+  }
+  @container (min-width: 60rem) {
+    .tc-bento {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-areas:
+        'intro comp tmpl'
+        'theme claude tmpl';
+    }
+  }
+  .intro {
+    padding: 1rem 0.5rem 1.5rem 0;
+  }
+  .intro h2 {
+    margin: 0 0 1rem;
+    color: var(--sl-color-white);
+    font-size: var(--hb-text-h2);
+    font-weight: 600;
+    line-height: var(--hb-line-height-headings);
+  }
+  .intro p {
+    margin: 0;
+    color: var(--sl-color-gray-2);
+    font-size: var(--hb-text-lead);
+    line-height: var(--hb-line-height);
+  }
+  @container (min-width: 40rem) {
+    .intro {
+      grid-area: intro;
+    }
+    .comp {
+      grid-area: comp;
+    }
+    .tmpl {
+      grid-area: tmpl;
+    }
+    .theme {
+      grid-area: theme;
+    }
+    .claude {
+      grid-area: claude;
+    }
+  }
+
+  .card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.25rem;
+    border: 1px solid var(--sl-color-hairline-light);
+    border-radius: 16px;
+    background-color: var(--tc-handbook-panel);
+    transition: border-color 0.15s ease;
+  }
+  .card:hover {
+    border-color: var(--sl-color-gray-4);
+  }
+  .card:has(a:focus-visible) {
+    outline: 2px solid var(--sl-color-accent);
+    outline-offset: 2px;
+  }
+  .text {
+    display: grid;
+    gap: 0.5rem;
+    justify-items: start;
+  }
+  h3 {
+    margin: 0;
+    color: var(--sl-color-white);
+    font-size: var(--hb-text-h3);
+    line-height: var(--hb-line-height-headings);
+    font-weight: 600;
+  }
+  .text p {
+    margin: 0;
+    color: var(--sl-color-gray-2);
+    font-size: var(--hb-text-body);
+    line-height: var(--hb-line-height);
+  }
+  .text a {
+    margin-block-start: 0.25rem;
+    color: var(--sl-color-text-accent);
+    font-size: var(--hb-text-ui);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  /* 連結延伸到整張卡片；焦點框畫在卡片上（.card:has(a:focus-visible)）。 */
+  .text a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: 16px;
+  }
+  .text a:focus-visible {
+    outline: none;
+  }
+
+  /* 預覽區：真正元件放在 --tc-* 底色上，跟著主題和色彩模式變。 */
+  .preview {
+    display: grid;
+    gap: 0.75rem;
+    align-content: center;
+    margin-block-start: auto;
+    padding: 1.1rem;
+    border: 1px solid var(--tc-handbook-tile-border);
+    border-radius: 12px;
+    background-color: var(--tc-color-surface-default);
+    color: var(--tc-color-text-default);
+    font-family: var(--tc-font-family-base);
+  }
+  .preview[inert],
+  .result[inert] {
+    pointer-events: none;
+    user-select: none;
+  }
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  /* 膠囊標籤原尺寸比徽章和按鈕大，縮小一點。 */
+  .components-preview tc-chip {
+    zoom: 0.85;
+  }
+  .components-preview tc-search-bar {
+    inline-size: 100%;
+  }
+
+  /* 範本卡片：大縮圖填滿說明文字下方剩下的高度（卡片佔兩列時不會留一大塊空白）。 */
+  .templates-preview {
+    flex: 1 1 auto;
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
+    gap: 0.75rem;
+  }
+  .templates-preview :global(.main-thumb) {
+    aspect-ratio: 16 / 11;
+  }
+  @container (min-width: 60rem) {
+    .templates-preview :global(.main-thumb) {
+      aspect-ratio: auto;
+      min-block-size: 12rem;
+    }
+  }
+  .pair {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  .now {
+    margin: 0;
+    color: var(--tc-color-text-muted);
+    font-size: var(--hb-text-label);
+  }
+  .dots {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0.25rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .dots li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    padding: 0.2rem 0.55rem 0.2rem 0.3rem;
+    border: 1px solid var(--tc-color-border-default);
+    border-radius: 999px;
+    font-size: var(--hb-text-label);
+  }
+  .dot {
+    inline-size: 0.85rem;
+    block-size: 0.85rem;
+    border-radius: 999px;
+    border: 1px solid rgba(127, 127, 127, 0.45);
+  }
+  .dot-name {
+    margin-inline-start: 0.15rem;
+  }
+  .dots .more {
+    padding-inline: 0.55rem;
+    color: var(--tc-color-text-muted);
+  }
+
+  .claude-preview {
+    background-color: transparent;
+    border-color: var(--sl-color-hairline-light);
+    color: var(--sl-color-gray-2);
+    font-family: inherit;
+  }
+  .steps {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: step;
+  }
+  .steps li {
+    position: relative;
+    display: grid;
+    flex: 1 1 0;
+    justify-items: center;
+    gap: 0.4rem;
+    font-size: var(--hb-text-label);
+    font-weight: 600;
+    color: var(--sl-color-white);
+    text-align: center;
+  }
+  /* 步驟之間的箭頭線。 */
+  .steps li + li::before {
+    content: '';
+    position: absolute;
+    inset-block-start: 1.2rem;
+    inset-inline-end: calc(50% + 1.6rem);
+    inline-size: calc(100% - 3.2rem);
+    border-block-start: 1.5px dashed var(--sl-color-gray-4);
+  }
+  .icon {
+    display: grid;
+    place-items: center;
+    inline-size: 2.4rem;
+    block-size: 2.4rem;
+    border-radius: 999px;
+    background-color: var(--sl-color-accent-low);
+    color: var(--sl-color-accent-high);
+  }
+  .chat {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.5rem 0.5rem 0.5rem 0.9rem;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 999px;
+    font-size: var(--hb-text-label);
+  }
+  .bubble {
+    color: var(--sl-color-gray-2);
+  }
+  .result {
+    flex: 0 0 auto;
+  }
+</style>

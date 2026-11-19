@@ -1,0 +1,28 @@
+<!--
+  LOCAL CHANGE: no Google Fonts (Inter) and no React Scan script, so the gallery makes no
+  third-party requests and has no absolute asset paths; text uses the system font stack.
+-->
+
+<script>
+  try {
+    if (
+      Object.prototype.hasOwnProperty.call(globalThis, "__REACT_DEVTOOLS_GLOBAL_HOOK__") &&
+      globalThis.__REACT_DEVTOOLS_GLOBAL_HOOK__ == null
+    ) {
+      delete globalThis.__REACT_DEVTOOLS_GLOBAL_HOOK__;
+    }
+  } catch {
+    // ignore
+  }
+</script>
+
+<style>
+  html,
+  body,
+  #storybook-root {
+    height: 100%;
+    font-family:
+      ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+      "Segoe UI Symbol", "Noto Color Emoji";
+  }
+</style>

@@ -1,0 +1,198 @@
+/* ==========================================================================
+   Description — Tzu Chi theme override
+   Destination: styles/themes/tzuchi/components/description.css
+   (layer: components, imported after ../../../components/description.css).
+
+   Description is a SHARED primitive: the helper line under a field, under a
+   field group (CheckboxGroup / RadioGroup / Fieldset), under a selection
+   control row, and the secondary line of a ListBox / Menu option. Base
+   description.css:3 is `text-xs text-wrap wrap-break-word text-muted`
+   — 12px / 400 / 16px.
+
+   WHAT THIS CHANGES — type only, two declarations.
+
+     · font-size    12px  ->  16px    (§1 R6)
+     · line-height  16px  ->  25.6px  (1.6, the prose voice)
+
+   EVIDENCE. R6 "Helper / description (.description, text-xs)":
+   `font-size: 16px; line-height: 1.6` and keep --muted. Tzu Chi's own helper
+   is tc-input.styles.ts:84-89 / tc-textarea.styles.ts:91-96 —
+   `.helper { font: typography-body; font-size: 16px; color: text-muted }`.
+   gap-audit/input.md:83-84 lists that helper as "not transferable" precisely
+   because HeroUI splits it into this file. §1 also makes it mechanical: Tzu
+   Chi has no 12px step, and §1.3's four exemptions (.header, .badge__label,
+   the breadcrumb separator, the close-button glyph) do not include
+   .description.
+
+   Colour is NOT restated — base `text-muted` already resolves to --muted,
+   which is what tc's helper uses (N5 / D1). Weight is NOT restated: 400 is
+   already the inherited default, and list-box-item.css:74-78 deliberately
+   re-asserts 400 inside an option row (which sets 700 on the row) — that
+   (0,3,0) rule keeps working untouched.
+
+   WHAT THIS DOES NOT DISTURB
+     · the 4px control-to-description gap: every host is already `gap-1`
+       (.textfield:4, .checkbox:6, .radio:14, .switch:3, .select:3) = 4px,
+       which is R142's value. Not restated.
+     · the indent under a selection control: checkbox.css:137-141 (40px),
+       radio.css:164-167 (40px) and switch.css:128-131 (52 / 44 / 60px) set
+       padding-inline-start at (0,3,0); this rule touches neither padding nor
+       the box (R144).
+     · `[data-invalid] [data-slot="description"] { hidden }` in textfield /
+       select / date-field / time-field / color-field / combo-box /
+       number-field / search-field — display is untouched.
+     · `.tag-group [data-slot="description"] { p-1 }` — padding only,
+       untouched.
+     · option rows: list-box-item.css:76-78 / menu-item keep their own weight
+       and `pointer-events-none` / `text-wrap`. Their description was still
+       12px (only the ROW was lifted to 16px in pass 1); it now joins the
+       16px scale, which is what §1 asks for.
+
+   CASCADE
+   (0,2,0) — attribute + class. Beats base description.css:2 (0,1,0)
+   outright. It TIES the two base rules that re-assert `text-xs` on a
+   description through the slot attribute —
+   `.checkbox > [data-slot="description"]` (checkbox.css:11-14) and
+   `.radio > [data-slot="description"]` (radio.css:27-30), both (0,2,0) —
+   and wins on source order, because the whole base component layer is
+   imported before this theme's components/index.css in the same unlayered
+   "components" layer. Nothing in this theme's own files declares a
+   font-size or line-height on a description, so there is no intra-theme tie.
+
+   Reviewed: no changes. Verified against the live files, not just the
+   report — base description.css:3 confirmed `text-xs text-wrap
+   wrap-break-word text-muted` (0,1,0). checkbox.css:11-14 and radio.css:
+   27-30 confirmed as `.checkbox > [data-slot="description"], … { … text-xs …
+   }` / `.radio > [data-slot="description"], … { … }`, both compiling to
+   (0,2,0), genuinely tying this rule and resolved only by source order (both
+   files land in the unlayered `components` layer, tzuchi's imported after
+   HeroUI's per styles/index.css:14 and themes/tzuchi/index.css's own header
+   comment). Confirmed switch.css:30-32 and :235 touch only padding-inline-
+   start and cursor for a description, so no switch tie exists (matches the
+   report; switch was correctly not listed among the ties). Confirmed the
+   40/40/52-60px indent rules (checkbox.css:139-141, radio.css:166,
+   switch.css:130) set only padding-inline-start — a different property,
+   never a cascade conflict. Confirmed list-box-item.css:76-78 in the theme
+   override (not the base file) is `& [data-slot="description"] {
+   font-weight: var(--tc-font-weight-regular, 400) }` at (0,3,0), which this
+   rule cannot reach or contradict since it declares no font-weight. Confirmed
+   tag-group.css:10-15 sets only `p-1`. Confirmed `--tc-font-size-16` (16px)
+   and `--tc-line-height-relaxed` (1.6) in tokens.css:85,94, mode-independent
+   in both dark blocks. Grepped clean for colour literals, --tc-color-,
+   !important, physical left/right; comment delimiters balanced. No
+   corrections needed.
+
+   Pass 5 (2026-09-20): the description now fades with its field when that
+   field or group is disabled.
+
+   THE BUG. HeroUI dims the label through `[data-disabled="true"] .label`
+   (base label.css:20-22) and the control through each component's own
+   `status-disabled`, but nothing ever reaches a description that sits at
+   FIELD or GROUP level. Probed in tzuchi light on
+   `components-forms-textfield--disabled`: `.label` 0.38, `.description` 1;
+   on `components-forms-radiogroup--disabled`:
+   `.radio-group > [data-slot="description"]` 1 while every `.radio` around it
+   is 0.38. Upstream has the same missing rule but hides it — 0.5 opacity
+   against a near-black label, and a 12px hint. Here the helper is 16px and
+   --disabled-opacity is 0.38 (variables.css:23), so the hint became the
+   loudest text in a control nobody can use and the hierarchy read upside down.
+
+   THE RULE. `opacity: var(--disabled-opacity)` — the same number
+   `status-disabled` uses (utilities/index.css:61-65), so label, control and
+   helper land on one level. Only the opacity: `cursor` and `pointer-events`
+   are left to the hosts that already set them, and no colour is touched.
+
+   THE TWO HOOKS, and why the selector is shaped this way.
+     · `[data-disabled="true"] > .description` — the real hook. The disabled
+       flag sits on the FIELD or GROUP root (`.textfield`, `.radio-group`,
+       `.checkbox-group`, `.number-field`, …), exactly the element label.css
+       already keys off, and the description is its direct child (probe-
+       confirmed on textfield / radio-group / checkbox-group / number-field).
+       `fieldset:disabled` rides along in the same `:is()`: HeroUI's Fieldset
+       mirrors native `disabled` to `data-disabled` itself
+       (react/src/components/fieldset/fieldset.tsx:48-59), so this only adds
+       cover for a hand-written `<fieldset disabled>`.
+     · `.label--disabled ~ .description` — for a hand-composed field with no
+       root at all. `components-forms-inputotp--disabled` is exactly that: a
+       plain `<div>` holding `<Label isDisabled>` + `<Description>` +
+       `<InputOTP isDisabled>`, where the only `[data-disabled]` in the whole
+       story is the OTP slot. Without this branch that helper stays at full
+       strength with no selector able to reach it. `.label--disabled` is only
+       emitted when a consumer disables a Label explicitly — grepped: one
+       occurrence in the entire story set, that one — so it cannot collide
+       with a component-driven disabled state.
+
+   NO DOUBLE-DIMMING. Opacity multiplies through the tree, so a description
+   inside a host HeroUI already dims must not be dimmed again. The `:not()`
+   lists every such host: `.checkbox` (base checkbox.css:25-31), `.radio`
+   (radio.css:34-42) and `.switch` (switch.css:16-26) each put
+   `status-disabled` on the item AND on its description, and `.list-box-item`
+   (list-box-item.css:68) / `.menu-item` (menu-item.css:94) / `.tag`
+   (tag.css:32-33) dim the whole row. Verified after the change: the group
+   description moved 1 -> 0.38 while `.checkbox[data-disabled] > .description`
+   and `.radio[data-disabled] > .description` stayed at exactly 0.38, and
+   `.list-box-item[data-disabled] .description` stayed at 1 under its already
+   dimmed row.
+
+   CASCADE. (0,4,1): the theme attribute, `:is()` (whose most specific
+   argument, `fieldset:disabled`, is one type + one pseudo-class), the `:not()`
+   (one class) and `.description`. Nothing in the base or in this theme
+   declares `opacity` on a description, so the margin is not needed — the rule
+   only has to sit under the theme attribute. No colour, no !important, no
+   physical property. `--disabled-opacity` is a HeroUI theme variable and
+   flips with neither mode, so light and dark fade identically.
+
+   Pass 5 verified by injection in tzuchi and tzuchi-dark on
+   textfield--disabled, radiogroup--disabled, checkboxgroup--disabled,
+   numberfield--disabled and inputotp--disabled (all now 0.38), against
+   checkbox--disabled, checkboxgroup--disabled and listbox--with-disabled-items
+   (unchanged) and textfield--with-description (still 1).
+
+   Pass 5 reviewed (2026-09-20): diffed against the live theme file — only the
+   two new rules were added; the R6 rule above is untouched. Confirmed
+   Fieldset (react/src/components/fieldset/fieldset.tsx:48-59) sets both the
+   native `disabled` attribute and `data-disabled="true"` on the same
+   `<fieldset>`, so `fieldset:disabled` is reachable and only ever adds cover
+   for a hand-written native fieldset, never double-fires against the
+   `[data-disabled="true"]` branch on the same element. Re-verified live by
+   css: injection in tzuchi and tzuchi-dark: textfield--disabled,
+   radiogroup--disabled (`.radio-group > .description`), checkboxgroup--
+   disabled (`.checkbox-group > .description`), numberfield--disabled and
+   inputotp--disabled all read opacity 0.38; checkbox--with-description (not
+   disabled) and textfield--with-description both stay at opacity 1;
+   listbox--with-disabled-items' `.list-box-item[data-disabled] .description`
+   stays at opacity 1 (the row's own dimming is untouched, not doubled) in both
+   light and dark. No premature comment close, no colour, no --tc-color-*, no
+   !important, no physical property. No corrections needed.
+   ========================================================================== */
+
+[data-theme^="tzuchi"] .description {
+  /* R6 — helper text is prose: 16px on the relaxed 1.6 line box.
+     Longhands, so --font-sans and the base's --muted are left alone. */
+  font-size: var(--tc-font-size-16, 16px);
+  line-height: var(--tc-line-height-relaxed, 1.6);
+}
+
+/* Pass 5 — a disabled field's helper fades with its label and its control.
+   First branch: the disabled flag on the field or group ROOT, the same hook
+   base label.css:20-22 uses, with the description as its direct child. The
+   `:not()` excludes every host that already applies `status-disabled` to its
+   own description (checkbox / radio / switch) or to the whole row
+   (list-box-item / menu-item / tag), because opacity multiplies through the
+   tree. Second branch: a hand-composed field that has no root to key off —
+   `components-forms-inputotp--disabled` disables its Label explicitly and
+   leaves the helper with no other hook. */
+[data-theme^="tzuchi"] {
+  :is([data-disabled="true"], fieldset:disabled):not(
+      .checkbox,
+      .radio,
+      .switch,
+      .list-box-item,
+      .menu-item,
+      .tag
+    )
+    > .description,
+  .label--disabled ~ .description {
+    opacity: var(--disabled-opacity);
+  }
+}

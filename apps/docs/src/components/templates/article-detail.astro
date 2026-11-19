@@ -1,0 +1,133 @@
+---
+// 範本：文章內頁。一篇文章的完整內容：標題、日期、內文，最後推薦相關文章。
+import '../../styles/templates.css';
+import SiteNavbar from '../template-parts/SiteNavbar.astro';
+import SiteFooter from '../template-parts/SiteFooter.astro';
+
+const RELATED = [
+  { tag: '社區關懷', title: '陪伴不缺席：每週一次的獨居長者訪視', date: '2026-11-10', tone: 'tone-b' },
+  { tag: '環保推廣', title: '回收寶特瓶變毛毯，一條毛毯要用掉 70 支瓶子', date: '2026-11-06', tone: 'tone-c' },
+  { tag: '志工故事', title: '退休後的第二人生：一位資深志工的二十年', date: '2026-11-02', tone: '' },
+];
+---
+
+<div class="tpl article-detail">
+  <SiteNavbar current="慈善" />
+
+  <article class="tpl-section">
+    <div class="tpl-container narrow">
+      <nav class="tpl-breadcrumb" aria-label="麵包屑（示意）">
+        <tc-link href="#" variant="subtle">首頁</tc-link>
+        <span aria-hidden="true">/</span>
+        <tc-link href="#" variant="subtle">慈善新聞</tc-link>
+      </nav>
+      <div class="tpl-row tags">
+        <tc-badge tone="brand">國際賑災</tc-badge>
+        <span class="tpl-muted">2026-11-14・閱讀時間 4 分鐘</span>
+      </div>
+      <h1 class="tpl-h1">跨國援助物資抵達災區，志工協助發放熱食與毛毯</h1>
+      <p class="lead">
+        災後第三天，第一批物資順利送達。志工分成三組，在臨時收容中心發放熱食、毛毯與衛生用品。
+      </p>
+      <div class="tpl-photo cover" aria-hidden="true"></div>
+      <p class="caption tpl-muted">志工在收容中心整理物資（照片為示意色塊）</p>
+
+      <div class="body">
+        <p>
+          清晨六點，第一輛物資車抵達收容中心。志工事先依照家庭人數分好物資，每一份都附上手寫的祝福卡片，讓受災的鄉親知道有人記掛著他們。
+        </p>
+        <h2 class="tpl-h3">熱食是最先送到的安心</h2>
+        <p>
+          連日停電，許多家庭已經好幾天沒有吃到熱的食物。志工在空地架起臨時廚房，一天供應三餐，也特別準備了適合長者和孩子的軟食。
+        </p>
+        <blockquote class="quote">
+          <p>「我們能做的不多，但至少讓大家今晚吃得飽、睡得暖。」</p>
+          <span class="tpl-muted">— 帶隊志工</span>
+        </blockquote>
+        <h2 class="tpl-h3">接下來的計畫</h2>
+        <p>
+          第二階段將協助清理家園，並評估長期安置的需求。想一起出力的朋友，可以透過下方的按鈕報名或捐款。
+        </p>
+      </div>
+
+      <div class="tpl-row actions">
+        <tc-button variant="filled">我要捐款</tc-button>
+        <tc-button variant="outlined">報名當志工</tc-button>
+        <tc-button variant="tonal">分享這篇文章</tc-button>
+      </div>
+    </div>
+  </article>
+
+  <section class="tpl-section related">
+    <div class="tpl-container">
+      <div class="tpl-section-head">
+        <h2 class="tpl-h2">相關文章</h2>
+        <tc-link href="#">看更多</tc-link>
+      </div>
+      <div class="tpl-grid-3">
+        {
+          RELATED.map((item) => (
+            <tc-article-card>
+              <div slot="media" class:list={['tpl-photo', item.tone]} aria-hidden="true" />
+              <tc-badge slot="badge" tone="brand">{item.tag}</tc-badge>
+              <span slot="headline">{item.title}</span>
+              <span slot="meta">{item.date}</span>
+            </tc-article-card>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <SiteFooter />
+</div>
+
+<style>
+  .narrow {
+    display: grid;
+    gap: 20px;
+    max-inline-size: 800px;
+  }
+  .tags {
+    font-size: 14px;
+  }
+  .lead {
+    color: var(--tc-color-text-muted);
+    font-size: 20px;
+  }
+  .cover {
+    aspect-ratio: 16 / 8;
+    border-radius: 16px;
+  }
+  .caption {
+    margin-block-start: -8px;
+    font-size: 14px;
+  }
+  .body {
+    display: grid;
+    gap: 18px;
+    font-size: 18px;
+    line-height: 1.8;
+  }
+  .quote {
+    padding: 20px 24px;
+    border-inline-start: 4px solid var(--tc-color-brand-primary);
+    border-radius: 0 12px 12px 0;
+    background: var(--tc-color-brand-surface);
+  }
+  .quote p {
+    color: var(--tc-color-brand-primary);
+    font-size: 20px;
+    font-weight: 700;
+  }
+  .quote span {
+    font-size: 14px;
+  }
+  .actions {
+    padding-block-start: 12px;
+    border-block-start: 1px solid var(--tc-color-border-default);
+  }
+  .related {
+    background: var(--tc-color-surface-subtle);
+  }
+</style>

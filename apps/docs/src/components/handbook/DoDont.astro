@@ -1,0 +1,89 @@
+---
+// 「該做與不該做」表格：每一列是一條建議（綠色「建議」）或提醒（紅色「避免」）。
+// 用法：<DoDont rows={[{ kind: 'do', text: '…' }, { kind: 'dont', text: '…' }]} />
+interface Row {
+  kind: 'do' | 'dont';
+  text: string;
+}
+
+interface Props {
+  rows: Row[];
+}
+
+const { rows } = Astro.props;
+const LABEL: Record<Row['kind'], string> = { do: '建議', dont: '避免' };
+---
+
+<div class="tc-dodont not-content">
+  <table>
+    <thead>
+      <tr>
+        <th scope="col">類型</th>
+        <th scope="col">說明</th>
+      </tr>
+    </thead>
+    <tbody>
+      {
+        rows.map((row) => (
+          <tr>
+            <td class="kind">
+              <span class:list={['badge', row.kind]}>{LABEL[row.kind]}</span>
+            </td>
+            <td>{row.text}</td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</div>
+
+<style>
+  .tc-dodont {
+    overflow-x: auto;
+    border: 1px solid var(--sl-color-hairline-light);
+    border-radius: 12px;
+  }
+  table {
+    inline-size: 100%;
+    border-collapse: collapse;
+    font-size: var(--hb-text-body);
+    line-height: var(--hb-line-height);
+  }
+  th {
+    padding: 0.6rem 1rem;
+    color: var(--sl-color-gray-3);
+    font-weight: 500;
+    text-align: start;
+    border-block-end: 1px solid var(--sl-color-hairline-light);
+  }
+  td {
+    padding: 0.75rem 1rem;
+    color: var(--sl-color-gray-1);
+    vertical-align: top;
+    border-block-end: 1px solid var(--sl-color-hairline-light);
+  }
+  tr:last-child td {
+    border-block-end: 0;
+  }
+  .kind {
+    inline-size: 5rem;
+    white-space: nowrap;
+  }
+  .badge {
+    display: inline-block;
+    padding: 0.1rem 0.6rem;
+    border-radius: 999px;
+    font-size: var(--hb-text-label);
+    font-weight: 600;
+    line-height: var(--hb-line-height);
+  }
+  /* 綠色和紅色都用 Starlight 的高對比組合：淺色模式深字淺底，深色模式淺字深底。 */
+  .do {
+    color: var(--sl-color-green-high);
+    background-color: var(--sl-color-green-low);
+  }
+  .dont {
+    color: var(--sl-color-red-high);
+    background-color: var(--sl-color-red-low);
+  }
+</style>

@@ -1,0 +1,74 @@
+---
+// 範本的縮圖：用 iframe 載入範本的畫面頁（/templates/frame/<id>/?view=thumb），iframe 固定用
+// THUMB_LAYOUT_WIDTH（1280px）的寬度排版，再整塊縮小放進圓角格子，只露出頁面最上面的部分
+// （像網站截圖）。iframe 的寬度就是範本的「視窗」寬度，所以縮圖一律是桌機版面，
+// 不會因為格子窄就變成手機的選單。
+//
+// - 縮圖不能點、不能用鍵盤選到，也不會被螢幕閱讀器唸出來（pointer-events: none、
+//   tabindex="-1"、aria-hidden，外層再加 inert）；範本的名稱另外寫在卡片的連結上。
+// - loading="lazy"：捲到附近才載入。
+// - 顏色跟著頁首的主題和色彩模式變（src/scripts/template-frames.ts 用 postMessage 通知）。
+// - 縮放比例由 script 依格子寬度計算；script 執行前先用 0.3 的比例顯示。
+import { THUMB_LAYOUT_WIDTH, getTemplate, templateFrameUrl } from '../../data/template-catalog';
+
+interface Props {
+  id: string;
+  /** 縮圖的長寬比，預設 16 / 10（剛好是 1280 × 800 的畫面）。'fill' = 不設長寬比，高度由外層決定。 */
+  ratio?: string;
+  class?: string;
+}
+
+const { id, ratio = '16 / 10', class: className } = Astro.props;
+const entry = getTemplate(id);
+---
+
+<div
+  class:list={['tc-template-thumb', 'not-content', className]}
+  style={`--tc-thumb-layout:${THUMB_LAYOUT_WIDTH}px${ratio === 'fill' ? '' : `;aspect-ratio:${ratio}`}`}
+  data-tc-thumb={THUMB_LAYOUT_WIDTH}
+  inert
+>
+  <iframe
+    src={`${templateFrameUrl(entry)}?view=thumb`}
+    title={`${entry.名稱}範本的縮圖`}
+    loading="lazy"
+    tabindex="-1"
+    aria-hidden="true"
+    data-tc-template-frame
+  ></iframe>
+</div>
+
+<script>
+  import { fitThumbs, startFrameSync } from '../../scripts/template-frames';
+
+  startFrameSync();
+  fitThumbs();
+</script>
+
+<style>
+  .tc-template-thumb {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--tc-handbook-tile-border, var(--sl-color-gray-6));
+    border-radius: var(--tc-handbook-radius, 14px);
+    background-color: var(--tc-color-surface-default);
+  }
+  iframe {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    display: block;
+    inline-size: var(--tc-thumb-layout);
+    block-size: calc(var(--tc-thumb-layout) * 10 / 16);
+    border: 0;
+    transform-origin: 0 0;
+    transform: scale(0.3);
+    pointer-events: none;
+    user-select: none;
+  }
+  :global([dir='rtl']) iframe {
+    inset-inline-start: auto;
+    inset-inline-end: 0;
+    transform-origin: 100% 0;
+  }
+</style>

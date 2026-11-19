@@ -6,6 +6,10 @@
       "surface": { "$value": "{color.blue.100}" },
       "surface-hover": { "$value": "{color.blue.200}" }
     },
+    "neutral": {
+      "surface": { "$value": "{color.gray.100}" },
+      "surface-hover": { "$value": "{color.gray.200}" }
+    },
     "text": {
       "default": { "$value": "{color.gray.900}" },
       "muted": { "$value": "{color.gray.700}" },
@@ -23,7 +27,9 @@
     },
     "feedback": {
       "error": { "$value": "{color.red.500}" },
-      "success": { "$value": "{color.green.600}" }
+      "success": { "$value": "{color.green.600}" },
+      "warning": { "$value": "{color.amber.700}" },
+      "info": { "$value": "{color.brand.primary}" }
     }
   }
 }

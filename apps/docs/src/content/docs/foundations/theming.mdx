@@ -1,23 +1,67 @@
 ---
-title: Theming（主題與深色模式）
-description: 深色模式如何運作——只覆寫語意色 token，元件透過 var() cascade 自動換色；含啟用方式、深色色票對照與擴充指引。
+title: 色彩模式（淺色／深色）
+description: 色彩模式（淺色／深色）怎麼運作：深色只重新指定語意色和陰影，所有元件就會跟著變；含目前主題的色票。
+sidebar:
+  label: 色彩模式
+  order: 3
 ---
 
 import Demo from '../../../components/Demo.astro';
 import ThemeSwatches from '../../../components/ThemeSwatches.astro';
+import PerSite from '../../../components/handbook/PerSite.astro';
+import CurrentSiteNote from '../../../components/handbook/CurrentSiteNote.astro';
+import ThemeColorTable from '../../../components/handbook/ThemeColorTable.astro';
 
-設計系統內建**淺色（預設）**與**深色**兩套主題。核心原則：**只有語意層（semantic）會換色**。
-primitive 純色票不可變，元件只引用語意 / 元件層 token，因此深色模式只需在一個 selector 內
-重新對應約 15 個語意色變數，整個元件庫就會透過 `var()` cascade 自動跟隨——**包含 Shadow DOM 內部**。
+UIKit 內建**淺色（預設）**與**深色**兩種色彩模式。原則是：**只有語意色和陰影會換**。
+基礎 Foundations 的色票（所有網站共用）不會變；元件只使用語意色和元件 token。所以深色模式只需要重新指定語意色和陰影，所有元件就會自動跟著變。
 
-## 啟用方式
+「色彩模式」和「主題」是兩回事：主題是一組有名字的外觀設定（Default、Green Natural…），一個網站選用一個主題；色彩模式決定淺色或深色。兩者可以自由組合，每個主題都有淺色和深色。詳見[主題總覽](/themes/)。
 
-深色色票包在兩個 selector 內，由 `@tzuchi/tokens/tokens.css` 一併提供：
+## 目前主題的色彩（淺色／深色）
+
+<CurrentSiteNote />
+
+下表跟著頁首的「主題」選單變。每一列是一個顏色用途（語意色），左邊是淺色模式用的顏色，右邊是深色模式用的顏色。標「這個主題改過」的列，是這個主題和預設主題（Default）不同的地方；標「示意」的主題，顏色不是正式的值。
+
+<PerSite>{(site) => <ThemeColorTable siteId={site.id} />}</PerSite>
+
+## 試試看
+
+按頁首的「色彩模式」按鈕（淺色時是月亮，深色時是太陽），或下面的切換鈕，下面的範例會即時換成淺色或深色。這裡同時有頁首的按鈕和下面的切換鈕，只是為了示範；正式網站一頁只放一個切換鈕。
+
+<Demo>
+  <tc-theme-toggle show-label></tc-theme-toggle>
+  <tc-button variant="filled">實心按鈕</tc-button>
+  <tc-button variant="tonal">淡底按鈕</tc-button>
+  <tc-badge tone="success" variant="soft">成功</tc-badge>
+  <tc-badge tone="error" variant="filled">錯誤</tc-badge>
+  <tc-chip>標籤</tc-chip>
+</Demo>
+
+## 運作原理：三層怎麼接起來
+
+這裡的三層是：基礎 Foundations → 語意色 → 元件 token。主題和色彩模式改的都是中間那一層（語意色）。
+
+以實心按鈕為例：按鈕的底色是元件 token `button.filled.bg`，它指向語意色 `color.brand.primary`（品牌主色）；品牌主色在淺色模式指向基礎色 `color.blue.900`，在深色模式改指向較亮的 `color.blue.300`。按鈕本身完全不用改，深色模式只換了中間那一層的指向。
+
+## 深色色票對照
+
+下表直接從設計數值（token）的原始檔產生（基礎 Foundations 的色票＋淺色語意色＋深色覆寫）。一般文字的對比值至少要 4.5 : 1（WCAG 2.1 的 AA 級）才算容易閱讀；目前淺色的次要文字 `color.text.muted` 在白底還不到 4.5 : 1，正等美編（設計）修正。
+
+<ThemeSwatches />
+
+## 給工程師
+
+以下是給工程師的啟用方式和設計決策，美編（設計）、網站的編輯和致遠（廠商）可以略過。
+
+### 啟用方式
+
+深色色票包在兩個選擇器（selector）內，由 `@tzuchi/tokens/tokens.css` 一併提供：
 
 ```css
 :root { /* 淺色：primitives + 語意 + 元件 */ }
 
-[data-theme='dark'] { /* 15 個語意色覆寫 */ }
+[data-theme='dark'] { /* 語意色和陰影的覆寫 */ }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) { /* 系統自動，除非明確選擇淺色 */ }
@@ -28,50 +72,22 @@ primitive 純色票不可變，元件只引用語意 / 元件層 token，因此�
 - **系統自動**：未設定 `data-theme` 時，跟隨作業系統 `prefers-color-scheme`。
 - **元件**：用 [`<tc-theme-toggle>`](/components/theme-toggle/) 切換並記憶選擇。
 
-<Demo>
-  <tc-theme-toggle show-label></tc-theme-toggle>
-  <tc-button variant="filled">主要按鈕</tc-button>
-  <tc-button variant="tonal">柔色按鈕</tc-button>
-  <tc-badge tone="success" variant="soft">成功</tc-badge>
-  <tc-badge tone="error" variant="filled">錯誤</tc-badge>
-  <tc-chip>標籤</tc-chip>
-</Demo>
-
-:::tip
-按右上角手冊主題鈕（或上方切換鈕），本頁所有範例會即時切換深淺。
-:::
-
-## 運作原理：三層 cascade
-
-以 filled 按鈕為例，深色模式下三層自動級聯：
+三層在 CSS 裡是 `var()` 串接，Shadow DOM 裡面也一樣：
 
 ```text
---tc-button-filled-bg  →  var(--tc-color-brand-primary)
+--tc-button-filled-bg     →  var(--tc-color-brand-primary)
 --tc-color-brand-primary  →  var(--tc-color-blue-300)   (僅深色區塊覆寫此行)
---tc-color-blue-300  →  #A9C2EA
 ```
-
-元件 CSS 完全不需修改——它引用的語意變數在深色 selector 內被重新指向不同的 primitive。
-
-## 深色色票對照
-
-下表直接從 token 原始檔渲染（primitive + 淺色語意 + 深色 overlay），所有對比度皆符合 WCAG 2.1 AA：
-
-<ThemeSwatches />
 
 ### 關鍵設計決策
 
-- **品牌色反轉（Material-3 tonal）**：`brand.primary` 由深靛藍 `#1B2D58` **提亮**為 `#A9C2EA`
-  以在深色面上可讀（9.39:1）。連帶地 `text.on-brand` 由白色**翻轉**為深靛藍 `#1B2D58`
-  （白字在淺藍底僅 1.81:1 會失敗）——因此 filled 按鈕在深色模式呈現「淺藍底＋深藍字」。
-- **表面分層**：`surface.subtle`（`#161618`）比 `surface.default`（`#1C1C1E`）更深，
-  讓卡片以**色階**浮起，不全靠陰影。
+- **品牌色反轉（Material-3 tonal）**：深色模式的 `color.brand.primary` 由深靛藍 `color.blue.900` 改指向較亮的 `color.blue.300`，在深色面上才讀得清楚。連帶地 `color.text.on-brand` 由白色翻轉為深靛藍（白字在淺藍底對比不足），因此實心按鈕在深色模式是「淺藍底＋深藍字」。
+- **表面分層**：深色模式的 `color.surface.subtle` 比 `color.surface.default` 更深，讓卡片以色階浮起，不全靠陰影。
 - **陰影加強**：深色模式 `--tc-elevation-*` 提高黑色不透明度（純黑陰影在深色面上幾乎不可見）。
-- **回饋色提亮**：`feedback.error/success` 在深色改用提亮的 `red-300 / green-400`，
-  作為深色面上的前景文字仍達 AA。
+- **回饋色提亮**：`color.feedback.error`／`color.feedback.success` 在深色改用較亮的基礎色，作為深色面上的前景文字仍達 AA。
 
-## 擴充：新增元件時
+### 擴充：新增元件時
 
 引用語意色（`--tc-color-surface-default`、`--tc-color-text-default`、`--tc-color-brand-primary`…）
 而非 primitive 或寫死色碼，元件即自動支援深色。**勿**將 `color-mix(... , white)` 寫死白色作為底色，
-請改用 `var(--tc-color-surface-default)`，使色調隨主題調整。
+請改用 `var(--tc-color-surface-default)`，使色調隨色彩模式調整。

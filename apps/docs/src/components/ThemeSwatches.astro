@@ -31,23 +31,38 @@ flatten(lightSem as Record<string, unknown>, '', light);
 const dark: Record<string, string> = {};
 flatten(darkSem as Record<string, unknown>, '', dark);
 
-/** Resolve a `{color.x.y}` reference (or raw hex) to a hex string. */
-const hex = (ref: string | undefined): string =>
-  ref ? (ref.startsWith('{') ? (prim[ref.slice(1, -1)] ?? ref) : ref) : '—';
+/**
+ * Resolve a `{color.x.y}` reference (or raw hex) to a hex string. A semantic
+ * colour may point at another semantic colour (e.g. feedback.info →
+ * brand.primary), so references are followed through the given layers, in
+ * order, until a primitive value is reached.
+ */
+function resolve(ref: string | undefined, layers: Record<string, string>[]): string {
+  let value = ref;
+  for (let depth = 0; depth < 10 && value?.startsWith('{'); depth += 1) {
+    const path = value.slice(1, -1);
+    const found = layers.map((layer) => layer[path]).find((v) => v !== undefined) ?? prim[path];
+    if (found === undefined) return value;
+    value = found;
+  }
+  return value ?? '—';
+}
+
+const darkLayers = [dark, light];
 
 const rows = Object.keys(light).map((token) => ({
   token: token.replace(/^color\./, ''),
   varName: `--tc-${token.replace(/\./g, '-')}`,
-  light: hex(light[token]),
-  dark: hex(dark[token] ?? light[token]),
+  light: resolve(light[token], [light]),
+  dark: resolve(dark[token] ?? light[token], darkLayers),
 }));
 ---
 
 <div class="theme-swatches">
   <div class="head">
-    <span>Semantic token</span>
-    <span>Light</span>
-    <span>Dark</span>
+    <span>語意色（變數名稱）</span>
+    <span>淺色</span>
+    <span>深色</span>
   </div>
   {
     rows.map((r) => (
@@ -69,7 +84,7 @@ const rows = Object.keys(light).map((token) => ({
 <style>
   .theme-swatches {
     margin-block: 1rem;
-    font-size: 0.8rem;
+    font-size: var(--hb-text-body);
   }
   .head,
   .row {
@@ -88,7 +103,7 @@ const rows = Object.keys(light).map((token) => ({
     border-block-end: 1px solid var(--sl-color-gray-6);
   }
   .row code {
-    font-size: 0.72rem;
+    font-size: var(--hb-text-code);
   }
   .cell {
     display: flex;

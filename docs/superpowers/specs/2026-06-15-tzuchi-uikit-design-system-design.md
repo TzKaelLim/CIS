@@ -8,6 +8,8 @@
 | 本規格範圍 | 整體架構、Monorepo、Design Tokens、元件層、React 交付、純 HTML、Storybook、測試、治理，以及 Milestone 1（地基 + 5 核心元件）詳細規格 |
 | 後續產物 | 經使用者審閱確認後 → `writing-plans` 產出逐步實作計畫 |
 
+> **2026-10-21 修正：** Lit Web Components（packages/components、packages/react、apps/storybook、apps/demo-html）已凍結：程式留在 repo、不再修改，root 的 build 和 test 不再包含它們。元件的方向改為 heroui/ 的 HeroUI v3 加上慈濟主題，元件樣品室是 heroui/storybook。本文以 Lit 為單一來源的段落，以此修正為準。共編機制見 tceditor repo 的 docs/superpowers/specs/2026-10-21-ci-tokens-coediting-design.md。
+
 > 本文件為設計系統的「合約」。Token 層與元件 API 一旦定案，即為各套件的對外承諾。
 
 ### Figma 來源節點對照（page `01 Components` / `2257:9115` 之下的 frames）

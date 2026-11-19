@@ -1,0 +1,144 @@
+/* -------------------------------------------------------------------------------------------------
+ * Tzu Chi theme — Drawer
+ *
+ * Drawer is Modal's third sibling (DESIGN-LANGUAGE §6(c)): the same dialog / header / body /
+ * footer skeleton on a docked panel. It takes the same shell — elevation, heading weight, body
+ * type, region rhythm, wrapping footer, bare close glyph — so a sheet and a dialog read as one
+ * surface. There is no `tc-drawer`; every value below is the one `modal.css` already ships.
+ *
+ * WHAT THIS CHANGES (everything else is HeroUI's, on purpose)
+ *   · panel elevation   --overlay-shadow (elevation.3) → --tzuchi-modal-shadow
+ *                       (elevation.4, LIGHT ONLY — see the cascade note)          [R104]
+ *   · heading weight    500 (font-medium) → 700 (typography.subtitle)             [R11 / R105]
+ *   · body type         14px/1.43 in --muted → 16px/1.6 in --overlay-foreground   [R5 / R106]
+ *   · region rhythm     header→body 8px → 16px;  header/body→footer 20px → 24px   [R107]
+ *   · footer            wraps its action row                                      [R108]
+ *   · close trigger     a bare glyph at rest instead of a permanent --default chip [R109]
+ *
+ * RADIUS — DELIBERATELY NOT RESTATED
+ *   R28 / R103 want 16px on a modal-like overlay's free edges. HeroUI already gets there under
+ *   this theme: `[data-placement="bottom"|"top"]` round their two free corners with
+ *   min(32px, var(--radius-2xl)), and `--radius-2xl` is calc(var(--radius) * 2) = 16px because
+ *   `variables.css` sets --radius to --tc-radius-md (8px). So the themed Drawer's free edges are
+ *   already exactly --tc-modal-radius, and restating them would be the duplication N5 forbids.
+ *   The left / right placements keep upstream's `rounded-none`: R103 says the edge-docked sides
+ *   stay square, and those panels are docked on three sides.
+ *
+ * MOTION — DELIBERATELY LEFT AS HEROUI'S
+ *   R110 / R133 describe an `animate-in` overlay (`--tw-animation-duration` + `--tw-ease` on
+ *   [data-entering]). Drawer does not animate: it TRANSITIONS `translate` with its own
+ *   --drawer-enter-duration / --drawer-enter-ease pair (250ms, cubic-bezier(.32,.72,0,1)), paired
+ *   with a 250ms backdrop fade and, on drag-dismiss, a snap-back that drawer.tsx:183 writes
+ *   INLINE as "transform 300ms cubic-bezier(.32,.72,0,1)". CSS cannot reach that inline curve, so
+ *   retuning only the two custom properties would leave the panel's enter on one curve and its
+ *   own drag release on another. §8 R140 ("durations that differ for a good reason stay") and the
+ *   brief's restraint rule both point the same way: a distance-proportional slide keeps its own
+ *   choreography. Recorded as a spec gap instead.
+ *
+ * KEPT AS HEROUI (see the report for the reasoning)
+ *   panel padding (24px, already --tc-modal-padding), every placement's geometry (w-80 /
+ *   sm:w-96 / max-w-85vw for left+right, w-full + max-h-85vh for top+bottom, and
+ *   `.drawer__dialog--top`'s 2px bottom trim), the drag-to-dismiss gesture, backdrop colour and
+ *   its opaque/blur/transparent variants (--backdrop is deliberately unmapped, D31), the 12px
+ *   header gap, the body's 3px scroll gutter, footer alignment + 8px gap, the handle bar (a 4px
+ *   tall bar with `rounded-xs` = 2px is already a full pill, so R26 asks for nothing), the
+ *   handle→header / handle→body zero margins, close-trigger position, focus ring, disabled
+ *   opacity, pressed scale, enter/exit transitions.
+ *
+ * VARIANT MAPPING (all rules are variant-agnostic — no tc counterpart exists to split them)
+ *   placement bottom (default) · top · left · right — geometry and radius untouched; the shell
+ *             rules below are placement-independent.
+ *   variant   opaque (default) · blur · transparent — backdrop only, untouched.
+ *
+ * CASCADE NOTES (hand-derived)
+ *   · Every rule is (0,2,0)–(0,4,0) against a (0,1,0)–(0,2,0) base, so each wins outright; the
+ *     two comma-separated branches are each scoped individually.
+ *   · `--tw-shadow` really is the property `shadow-overlay` compiles to — the built Storybook CSS
+ *     emits `.drawer__dialog{ … --tw-shadow:var(--overlay-shadow); box-shadow:
+ *     var(--tw-inset-shadow), …, var(--tw-shadow) }` — so feeding the custom property keeps
+ *     Tailwind's inset / ring composition intact. It is set on `.drawer__dialog`, which every
+ *     placement modifier shares, so all four keep it.
+ *   · `--tzuchi-modal-shadow` is declared in `variables.css` under [data-theme="tzuchi"] ONLY.
+ *     Under `tzuchi-dark` the fallback fires and this resolves to HeroUI's `--overlay-shadow`,
+ *     i.e. the 1px inset hairline, which is intentional on a near-black page (§6 "Dark mode keeps
+ *     HeroUI's inset hairline"). Do not read this rule as "a real drop shadow in dark" — that
+ *     claim in modal.css is the known error §11 I4 records.
+ *   · The close-trigger `:not(…)` guard uses the exact attribute names `close-button.css` checks,
+ *     so upstream's hover fill, pressed scale, focus ring, disabled and pending all keep working;
+ *     none of status-focused / -disabled / -pending touches background-color. The class pair
+ *     `.drawer__close-trigger.close-button--default` exists because DrawerCloseTrigger merges its
+ *     slot class onto CloseButtonRoot's own `close-button close-button--default`.
+ *   · The region-rhythm rules are adjacent-sibling pairs, so upstream's own
+ *     `.drawer__handle + .drawer__header` / `+ .drawer__body` zero margins are untouched.
+ *   · `margin-block-start` beats the base `margin-top` on specificity — logical and physical
+ *     longhands cascade against one another for the same used property.
+ *
+ * No --tc-color-x token, no colour-valued component token, no hex / rgb / hsl / oklch literal,
+ * no !important, no physical left / right. No HeroUI variant, placement or state is hidden.
+ *
+ * Reviewed: no changes. Independently re-derived against the built Storybook CSS
+ * (storybook-static/assets/iframe-DpN8oW_m.css), drawer.tsx / close-button.tsx's slot/className
+ * composition, drawer.styles.ts / close-button.styles.ts, themes/tzuchi/variables.css and
+ * packages/tokens/dist/tokens.css. Confirmed: `.drawer__close-trigger.close-button--default` is
+ * actually emitted (DrawerCloseTrigger merges its slot class onto CloseButtonRoot's own
+ * `close-button close-button--default`); every rule and every comma branch is scoped by
+ * `[data-theme^="tzuchi"]`; no `--tc-color-*` or colour-valued component token appears, no
+ * hex/rgb/hsl/oklch literal, no `!important`; every `--tc-*` token used resolves in tokens.css and
+ * is confirmed absent from both of tokens.css's dark blocks; `--overlay-foreground` and
+ * `--tzuchi-modal-shadow` are on the allowed theme-variable list; the built CSS confirms the free-
+ * edge radius under this theme (`min(32px, var(--radius-2xl))` with `--radius` = `--tc-radius-md`
+ * = 8px) already resolves to exactly 16px on `[data-placement="bottom"|"top"]`, so the absence of
+ * a radius rule here is correct and not an omission, and left/right's `border-radius:0` is
+ * untouched since this file never declares `border-radius`; `--tw-shadow:var(--overlay-shadow)`
+ * is confirmed the mechanism the base `.drawer__dialog` rule uses, shared by every placement
+ * modifier; no existing override file touches `.drawer__*`, and the `.close-button--default`
+ * reach is the same own-host-class pattern `modal.css` and `tag.css` already use. Zero
+ * corrections were needed.
+ * ---------------------------------------------------------------------------------------------- */
+
+/* Panel — the elevation.4 drop shadow the modal-like shell carries.
+ * Radius is intentionally absent: see "RADIUS" above. */
+[data-theme^="tzuchi"] .drawer__dialog {
+  --tw-shadow: var(--tzuchi-modal-shadow, var(--overlay-shadow));
+}
+
+/* Heading — typography.subtitle is bold; its 16px/1.5 already matches `text-base`. */
+[data-theme^="tzuchi"] .drawer__heading {
+  font-weight: var(--tc-font-weight-bold, 700);
+}
+
+/* Body — typography.body, painted in the panel's own foreground rather than --muted
+ * (--muted is 3.84:1 on white, below AA for body copy). */
+[data-theme^="tzuchi"] .drawer__body {
+  font-size: var(--tc-font-size-16, 16px);
+  line-height: var(--tc-line-height-relaxed, 1.6);
+  color: var(--overlay-foreground);
+}
+
+/* Region rhythm — header margin-block-end 16px, footer margin-block-start 24px. */
+[data-theme^="tzuchi"] .drawer__header + .drawer__body {
+  margin-block-start: var(--tc-space-16, 16px);
+}
+
+[data-theme^="tzuchi"] .drawer__header + .drawer__footer,
+[data-theme^="tzuchi"] .drawer__body + .drawer__footer {
+  margin-block-start: var(--tc-space-24, 24px);
+}
+
+/* Footer — the action row wraps when a Cancel / Confirm pair runs out of room. */
+[data-theme^="tzuchi"] .drawer__footer {
+  flex-wrap: wrap;
+}
+
+/* Close trigger — a bare glyph that only fills on hover / press.
+ * The :not() list is what keeps upstream's hover, pressed, focus-visible, disabled and pending
+ * treatments untouched: this rule stops applying the moment any of them is active. */
+[data-theme^="tzuchi"]
+  .drawer__close-trigger.close-button--default:not(
+    :hover,
+    [data-hovered="true"],
+    :active,
+    [data-pressed="true"]
+  ) {
+  background-color: transparent;
+}

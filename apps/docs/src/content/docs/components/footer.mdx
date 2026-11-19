@@ -1,27 +1,156 @@
 ---
-title: Footer
-description: tc-footer / tc-footer-column — 網站頁尾，含品牌區、社群連結、響應式連結群組與版權列；行動裝置上群組可手風琴收合。
+title: 頁尾
+description: 網站最下方：聯絡資訊、分類連結與版權聲明。
 ---
 
 import Demo from '../../../components/Demo.astro';
 import PropsTable from '../../../components/PropsTable.astro';
+import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
+import PreviewTile from '../../../components/handbook/PreviewTile.astro';
+import DoDont from '../../../components/handbook/DoDont.astro';
+import StorybookNote from '../../../components/handbook/StorybookNote.astro';
+import SiteLook from '../../../components/handbook/SiteLook.astro';
 
-`<tc-footer>` 是網站頁尾容器：上方彩色內容區（品牌資訊、社群連結、一組 `<tc-footer-column>` 連結群組、回到頂部）加上底部版權列。連結群組以 CSS grid `auto-fit`／`minmax` 排列（桌機約 4-6 欄、平板 2 欄、行動 1 欄）；在 `<=768px` 時每個 `<tc-footer-column>` 變為可收合的手風琴。提供 `light`（淺色）與 `brand`（深色品牌）兩種變體。下方為**可互動的真實元件**（社群圖示為 Lorem Picsum 假圖）：
+<ComponentMeta id="footer" />
+
+<PreviewTile size="hero" scale={0.8} interactive>
+  <tc-footer copyright="Copyright © Tzu Chi Foundation." style="inline-size:100%">
+    <a
+      slot="social"
+      href="#"
+      aria-label="Facebook"
+      style="display:inline-flex;width:32px;height:32px;border-radius:6px;overflow:hidden"
+    >
+      <div
+        aria-hidden="true"
+        style="width:100%;height:100%;background:linear-gradient(135deg,var(--tc-color-brand-surface-hover),var(--tc-color-brand-surface))"
+      ></div>
+    </a>
+    <a
+      slot="social"
+      href="#"
+      aria-label="YouTube"
+      style="display:inline-flex;width:32px;height:32px;border-radius:6px;overflow:hidden"
+    >
+      <div
+        aria-hidden="true"
+        style="width:100%;height:100%;background:linear-gradient(135deg,var(--tc-color-brand-surface-hover),var(--tc-color-brand-surface))"
+      ></div>
+    </a>
+    <div slot="brand">
+      <strong style="display:block;font-size:18px;margin-bottom:8px">花蓮本會</strong>
+      <p style="margin:0 0 12px">花蓮縣花蓮市中央路三段 703 號</p>
+      <tc-button variant="filled">聯絡我們</tc-button>
+    </div>
+    <tc-footer-column label="公益慈善">
+      <tc-link variant="subtle" href="#">
+        國際賑災
+      </tc-link>
+      <tc-link variant="subtle" href="#">
+        全球志工服務
+      </tc-link>
+      <tc-link variant="subtle" href="#">
+        環保推廣
+      </tc-link>
+    </tc-footer-column>
+    <tc-footer-column label="醫療志業">
+      <tc-link variant="subtle" href="#">
+        慈濟醫療基金會
+      </tc-link>
+      <tc-link variant="subtle" href="#">
+        花蓮慈濟醫院
+      </tc-link>
+    </tc-footer-column>
+    <tc-footer-column label="教育志業">
+      <tc-link variant="subtle" href="#">
+        慈濟大學
+      </tc-link>
+      <tc-link variant="subtle" href="#">
+        慈濟科技大學
+      </tc-link>
+    </tc-footer-column>
+  </tc-footer>
+</PreviewTile>
+
+## 用法
+
+頁尾放在每一頁的最下方，收網站的聯絡資訊、社群連結、分類連結和版權聲明，右上角還有內建的「回到頂部」按鈕。連結依群組排列：寬畫面上排成多欄，平板排成兩欄，手機排成一欄，而且手機上可以點群組的標題收起或展開。網站最重要的幾個區域放在「導覽列」；頁尾放比較完整、但比較少用到的連結。元件另有一個品牌底色（brand）變體，但目前在網站上看起來和預設一樣（待工程修正），請先用預設。
+
+## 組成
+
+| 部位       | 說明                                                                                                     |
+| ---------- | -------------------------------------------------------------------------------------------------------- |
+| 上方內容區 | 頁尾的主要區塊，用淡淡的底色和頁面內容分開。底色和文字色跟著主題和色彩模式變。                       |
+| 社群連結   | 可省略。左上角一排社群網站的小圖示連結，由網站提供。                                                     |
+| 回到頂部   | 右上角內建的按鈕，按下會捲回頁面最上方。需要不同的樣子時，可以換成網站自己的按鈕。                       |
+| 品牌區     | 可省略。網站或單位的名稱、地址、電話，也可以放一個按鈕，例如「聯絡我們」。寬畫面在左邊，窄畫面在最上面。 |
+| 連結群組   | 一組有標題的連結，例如「公益慈善」。手機上標題變成可以點的按鈕，點了收起或展開這一組連結，預設是展開。   |
+| 版權列     | 最下面一條，用主題的主色當底，文字用和底色對比的顏色，寫版權聲明。沒有版權文字時就不顯示。                         |
+| 焦點框     | 用鍵盤選到按鈕或連結時出現的外框，讓不用滑鼠的人知道目前在哪裡。顏色跟著主題。                       |
+
+## 該做與不該做
+
+:::caution[草稿]
+這一節是草稿，待美編（設計）確認。
+:::
+
+<DoDont
+  rows={[
+    {
+      kind: 'do',
+      text: '每個連結群組都寫一個清楚的標題，例如「醫療志業」。手機上讀者是靠標題決定要不要展開這一組。',
+    },
+    {
+      kind: 'do',
+      text: '每個社群圖示連結都寫好名稱（例如「Facebook」），螢幕閱讀器才唸得出來，不能只放圖示。',
+    },
+    {
+      kind: 'do',
+      text: '地址、電話用一般文字寫，不要做成圖片，讀者才能複製，螢幕閱讀器也唸得出來。',
+    },
+    {
+      kind: 'do',
+      text: '每個群組的連結控制在幾個以內。手機上所有群組預設是展開的，連結太多頁尾會變得很長。',
+    },
+    {
+      kind: 'dont',
+      text: '不要再自己加一個「回到頂部」按鈕；元件已經內建，要換樣子時請工程換掉內建的按鈕。',
+    },
+    {
+      kind: 'dont',
+      text: '不要把重要的動作（例如捐款、報名）只放在頁尾；讀者不一定會捲到最下面。',
+    },
+  ]}
+/>
+
+## 在目前主題下的樣子
+
+<SiteLook />
+
+上方的大預覽會跟著頁首的「主題」和「色彩模式」一起變。
+
+## 給工程師
+
+以下是給工程師的安裝與 API 說明，美編（設計）、網站的編輯和致遠（廠商）可以略過。
+
+<StorybookNote tag="tc-footer" />
+
+`<tc-footer>` 是網站頁尾容器：上方彩色內容區（品牌資訊、社群連結、一組 `<tc-footer-column>` 連結群組、回到頂部）加上底部版權列。連結群組以 CSS grid `auto-fit`／`minmax` 排列（桌機約 4-6 欄、平板 2 欄、行動 1 欄）；在 `<=768px` 時每個 `<tc-footer-column>` 變為可收合的手風琴。提供 `light`（淺色）與 `brand`（深色品牌）兩種變體。下方為**可互動的真實元件**（社群圖示以色塊代替）：
 
 <Demo>
   <tc-footer copyright="Copyright © 2020 Open Source Matters. 版權所有, Copyright, Tzu Chi Foundation.">
     <a slot="social" href="#" aria-label="Facebook" style="display:inline-flex;width:32px;height:32px;border-radius:6px;overflow:hidden">
-      <img src="https://picsum.photos/seed/fb/32/32" alt="" style="width:100%;height:100%;object-fit:cover" />
+      <div aria-hidden="true" style="width:100%;height:100%;background:linear-gradient(135deg,var(--tc-color-brand-surface-hover),var(--tc-color-brand-surface))"></div>
     </a>
     <a slot="social" href="#" aria-label="Instagram" style="display:inline-flex;width:32px;height:32px;border-radius:6px;overflow:hidden">
-      <img src="https://picsum.photos/seed/ig/32/32" alt="" style="width:100%;height:100%;object-fit:cover" />
+      <div aria-hidden="true" style="width:100%;height:100%;background:linear-gradient(135deg,var(--tc-color-brand-surface-hover),var(--tc-color-brand-surface))"></div>
     </a>
     <a slot="social" href="#" aria-label="YouTube" style="display:inline-flex;width:32px;height:32px;border-radius:6px;overflow:hidden">
-      <img src="https://picsum.photos/seed/yt/32/32" alt="" style="width:100%;height:100%;object-fit:cover" />
+      <div aria-hidden="true" style="width:100%;height:100%;background:linear-gradient(135deg,var(--tc-color-brand-surface-hover),var(--tc-color-brand-surface))"></div>
     </a>
     <div slot="brand">
       <strong style="display:block;font-size:18px;margin-bottom:8px">花蓮本會</strong>
-      <p style="margin:0 0 12px;color:#616161">花蓮縣花蓮市國強里 11 鄰中央路三段 703 號<br />03 856 6779</p>
+      <p style="margin:0 0 12px;color:#616161">花蓮縣花蓮市國強里 11 鄰中央路三段 703 號<br />0000-000-000（示意）</p>
       <tc-button variant="filled">聯絡我們</tc-button>
     </div>
     <tc-footer-column label="公益慈善">
@@ -47,7 +176,7 @@ import PropsTable from '../../../components/PropsTable.astro';
   </tc-footer>
 </Demo>
 
-## 變體（variant）
+### 變體（variant）
 
 `brand` 變體使用深色品牌底色與淺色文字：
 
@@ -68,8 +197,6 @@ import PropsTable from '../../../components/PropsTable.astro';
   </tc-footer>
 </Demo>
 
-## 用法
-
 ### 純 HTML
 
 ```html
@@ -78,7 +205,7 @@ import PropsTable from '../../../components/PropsTable.astro';
 
 <tc-footer copyright="Copyright © 2020 Tzu Chi Foundation.">
   <a slot="social" href="https://facebook.com" aria-label="Facebook">FB</a>
-  <div slot="brand">花蓮本會 · 03 856 6779</div>
+  <div slot="brand">花蓮本會 · 0000-000-000（示意）</div>
 
   <tc-footer-column label="公益慈善">
     <tc-link variant="subtle" href="/relief">國際賑災</tc-link>
@@ -103,22 +230,22 @@ import { TcFooter, TcFooterColumn } from '@tzuchi/react';
 </TcFooter>;
 ```
 
-## API
+### API
 
 下表自 Custom Elements Manifest 自動產生：
 
-### `<tc-footer>`
+#### `<tc-footer>`
 
 <PropsTable tag="tc-footer" />
 
-### `<tc-footer-column>`
+#### `<tc-footer-column>`
 
 <PropsTable tag="tc-footer-column" />
 
-## 無障礙（Accessibility）
+### 無障礙（Accessibility）
 
 - 頁尾容器為 `<footer role="contentinfo">`。
 - 每個 `<tc-footer-column>` 為 `role="group"`：桌機標題以 `<h3>` 靜態呈現、連結恆顯示；行動裝置（`<=768px`）標題改為按鈕，帶 `aria-expanded`／`aria-controls`，連結容器為 `role="region"` 並以 `aria-labelledby` 連結標題。
-- 切換手風琴時 `<tc-footer-column>` 派發 `tc-toggle`，`detail.open` 為新狀態。
-- 內建「回到頂部」按鈕帶 `aria-label`，點擊派發 `tc-back-to-top` 並平滑捲動至頁首；亦可改用 `back-to-top` 插槽提供自訂控件。
+- 切換手風琴時 `<tc-footer-column>` 發出 `tc-toggle`，`detail.open` 為新狀態。
+- 內建「回到頂部」按鈕帶 `aria-label`，點擊發出 `tc-back-to-top` 並平滑捲動至頁首；亦可改用 `back-to-top` 插槽提供自訂控制項。
 - `:focus-visible` 焦點環使用 `--tc-focus-ring-*` token。

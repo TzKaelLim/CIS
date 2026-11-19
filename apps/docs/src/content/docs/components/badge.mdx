@@ -1,10 +1,80 @@
 ---
-title: Badge
-description: tc-badge — 小型標籤 / 狀態 / 數量徽章，支援多種色調、變體與尺寸。
+title: 徽章
+description: 標示狀態、分類或數量的小標記。
 ---
 
 import Demo from '../../../components/Demo.astro';
 import PropsTable from '../../../components/PropsTable.astro';
+import SiteLook from '../../../components/handbook/SiteLook.astro';
+import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
+import PreviewTile from '../../../components/handbook/PreviewTile.astro';
+import DoDont from '../../../components/handbook/DoDont.astro';
+import StorybookNote from '../../../components/handbook/StorybookNote.astro';
+
+<ComponentMeta id="badge" />
+
+<PreviewTile size="hero">
+  <div style="display:flex;flex-direction:column;align-items:center;gap:1rem">
+    <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:0.5rem">
+      <tc-badge>一般</tc-badge>
+      <tc-badge tone="brand">兒少</tc-badge>
+      <tc-badge tone="success" dot>已上線</tc-badge>
+      <tc-badge tone="warning" dot>待審核</tc-badge>
+      <tc-badge tone="error" dot>已截止</tc-badge>
+      <tc-badge tone="info">新活動</tc-badge>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:0.5rem">
+      <tc-badge tone="brand" variant="soft">淡底</tc-badge>
+      <tc-badge tone="brand" variant="filled">實底</tc-badge>
+      <tc-badge tone="brand" variant="outline">外框</tc-badge>
+      <tc-badge tone="brand" pill>99+</tc-badge>
+      <tc-badge tone="error" variant="filled" pill>12</tc-badge>
+      <tc-badge tone="brand" size="sm">小尺寸</tc-badge>
+    </div>
+  </div>
+</PreviewTile>
+
+## 用法
+
+徽章是貼在旁邊的小標記，用來標示分類、狀態或數量，例如「兒少」「已上線」「12」。它只給人看，不能點。要讓讀者點選、篩選或移除的小標籤，請改用「膠囊標籤」；要讓讀者按下去做一件事，用「按鈕」。徽章有六種色調：一般（neutral）和品牌（brand）用在分類，成功（success）、錯誤（error）、警告（warning）、資訊（info）用在狀態；外觀有淡底（soft）、實底（filled）、外框（outline）三種，另有小尺寸（sm）給平板直式和手機用。
+
+## 組成
+
+| 部位             | 說明                                                                                                         |
+| ---------------- | ------------------------------------------------------------------------------------------------------------ |
+| 底色與外框       | 依外觀而定：淡底配色調文字、實底配反白文字，或透明底配色調外框。顏色跟著主題。                           |
+| 文字             | 必填。分類、狀態或數字，排成一行，不會換行。                                                                 |
+| 狀態圓點         | 可省略。文字前面的小圓點，只是裝飾，螢幕閱讀器不會唸。                                                       |
+| 形狀             | 預設是小圓角；也可以改成兩端全圓的膠囊形，適合放數字。                                                       |
+| 給螢幕閱讀器的字 | 只有狀態色調才有：看不見的「成功：」「錯誤：」「警告：」「資訊：」，螢幕閱讀器會先唸這幾個字，再唸徽章文字。 |
+
+## 該做與不該做
+
+:::caution[草稿]
+這一節是草稿，待美編（設計）確認。
+:::
+
+<DoDont
+  rows={[
+    { kind: 'do', text: '文字越短越好，一兩個詞或一個數字。徽章不會換行，字太多會撐得很寬。' },
+    { kind: 'do', text: '色調要和意思一致：完成、上線用成功（success），失敗、截止用錯誤（error），需要注意用警告（warning），一般提示用資訊（info）；單純分類用一般（neutral）或品牌（brand）。' },
+    { kind: 'do', text: '意思要寫在文字裡，不能只靠顏色或圓點表達；分不出顏色的讀者也要看得懂。目前警告（warning）、資訊（info）和品牌（brand）都是藍色系，只看顏色分不出來。' },
+    { kind: 'dont', text: '不要用徽章當按鈕或連結。它不能點，也不能用鍵盤選到；要讓讀者點選或篩選，請用「膠囊標籤」。' },
+    { kind: 'dont', text: '狀態色調的文字不要只寫色調本身的名稱。例如錯誤色調只寫「錯誤」，螢幕閱讀器會唸成「錯誤：錯誤」；改寫成發生了什麼，例如「已截止」「上傳失敗」。' },
+  ]}
+/>
+
+## 在目前主題下的樣子
+
+<SiteLook />
+
+徽章還沒有各主題的對照範例；上方的大預覽會跟著頁首的「主題」和「色彩模式」一起變。
+
+## 給工程師
+
+以下是給工程師的安裝與 API 說明，美編（設計）、網站的編輯和致遠（廠商）可以略過。
+
+<StorybookNote tag="tc-badge" />
 
 `<tc-badge>` 是小型、非互動的徽章，用於標示標籤、狀態或數量。比 `tc-chip` 更小且不可點擊。支援六種色調（`neutral`、`brand`、`success`、`error`、`warning`、`info`）、三種變體（`soft`、`filled`、`outline`）、兩種尺寸（`md` / `sm`），並可加上前置狀態圓點與膠囊形外觀。下方為**真實元件**：
 
@@ -14,8 +84,6 @@ import PropsTable from '../../../components/PropsTable.astro';
   <tc-badge tone="success" dot>上線</tc-badge>
   <tc-badge tone="error">錯誤</tc-badge>
 </Demo>
-
-## 用法
 
 ### 純 HTML
 
@@ -37,7 +105,7 @@ import { TcBadge } from '@tzuchi/react';
 </TcBadge>;
 ```
 
-## 色調（Tone）
+### 色調（Tone）
 
 色調對應語意色彩。`neutral` 與 `brand` 視為一般標籤；`success`、`error`、`warning`、`info` 視為狀態，會附帶一段視覺隱藏文字供螢幕報讀器辨識。
 
@@ -50,7 +118,7 @@ import { TcBadge } from '@tzuchi/react';
   <tc-badge tone="info">info</tc-badge>
 </Demo>
 
-## 變體（Variant）
+### 變體（Variant）
 
 `soft`（預設）為淡底配色調文字；`filled` 為實底配反白文字；`outline` 為透明底配色調邊框與文字。
 
@@ -60,7 +128,7 @@ import { TcBadge } from '@tzuchi/react';
   <tc-badge tone="brand" variant="outline">outline</tc-badge>
 </Demo>
 
-## 尺寸（Size）
+### 尺寸（Size）
 
 `md`（預設）適用桌機與平板橫式；`sm` 適用平板直式與手機。
 
@@ -69,7 +137,7 @@ import { TcBadge } from '@tzuchi/react';
   <tc-badge tone="brand" size="sm">Small</tc-badge>
 </Demo>
 
-## 狀態圓點與膠囊形
+### 狀態圓點與膠囊形
 
 `dot` 會在前端顯示狀態圓點；`pill` 會將徽章改為完整膠囊形（適合數量計數）。
 
@@ -80,15 +148,15 @@ import { TcBadge } from '@tzuchi/react';
   <tc-badge tone="error" variant="filled" pill>12</tc-badge>
 </Demo>
 
-## API
+### API
 
 下表自 Custom Elements Manifest 自動產生：
 
 <PropsTable tag="tc-badge" />
 
-## 無障礙（Accessibility）
+### 無障礙（Accessibility）
 
 - 徽章預設為 `role="presentation"`（純裝飾）。若徽章承載狀態語意，作者可自行加上 `role="status"`。
 - 狀態色調（`success` / `error` / `warning` / `info`）會附帶視覺隱藏文字，向螢幕報讀器說明狀態。
 - 狀態圓點為純裝飾（`aria-hidden`），不依賴顏色傳達意義——色調搭配文字與隱藏標籤共同表意。
-- 徽章為非互動元件，不接收焦點、不派發事件。
+- 徽章為非互動元件，不接收焦點、不發出事件。

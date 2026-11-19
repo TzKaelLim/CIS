@@ -1,10 +1,77 @@
 ---
-title: Icon Button
-description: tc-icon-button — 圓形圖示按鈕，tonal / filled 兩種變體，48 / 64px 兩種尺寸。
+title: 圖示按鈕
+description: 只有圖示、沒有文字的圓形按鈕，例如返回、展開。
 ---
 
 import Demo from '../../../components/Demo.astro';
 import PropsTable from '../../../components/PropsTable.astro';
+import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
+import PreviewTile from '../../../components/handbook/PreviewTile.astro';
+import DoDont from '../../../components/handbook/DoDont.astro';
+import StorybookNote from '../../../components/handbook/StorybookNote.astro';
+import SiteLook from '../../../components/handbook/SiteLook.astro';
+
+<ComponentMeta id="icon-button" />
+
+<PreviewTile size="hero" interactive>
+  <tc-icon-button variant="tonal" label="返回上一頁">
+    <svg viewBox="0 0 24 24" width="100%" height="100%" fill="currentColor" aria-hidden="true"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z" /></svg>
+  </tc-icon-button>
+  <tc-icon-button variant="filled" label="展開更多內容">
+    <svg viewBox="0 0 24 24" width="100%" height="100%" fill="currentColor" aria-hidden="true"><path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z" /></svg>
+  </tc-icon-button>
+  <tc-icon-button variant="tonal" size="lg" label="返回上一頁">
+    <svg viewBox="0 0 24 24" width="100%" height="100%" fill="currentColor" aria-hidden="true"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z" /></svg>
+  </tc-icon-button>
+  <tc-icon-button variant="filled" size="lg" label="展開更多內容">
+    <svg viewBox="0 0 24 24" width="100%" height="100%" fill="currentColor" aria-hidden="true"><path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z" /></svg>
+  </tc-icon-button>
+  <tc-icon-button disabled label="返回上一頁（停用）">
+    <svg viewBox="0 0 24 24" width="100%" height="100%" fill="currentColor" aria-hidden="true"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z" /></svg>
+  </tc-icon-button>
+</PreviewTile>
+
+## 用法
+
+圖示按鈕是只有一個圖示、沒有文字的圓形按鈕，用在大家一看就懂的動作，例如返回、展開、搜尋、開啟選單，常放在導覽列、工具列這類空間很小的地方。淡底（tonal）是一般用法，實心（filled）用來強調；有 48px 和 64px 兩種大小。如果動作需要用文字才說得清楚，或是畫面上最重要的動作（例如送出、捐款），請改用有文字的「按鈕」。
+
+## 組成
+
+| 部位       | 說明                                                                                               |
+| ---------- | -------------------------------------------------------------------------------------------------- |
+| 圓形容器   | 按鈕的底色。淡底按鈕用淡淡的品牌底色，實心按鈕用主色；大小有 48px 和 64px 兩種。                   |
+| 圖示       | 必填。放在圓形中間的一個圖示，顏色跟著變體：淡底按鈕是主色圖示，實心按鈕的圖示用和主色對比清楚的顏色。 |
+| 標籤       | 必填，但畫面上看不到。用一句話說出按下去會做什麼，例如「返回上一頁」；螢幕閱讀器會唸這段文字。     |
+| 焦點框     | 用鍵盤選到按鈕時出現的外框，讓不用滑鼠的人知道目前在哪裡。                                         |
+| 停用狀態   | 暫時不能按時整顆變淡。                                                                             |
+
+## 該做與不該做
+
+:::caution[草稿]
+這一節是草稿，待美編（設計）確認。
+:::
+
+<DoDont
+  rows={[
+    { kind: 'do', text: '只用大家一看就懂的圖示，例如返回箭頭、放大鏡、三條線的選單。不確定讀者看不看得懂時，改用有文字的「按鈕」。' },
+    { kind: 'do', text: '每個圖示按鈕都要寫標籤，說出按下去會做什麼，例如「返回上一頁」「搜尋」。畫面上看不到，但螢幕閱讀器會唸出來。' },
+    { kind: 'do', text: '同一排的圖示按鈕用同一個大小；需要特別強調的那一個才用實心，其他用淡底。' },
+    { kind: 'dont', text: '不要把畫面上最重要的動作（例如送出、立即捐款）只做成圖示按鈕；請用有文字的「按鈕」。' },
+    { kind: 'dont', text: '不要在一個圖示按鈕裡放兩個圖示或加上文字。圓形裡只放得下一個圖示，需要文字時請用「按鈕」。' },
+  ]}
+/>
+
+## 在目前主題下的樣子
+
+<SiteLook />
+
+上方的大預覽會跟著頁首的「主題」和「色彩模式」一起變；這個元件還沒有淺色、深色並排的範例。
+
+## 給工程師
+
+以下是給工程師的安裝與 API 說明，美編（設計）、網站的編輯和致遠（廠商）可以略過。
+
+<StorybookNote tag="tc-icon-button" />
 
 `<tc-icon-button>` 是以圓形容器包裹單一圖示的按鈕，提供 `tonal` / `filled` 兩種變體與 `md`（48px）/ `lg`（64px）兩種尺寸。`label` 為必填，會套用至內部 `<button>` 的 `aria-label`。下方為**可互動的真實元件**：
 
@@ -22,8 +89,6 @@ import PropsTable from '../../../components/PropsTable.astro';
     <svg viewBox="0 0 24 24" width="100%" height="100%" fill="currentColor" aria-hidden="true"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z" /></svg>
   </tc-icon-button>
 </Demo>
-
-## 用法
 
 ### 純 HTML
 
@@ -46,21 +111,21 @@ import { TcIconButton } from '@tzuchi/react';
 </TcIconButton>;
 ```
 
-## 變體與尺寸
+### 變體與尺寸
 
 - `variant="tonal"`（預設）：品牌淺色底 + 品牌主色圖示。
 - `variant="filled"`：品牌主色底 + 對比文字色圖示。
 - `size="md"`（預設，48px）/ `size="lg"`（64px），對應 `--tc-size-control-*`。
 
-## API
+### API
 
 下表自 Custom Elements Manifest 自動產生：
 
 <PropsTable tag="tc-icon-button" />
 
-## 無障礙（Accessibility）
+### 無障礙（Accessibility）
 
 - `label` 為必填，會套用至內部原生 `<button>` 的 `aria-label`，供螢幕報讀器辨識。
 - 內含原生 `<button>`，支援鍵盤 Enter / Space。
 - `:focus-visible` 焦點環使用 `--tc-focus-ring-*` token。
-- `disabled` 透過停用內部原生控件實作（非 `pointer-events:none`）。
+- `disabled` 透過停用內部的原生控制項實作（非 `pointer-events:none`）。

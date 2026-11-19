@@ -1,0 +1,16 @@
+---
+// 元件頁「給工程師」開頭的一段：這個元件在 Storybook 的狀況。
+// 今天的 Storybook（heroui/storybook）只收錄 HeroUI 的元件，還沒有任何 <tc-*> 元件的頁面，
+// 所以元件頁不放「在 Storybook 開啟」的連結；有了對應的 story 之後，再改成連到那一頁（R-H-08）。
+interface Props {
+  /** 元件的標籤名稱，例如 `tc-button`。 */
+  tag: string;
+}
+
+const { tag } = Astro.props;
+if (!/^tc-[a-z][a-z-]*$/.test(tag)) throw new Error(`StorybookNote 的 tag 要是 tc-* 標籤名稱：${tag}`);
+---
+
+<p>
+  Storybook（給工程師逐一檢查元件狀態的工具網站，在本機用 <code>pnpm run heroui:storybook</code> 開啟）目前只收錄 HeroUI 的元件，還沒有 <code>&lt;{tag}&gt;</code> 的頁面；這一段的範例和 API 表就是它的說明。
+</p>

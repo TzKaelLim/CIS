@@ -1,0 +1,29 @@
+---
+// 舊網址 /templates/<id>/ 的轉址頁。每個範本原本有自己的一頁，現在改在範本總覽頁的對話框裡預覽，
+// 這一頁只把讀者送到 /templates/?t=<id>（直接打開那個範本的預覽）。
+// 不是 Starlight 的頁面，所以不在搜尋索引和側欄裡；也不給搜尋引擎收錄（noindex）。
+import { TEMPLATES, getTemplate, templateUrl } from '../../data/template-catalog';
+
+export function getStaticPaths() {
+  return TEMPLATES.map((entry) => ({ params: { id: entry.id } }));
+}
+
+const entry = getTemplate(Astro.params.id ?? '');
+const target = templateUrl(entry);
+---
+
+<!doctype html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <meta http-equiv="refresh" content={`0; url=${target}`} />
+    <title>{`${entry.名稱}｜範本｜慈濟 CIS UIKit`}</title>
+  </head>
+  <body>
+    <p>
+      範本的頁面已經移到範本總覽。<a href={target}>打開「{entry.名稱}」的預覽</a>
+    </p>
+  </body>
+</html>

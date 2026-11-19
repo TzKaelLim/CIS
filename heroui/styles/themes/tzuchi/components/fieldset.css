@@ -1,0 +1,75 @@
+/* ==========================================================================
+   Fieldset — Tzu Chi theme override
+   Destination: styles/themes/tzuchi/components/fieldset.css
+   (layer: components, imported after ../../../components/fieldset.css).
+
+   WHAT THIS CHANGES — one declaration.
+
+     .fieldset__legend  font-weight  500 -> 700
+
+   EVIDENCE. A legend is the label of a field GROUP, i.e. the R1 "control
+   label" role (16 / 700 / 1.5). R1's "Replaces (HeroUI)" column names
+   `text-base` + `font-medium` — which is exactly fieldset.css:9 — and the
+   fix is the same shape R11 uses for an overlay heading: "font-weight: 700
+   only, HeroUI's `text-base` is already 16/1.5" (modal.css:81-83). Base
+   `text-base` is 16px / 24px = 16 / 1.5, so size and line-height are already
+   the Tzu Chi subtitle metrics and are NOT restated (N5). Colour
+   (`text-foreground` -> --foreground) is already right (D1).
+
+   The legend therefore lands on the same 16 / 700 / 1.5 as a field's own
+   Label (see label.css). That is deliberate: Tzu Chi's type scale has a
+   single "subtitle" voice and the spec gives no larger group-heading role;
+   the legend is distinguished by position and by the 24px gap below it, not
+   by size. Conservative choice from the closest role, per METHOD step 1.
+
+   LEFT EXACTLY AS HEROUI HAS IT — every gap in this component is already on
+   the Tzu Chi 4px rhythm, and R145 says so in writing ("HeroUI's bases today
+   are mt-4 (16px, checkbox/radio) and gap-6 (24px, switch/fieldset) — both
+   are already on the Tzu Chi 4px rhythm, so the safe move is to change
+   nothing"):
+
+     · `.fieldset { gap-6 }` = 24px between legend / description / field
+       group / actions — R145's "between sections" value, --tc-space-24.
+     · `.fieldset__field-group { space-y-4 }` = 16px between fields
+       (--tc-space-16).
+     · `.fieldset__actions { gap-2 }` = 8px — already R150's action-row gap
+       (--tc-space-8) — and its `pt-1` (4px), a micro gap §9 R154 also lands
+       on.
+     · `shrink grow basis-0` (the Safari legend-in-flexbox fix), `w-full`,
+       `flex items-center` — structure, not design (D32).
+     · The `data-disabled="true"` mirroring and the React Aria context
+       forwarding in fieldset.tsx:48-90 — behaviour (D32). The disabled look
+       it drives is `status-disabled` / --disabled-opacity 0.38, already right
+       (D2 / R85).
+     · `.fieldset__description` — fieldset.styles.ts:9 declares the slot but
+       no base rule exists for it; the stock story uses the shared
+       `<Description>` instead, which description.css already themes. Nothing
+       invented here.
+
+   CASCADE
+   (0,2,0) — attribute + class — against base fieldset.css:8-10 (0,1,0). No
+   other base or theme file declares a font-weight that reaches
+   `.fieldset__legend`, and label.css's rule cannot reach it either (a legend
+   carries `.fieldset__legend`, never `.label`), so nothing ties.
+
+   Reviewed: no changes. Verified against the live files, not just the
+   report — base fieldset.css confirmed exactly: `.fieldset { flex flex-col
+   gap-6; shrink grow basis-0 }`, `.fieldset__legend { text-base font-medium
+   text-foreground }` (0,1,0), `.fieldset__field-group { w-full space-y-4 }`,
+   `.fieldset__actions { flex items-center gap-2 pt-1 }` — every gap already
+   on the 4px rhythm R145 describes. Confirmed `fieldset.styles.ts`'s
+   `slots.legend = "fieldset__legend"`, so the rendered `<Fieldset.Legend>`
+   really carries this class, and confirmed via
+   fieldset.stories.tsx `Default` that the legend and a sibling
+   `<Description>` both render as claimed. Confirmed no other file declares a
+   font-weight on `.fieldset__legend`, so no tie exists beyond the base rule
+   it beats outright. Grepped clean for colour literals, --tc-color-,
+   !important, physical left/right; comment delimiters balanced. No
+   corrections needed.
+   ========================================================================== */
+
+[data-theme^="tzuchi"] .fieldset__legend {
+  /* R1 / R11 — group label is the subtitle voice; `text-base` already gives
+     16px on a 1.5 line box, so only the weight moves. */
+  font-weight: var(--tc-font-weight-bold, 700);
+}

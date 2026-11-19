@@ -1,0 +1,141 @@
+/* ==========================================================================
+   Label — Tzu Chi theme override
+   Destination: styles/themes/tzuchi/components/label.css
+   (layer: components, imported after ../../../components/label.css).
+
+   Label is a SHARED primitive: every field family member (TextField, Select,
+   SearchField, NumberField, DateField/TimeField, ColorField, ComboBox,
+   InputGroup, InputOTP …), every field GROUP (CheckboxGroup, RadioGroup) and
+   the option rows of ListBox/Menu all render it. Base label.css:4 is
+   `text-sm font-medium text-foreground` — 14px / 500 / 20px.
+
+   WHAT THIS CHANGES — type only, one declaration block.
+
+     · font-size    14px  ->  16px   (§1 R1; Tzu Chi has no 14px step)
+     · font-weight   500  ->   700   (§1 R1 / §1.2 "is the control" -> subtitle)
+     · line-height   20px ->  24px   (1.5, the control voice)
+
+   EVIDENCE. A field's own label is the "control label" role R1
+   (16 / 700 / 1.5). R1's "Replaces (HeroUI)" column names `text-sm
+   font-medium` exactly. The Tzu Chi source is unambiguous:
+   tc-input.styles.ts:14-17 and tc-textarea.styles.ts:14-17 both set
+   `.label { font: var(--tc-typography-subtitle, 700 16px/1.5) }`, and
+   gap-audit/input.md:80-82 records that label as "not transferable" because
+   HeroUI splits it into this file. This is that file.
+
+   Colour is NOT restated: base `text-foreground` already resolves to
+   --foreground = tc color.text.default, exactly what tc-input's label uses
+   (N5 / D1).
+
+   THE EXCLUSION LIST (zero-specificity, so it does not change the cascade)
+   `:not(:where(...))` contributes 0 to specificity, so this rule stays at
+   (0,2,0). Two families are excluded, because in both the spec assigns this
+   element a DIFFERENT role and an override file has already implemented it:
+
+     (a) .checkbox__content, .radio__content, .switch__content
+        A selection control's label is PROSE, not a control label
+        (§1.2 "label of a checkbox" -> body 400 16px/1.6; R5).
+        checkbox.css:129-134, radio.css:156-161 and switch.css:118-123 set
+        that on the CONTENT container and let the label inherit it. A direct
+        declaration here would beat inheritance regardless of specificity, so
+        the label must be excluded, not out-specified. The stock stories put
+        plain text in that slot, but base checkbox.css:20, radio.css:22 and
+        switch.css:231 all support a real Label there.
+
+     (b) .progress-bar, .slider, .meter, .color-slider
+        R19 (numeric readout): the label is the row-mate of a numeric output
+        and must carry the OUTPUT's metrics — 16px / 1.6 — with its weight
+        left at HeroUI's so the two share a baseline in the
+        `"label output"` grid row. progress-bar.css:126-131 ships exactly
+        that and says in writing that the weight stays HeroUI's; this pass's
+        slider.css, meter.css and color-slider.css each repeat it verbatim.
+        Those rules are (0,3,0) and only set font-size and line-height, so
+        without this exclusion the 700 below would still land on them and
+        contradict four files at once.
+
+   ProgressCircle is NOT excluded: it has no `[data-slot="label"]` rule of
+   its own, and its story renders the Label as a sibling OUTSIDE
+   `.progress-circle` (progress-circle.stories.tsx:127-133) — a standalone
+   label, so R1 is the right default.
+
+   LEFT EXACTLY AS HEROUI HAS IT
+     · colour, in every state: --foreground at rest, `text-danger` for
+       `.label--invalid` / `[data-invalid="true"] .label`, `status-disabled`
+       for `.label--disabled` (D1, D2, R86).
+     · the required marker: its content, its colour and its `after:ms-0.5`
+       (2px) inset. tc uses 4px (tc-input.styles.ts:19-22) but §9 has no rule
+       for a required-marker gap, and the base rule's third branch
+       `[data-required="true"]:not(...):not(...):not(...) > .label` is
+       (0,5,0) — three mirrored high-specificity selectors to move an
+       asterisk 2px is not a trade this pass should make (Rule 6, restraint).
+     · `w-fit` / `select-none` / `cursor` and every per-host layout rule
+       (select.css:12-14, date-field.css:12-14, list-box-item.css:21-23 …):
+       geometry, not type.
+     · the 4px label-to-control gap: already theme-wide via each field's
+       `gap-1` (R141 — "do not restate").
+
+   CASCADE
+   (0,2,0) — attribute + class. It beats base label.css:4 (0,1,0) outright
+   and ties the per-host `[data-slot="label"]` rules inside `.select`,
+   `.date-field`, `.time-field`, `.color-field`, `.combo-box`,
+   `.number-field`, `.search-field`, `.list-box-item`, `.menu-item` and
+   `.color-picker` (all (0,2,0), none of which set a font-size or weight
+   except the readout family excluded above), winning on source order because
+   this theme's components/index.css is imported after @heroui/styles into
+   the same unlayered "components" layer. It deliberately LOSES to every
+   (0,3,0)+ theme rule already shipped: list-box-item.css:68-72,
+   dropdown.css:117-128 and select.css:267-274, which own their own option-row
+   label metrics (R4 / R94) and already land on the same 16 / 700 / 1.5.
+
+   Reviewed: no changes. Verified against the live files, not just the
+   report — base label.css:4 is exactly `text-sm font-medium text-foreground`
+   (0,1,0, confirmed); labelVariants' tv() base is `"label"` unconditionally
+   (react/src/components/label/label.tsx + styles/src/components/label/
+   label.styles.ts), so every Label instance really carries `.label`,
+   including inside a selection control's content and a readout row.
+   Confirmed the three exclusion targets' own theme rules set font-weight
+   directly on the content container (checkbox.css:129-134 `.checkbox__content
+   { font-weight: var(--tc-font-weight-regular, 400) }`, radio.css:156-161
+   `.radio__content { … }`, switch.css:118-123 `& .switch__content { … }`) —
+   a direct `.label` declaration would beat that by inheritance regardless of
+   specificity, so the exclusion is load-bearing, not decorative. Confirmed
+   the R19 family — progress-bar.css:126-131 already shipped, and this pass's
+   slider.css:147-150 / meter.css:90-93 / color-slider.css:110-113 all set
+   only `[data-slot="label"] { font-size; line-height }` at (0,3,0), weight
+   untouched — so the exclusion is exactly what keeps this rule's 700 off
+   them. Confirmed the two component index.css files share the unlayered
+   `components` layer and import order (styles/index.css:14 `@import
+   "./components/index.css" layer(components)`; themes/tzuchi/index.css's own
+   header: "must be imported AFTER @heroui/styles … so the two imports land
+   in the top-level … components layers next to HeroUI's own"), so every
+   source-order tie-break claim above holds. Confirmed the ten per-host
+   `[data-slot="label"]` base rules cited (select.css:12-14 through
+   color-picker.css:29) set no font-size/weight/line-height, so ties with them
+   are inert. Confirmed `--tc-font-size-16` (16px), `--tc-font-weight-bold`
+   (700) and `--tc-line-height-normal` (1.5) in tokens.css:82-93 and that
+   neither dark block (`[data-theme="dark"]` at :410, the
+   `prefers-color-scheme` block at :435) redeclares any of them — genuinely
+   mode-independent. Grepped clean for `--tc-color-`, hex/rgb/hsl/oklch
+   literals, `!important`, physical left/right. Comment open/close counts
+   balanced, no premature comment closes. No corrections needed.
+   ========================================================================== */
+
+[data-theme^="tzuchi"]
+  .label:not(
+    :where(
+      .checkbox__content *,
+      .radio__content *,
+      .switch__content *,
+      .progress-bar *,
+      .slider *,
+      .meter *,
+      .color-slider *
+    )
+  ) {
+  /* R1 — the control's own label: subtitle, 700 16px/1.5.
+     Longhands, not the `font` shorthand, so the theme's --font-sans is not
+     re-declared (same convention as list-box-item.css:63-65). */
+  font-size: var(--tc-font-size-16, 16px);
+  font-weight: var(--tc-font-weight-bold, 700);
+  line-height: var(--tc-line-height-normal, 1.5);
+}

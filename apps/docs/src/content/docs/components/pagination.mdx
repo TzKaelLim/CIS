@@ -1,10 +1,74 @@
 ---
-title: Pagination
-description: tc-pagination — 分頁導覽，頁碼按鈕與上一頁／下一頁控制，頁數過多時以省略號收合。
+title: 分頁
+description: 內容分成很多頁時，切換第幾頁。
 ---
 
 import Demo from '../../../components/Demo.astro';
 import PropsTable from '../../../components/PropsTable.astro';
+import ComponentMeta from '../../../components/handbook/ComponentMeta.astro';
+import PreviewTile from '../../../components/handbook/PreviewTile.astro';
+import DoDont from '../../../components/handbook/DoDont.astro';
+import StorybookNote from '../../../components/handbook/StorybookNote.astro';
+import SiteLook from '../../../components/handbook/SiteLook.astro';
+
+<ComponentMeta id="pagination" />
+
+<PreviewTile size="hero" scale={0.8} interactive>
+  <tc-pagination total="8" page="1" style="flex-basis:100%"></tc-pagination>
+  <tc-pagination total="20" page="10" style="flex-basis:100%"></tc-pagination>
+</PreviewTile>
+
+## 用法
+
+分頁用在同一份列表分成很多頁的時候，例如新聞列表、搜尋結果，讓讀者切換到第幾頁，或往前、往後一頁。頁數多時，中間的頁碼會收成「…」，第一頁、最後一頁和目前頁碼的前後一頁一直看得到（見上方的預覽）。分頁元件只有這一排按鈕，換頁之後要顯示哪些內容，由網站自己處理。只有兩三組不同的內容要切換時，請改用「頁籤」。
+
+## 組成
+
+| 部位       | 說明                                                                               |
+| ---------- | ---------------------------------------------------------------------------------- |
+| 上一頁按鈕 | 左邊的箭頭。在第一頁時變淡，不能按。螢幕閱讀器唸作「上一頁」。                     |
+| 頁碼       | 每一頁一個按鈕，螢幕閱讀器唸作「第 3 頁」這樣的完整說法。                          |
+| 目前頁碼   | 讀者現在所在的那一頁，用主題的主色當底，文字用和底色對比的顏色。                            |
+| 省略號     | 頁數多時代替中間收起來的頁碼，只是提示，不能按。                                   |
+| 下一頁按鈕 | 右邊的箭頭。在最後一頁時變淡，不能按。螢幕閱讀器唸作「下一頁」。                   |
+| 焦點框     | 用鍵盤選到任一個按鈕時出現的外框，讓不用滑鼠的人知道目前在哪裡。顏色跟著主題。 |
+
+## 該做與不該做
+
+:::caution[草稿]
+這一節是草稿，待美編（設計）確認。
+:::
+
+<DoDont
+  rows={[
+    {
+      kind: 'do',
+      text: '把分頁放在列表的下方，讀者看完這一頁的內容後，自然就會看到下一頁的按鈕。',
+    },
+    { kind: 'do', text: '每頁的筆數在同一個網站保持一致，讀者才能估計還有多少內容。' },
+    {
+      kind: 'do',
+      text: '手機上保持預設的「目前頁碼前後各一頁」。這一排按鈕不會換行，前後顯示的頁數越多，越容易超出窄畫面。',
+    },
+    { kind: 'dont', text: '只有一頁內容時，不要顯示分頁。' },
+    {
+      kind: 'dont',
+      text: '不要用分頁切換不同類別的內容，例如「慈善」「醫療」；依分類篩選同一份列表請用「膠囊標籤」。',
+    },
+  ]}
+/>
+
+## 在目前主題下的樣子
+
+<SiteLook />
+
+上方的大預覽會跟著頁首的「主題」和「色彩模式」一起變。
+
+## 給工程師
+
+以下是給工程師的安裝與 API 說明，美編（設計）、網站的編輯和致遠（廠商）可以略過。
+
+<StorybookNote tag="tc-pagination" />
 
 `<tc-pagination>` 提供分頁導覽：上一頁、頁碼、下一頁。目前頁碼以品牌主色凸顯並標記 `aria-current="page"`，頁數過多時以省略號收合。下方為**可互動的真實元件**：
 
@@ -18,8 +82,6 @@ import PropsTable from '../../../components/PropsTable.astro';
   <tc-pagination total="20" page="10"></tc-pagination>
   <tc-pagination total="20" page="10" sibling-count="2"></tc-pagination>
 </Demo>
-
-## 用法
 
 ### 純 HTML
 
@@ -43,19 +105,19 @@ import { TcPagination } from '@tzuchi/react';
 <TcPagination total={8} page={page} onTcPageChange={(e) => setPage(e.detail.page)} />;
 ```
 
-## 事件
+### 事件
 
 | 事件名稱         | detail            | 說明                       |
 | ---------------- | ----------------- | -------------------------- |
-| `tc-page-change` | `{ page: number }` | 頁碼改變時派發（會冒泡）。 |
+| `tc-page-change` | `{ page: number }` | 頁碼改變時發出（會冒泡）。 |
 
-## API
+### API
 
 下表自 Custom Elements Manifest 自動產生：
 
 <PropsTable tag="tc-pagination" />
 
-## 無障礙（Accessibility）
+### 無障礙（Accessibility）
 
 - 外層為 `<nav aria-label>`，頁碼與上一頁／下一頁皆為原生 `<button>`，支援鍵盤 Enter / Space。
 - 目前頁碼標記 `aria-current="page"`，每個頁碼具有 `aria-label`（如「第 3 頁」）。

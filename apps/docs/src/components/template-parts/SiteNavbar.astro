@@ -1,0 +1,32 @@
+---
+// 範本共用的網站頁首：用真正的 <tc-navbar>。current 是目前所在的選單項目（加粗、品牌色）。
+interface Props {
+  current?: string;
+}
+
+const { current } = Astro.props;
+const ITEMS = ['關於慈濟', '慈善', '醫療', '教育', '人文', '活動訊息'];
+---
+
+<tc-navbar variant="light">
+  <span slot="brand" class="tpl-brand">
+    <span class="tpl-brand-mark" aria-hidden="true">慈</span>
+    慈濟基金會
+  </span>
+  {
+    ITEMS.map((item) => (
+      <tc-link href="#" variant="subtle" class:list={{ 'is-current': item === current }}>
+        {item}
+      </tc-link>
+    ))
+  }
+  <tc-icon-button slot="actions" label="搜尋"><tc-icon name="search"></tc-icon></tc-icon-button>
+  <tc-button slot="actions" variant="filled">我要捐款</tc-button>
+</tc-navbar>
+
+<style>
+  .is-current {
+    font-weight: 700;
+    color: var(--tc-color-brand-primary);
+  }
+</style>

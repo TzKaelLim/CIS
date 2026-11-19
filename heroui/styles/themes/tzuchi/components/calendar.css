@@ -1,0 +1,258 @@
+/* ==========================================================================
+   Calendar — Tzu Chi theme overrides
+   Destination: styles/themes/tzuchi/components/calendar.css
+   Layer: `components`, imported AFTER styles/components/calendar.css.
+   ==========================================================================
+
+   WHAT THIS CHANGES (three declarations; everything else is HeroUI's)
+
+   1. Cell shape  — the day cell's `rounded-3xl` (calc(--radius * 3) = 24px on
+                    a 36px box, i.e. a circle) becomes the Tzu Chi square-ish
+                    cell, 4px.  DESIGN-LANGUAGE §2 R33 ("square-ish cell —
+                    pagination item", resolved 4px); the calendar day grid is
+                    the same role as a pagination strip — a set of equal cells
+                    where selection is the only state that matters (§5 R81).
+                    Same resolved value as pagination.css:93
+                    (--tc-pagination-radius → --tc-radius-sm → 4px); written
+                    here as --tc-radius-sm directly, the form link.css:40 uses
+                    for a radius that is not the owning component's token.
+
+   2. Cell type   — `text-sm font-medium` (14px/500, 20px line box) becomes the
+                    Tzu Chi numeric-grid step 16px/400/1.6.  §1 R21 sends
+                    "calendar day cells" explicitly to R16, the pagination
+                    number: 16 / 400 / 1.6.  The Tzu Chi scale has no 14px and
+                    no 12px step (§1, §0 token list), so this is mechanical,
+                    not a judgement call.
+
+   3. Selected    — the chosen day takes the `subtitle` weight 700, exactly as
+      weight       pagination's current page does (§1 R16 "+ current page
+                   font-weight: 700"; §5 R81's declaration set).  The fill is
+                   NOT touched: HeroUI already paints [data-selected] with
+                   --accent / --accent-foreground, which is R81's own answer
+                   and resolves to tc brand.primary / text.on-brand in both
+                   modes.
+
+   4. Heading     — the month/year `.calendar__heading` moves off `text-sm
+                    font-medium` (14/500) onto the control-label voice,
+                    16/700/1.5 (§1 R1 + §1.2: the heading IS the control, so it
+                    takes `subtitle`, not `body`).  The identical rule is in
+                    calendar-year-picker.css for the trigger form of the same
+                    text, so a Calendar and a Calendar-with-year-picker have
+                    the same headline.
+
+   NOT CHANGED, deliberately
+
+   - COLOUR: nothing.  Under this theme the base file already speaks Tzu Chi:
+     [data-selected] = --accent + --accent-foreground (§5 R81), [data-today] =
+     --accent-soft (+ --accent-soft-hover on hover), hover = --default,
+     [data-outside-month] = --muted at 50%, [data-unavailable] / :disabled =
+     `status-disabled` (--disabled-opacity 0.38, §5 R85, §10 D2).
+   - HOVER stays the neutral --default and does NOT become --accent-soft
+     (§5 R78).  §5 R88 ③ — "anything where a brand tint would falsely read as
+     selected" — governs here: inside this component --accent-soft is already
+     load-bearing as the TODAY marker (and, in RangeCalendar, as the selection
+     band).  Painting hover with it would make resting-today and hovered-day
+     pixel-identical.  Measured: today vs hover is 1.04:1 light / 1.06:1 dark
+     in luminance but differs in HUE (blue-100 vs gray-100 / blue-900 vs
+     gray-900); collapsing them to one token would delete the only channel
+     that separates them.  Recorded as a deviation from R78 in the report,
+     with the pagination inconsistency it creates.
+   - WEEKDAY HEADER `.calendar__header-cell` keeps its 12px (§1.3 row 1 and
+     §1 R8: a structural label above the rows it introduces keeps 12px; only
+     its inset ever moves, and here it is already flush with the cells).
+   - NAV BUTTONS: untouched.  Radius — `rounded-2xl` is 16px on a 24px box, so
+     the used value is already a full circle, which is what §2 R24 asks for;
+     restating it would be noise (§0 N5).  Box/icon — 16px glyph on a 24px box
+     is the exact proportion §1.3 row 4 protects for `.close-button`
+     (0.67 vs tc's 20-on-32 = 0.63), and §10 D8 keeps that shared 24px box.
+   - CELL INDICATOR, header padding (px-0.5 pb-4 — 16px is already on the
+     4px rhythm), grid geometry, `aspect-square`, the 252px width, week-view /
+     day-view modifiers, press-scale, transitions (§8 R136: the base uses
+     `transition` shorthands, so re-timing background-color would mean
+     restating HeroUI's transform/box-shadow channels AND both reduced-motion
+     guards for an imperceptible 100ms→150ms move), and the focus ring
+     (§4 R70, §10 D3 — already 2px --focus at 2px offset, and nothing in the
+     day grid clips it: `container-type: inline-size` contains layout, not
+     paint).
+   - The Calendar CONTAINER: §6(b) names "Calendar/RangeCalendar containers"
+     for the 16px content-popover surface, but a standalone `.calendar` paints
+     no background, border, radius or padding — that chrome lives on the
+     DatePicker / DateRangePicker popover, which is another unit's file
+     (hard rule 7, ownership).
+
+   CASCADE
+
+   Every selector below is a clear win, not a tie:
+     .calendar__heading                (0,1,0) → (0,2,0)
+     .calendar__cell                   (0,1,0) → (0,2,0)
+     .calendar__cell[data-selected]    (0,2,0) → (0,3,0)
+   The base sets font-weight only on `.calendar__cell` (0,1,0), so the
+   selected-state weight has no competitor at all.  No base rule is hidden:
+   today, hover, pressed, focus-visible, outside-month, unavailable, disabled,
+   readonly, multiple-selection, week-view and day-view all keep their own
+   declarations and simply inherit the new radius and type.
+
+   Reviewed: no changes. Verified against the live sources — .calendar__heading
+   and .calendar__cell (incl. text-sm/font-medium, rounded-3xl) exist exactly
+   as cited in styles/components/calendar.css and are emitted by
+   calendar.styles.ts's `heading`/`cell` slots; every rule and nested `&` is
+   scoped [data-theme^="tzuchi"]; only --tc-radius-sm, --tc-font-size-16,
+   --tc-font-weight-regular/-bold and --tc-line-height-normal/-relaxed appear,
+   all confirmed mode-independent (absent from both of tokens.css's dark
+   blocks) with fallbacks, and no --tc-color-*, hex/rgb/hsl/oklch literal,
+   invented --tzuchi-*, !important or physical left/right property appears;
+   hand-derived cascade confirms .calendar__heading (0,1,0)→(0,2,0) and
+   .calendar__cell (0,1,0)→(0,2,0) are clean wins with no competing base
+   declaration, and .calendar__cell[data-selected="true"] (0,2,0 base with no
+   font-weight declared there at all) is beaten outright by the override's
+   (0,3,0); no HeroUI state, size or variant is hidden; all 3 comments open
+   and close cleanly with no premature "*" + "/" closure. Every assertion's
+   storyId, selector and computed value re-checked against the real base
+   markup and confirmed; none dropped.
+
+   PASS 4 (2026-09-20) — weekday header cell 12px -> 16px / 1.6.
+   This SUPERSEDES the "WEEKDAY HEADER `.calendar__header-cell` keeps its
+   12px" bullet above.  The completeness sweep ruled (the integrator's call, delegated by the owner) that
+   Tzu Chi has no type step below 16px anywhere, so §1's mechanical rule —
+   "every 12px (`text-xs`) role moves to 16px" — applies here too; §1.3's
+   exception list never covered this cell (it names `.header`,
+   `.badge__label`, `.breadcrumbs__separator`, `.close-button svg` and the
+   toast spinner, not the calendar weekday row), so the earlier reading of
+   §1.3 row 1 / R8 was an extension of R8's `.header`, not R8 itself.
+   Line-height moves with the size, onto the 1.6 the day numerals already
+   carry (R21 -> R16), instead of being left in Tailwind's `text-xs` 16px
+   line box: the header cell grows 24px -> 33.6px tall and the grid below it
+   is untouched.  WEIGHT stays HeroUI's 500 (N5 — do not restate): keeping it
+   under the 700 of a subtitle is what still makes the weekday row read as
+   subordinate to the numerals it introduces, which was R8's actual concern.
+   COLOUR stays --muted: this row sits on the calendar surface, not on a
+   fill, so the new "no muted text on a fill" rule does not reach it, and its
+   contrast against the surface is a token-level matter (out of scope).
+   FIT, measured in the browser at 16px against a real 36px column
+   (`.calendar` is `w-63` = 252px, / 7), with React Aria's own
+   weekdayStyle="short" labels (calendar.tsx:287) for every locale the
+   Storybook i18n addon offers: zh-TW / zh-CN "週日" = 32.0px — two CJK
+   glyphs are 2em in any CJK font, so that one is font-independent — en-US /
+   en-GB "Wed" = 34.3px, de-DE "Mo" = 24.1px, ja-JP "日" = 16.0px, hi-IN
+   (the `--international-calendar` story) "मंगल" = 30.0px, all on one line,
+   and the same in the `--multiple-months` (37px columns), `--three-months`,
+   `--week-view` and `--day-view` stories and in the DatePicker /
+   DateRangePicker popovers.
+   NINE locales set a label WIDER than the 36px column and are REPORTED, not
+   worked around (the brief: name the locale rather than shrink the type, and
+   the 36px column is HeroUI's own): pt-PT (66.5px), lv-LV (62.2) and ar-AE
+   (53.7) already overset at 12px (50.4 / 48.1 / 40.7), so they are the base
+   file's problem, not this rule's; pl-PL (46.2), pt-BR (38.3), ro-RO (38.3),
+   da-DK (37.4), nb-NO (37.4) and fr-FR / fr-CA (36.4) newly cross it, by
+   0.4-10.2px; he-IL's "יום א׳" wraps to two lines.  Nothing clips — the cell
+   sets no overflow — the label simply centres wider than its column.  See
+   reports/fills-and-scale.md.
+
+   Pass 4 reviewed (2026-09-20): no changes to the CSS. Diffed this file
+   against the live styles/themes/tzuchi/components/calendar.css and confirmed
+   only the briefed `.calendar__header-cell { font-size / line-height }` rule
+   and its comment are new — nothing else moved or reformatted. Re-probed the
+   live weekday cell with this file injected: 16px / 25.6px line-height (1.6),
+   weight still 500, colour still rgb(130,130,130) light / rgb(179,179,179)
+   dark (--muted, unchanged) — a clean (0,2,0) win over the base's (0,1,0),
+   confirmed against the actual base file, and no font-weight or colour
+   declared on this element anywhere else to compete with it. Opened the
+   provided evidence screenshots and took my own: `--default` (zh-TW "週日"),
+   `--international-calendar` (hi-IN "मंगल"), `--multiple-months` and
+   `--three-months` all render the header row at the new size with every
+   label sitting inside its 36/37px column with no clipping or wrapping,
+   matching the file's measurements. Re-checked selected/today/hover/outside-
+   month/unavailable/disabled/week-view/day-view: all unchanged and still
+   correct — the header-cell rule touches no colour, weight or state. Comment
+   safety, colour-literal, !important, physical-property and scope scans:
+   clean.
+
+   Pass 5 (2026-09-20): today now carries a 1px --accent ring inside its own
+   4px corner, here and in range-calendar.css, so both calendars mark today
+   the same way.  WHY: squaring the day cell to 4px (item 1 above) deleted the
+   shape channel HeroUI used to keep today apart from a selection — upstream's
+   today is a full circle on a 36px box, the Tzu Chi today is a 4px rectangle
+   like every other state.  In the RangeCalendar the collision is total: the
+   selection band and the today marker are both --accent-soft on a 4px
+   rectangle, so a today inside the range disappears and a today beside it
+   reads as a selected day.  A ring restores the channel without touching any
+   fill: today keeps --accent-soft, which is still HeroUI's own answer.
+   MECHANISM — outline, not box-shadow: `status-focused` (utilities/index.css
+   :1-6) paints the focus ring as a Tailwind `ring`, i.e. as box-shadow, so a
+   box-shadow marker and the focus ring would evict one another; `outline` is
+   free, because the base sets only `outline-none` on this cell and never a
+   width or a colour of its own.  outline-offset is negative so the ring sits
+   INSIDE the 4px corner and cannot collide with the 2px focus ring outside it
+   (verified in the browser: a focused today shows both, concentric, nothing
+   clipped).
+   SELECTED: on a selected day the fill is --accent, so the ring flips to
+   --accent-foreground — the same pair HeroUI already paints on that cell — and
+   today stays legible as today while it is selected.  Both are HeroUI theme
+   variables and resolve in tzuchi and tzuchi-dark alike.
+   SPECIFICITY: `[data-theme^="tzuchi"] .calendar__cell[data-today="true"]` is
+   (0,3,0) — a tie with the base's `.calendar__cell:focus-visible:not(
+   [data-focused])` (0,3,0) that this file wins on import order, and a win over
+   `.calendar__cell[data-focus-visible="true"]` (0,2,0); the selected flip is
+   (0,4,0).  Nothing else in the base file declares an outline on this element,
+   and no fill, weight, colour, size or state is removed.
+
+   Pass 5 reviewed (2026-09-20): no changes. Diffed against the live
+   styles/themes/tzuchi/components/calendar.css — only the briefed today-ring
+   rules are new; nothing else moved, reordered or reformatted. Confirmed
+   --accent and --accent-foreground are mapped in both [data-theme="tzuchi"]
+   and [data-theme="tzuchi-dark"]. Re-probed in the browser (both themes):
+   today at rest shows outline-width 1px / outline-color = --accent /
+   outline-offset -1px on a --accent-soft fill; today selected via keyboard
+   (Tab x3, Enter — the grid focuses today by default) flips outline-color to
+   --accent-foreground (white in tzuchi, --eclipse in tzuchi-dark) on the
+   --accent fill, concentric with the 2px focus box-shadow ring outside it,
+   nothing clipped. Comment safety (no early "*" "/" close), colour-literal,
+   !important, physical-property and scope scans: clean.
+   ========================================================================== */
+
+[data-theme^="tzuchi"] .calendar__heading {
+  /* R1 / §1.2 — the heading IS the control: subtitle 700 16px/1.5. */
+  font-size: var(--tc-font-size-16, 16px);
+  font-weight: var(--tc-font-weight-bold, 700);
+  line-height: var(--tc-line-height-normal, 1.5);
+}
+
+/* Pass 4 — R21/§1: no Tzu Chi type step below 16px.  The weekday label takes
+   the same 16px / 1.6 as the numerals it heads; weight (500) and colour
+   (--muted) stay HeroUI's.  Base `.calendar__header-cell` is (0,1,0), this is
+   (0,2,0), and nothing else in the base file declares type on this element. */
+[data-theme^="tzuchi"] .calendar__header-cell {
+  font-size: var(--tc-font-size-16, 16px);
+  line-height: var(--tc-line-height-relaxed, 1.6);
+}
+
+[data-theme^="tzuchi"] .calendar__cell {
+  /* R33 — square-ish cell, the pagination item's 4px. */
+  border-radius: var(--tc-radius-sm, 4px);
+
+  /* R21 → R16 — dense numeric grid: 16px / 400 / 1.6. */
+  font-size: var(--tc-font-size-16, 16px);
+  font-weight: var(--tc-font-weight-regular, 400);
+  line-height: var(--tc-line-height-relaxed, 1.6);
+
+  /* R16 / R81 — the selected day is the calendar's "current page".
+     Its --accent fill and --accent-foreground text are already HeroUI's. */
+  &[data-selected="true"] {
+    font-weight: var(--tc-font-weight-bold, 700);
+  }
+}
+
+/* Pass 5 — TODAY: the --accent-soft fill stays HeroUI's; the ring is what
+   separates it from a selected day now that both are 4px rectangles.  Inset by
+   its own width so it hugs the 4px corner and leaves the focus ring (a
+   box-shadow, 2px at 2px offset) its own space outside. */
+[data-theme^="tzuchi"] .calendar__cell[data-today="true"] {
+  outline: 1px solid var(--accent);
+  outline-offset: -1px;
+}
+
+/* Pass 5 — today AND selected: the fill under the ring is --accent, so the
+   ring takes that fill's own foreground and today is still marked. */
+[data-theme^="tzuchi"] .calendar__cell[data-today="true"][data-selected="true"] {
+  outline-color: var(--accent-foreground);
+}
