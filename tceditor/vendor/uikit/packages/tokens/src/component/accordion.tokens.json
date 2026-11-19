@@ -1,0 +1,14 @@
+{
+  "accordion": {
+    "header-fg": { "$type": "color", "$value": "{color.text.default}" },
+    "header-bg": { "$type": "color", "$value": "{color.surface.default}" },
+    "header-bg-hover": { "$type": "color", "$value": "{color.surface.subtle}" },
+    "panel-fg": { "$type": "color", "$value": "{color.text.default}" },
+    "border": { "$type": "color", "$value": "{color.border.default}" },
+    "radius": { "$type": "dimension", "$value": "{radius.md}" },
+    "chevron": { "$type": "color", "$value": "{color.text.muted}" },
+    "header-padding": { "$type": "dimension", "$value": "{space.16}" },
+    "panel-padding": { "$type": "dimension", "$value": "{space.16}" },
+    "focus-ring-color": { "$type": "color", "$value": "{focus-ring.color}" }
+  }
+}

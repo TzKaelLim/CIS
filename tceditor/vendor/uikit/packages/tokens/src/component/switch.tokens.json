@@ -1,0 +1,14 @@
+{
+  "switch": {
+    "width": { "$type": "dimension", "$value": "44px" },
+    "height": { "$type": "dimension", "$value": "24px" },
+    "thumb-size": { "$type": "dimension", "$value": "18px" },
+    "track-bg": { "$type": "color", "$value": "{color.border.strong}" },
+    "track-bg-checked": { "$type": "color", "$value": "{color.brand.primary}" },
+    "thumb-bg": { "$type": "color", "$value": "{color.white}" },
+    "label": { "$type": "color", "$value": "{color.text.default}" },
+    "radius": { "$type": "dimension", "$value": "{radius.full}" },
+    "disabled-opacity": { "$type": "number", "$value": "{opacity.disabled}" },
+    "focus-ring-color": { "$type": "color", "$value": "{focus-ring.color}" }
+  }
+}

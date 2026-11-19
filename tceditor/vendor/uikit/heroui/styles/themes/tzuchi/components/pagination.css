@@ -1,0 +1,206 @@
+/* ==========================================================================
+   Pagination — Tzu Chi theme overrides
+   Destination: styles/themes/tzuchi/components/pagination.css
+   Layer: `components`, imported AFTER ../../../components/pagination.css.
+   ==========================================================================
+
+   WHAT THIS CHANGES (everything else is left to HeroUI's base CSS)
+
+   1. Shape    — pill (rounded-3xl = 24px) becomes the Tzu Chi 4px square-ish
+                 item (--tc-pagination-radius → --tc-radius-sm).
+   2. Density  — item box 36px / 32px@md becomes 40px (--tc-size-icon-lg), and
+                 the page-number box grows past it instead of being a hard
+                 square (tc uses min-width + padding-inline 4px, so a 4-digit
+                 page number is not clipped).
+   3. Type     — text-sm/font-medium (14px/500) becomes the Tzu Chi body step
+                 16px/400/1.6; the current page takes the `subtitle` weight 700.
+                 The Tzu Chi scale has NO step below 16px, which is why the
+                 numbers, the ellipsis and the summary all move up.
+   4. Colour   — the current page is a brand-accent fill (tc `brand.primary` +
+                 `text.on-brand`), not HeroUI's neutral --default chip; hover is
+                 the brand tint (tc `brand.surface` = --accent-soft); the resting
+                 number colour is --foreground (tc `text.default`), which is
+                 also what the theme now maps --default-foreground to.
+                 All of it goes through HeroUI's own --pagination-link-* hooks,
+                 so no background/color is re-declared.
+
+   NOT CHANGED (documented in the report): gap (already 4px = --tc-space-4),
+   focus ring (already 2px --focus at 2px offset), disabled (already
+   --disabled-opacity + not-allowed), press-scale + transitions, nav-button
+   padding/gap and the 16px chevrons (Tzu Chi's nav button is icon-only and has
+   no labelled counterpart), the `1px solid transparent` border on tc `.item`
+   (border-box + transparent = no visual effect).
+
+   VARIANT / PART MAPPING
+     tc `.nav`                        → `.pagination__content`
+     tc `.item` (page number)         → `.pagination__link`
+     tc `.item[aria-current="page"]`  → `.pagination__link[data-active="true"]`
+     tc `.item.nav-button` (prev/next)→ `.pagination__link.pagination__link--nav`
+     tc `.ellipsis`                   → `.pagination__ellipsis`
+     tc has ONE size                  → `.pagination--md` (HeroUI's default)
+     no tc counterpart                → `.pagination--sm` / `.pagination--lg`
+                                        (re-pitched onto the same tc scale:
+                                        32/40/48px box, 16/16/20px text) and
+                                        `.pagination__summary` (kept muted,
+                                        only re-pitched onto the tc type scale).
+
+   `--pagination-item-size` / `--pagination-item-font-size` are local plumbing
+   in the spirit of HeroUI's own `--pagination-link-*`: declared on the root so
+   the size modifiers set them once and both the links and the ellipsis read
+   them. They are not theme variables and need no generator entry.
+
+   Reviewed: no changes. Verified against the real sources — every class and
+   data-attribute selector exists in styles/components/pagination.css or is
+   emitted by react/src/components/pagination/pagination.tsx; every rule
+   (including nested ones' compiled selector) carries the `[data-theme^="tzuchi"]`
+   prefix; no --tc-color-* / --tc-pagination-item-* token or hex/rgb/hsl/oklch
+   literal appears — every colour resolves through --foreground, --accent,
+   --accent-hover, --accent-foreground or --accent-soft, each confirmed against
+   packages/tokens/dist/tokens.css to land on the exact tc value in both light
+   and dark (so no extraThemeVars are needed); every mode-independent token
+   used (--tc-pagination-radius, --tc-size-icon-lg/-md, --tc-size-control-md,
+   --tc-space-4, --tc-font-size-16/-20, --tc-font-weight-regular/-bold,
+   --tc-line-height-relaxed) carries a fallback and none resolve to a colour or
+   shadow. Checked the cascade for every declaration this file must beat
+   (base's size-9/md:size-8, text-sm/font-medium, the --default chip on
+   [data-active="true"], and the sm/lg nested `.pagination--sm .pagination__link`
+   rules): each override selector is a specificity tie or win against its base
+   counterpart, and since this file is imported strictly after
+   styles/components/pagination.css in the same `components` layer, ties
+   resolve to the override in every state, size and breakpoint (logical
+   block-size/inline-size/padding-inline correctly compete with and beat the
+   base's physical height/width/padding for the same box side, per the CSS
+   Logical Properties cascade rule). No HeroUI variant, size or state (hover,
+   pressed, focus-visible, disabled, active) is hidden or broken — disabled,
+   focus ring, gap, cursor and transitions were already correct and are left
+   untouched, and the active item's hover is intentionally kept (via
+   --accent-hover) rather than removed, per hard rule 5, even though tc itself
+   suppresses hover on the current page. All 6 assertions from the audit were
+   re-derived independently and confirmed against the resolved token chain and
+   the `Default` story's actual markup; none were dropped.
+
+   Pass 5 (2026-09-20) — the focus ring hugs the cell: ring offset 0 here.
+   This SUPERSEDES the "focus ring (already 2px --focus at 2px offset)" entry
+   in NOT CHANGED.  WHY: the theme's other two decisions collide at this one
+   spot.  The gap between cells is HeroUI's `gap-1`, kept because it is
+   already 4px (--tc-space-4); the cell is no longer a 24px pill but a 4px
+   square that has grown from 32px to 40px.  A 2px ring at a 2px offset
+   reaches 4px outward, i.e. exactly across that gap, so tabbing to a page
+   number put its ring flush against the filled current-page chip — two
+   squares meeting corner to corner, which reads as a collision.  Upstream's
+   round pills keep daylight at the same spacing; square ones cannot.
+   Width and colour are untouched (2px --focus), so this is the same ring, a
+   ring's width closer in.  Applied to every `.pagination__link`, numbers and
+   the prev/next buttons alike, because they sit in the same 4px strip and one
+   strip should not carry two ring geometries.
+   MECHANISM: `status-focused` -> `focus-ring` reads its offset from
+   `--tw-ring-offset-width: var(--ring-offset-width)`
+   (styles/utilities/index.css:1-6), and --ring-offset-width is a theme-level
+   variable (themes/tzuchi/variables.css:24 = --tc-focus-ring-offset).
+   Re-pointing it on the link is a scoped, per-component answer that needs no
+   !important and no restating of the ring itself; the base never declares
+   --ring-offset-width on this element, so there is nothing to out-specify.
+   The value is a dimension, not a colour, and 0 has no token.
+
+   Pass 5 reviewed (2026-09-20): no changes. Diffed against the live
+   styles/themes/tzuchi/components/pagination.css — only the briefed
+   `--ring-offset-width: 0px` declaration on `.pagination__link` is new.
+   Re-probed in the browser (both themes, sm/md/lg sizes): the focus ring is
+   still 2px --focus, now at a 0px offset, hugging the cell instead of
+   reaching across the 4px gap into a neighbouring filled current-page chip;
+   focusing the current-page cell itself shows the same tight ring on its
+   navy fill. Comment safety, colour-literal, !important, physical-property
+   and scope scans: clean.
+   ========================================================================== */
+
+[data-theme^="tzuchi"] .pagination {
+  --pagination-item-size: var(--tc-size-icon-lg, 40px);
+  --pagination-item-font-size: var(--tc-font-size-16, 16px);
+}
+
+/* --------------------------------------------------------------------------
+   Page links (numbers + prev/next)
+   -------------------------------------------------------------------------- */
+
+[data-theme^="tzuchi"] .pagination__link {
+  /* Pass 5 — the ring hugs the cell: a 4px square in a 4px gap has no room
+     for a 2px offset.  `focus-ring` reads its offset from here. */
+  --ring-offset-width: 0px;
+
+  border-radius: var(--tc-pagination-radius, var(--radius-sm));
+  block-size: var(--pagination-item-size);
+
+  font-size: var(--pagination-item-font-size);
+  font-weight: var(--tc-font-weight-regular, 400);
+  line-height: var(--tc-line-height-relaxed, 1.6);
+
+  /* tc `pagination.item-fg` = color.text.default → --foreground.
+     (The theme now maps --default-foreground to that same token, so this no
+     longer changes the value; it keeps the intent explicit.) */
+  --pagination-link-fg: var(--foreground);
+
+  /* tc `pagination.item-bg-hover` = color.brand.surface → --accent-soft.
+     HeroUI keeps pressed == hover for this component; preserved. */
+  --pagination-link-bg-hover: var(--accent-soft);
+  --pagination-link-bg-pressed: var(--accent-soft);
+
+  /* Square-ish number cell: min box + padding, not a fixed square, so long
+     page numbers grow. Nav buttons keep HeroUI's w-auto + px-2.5/2/3. */
+  &:not(.pagination__link--nav) {
+    inline-size: auto;
+    min-inline-size: var(--pagination-item-size);
+    padding-inline: var(--tc-space-4, 4px);
+  }
+
+  /* Current page — tc paints it brand-primary with on-brand text and the
+     `subtitle` weight, where HeroUI uses the neutral --default chip. */
+  &[data-active="true"] {
+    --pagination-link-bg: var(--accent);
+    --pagination-link-bg-hover: var(--accent-hover);
+    --pagination-link-bg-pressed: var(--accent-hover);
+    --pagination-link-fg: var(--accent-foreground);
+
+    font-weight: var(--tc-font-weight-bold, 700);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Ellipsis — same box as an item; tc keeps it at text.default, not muted.
+   -------------------------------------------------------------------------- */
+
+[data-theme^="tzuchi"] .pagination__ellipsis {
+  inline-size: auto;
+  min-inline-size: var(--pagination-item-size);
+  block-size: var(--pagination-item-size);
+
+  color: var(--foreground);
+  font-size: var(--pagination-item-font-size);
+  line-height: var(--tc-line-height-relaxed, 1.6);
+}
+
+/* --------------------------------------------------------------------------
+   Summary — no tc counterpart; only re-pitched onto the tc type scale so it
+   does not sit 2px below every other glyph in the component.
+   -------------------------------------------------------------------------- */
+
+[data-theme^="tzuchi"] .pagination__summary {
+  font-size: var(--pagination-item-font-size);
+  line-height: var(--tc-line-height-relaxed, 1.6);
+}
+
+/* --------------------------------------------------------------------------
+   Size variants — tc ships one size (≙ md). sm/lg are re-pitched onto the same
+   tc dimension/type tokens so both stay distinct and on-scale.
+   Must come after the `.pagination` block above (equal specificity).
+   -------------------------------------------------------------------------- */
+
+[data-theme^="tzuchi"] .pagination--sm {
+  --pagination-item-size: var(--tc-size-icon-md, 32px);
+}
+
+/* .pagination--md is the tc size itself — nothing to add. */
+
+[data-theme^="tzuchi"] .pagination--lg {
+  --pagination-item-size: var(--tc-size-control-md, 48px);
+  --pagination-item-font-size: var(--tc-font-size-20, 20px);
+}

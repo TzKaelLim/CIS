@@ -1,0 +1,101 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": ["**/.env.*local"],
+  "globalEnv": ["NODE_ENV"],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**",
+        "dist/**",
+        "storybook-static/**"
+      ]
+    },
+    "@tzuchi/tceditor-storybook#build": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/packages/blocks/src/**",
+        "$TURBO_ROOT$/packages/blocks/styles.css",
+        "$TURBO_ROOT$/packages/spec/src/**",
+        "$TURBO_ROOT$/vendor/uikit/**",
+        "$TURBO_ROOT$/apps/showcase/public/demo-assets/**"
+      ],
+      "outputs": ["storybook-static/**"]
+    },
+    "lint": {
+      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/eslint.config.mjs"]
+    },
+    "test": {
+      "dependsOn": ["^build"]
+    },
+    "typecheck": {
+      "dependsOn": ["^build"]
+    },
+    "@tzuchi/tceditor#test": {
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/LICENSE",
+        "$TURBO_ROOT$/NOTICE",
+        "$TURBO_ROOT$/packages/plugin-heading-analyzer/package.json",
+        "$TURBO_ROOT$/packages/plugin-heading-analyzer/LICENSE",
+        "$TURBO_ROOT$/packages/plugin-heading-analyzer/NOTICE"
+      ]
+    },
+    "@tzuchi/tceditor-blocks#typecheck": {
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/vendor/uikit/**"]
+    },
+    "@tzuchi/tceditor-blocks#test": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/.editorconfig",
+        "$TURBO_ROOT$/.prettierrc.json",
+        "$TURBO_ROOT$/vendor/uikit/**",
+        "$TURBO_ROOT$/apps/showcase/public/demo-assets/**"
+      ]
+    },
+    "@tzuchi/tceditor-showcase#build": {
+      "dependsOn": ["^build", "typecheck"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/packages/blocks/package.json",
+        "$TURBO_ROOT$/packages/blocks/styles.css",
+        "$TURBO_ROOT$/packages/blocks/src/**",
+        "$TURBO_ROOT$/packages/spec/package.json",
+        "$TURBO_ROOT$/packages/spec/src/**",
+        "$TURBO_ROOT$/vendor/uikit/**"
+      ],
+      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**"]
+    },
+    "@tzuchi/tceditor-showcase#test": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/packages/blocks/package.json",
+        "$TURBO_ROOT$/packages/blocks/src/**",
+        "$TURBO_ROOT$/packages/spec/package.json",
+        "$TURBO_ROOT$/packages/spec/src/**"
+      ],
+      "passThroughEnv": ["SHOWCASE_DATA_DIR"]
+    },
+    "@tzuchi/tceditor-showcase#typecheck": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/packages/blocks/package.json",
+        "$TURBO_ROOT$/packages/blocks/styles.css",
+        "$TURBO_ROOT$/packages/blocks/src/**",
+        "$TURBO_ROOT$/packages/spec/package.json",
+        "$TURBO_ROOT$/packages/spec/src/**",
+        "$TURBO_ROOT$/vendor/uikit/**"
+      ]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    }
+  }
+}

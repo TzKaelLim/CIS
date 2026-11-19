@@ -1,0 +1,141 @@
+/* -------------------------------------------------------------------------------------------------
+ * Tzu Chi theme — AlertDialog
+ *
+ * AlertDialog is Modal's sibling: same backdrop / container / dialog / header / body / footer
+ * skeleton, same `animate-in` enter, same shared `.close-button`. It therefore takes the
+ * modal-like shell of DESIGN-LANGUAGE §6(c) verbatim, so a confirm dialog and a modal read as
+ * one surface. There is no `tc-alert-dialog`; every value below is the one `modal.css` already
+ * ships, which is itself traced to `tc-modal`.
+ *
+ * WHAT THIS CHANGES (everything else is HeroUI's, on purpose)
+ *   · dialog radius     min(32px, --radius-3xl) → 24px under this theme → 16px   [R28 / R103]
+ *   · dialog elevation  --overlay-shadow (elevation.3) → --tzuchi-modal-shadow
+ *                       (elevation.4, LIGHT ONLY — see the cascade note)          [R104]
+ *   · heading weight    500 (font-medium) → 700 (typography.subtitle)             [R11 / R105]
+ *   · body type         14px/1.43 in --muted → 16px/1.6 in --overlay-foreground   [R5 / R106]
+ *   · region rhythm     header→body 8px → 16px;  header/body→footer 20px → 24px   [R107]
+ *   · footer            wraps its action row                                      [R108]
+ *   · close trigger     a bare glyph at rest instead of a permanent --default chip [R109]
+ *   · enter motion      250ms ease-out-quad / 150ms ease-out → motion.duration.base
+ *                       + motion.easing.standard, on [data-entering] only          [R110 / R133]
+ *
+ * KEPT AS HEROUI (see the report for the reasoning)
+ *   dialog padding (24px, already --tc-modal-padding), the xs/sm/md/lg/cover size scale,
+ *   placement margins, backdrop colour and its opaque/blur/transparent variants (--backdrop is
+ *   deliberately unmapped, D31), the 40px status icon chip with its --default / -soft fills and
+ *   its 20px glyph (= --tc-size-icon-sm already; D17 keeps Modal's icon slot, and the brief keeps
+ *   these), the 12px header gap, the body's 3px scroll gutter, footer alignment + 8px gap,
+ *   close-trigger position (16px inset on a 24px box = the same 28px optical centre tc-modal
+ *   reaches with 12px on a 32px box), focus ring, disabled opacity, pressed scale, exit motion.
+ *
+ * VARIANT MAPPING (all rules are variant-agnostic — no tc counterpart exists to split them)
+ *   size    xs · sm · md (default) · lg · cover   — all four keep their max-inline-size; cover
+ *           keeps upstream's full-bleed box and, unlike Modal's `--full`, is NOT stripped of
+ *           radius or shadow upstream, so it correctly inherits the 16px corner here too.
+ *   status  default · accent · success · warning · danger (default) — icon chip only, untouched.
+ *   variant opaque (default) · blur · transparent — backdrop only, untouched.
+ *
+ * CASCADE NOTES (hand-derived)
+ *   · Every rule is (0,2,0)–(0,4,0) against a (0,1,0)–(0,2,0) base, so each wins outright; the
+ *     two comma-separated branches are each scoped individually.
+ *   · `--tw-shadow` really is the property `shadow-overlay` compiles to — the built Storybook CSS
+ *     emits `.alert-dialog__dialog{ … --tw-shadow:var(--overlay-shadow); box-shadow:
+ *     var(--tw-inset-shadow), …, var(--tw-shadow) }` — so feeding the custom property keeps
+ *     Tailwind's inset / ring composition intact.
+ *   · `--tzuchi-modal-shadow` is declared in `variables.css` under [data-theme="tzuchi"] ONLY.
+ *     Under `tzuchi-dark` the fallback fires and this resolves to HeroUI's `--overlay-shadow`,
+ *     i.e. the 1px inset hairline, which is intentional on a near-black page (§6 "Dark mode keeps
+ *     HeroUI's inset hairline"). Do not read this rule as "a real drop shadow in dark" — that
+ *     claim in modal.css is the known error §11 I4 records.
+ *   · The close-trigger `:not(…)` guard uses the exact attribute names `close-button.css` checks,
+ *     so upstream's hover fill, pressed scale, focus ring, disabled and pending all keep working;
+ *     none of status-focused / -disabled / -pending touches background-color. The class pair
+ *     `.alert-dialog__close-trigger.close-button--default` exists because AlertDialogCloseTrigger
+ *     merges its slot class onto CloseButtonRoot's own `close-button close-button--default`.
+ *   · The motion rule sets `--tw-animation-duration` (which `animate-in`'s shorthand reads before
+ *     `--tw-duration`) and `--tw-ease`; it never touches `animation-name`, so both reduced-motion
+ *     guards ([data-reduce-motion] and the media query) still win, and the exits stay at 100ms.
+ *   · `margin-block-start` beats the base `margin-top` on specificity — logical and physical
+ *     longhands cascade against one another for the same used property.
+ *
+ * No --tc-color-x token, no colour-valued component token, no hex / rgb / hsl / oklch literal,
+ * no !important, no physical left / right. No HeroUI variant, size or state is hidden.
+ *
+ * Reviewed: no changes. Independently re-derived against the built Storybook CSS
+ * (storybook-static/assets/iframe-DpN8oW_m.css), alert-dialog.tsx / close-button.tsx's slot/
+ * className composition, alert-dialog.styles.ts / close-button.styles.ts, themes/tzuchi/
+ * variables.css and packages/tokens/dist/tokens.css. Confirmed: every selector is actually
+ * emitted (including `.alert-dialog__close-trigger.close-button--default`, verified by reading
+ * AlertDialogCloseTrigger's className composition and closeButtonVariants' default-variant class
+ * list); every rule and every comma branch is scoped by `[data-theme^="tzuchi"]`; no `--tc-color-*`
+ * or colour-valued component token appears, no hex/rgb/hsl/oklch literal, no `!important`; every
+ * `--tc-*` token used (`--tc-modal-radius`→`--tc-radius-lg`=16px, `--tc-font-weight-bold`=700,
+ * `--tc-font-size-16`=16px, `--tc-line-height-relaxed`=1.6, `--tc-space-16`=16px,
+ * `--tc-space-24`=24px, `--tc-motion-duration-base`=200ms, `--tc-motion-easing-standard`) resolves
+ * in tokens.css and is confirmed absent from both of tokens.css's dark blocks, so none flip under
+ * `tzuchi-dark`; `--overlay-foreground` and `--tzuchi-modal-shadow` are on the allowed theme-
+ * variable list; `.alert-dialog__dialog--cover` was checked in the base CSS and, unlike Modal's
+ * `--full`, carries no `border-radius:0`/`shadow:none`, so no `:not()` carve-out is needed; the
+ * built CSS confirms `--tw-shadow:var(--overlay-shadow)` feeds the shared box-shadow shorthand and
+ * that `--tw-animation-duration` is read before `--tw-duration` in the `animate-in` shorthand, so
+ * the `[data-reduce-motion="true"]` guard still wins; no existing override file touches
+ * `.alert-dialog__*`, and the `.close-button--default` reach is the same own-host-class pattern
+ * `modal.css` and `tag.css` already use. Zero corrections were needed.
+ * ---------------------------------------------------------------------------------------------- */
+
+/* Shell — the 16px modal corner and the elevation.4 drop shadow.
+ * No size modifier needs excluding: unlike Modal's `--full`, AlertDialog's `--cover` keeps
+ * upstream's radius and shadow, so it should follow the themed corner as well. */
+[data-theme^="tzuchi"] .alert-dialog__dialog {
+  border-radius: var(--tc-modal-radius, var(--tc-radius-lg, 16px));
+  --tw-shadow: var(--tzuchi-modal-shadow, var(--overlay-shadow));
+}
+
+/* Heading — typography.subtitle is bold; its 16px/1.5 already matches `text-base`. */
+[data-theme^="tzuchi"] .alert-dialog__heading {
+  font-weight: var(--tc-font-weight-bold, 700);
+}
+
+/* Body — typography.body, painted in the dialog's own foreground rather than --muted
+ * (--muted is 3.84:1 on white, below AA for the sentence a confirm dialog hinges on). */
+[data-theme^="tzuchi"] .alert-dialog__body {
+  font-size: var(--tc-font-size-16, 16px);
+  line-height: var(--tc-line-height-relaxed, 1.6);
+  color: var(--overlay-foreground);
+}
+
+/* Region rhythm — header margin-block-end 16px, footer margin-block-start 24px. */
+[data-theme^="tzuchi"] .alert-dialog__header + .alert-dialog__body {
+  margin-block-start: var(--tc-space-16, 16px);
+}
+
+[data-theme^="tzuchi"] .alert-dialog__header + .alert-dialog__footer,
+[data-theme^="tzuchi"] .alert-dialog__body + .alert-dialog__footer {
+  margin-block-start: var(--tc-space-24, 24px);
+}
+
+/* Footer — the action row wraps when a Cancel / Confirm pair runs out of room. */
+[data-theme^="tzuchi"] .alert-dialog__footer {
+  flex-wrap: wrap;
+}
+
+/* Close trigger — a bare glyph that only fills on hover / press.
+ * The :not() list is what keeps upstream's hover, pressed, focus-visible, disabled and pending
+ * treatments untouched: this rule stops applying the moment any of them is active. */
+[data-theme^="tzuchi"]
+  .alert-dialog__close-trigger.close-button--default:not(
+    :hover,
+    [data-hovered="true"],
+    :active,
+    [data-pressed="true"]
+  ) {
+  background-color: transparent;
+}
+
+/* Enter motion — motion.duration.base + motion.easing.standard, exactly as Modal.
+ * Only the entering state is touched; the exit keeps upstream's 100ms. */
+[data-theme^="tzuchi"] .alert-dialog__backdrop[data-entering="true"],
+[data-theme^="tzuchi"] .alert-dialog__container[data-entering="true"] {
+  --tw-animation-duration: var(--tc-motion-duration-base, 200ms);
+  --tw-ease: var(--tc-motion-easing-standard, cubic-bezier(0.2, 0, 0, 1));
+}

@@ -1,0 +1,10 @@
+/* tceditor blocks: the one CSS entry for the showcase and Storybook.
+   Order: tokens -> @heroui/styles (it imports tailwindcss and tw-animate-css
+   itself) -> Tzu Chi theme, unlayered -> the blocks' own tcb-* classes. */
+@import "@tzuchi/tokens/tokens.css";
+@import "@heroui/styles";
+@import "@heroui/styles/themes/tzuchi/index.css";
+@import "./src/blocks.css";
+
+/* Tailwind utilities used by the block views (paths relative to this file). */
+@source "./src";

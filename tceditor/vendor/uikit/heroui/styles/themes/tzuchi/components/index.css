@@ -1,0 +1,118 @@
+/* ------------------------------------------------------------------------------------------------
+ * Tzu Chi theme — component customizations
+ * ------------------------------------------------------------------------------------------------
+ * Theme variables (../variables.css) only reach colour, the radius scale and shadows. Whatever a
+ * component hard-codes in its base styles (../../../components/*.css) — shape, density, typography,
+ * borders, per-variant treatment — is overridden here, one file per component.
+ *
+ * Rules every file follows:
+ *   - HeroUI's structure is untouched: no markup, prop, class-name or base-CSS change.
+ *   - Every rule is scoped by [data-theme^="tzuchi"], so upstream's light / dark are unaffected.
+ *   - COLOURS come only from HeroUI theme variables (--accent, --border, --surface …) or from a
+ *     --tzuchi-* variable emitted by ../generate.mjs. Never from --tc-color-* or a colour-valued
+ *     --tc-<component>-* token: tokens.css flips those only under [data-theme="dark"], so under
+ *     "tzuchi-dark" they would yield LIGHT values.
+ *   - Mode-independent tokens (--tc-radius-*, --tc-space-*, --tc-size-*, --tc-typography-*,
+ *     --tc-motion-*, dimension-valued --tc-<component>-*) are referenced directly, with a fallback.
+ *
+ * Same order and grouping as ../../../components/index.css (its Storybook categories).
+ * Where the Tzu Chi counterpart has a different name it is noted: HeroUI file ← tc-* element.
+ * ------------------------------------------------------------------------------------------------ */
+
+/* Component Styles */
+@import "./close-button.css";
+@import "./description.css";
+@import "./error-message.css";
+@import "./field-error.css";
+@import "./label.css";
+
+/* Navigation */
+@import "./accordion.css";
+@import "./breadcrumbs.css"; /* ← tc-breadcrumb */
+@import "./disclosure.css";
+@import "./link.css";
+@import "./pagination.css";
+@import "./tabs.css";
+
+/* Buttons */
+@import "./button.css"; /* incl. the icon-only modifier ← tc-icon-button */
+@import "./toggle-button.css";
+@import "./toggle-button-group.css";
+@import "./toolbar.css";
+
+/* Collections */
+@import "./dropdown.css";
+@import "./list-box-item.css"; /* ← tc-dropdown's options (shared by Select, ComboBox, Autocomplete, ListBox) */
+@import "./list-box.css";
+@import "./menu-item.css";
+@import "./menu.css";
+@import "./tag-group.css";
+@import "./tag.css"; /* ← tc-chip's interactive half (TagGroup) */
+
+/* Colors */
+@import "./color-picker.css";
+@import "./color-slider.css";
+@import "./color-swatch.css";
+@import "./color-swatch-picker.css";
+@import "./color-input-group.css";
+
+/* Controls */
+@import "./slider.css";
+@import "./switch.css";
+
+/* DataDisplay */
+@import "./badge.css";
+@import "./chip.css";
+@import "./table.css";
+
+/* Feedback */
+@import "./alert.css";
+@import "./empty-state.css";
+@import "./meter.css";
+@import "./progress-bar.css"; /* ← tc-progress */
+@import "./progress-circle.css";
+@import "./spinner.css";
+@import "./toast.css";
+
+/* Forms */
+@import "./checkbox.css";
+@import "./fieldset.css";
+@import "./input-otp.css";
+@import "./input.css";
+@import "./input-group.css";
+@import "./number-field.css";
+@import "./radio.css";
+@import "./search-field.css"; /* ← tc-search-bar's text field */
+@import "./textarea.css";
+
+/* Date & Time */
+@import "./calendar.css";
+@import "./range-calendar.css";
+@import "./calendar-year-picker.css";
+@import "./date-input-group.css";
+@import "./date-picker.css";
+@import "./date-range-picker.css";
+
+/* Layout */
+@import "./card.css";
+@import "./header.css";
+@import "./separator.css"; /* ← tc-divider */
+
+/* Media */
+@import "./avatar.css";
+
+/* Overlays */
+@import "./alert-dialog.css";
+@import "./drawer.css";
+@import "./modal.css";
+@import "./popover.css";
+@import "./tooltip.css";
+
+/* Pickers */
+@import "./combo-box.css";
+@import "./select.css"; /* ← tc-dropdown (trigger + listbox) */
+@import "./autocomplete.css";
+
+/* Typography */
+@import "./kbd.css";
+@import "./typography.css";

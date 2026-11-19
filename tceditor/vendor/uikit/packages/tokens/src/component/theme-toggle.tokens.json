@@ -1,0 +1,14 @@
+{
+  "theme-toggle": {
+    "size": { "$type": "dimension", "$value": "{size.control.md}" },
+    "icon-size": { "$type": "dimension", "$value": "{size.icon.sm}" },
+    "radius": { "$type": "dimension", "$value": "{radius.full}" },
+    "gap": { "$type": "dimension", "$value": "{space.8}" },
+    "bg": { "$type": "color", "$value": "{color.surface.default}" },
+    "bg-hover": { "$type": "color", "$value": "{color.brand.surface}" },
+    "fg": { "$type": "color", "$value": "{color.brand.primary}" },
+    "border": { "$type": "color", "$value": "{color.border.default}" },
+    "border-hover": { "$type": "color", "$value": "{color.brand.primary}" },
+    "focus-ring-color": { "$type": "color", "$value": "{color.border.focus}" }
+  }
+}

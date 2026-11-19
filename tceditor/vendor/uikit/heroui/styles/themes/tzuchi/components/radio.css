@@ -1,0 +1,167 @@
+/* ==========================================================================
+   Radio — Tzu Chi shape/density overrides
+   Scoped to [data-theme^="tzuchi"]; same cascade layer as styles/components/radio.css,
+   imported after it. Upstream's own light/dark themes are untouched.
+
+   What this changes (tc-radio → HeroUI .radio):
+   1. Control  16px rounded-lg square-that-happens-to-be-a-circle  →  32px true
+      circle (--tc-radio-size / --tc-radius-full) with a 2px ring instead of the
+      1px field border.
+   2. Selection model  filled disc (bg-accent + accent-foreground dot)  →  Tzu Chi
+      "ring + dot": the control keeps the field background, the ring turns accent
+      and the indicator becomes an accent dot at 50% of the inner box (14px).
+   3. Hover ring  --field-border-hover (blue-500 in light)  →  --accent, which is
+      what tc-radio does (--tc-radio-ring-checked = brand.primary) — inputs keep
+      the theme's field-border-hover, the radio does not.
+   4. Row density/typography  gap-3 + text-sm/font-medium  →  8px gap + body type
+      (16px / 400 / 1.6). Field description indent follows the new 32+8 offset.
+   5. Focus ring hugs the control (offset 0) — tc-radio's focus box-shadow has no
+      gap; HeroUI's `status-focused` offset is re-pointed via --ring-offset-width.
+
+   Variant mapping — tc-radio has no variants, so it maps onto HeroUI's default
+   `radio-group--primary`. `radio-group--secondary` (neutral --default fill in the
+   unselected indicator) is left to the theme's own colours; it inherits the new
+   size, ring, radius, gap and type from here and keeps working.
+
+   Not changed (already right under the Tzu Chi theme): colours of label/foreground,
+   disabled treatment (status-disabled = --disabled-opacity 0.38), shadow
+   (--field-shadow is already `0 0 0 0 transparent`), invalid treatment, motion.
+
+   Reviewed: no changes. Verified against the real files (not just the report):
+   every selector (.radio__control/.radio__content/.radio__indicator:empty::before,
+   the [data-slot="radio-content"] hover/pressed/selected combinations, the
+   .radio > [data-slot="description"|"field-error"] pair) exists verbatim in
+   styles/components/radio.css or is emitted by react/src/components/radio/*.tsx
+   and radio-group.stories.tsx. Every rule (each comma-separated alternative,
+   including the multi-line ones) is prefixed by [data-theme^="tzuchi"]; nothing
+   leaks into upstream's own light/dark themes. Colour rule: no --tc-color-*, no
+   colour-resolving --tc-<component>-* token, no hex/rgb/hsl/oklch literal
+   anywhere — --tzuchi-radio-ring is the one invented variable, correctly used as
+   var(--tzuchi-radio-ring, var(--field-border)) with a HeroUI fallback, and its
+   requested source (--tc-color-border-strong) checks out in tokens.css (gray-700
+   / gray-500, one step darker than --field-border's gray-300 / gray-750). Every
+   colour actually used (--accent, --accent-hover, --field-background) was
+   resolved through tokens.css and cross-checked against tc-radio.styles.ts's own
+   tokens byte-for-byte in BOTH modes: --accent === --tc-color-brand-primary
+   (#1b2d58 light / #a9c2ea dark, tc-radio's ring-checked/dot colour) and
+   --accent-hover === --tc-color-brand-primary-hover (#30559f / #c2d4f2) exactly.
+   Cascade: every overridden declaration's selector has equal-or-greater
+   specificity than the base declaration it must beat, or wins outright ([data-
+   theme^="tzuchi"] adds one attribute selector on top of an otherwise identical
+   compound selector copied from the base rule), so it wins in every state this
+   file touches (rest, hover, selected, selected+pressed) without an !important;
+   radio-group--secondary's hover rule ties in specificity with this file's, and
+   this file wins on source order (imported after radio-group.css) — bringing its
+   hover ring to --accent too, which is the "consistent with the same tokens"
+   fallback Rule 5 asks for since tc has no secondary-radio counterpart. The
+   .radio__indicator:empty::before border-radius fix is a necessary knock-on: the
+   control's border-radius has to go rounded-lg (8px, a circle only at 16px) →
+   var(--tc-radius-full), so the indicator (still square, size 100%) needed the
+   same or its corners would show past the round control (base's 16px case
+   avoided this only because rounded-lg (8px) already saturates a circle at
+   16px). No variant, size or state is broken: primary/secondary, hover, pressed,
+   selected, selected+pressed, focus-visible, invalid and disabled all still
+   resolve, and the :empty guard for custom Radio.Indicator children is
+   untouched. One acknowledged, unavoidable side effect of Hard Rule 1's ancestor
+   scoping: DeliveryAndPaymentExample's per-instance `size-5` className on
+   Radio.Control (a single utility class) cannot out-specificity a rule prefixed
+   by [data-theme^="tzuchi"], so that demo's compact control also becomes 32px
+   under the Tzu Chi theme — inherent to the scoping requirement, not a defect of
+   this file, and not a tracked HeroUI variant/size. All 6 auditor assertions
+   confirmed against the real computed chain; none dropped.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Control — 32px circle, 2px ring
+   -------------------------------------------------------------------------- */
+[data-theme^="tzuchi"] .radio__control {
+  inline-size: var(--tc-radio-size, 32px);
+  block-size: var(--tc-radio-size, 32px);
+  border-radius: var(--tc-radius-full, 9999px);
+  /* tc-radio draws a 2px outer ring; the theme's --field-border-width is 1px. */
+  border-width: 2px;
+  /* Resting ring: tc uses color.border.strong, a step darker than --field-border. */
+  border-color: var(--tzuchi-radio-ring, var(--field-border));
+  /* tc's focus ring sits directly on the control — no --background gap. */
+  --ring-offset-width: 0px;
+}
+
+/* Inner dot must be round on a 28px inner box; `rounded-lg` (8px) no longer
+   clamps to a circle at this size. */
+[data-theme^="tzuchi"] .radio__indicator:empty::before {
+  border-radius: var(--tc-radius-full, 9999px);
+}
+
+/* --------------------------------------------------------------------------
+   Hover (ring) — tc turns the ring brand-primary, not field-border-hover
+   -------------------------------------------------------------------------- */
+[data-theme^="tzuchi"] .radio:has([data-slot="radio-content"][data-hovered="true"]) .radio__control,
+[data-theme^="tzuchi"] .radio [data-slot="radio-content"][data-hovered="true"] .radio__control {
+  border-color: var(--accent);
+}
+
+/* --------------------------------------------------------------------------
+   Selected — ring + dot, not a filled disc
+   -------------------------------------------------------------------------- */
+[data-theme^="tzuchi"] .radio[data-selected] .radio__control,
+[data-theme^="tzuchi"]
+  .radio:has([data-slot="radio-content"][aria-checked="true"])
+  .radio__control,
+[data-theme^="tzuchi"] .radio:has(input:checked) .radio__control {
+  border-color: var(--accent);
+  background-color: var(--field-background, var(--surface));
+}
+
+[data-theme^="tzuchi"] .radio[data-selected] .radio__indicator:empty::before,
+[data-theme^="tzuchi"]
+  .radio:has([data-slot="radio-content"][aria-checked="true"])
+  .radio__indicator:empty::before,
+[data-theme^="tzuchi"] .radio:has(input:checked) .radio__indicator:empty::before {
+  background-color: var(--accent);
+  /* 50% of the 28px inner box = 14px, matching tc-radio's `.dot { 50% }`. */
+  scale: 0.5;
+}
+
+/* Selected + pressed — keep HeroUI's "dot grows" feedback, darken the ring
+   instead of the (now absent) fill. */
+[data-theme^="tzuchi"]
+  .radio[data-selected]:has([data-slot="radio-content"][data-pressed="true"])
+  .radio__control,
+[data-theme^="tzuchi"]
+  .radio:has([data-slot="radio-content"][data-pressed="true"][aria-checked="true"])
+  .radio__control,
+[data-theme^="tzuchi"]
+  .radio:has(input:checked):has([data-slot="radio-content"][data-pressed="true"])
+  .radio__control {
+  border-color: var(--accent-hover);
+  background-color: var(--field-background, var(--surface));
+}
+
+[data-theme^="tzuchi"]
+  .radio[data-selected]:has([data-slot="radio-content"][data-pressed="true"])
+  .radio__indicator:empty::before,
+[data-theme^="tzuchi"]
+  .radio:has([data-slot="radio-content"][data-pressed="true"][aria-checked="true"])
+  .radio__indicator:empty::before,
+[data-theme^="tzuchi"]
+  .radio:has(input:checked):has([data-slot="radio-content"][data-pressed="true"])
+  .radio__indicator:empty::before {
+  /* same 4:3 growth HeroUI uses (6px → 8px), here 14px → 18px */
+  scale: 0.6429;
+}
+
+/* --------------------------------------------------------------------------
+   Row density + typography — tc gap 8px, body type 16px/400/1.6
+   -------------------------------------------------------------------------- */
+[data-theme^="tzuchi"] .radio__content {
+  gap: var(--tc-space-8, 8px);
+  font-size: var(--tc-font-size-16, 16px);
+  font-weight: var(--tc-font-weight-regular, 400);
+  line-height: var(--tc-line-height-relaxed, 1.6);
+}
+
+/* Field description/error stay aligned under the label: control + gap. */
+[data-theme^="tzuchi"] .radio > [data-slot="description"],
+[data-theme^="tzuchi"] .radio > [data-slot="field-error"] {
+  padding-inline-start: calc(var(--tc-radio-size, 32px) + var(--tc-space-8, 8px));
+}

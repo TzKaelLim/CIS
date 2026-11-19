@@ -1,0 +1,12 @@
+{
+  "radio": {
+    "size": { "$type": "dimension", "$value": "{size.icon.md}" },
+    "ring": { "$type": "color", "$value": "{color.border.strong}" },
+    "ring-checked": { "$type": "color", "$value": "{color.brand.primary}" },
+    "dot": { "$type": "color", "$value": "{color.brand.primary}" },
+    "bg": { "$type": "color", "$value": "{color.surface.default}" },
+    "label": { "$type": "color", "$value": "{color.text.default}" },
+    "disabled-opacity": { "$type": "number", "$value": "{opacity.disabled}" },
+    "focus-ring-color": { "$type": "color", "$value": "{focus-ring.color}" }
+  }
+}

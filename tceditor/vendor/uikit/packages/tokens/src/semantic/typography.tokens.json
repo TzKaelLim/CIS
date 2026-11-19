@@ -1,0 +1,77 @@
+{
+  "typography": {
+    "$type": "typography",
+    "heading-1": {
+      "$value": {
+        "fontFamily": "{font.family.base}",
+        "fontSize": "{font.size.46}",
+        "fontWeight": "{font.weight.bold}",
+        "lineHeight": "{line-height.tight}"
+      }
+    },
+    "heading-2": {
+      "$value": {
+        "fontFamily": "{font.family.base}",
+        "fontSize": "{font.size.34}",
+        "fontWeight": "{font.weight.bold}",
+        "lineHeight": "{line-height.tight}"
+      }
+    },
+    "heading-3": {
+      "$value": {
+        "fontFamily": "{font.family.base}",
+        "fontSize": "{font.size.26}",
+        "fontWeight": "{font.weight.bold}",
+        "lineHeight": "{line-height.snug}"
+      }
+    },
+    "heading-4": {
+      "$value": {
+        "fontFamily": "{font.family.base}",
+        "fontSize": "{font.size.24}",
+        "fontWeight": "{font.weight.bold}",
+        "lineHeight": "{line-height.snug}"
+      }
+    },
+    "title": {
+      "$value": {
+        "fontFamily": "{font.family.base}",
+        "fontSize": "{font.size.20}",
+        "fontWeight": "{font.weight.bold}",
+        "lineHeight": "{line-height.normal}"
+      }
+    },
+    "subtitle": {
+      "$value": {
+        "fontFamily": "{font.family.base}",
+        "fontSize": "{font.size.16}",
+        "fontWeight": "{font.weight.bold}",
+        "lineHeight": "{line-height.normal}"
+      }
+    },
+    "body": {
+      "$value": {
+        "fontFamily": "{font.family.base}",
+        "fontSize": "{font.size.16}",
+        "fontWeight": "{font.weight.regular}",
+        "lineHeight": "{line-height.relaxed}"
+      }
+    },
+    "tab-lg": {
+      "$value": {
+        "fontFamily": "{font.family.base}",
+        "fontSize": "{font.size.34}",
+        "fontWeight": "{font.weight.medium}",
+        "lineHeight": "{line-height.normal}"
+      }
+    },
+    "tab-sm": {
+      "$value": {
+        "fontFamily": "{font.family.base}",
+        "fontSize": "{font.size.20}",
+        "fontWeight": "{font.weight.medium}",
+        "lineHeight": "{line-height.normal}"
+      }
+    }
+  }
+}

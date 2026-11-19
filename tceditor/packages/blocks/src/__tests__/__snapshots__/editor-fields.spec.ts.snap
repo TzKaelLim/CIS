@@ -1,0 +1,484 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`editor fields of every block (spec §13.1) Button 1`] = `
+{
+  "defaultProps": {
+    "fullWidth": false,
+    "href": "",
+    "label": "立即報名",
+    "size": "md",
+    "variant": "primary",
+  },
+  "fields": {
+    "fullWidth": {
+      "label": "滿版寬度",
+      "options": [
+        {
+          "label": "是",
+          "value": true,
+        },
+        {
+          "label": "否",
+          "value": false,
+        },
+      ],
+      "type": "radio",
+    },
+    "href": {
+      "label": "連結網址",
+      "type": "text",
+    },
+    "label": {
+      "label": "按鈕文字",
+      "type": "text",
+    },
+    "size": {
+      "label": "大小",
+      "options": [
+        {
+          "label": "小",
+          "value": "sm",
+        },
+        {
+          "label": "中",
+          "value": "md",
+        },
+        {
+          "label": "大",
+          "value": "lg",
+        },
+      ],
+      "type": "radio",
+    },
+    "variant": {
+      "label": "樣式",
+      "options": [
+        {
+          "label": "主要",
+          "value": "primary",
+        },
+        {
+          "label": "次要",
+          "value": "secondary",
+        },
+        {
+          "label": "外框",
+          "value": "outline",
+        },
+      ],
+      "type": "radio",
+    },
+  },
+}
+`;
+
+exports[`editor fields of every block (spec §13.1) Card 1`] = `
+{
+  "defaultProps": {
+    "content": [],
+    "href": "",
+    "summary": "",
+    "title": "卡片標題",
+    "variant": "default",
+  },
+  "fields": {
+    "content": {
+      "allow": [
+        "Paragraph",
+        "Button",
+        "TagList",
+        "Image",
+      ],
+      "label": "內容",
+      "type": "slot",
+    },
+    "href": {
+      "label": "連結網址",
+      "type": "text",
+    },
+    "summary": {
+      "label": "摘要",
+      "type": "textarea",
+    },
+    "title": {
+      "label": "標題",
+      "type": "text",
+    },
+    "variant": {
+      "label": "樣式",
+      "options": [
+        {
+          "label": "預設",
+          "value": "default",
+        },
+        {
+          "label": "次要",
+          "value": "secondary",
+        },
+      ],
+      "type": "radio",
+    },
+  },
+}
+`;
+
+exports[`editor fields of every block (spec §13.1) Columns 1`] = `
+{
+  "defaultProps": {
+    "columns": [
+      {
+        "content": [],
+      },
+      {
+        "content": [],
+      },
+    ],
+    "gap": "24",
+  },
+  "fields": {
+    "columns": {
+      "arrayFields": {
+        "content": {
+          "allow": [
+            "Heading",
+            "Paragraph",
+            "Button",
+            "Card",
+            "TagList",
+            "Image",
+          ],
+          "label": "內容",
+          "type": "slot",
+        },
+      },
+      "defaultItemProps": "[Function]",
+      "getItemSummary": "[Function]",
+      "label": "欄",
+      "max": 3,
+      "min": 2,
+      "type": "array",
+    },
+    "gap": {
+      "label": "欄距",
+      "options": [
+        {
+          "label": "小",
+          "value": "16",
+        },
+        {
+          "label": "中",
+          "value": "24",
+        },
+        {
+          "label": "大",
+          "value": "32",
+        },
+      ],
+      "type": "radio",
+    },
+  },
+}
+`;
+
+exports[`editor fields of every block (spec §13.1) Heading 1`] = `
+{
+  "defaultProps": {
+    "align": "start",
+    "level": "h2",
+    "text": "標題文字",
+  },
+  "fields": {
+    "align": {
+      "label": "對齊",
+      "options": [
+        {
+          "label": "靠左",
+          "value": "start",
+        },
+        {
+          "label": "置中",
+          "value": "center",
+        },
+        {
+          "label": "靠右",
+          "value": "end",
+        },
+      ],
+      "type": "radio",
+    },
+    "level": {
+      "label": "層級",
+      "options": [
+        {
+          "label": "標題 1",
+          "value": "h1",
+        },
+        {
+          "label": "標題 2",
+          "value": "h2",
+        },
+        {
+          "label": "標題 3",
+          "value": "h3",
+        },
+        {
+          "label": "標題 4",
+          "value": "h4",
+        },
+      ],
+      "type": "radio",
+    },
+    "text": {
+      "contentEditable": true,
+      "label": "標題文字",
+      "type": "text",
+    },
+  },
+}
+`;
+
+exports[`editor fields of every block (spec §13.1) Image 1`] = `
+{
+  "defaultProps": {
+    "caption": "",
+    "image": {
+      "alt": "",
+      "assetId": "",
+      "decorative": false,
+    },
+    "ratio": "auto",
+  },
+  "fields": {
+    "caption": {
+      "label": "圖說",
+      "type": "text",
+    },
+    "image": {
+      "label": "圖片",
+      "render": "[Function]",
+      "type": "custom",
+    },
+    "ratio": {
+      "label": "比例",
+      "options": [
+        {
+          "label": "原始比例",
+          "value": "auto",
+        },
+        {
+          "label": "16:9",
+          "value": "16:9",
+        },
+        {
+          "label": "4:3",
+          "value": "4:3",
+        },
+        {
+          "label": "1:1",
+          "value": "1:1",
+        },
+      ],
+      "type": "radio",
+    },
+  },
+}
+`;
+
+exports[`editor fields of every block (spec §13.1) Paragraph 1`] = `
+{
+  "defaultProps": {
+    "align": "start",
+    "body": {
+      "content": [
+        {
+          "content": [
+            {
+              "text": "請輸入內文。",
+              "type": "text",
+            },
+          ],
+          "type": "paragraph",
+        },
+      ],
+      "type": "doc",
+    },
+  },
+  "fields": {
+    "align": {
+      "label": "對齊",
+      "options": [
+        {
+          "label": "靠左",
+          "value": "start",
+        },
+        {
+          "label": "置中",
+          "value": "center",
+        },
+        {
+          "label": "靠右",
+          "value": "end",
+        },
+      ],
+      "type": "radio",
+    },
+    "body": {
+      "contentEditable": true,
+      "label": "內文",
+      "options": {
+        "blockquote": false,
+        "code": false,
+        "codeBlock": false,
+        "heading": false,
+        "horizontalRule": false,
+        "strike": false,
+        "textAlign": false,
+        "underline": false,
+      },
+      "type": "richtext",
+    },
+  },
+}
+`;
+
+exports[`editor fields of every block (spec §13.1) Section 1`] = `
+{
+  "defaultProps": {
+    "background": "transparent",
+    "content": [],
+    "paddingY": "48",
+  },
+  "fields": {
+    "background": {
+      "label": "背景",
+      "options": [
+        {
+          "label": "無背景",
+          "value": "transparent",
+        },
+        {
+          "label": "白色",
+          "value": "default",
+        },
+        {
+          "label": "淺灰",
+          "value": "secondary",
+        },
+      ],
+      "type": "radio",
+    },
+    "content": {
+      "disallow": [
+        "Section",
+      ],
+      "label": "內容",
+      "type": "slot",
+    },
+    "paddingY": {
+      "label": "上下留白",
+      "options": [
+        {
+          "label": "小",
+          "value": "16",
+        },
+        {
+          "label": "中",
+          "value": "32",
+        },
+        {
+          "label": "大",
+          "value": "48",
+        },
+        {
+          "label": "特大",
+          "value": "64",
+        },
+      ],
+      "type": "radio",
+    },
+  },
+}
+`;
+
+exports[`editor fields of every block (spec §13.1) TagList 1`] = `
+{
+  "defaultProps": {
+    "color": "default",
+    "tags": [
+      {
+        "label": "志工",
+      },
+      {
+        "label": "環保",
+      },
+    ],
+    "variant": "secondary",
+  },
+  "fields": {
+    "color": {
+      "label": "顏色",
+      "options": [
+        {
+          "label": "預設",
+          "value": "default",
+        },
+        {
+          "label": "強調",
+          "value": "accent",
+        },
+        {
+          "label": "成功",
+          "value": "success",
+        },
+      ],
+      "type": "radio",
+    },
+    "tags": {
+      "arrayFields": {
+        "label": {
+          "label": "標籤文字",
+          "type": "text",
+        },
+      },
+      "getItemSummary": "[Function]",
+      "label": "標籤",
+      "max": 10,
+      "min": 1,
+      "type": "array",
+    },
+    "variant": {
+      "label": "樣式",
+      "options": [
+        {
+          "label": "次要",
+          "value": "secondary",
+        },
+        {
+          "label": "柔和",
+          "value": "soft",
+        },
+      ],
+      "type": "radio",
+    },
+  },
+}
+`;
+
+exports[`editor fields of every block (spec §13.1) page root 1`] = `
+{
+  "defaultProps": {
+    "description": "",
+    "title": "未命名頁面",
+  },
+  "fields": {
+    "description": {
+      "label": "頁面說明",
+      "type": "textarea",
+    },
+    "title": {
+      "label": "頁面標題",
+      "type": "text",
+    },
+  },
+}
+`;

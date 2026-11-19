@@ -14,6 +14,8 @@ export default [
       '**/coverage/**',
       // Vendored HeroUI source keeps upstream's own lint/format config.
       'heroui/**',
+      // tceditor keeps its own lint/format config (tceditor/eslint.config.mjs).
+      'tceditor/**',
     ],
   },
   js.configs.recommended,

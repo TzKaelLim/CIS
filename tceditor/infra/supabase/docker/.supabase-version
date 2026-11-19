@@ -1,0 +1,4 @@
+# Supabase self-hosted version stamp, in the format setup.sh / update.sh use.
+# tceditor vendors docker/ from supabase/supabase at this ref and commits this
+# file on purpose (git add -f: the vendored .gitignore ignores it).
+ref=a4be1674911d863d55d351d245fba8e83b62dc76

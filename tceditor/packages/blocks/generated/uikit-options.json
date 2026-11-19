@@ -1,0 +1,1162 @@
+{
+  "source": {
+    "repository": "tzuchi/tzuchi-uikit",
+    "commit": "2b5a6781f4a4180346550f7b5255126dafb8be85",
+    "package": "@heroui/styles"
+  },
+  "components": {
+    "accordion": {
+      "export": "accordionVariants",
+      "variants": {
+        "variant": [
+          "default",
+          "surface"
+        ]
+      },
+      "defaultVariants": {}
+    },
+    "alert": {
+      "export": "alertVariants",
+      "variants": {
+        "status": [
+          "accent",
+          "danger",
+          "default",
+          "success",
+          "warning"
+        ]
+      },
+      "defaultVariants": {
+        "status": "default"
+      }
+    },
+    "alertDialog": {
+      "export": "alertDialogVariants",
+      "variants": {
+        "size": [
+          "cover",
+          "lg",
+          "md",
+          "sm",
+          "xs"
+        ],
+        "status": [
+          "accent",
+          "danger",
+          "default",
+          "success",
+          "warning"
+        ],
+        "variant": [
+          "blur",
+          "opaque",
+          "transparent"
+        ]
+      },
+      "defaultVariants": {
+        "size": "md",
+        "status": "danger",
+        "variant": "opaque"
+      }
+    },
+    "autocomplete": {
+      "export": "autocompleteVariants",
+      "variants": {
+        "fullWidth": [
+          "false",
+          "true"
+        ],
+        "variant": [
+          "primary",
+          "secondary"
+        ]
+      },
+      "defaultVariants": {
+        "fullWidth": "false",
+        "variant": "primary"
+      }
+    },
+    "avatar": {
+      "export": "avatarVariants",
+      "variants": {
+        "color": [
+          "accent",
+          "danger",
+          "default",
+          "success",
+          "warning"
+        ],
+        "size": [
+          "lg",
+          "md",
+          "sm"
+        ],
+        "variant": [
+          "default",
+          "soft"
+        ]
+      },
+      "defaultVariants": {
+        "color": "default",
+        "size": "md"
+      }
+    },
+    "avatarGroup": {
+      "export": "avatarGroupVariants",
+      "variants": {
+        "isGrid": [
+          "false",
+          "true"
+        ],
+        "overlap": [
+          "clip",
+          "ring"
+        ]
+      },
+      "defaultVariants": {
+        "isGrid": "false",
+        "overlap": "clip"
+      }
+    },
+    "badge": {
+      "export": "badgeVariants",
+      "variants": {
+        "color": [
+          "accent",
+          "danger",
+          "default",
+          "success",
+          "warning"
+        ],
+        "placement": [
+          "bottom-left",
+          "bottom-right",
+          "top-left",
+          "top-right"
+        ],
+        "size": [
+          "lg",
+          "md",
+          "sm"
+        ],
+        "variant": [
+          "primary",
+          "secondary",
+          "soft"
+        ]
+      },
+      "defaultVariants": {
+        "color": "default",
+        "placement": "top-right",
+        "size": "md",
+        "variant": "primary"
+      }
+    },
+    "breadcrumbs": {
+      "export": "breadcrumbsVariants",
+      "variants": {},
+      "defaultVariants": {}
+    },
+    "button": {
+      "export": "buttonVariants",
+      "variants": {
+        "fullWidth": [
+          "false",
+          "true"
+        ],
+        "isIconOnly": [
+          "true"
+        ],
+        "size": [
+          "lg",
+          "md",
+          "sm"
+        ],
+        "variant": [
+          "danger",
+          "danger-soft",
+          "ghost",
+          "outline",
+          "primary",
+          "secondary",
+          "tertiary"
+        ]
+      },
+      "defaultVariants": {
+        "fullWidth": "false",
+        "isIconOnly": "false",
+        "size": "md",
+        "variant": "primary"
+      }
+    },
+    "buttonGroup": {
+      "export": "buttonGroupVariants",
+      "variants": {
+        "fullWidth": [
+          "false",
+          "true"
+        ],
+        "orientation": [
+          "horizontal",
+          "vertical"
+        ]
+      },
+      "defaultVariants": {
+        "fullWidth": "false",
+        "orientation": "horizontal"
+      }
+    },
+    "calendar": {
+      "export": "calendarVariants",
+      "variants": {},
+      "defaultVariants": {}
+    },
+    "calendarYearPicker": {
+      "export": "calendarYearPickerVariants",
+      "variants": {},
+      "defaultVariants": {}
+    },
+    "card": {
+      "export": "cardVariants",
+      "variants": {
+        "variant": [
+          "default",
+          "secondary",
+          "tertiary",
+          "transparent"
+        ]
+      },
+      "defaultVariants": {
+        "variant": "default"
+      }
+    },
+    "checkbox": {
+      "export": "checkboxVariants",
+      "variants": {
+        "variant": [
+          "primary",
+          "secondary"
+        ]
+      },
+      "defaultVariants": {
+        "variant": "primary"
+      }
+    },
+    "checkboxGroup": {
+      "export": "checkboxGroupVariants",
+      "variants": {
+        "variant": [
+          "primary",
+          "secondary"
+        ]
+      },
+      "defaultVariants": {
+        "variant": "primary"
+      }
+    },
+    "chip": {
+      "export": "chipVariants",
+      "variants": {
+        "color": [
+          "accent",
+          "danger",
+          "default",
+          "success",
+          "warning"
+        ],
+        "size": [
+          "lg",
+          "md",
+          "sm"
+        ],
+        "variant": [
+          "primary",
+          "secondary",
+          "soft",
+          "tertiary"
+        ]
+      },
+      "defaultVariants": {
+        "color": "default",
+        "variant": "secondary"
+      }
+    },
+    "closeButton": {
+      "export": "closeButtonVariants",
+      "variants": {
+        "variant": [
+          "default"
+        ]
+      },
+      "defaultVariants": {
+        "variant": "default"
+      }
+    },
+    "colorArea": {
+      "export": "colorAreaVariants",
+      "variants": {
+        "showDots": [
+          "false",
+          "true"
+        ]
+      },
+      "defaultVariants": {
+        "showDots": "false"
+      }
+    },
+    "colorField": {
+      "export": "colorFieldVariants",
+      "variants": {
+        "fullWidth": [
+          "false",
+          "true"
+        ]
+      },
+      "defaultVariants": {
+        "fullWidth": "false"
+      }
+    },
+    "colorInputGroup": {
+      "export": "colorInputGroupVariants",
+      "variants": {
+        "fullWidth": [
+          "false",
+          "true"
+        ],
+        "variant": [
+          "primary",
+          "secondary"
+        ]
+      },
+      "defaultVariants": {
+        "fullWidth": "false",
+        "variant": "primary"
+      }
+    },
+    "colorPicker": {
+      "export": "colorPickerVariants",
+      "variants": {},
+      "defaultVariants": {}
+    },
+    "colorSlider": {
+      "export": "colorSliderVariants",
+      "variants": {},
+      "defaultVariants": {}
+    },
+    "colorSwatch": {
+      "export": "colorSwatchVariants",
+      "variants": {
+        "shape": [
+          "circle",
+          "square"
+        ],
+        "size": [
+          "lg",
+          "md",
+          "sm",
+          "xl",
+          "xs"
+        ]
+      },
+      "defaultVariants": {
+        "shape": "circle",
+        "size": "md"
+      }
+    },
+    "colorSwatchPicker": {
+      "export": "colorSwatchPickerVariants",
+      "variants": {
+        "layout": [
+          "grid",
+          "stack"
+        ],
+        "size": [
+          "lg",
+          "md",
+          "sm",
+          "xl",
+          "xs"
+        ],
+        "variant": [
+          "circle",
+          "square"
+        ]
+      },
+      "defaultVariants": {
+        "layout": "grid",
+        "size": "md",
+        "variant": "circle"
+      }
+    },
+    "comboBox": {
+      "export": "comboBoxVariants",
+      "variants": {
+        "fullWidth": [
+          "false",
+          "true"
+        ]
+      },
+      "defaultVariants": {
+        "fullWidth": "false"
+      }
+    },
+    "dateField": {
+      "export": "dateFieldVariants",
+      "variants": {
+        "fullWidth": [
+          "false",
+          "true"
+        ]
+      },
+      "defaultVariants": {
+        "fullWidth": "false"
+      }
+    },
+    "dateInputGroup": {
+      "export": "dateInputGroupVariants",
+      "variants": {
+        "fullWidth": [
+          "false",
+          "true"
+        ],
+        "variant": [
+          "primary",
+          "secondary"
+        ]
+      },
+      "defaultVariants": {
+        "fullWidth": "false",
+        "variant": "primary"
+      }
+    },
+    "datePicker": {
+      "export": "datePickerVariants",
+      "variants": {},
+      "defaultVariants": {}
+    },
+    "dateRangePicker": {
+      "export": "dateRangePickerVariants",
+      "variants": {},
+      "defaultVariants": {}
+    },
+    "description": {
+      "export": "descriptionVariants",
+      "variants": {},
+      "defaultVariants": {}
+    },
+    "disclosure": {
+      "export": "disclosureVariants",
+      "variants": {},
+      "defaultVariants": {}
+    },
+    "disclosureGroup": {
+      "export": "disclosureGroupVariants",
+      "variants": {},
+      "defaultVariants": {}
+    },
+    "drawer": {
+      "export": "drawerVariants",
+      "variants": {
+        "placement": [
+          "bottom",
+          "left",
+          "right",
+          "top"
+        ],
+        "variant": [
+          "blur",
+          "opaque",
+          "transparent"
+        ]
+      },
+      "defaultVariants": {
+        "placement": "bottom",
+        "variant": "opaque"
+      }
+    },
+    "dropdown": {
+      "export": "dropdownVariants",
+      "variants": {},
+      "defaultVariants": {}
+    },
+    "emptyState": {
+      "export": "emptyStateVariants",
+      "variants": {},
+      "defaultVariants": {}
+    },
+    "errorMessage": {
+      "export": "errorMessageVariants",
+      "variants": {},
+      "defaultVariants": {}
+    },
+    "fieldError": {
+      "export": "fieldErrorVariants",
+      "variants": {},
+      "defaultVariants": {}
+    },
+    "fieldset": {
+      "export": "fieldsetVariants",
+      "variants": {},
+      "defaultVariants": {}
+    },
+    "header": {
+      "export": "headerVariants",
+      "variants": {},
+      "defaultVariants": {}
+    },
+    "input": {
+      "export": "inputVariants",
+      "variants": {
+        "fullWidth": [
+          "false",
+          "true"
+        ],
+        "variant": [
+          "primary",
+          "secondary"
+        ]
+      },
+      "defaultVariants": {
+        "fullWidth": "false",
+        "variant": "primary"
+      }
+    },
+    "inputGroup": {
+      "export": "inputGroupVariants",
+      "variants": {
+        "fullWidth": [
+          "false",
+          "true"
+        ],
+        "variant": [
+          "primary",
+          "secondary"
+        ]
+      },
+      "defaultVariants": {
+        "fullWidth": "false",
+        "variant": "primary"
+      }
+    },
+    "inputOTP": {
+      "export": "inputOTPVariants",
+      "variants": {
+        "variant": [
+          "primary",
+          "secondary"
+        ]
+      },
+      "defaultVariants": {
+        "variant": "primary"
+      }
+    },
+    "kbd": {
+      "export": "kbdVariants",
+      "variants": {
+        "variant": [
+          "default",
+          "light"
+        ]
+      },
+      "defaultVariants": {}
+    },
+    "label": {
+      "export": "labelVariants",
+      "variants": {
+        "isDisabled": [
+          "true"
+        ],
+        "isInvalid": [
+          "true"
+        ],
+        "isRequired": [
+          "true"
+        ]
+      },
+      "defaultVariants": {
+        "isDisabled": "false",
+        "isInvalid": "false",
+        "isRequired": "false"
+      }
+    },
+    "link": {
+      "export": "linkVariants",
+      "variants": {},
+      "defaultVariants": {}
+    },
+    "listbox": {
+      "export": "listboxVariants",
+      "variants": {
+        "variant": [
+          "danger",
+          "default"
+        ]
+      },
+      "defaultVariants": {
+        "variant": "default"
+      }
+    },
+    "listboxItem": {
+      "export": "listboxItemVariants",
+      "variants": {
+        "variant": [
+          "danger",
+          "default"
+        ]
+      },
+      "defaultVariants": {
+        "variant": "default"
+      }
+    },
+    "listboxSection": {
+      "export": "listboxSectionVariants",
+      "variants": {},
+      "defaultVariants": {}
+    },
+    "menu": {
+      "export": "menuVariants",
+      "variants": {},
+      "defaultVariants": {}
+    },
+    "menuItem": {
+      "export": "menuItemVariants",
+      "variants": {
+        "variant": [
+          "danger",
+          "default"
+        ]
+      },
+      "defaultVariants": {
+        "variant": "default"
+      }
+    },
+    "menuSection": {
+      "export": "menuSectionVariants",
+      "variants": {},
+      "defaultVariants": {}
+    },
+    "meter": {
+      "export": "meterVariants",
+      "variants": {
+        "color": [
+          "accent",
+          "danger",
+          "default",
+          "success",
+          "warning"
+        ],
+        "size": [
+          "lg",
+          "md",
+          "sm"
+        ]
+      },
+      "defaultVariants": {
+        "color": "accent",
+        "size": "md"
+      }
+    },
+    "modal": {
+      "export": "modalVariants",
+      "variants": {
+        "scroll": [
+          "inside",
+          "outside"
+        ],
+        "size": [
+          "cover",
+          "full",
+          "lg",
+          "md",
+          "sm",
+          "xs"
+        ],
+        "variant": [
+          "blur",
+          "opaque",
+          "transparent"
+        ]
+      },
+      "defaultVariants": {
+        "scroll": "inside",
+        "size": "md",
+        "variant": "opaque"
+      }
+    },
+    "numberField": {
+      "export": "numberFieldVariants",
+      "variants": {
+        "fullWidth": [
+          "false",
+          "true"
+        ],
+        "variant": [
+          "primary",
+          "secondary"
+        ]
+      },
+      "defaultVariants": {
+        "fullWidth": "false",
+        "variant": "primary"
+      }
+    },
+    "pagination": {
+      "export": "paginationVariants",
+      "variants": {
+        "size": [
+          "lg",
+          "md",
+          "sm"
+        ]
+      },
+      "defaultVariants": {
+        "size": "md"
+      }
+    },
+    "popover": {
+      "export": "popoverVariants",
+      "variants": {},
+      "defaultVariants": {}
+    },
+    "progressBar": {
+      "export": "progressBarVariants",
+      "variants": {
+        "color": [
+          "accent",
+          "danger",
+          "default",
+          "success",
+          "warning"
+        ],
+        "size": [
+          "lg",
+          "md",
+          "sm"
+        ]
+      },
+      "defaultVariants": {
+        "color": "accent",
+        "size": "md"
+      }
+    },
+    "progressCircle": {
+      "export": "progressCircleVariants",
+      "variants": {
+        "color": [
+          "accent",
+          "danger",
+          "default",
+          "success",
+          "warning"
+        ],
+        "size": [
+          "lg",
+          "md",
+          "sm"
+        ]
+      },
+      "defaultVariants": {
+        "color": "accent",
+        "size": "md"
+      }
+    },
+    "radio": {
+      "export": "radioVariants",
+      "variants": {},
+      "defaultVariants": {}
+    },
+    "radioGroup": {
+      "export": "radioGroupVariants",
+      "variants": {
+        "variant": [
+          "primary",
+          "secondary"
+        ]
+      },
+      "defaultVariants": {
+        "variant": "primary"
+      }
+    },
+    "rangeCalendar": {
+      "export": "rangeCalendarVariants",
+      "variants": {},
+      "defaultVariants": {}
+    },
+    "scrollShadow": {
+      "export": "scrollShadowVariants",
+      "variants": {
+        "hideScrollBar": [
+          "false",
+          "true"
+        ],
+        "orientation": [
+          "horizontal",
+          "vertical"
+        ],
+        "variant": [
+          "fade"
+        ]
+      },
+      "defaultVariants": {
+        "hideScrollBar": "false",
+        "orientation": "vertical",
+        "variant": "fade"
+      }
+    },
+    "searchField": {
+      "export": "searchFieldVariants",
+      "variants": {
+        "fullWidth": [
+          "false",
+          "true"
+        ],
+        "variant": [
+          "primary",
+          "secondary"
+        ]
+      },
+      "defaultVariants": {
+        "fullWidth": "false",
+        "variant": "primary"
+      }
+    },
+    "select": {
+      "export": "selectVariants",
+      "variants": {
+        "fullWidth": [
+          "false",
+          "true"
+        ],
+        "variant": [
+          "primary",
+          "secondary"
+        ]
+      },
+      "defaultVariants": {
+        "fullWidth": "false",
+        "variant": "primary"
+      }
+    },
+    "separator": {
+      "export": "separatorVariants",
+      "variants": {
+        "orientation": [
+          "horizontal",
+          "vertical"
+        ],
+        "variant": [
+          "default",
+          "secondary",
+          "tertiary"
+        ]
+      },
+      "defaultVariants": {
+        "orientation": "horizontal",
+        "variant": "default"
+      }
+    },
+    "skeleton": {
+      "export": "skeletonVariants",
+      "variants": {
+        "animationType": [
+          "none",
+          "pulse",
+          "shimmer"
+        ]
+      },
+      "defaultVariants": {
+        "animationType": "shimmer"
+      }
+    },
+    "slider": {
+      "export": "sliderVariants",
+      "variants": {},
+      "defaultVariants": {}
+    },
+    "spinner": {
+      "export": "spinnerVariants",
+      "variants": {
+        "color": [
+          "accent",
+          "current",
+          "danger",
+          "success",
+          "warning"
+        ],
+        "size": [
+          "lg",
+          "md",
+          "sm",
+          "xl"
+        ]
+      },
+      "defaultVariants": {
+        "color": "accent",
+        "size": "md"
+      }
+    },
+    "surface": {
+      "export": "surfaceVariants",
+      "variants": {
+        "variant": [
+          "default",
+          "secondary",
+          "tertiary",
+          "transparent"
+        ]
+      },
+      "defaultVariants": {
+        "variant": "default"
+      }
+    },
+    "switch": {
+      "export": "switchVariants",
+      "variants": {
+        "size": [
+          "lg",
+          "md",
+          "sm"
+        ]
+      },
+      "defaultVariants": {
+        "size": "md"
+      }
+    },
+    "switchGroup": {
+      "export": "switchGroupVariants",
+      "variants": {
+        "orientation": [
+          "horizontal",
+          "vertical"
+        ]
+      },
+      "defaultVariants": {
+        "orientation": "vertical"
+      }
+    },
+    "table": {
+      "export": "tableVariants",
+      "variants": {
+        "variant": [
+          "primary",
+          "secondary"
+        ]
+      },
+      "defaultVariants": {
+        "variant": "primary"
+      }
+    },
+    "tabs": {
+      "export": "tabsVariants",
+      "variants": {
+        "align": [
+          "center",
+          "end",
+          "start"
+        ],
+        "variant": [
+          "primary",
+          "secondary"
+        ]
+      },
+      "defaultVariants": {
+        "align": "center",
+        "variant": "primary"
+      }
+    },
+    "tag": {
+      "export": "tagVariants",
+      "variants": {
+        "size": [
+          "lg",
+          "md",
+          "sm"
+        ],
+        "variant": [
+          "default",
+          "surface"
+        ]
+      },
+      "defaultVariants": {
+        "size": "md",
+        "variant": "default"
+      }
+    },
+    "tagGroup": {
+      "export": "tagGroupVariants",
+      "variants": {},
+      "defaultVariants": {}
+    },
+    "textArea": {
+      "export": "textAreaVariants",
+      "variants": {
+        "fullWidth": [
+          "false",
+          "true"
+        ],
+        "variant": [
+          "primary",
+          "secondary"
+        ]
+      },
+      "defaultVariants": {
+        "fullWidth": "false",
+        "variant": "primary"
+      }
+    },
+    "textField": {
+      "export": "textFieldVariants",
+      "variants": {
+        "fullWidth": [
+          "false",
+          "true"
+        ]
+      },
+      "defaultVariants": {
+        "fullWidth": "false"
+      }
+    },
+    "timeField": {
+      "export": "timeFieldVariants",
+      "variants": {
+        "fullWidth": [
+          "false",
+          "true"
+        ]
+      },
+      "defaultVariants": {
+        "fullWidth": "false"
+      }
+    },
+    "toast": {
+      "export": "toastVariants",
+      "variants": {
+        "placement": [
+          "bottom",
+          "bottom end",
+          "bottom start",
+          "top",
+          "top end",
+          "top start"
+        ],
+        "variant": [
+          "accent",
+          "danger",
+          "default",
+          "success",
+          "warning"
+        ]
+      },
+      "defaultVariants": {
+        "placement": "bottom",
+        "variant": "default"
+      }
+    },
+    "toggleButton": {
+      "export": "toggleButtonVariants",
+      "variants": {
+        "isIconOnly": [
+          "true"
+        ],
+        "size": [
+          "lg",
+          "md",
+          "sm"
+        ],
+        "variant": [
+          "default",
+          "ghost"
+        ]
+      },
+      "defaultVariants": {
+        "isIconOnly": "false",
+        "size": "md",
+        "variant": "default"
+      }
+    },
+    "toggleButtonGroup": {
+      "export": "toggleButtonGroupVariants",
+      "variants": {
+        "fullWidth": [
+          "false",
+          "true"
+        ],
+        "isDetached": [
+          "false",
+          "true"
+        ],
+        "orientation": [
+          "horizontal",
+          "vertical"
+        ]
+      },
+      "defaultVariants": {
+        "fullWidth": "false",
+        "isDetached": "false",
+        "orientation": "horizontal"
+      }
+    },
+    "toolbar": {
+      "export": "toolbarVariants",
+      "variants": {
+        "isAttached": [
+          "true"
+        ],
+        "orientation": [
+          "horizontal",
+          "vertical"
+        ]
+      },
+      "defaultVariants": {
+        "isAttached": "false",
+        "orientation": "horizontal"
+      }
+    },
+    "tooltip": {
+      "export": "tooltipVariants",
+      "variants": {},
+      "defaultVariants": {}
+    },
+    "typography": {
+      "export": "typographyVariants",
+      "variants": {
+        "align": [
+          "center",
+          "end",
+          "justify",
+          "start"
+        ],
+        "color": [
+          "default",
+          "muted"
+        ],
+        "truncate": [
+          "true"
+        ],
+        "type": [
+          "body",
+          "body-sm",
+          "body-xs",
+          "code",
+          "h1",
+          "h2",
+          "h3",
+          "h4",
+          "h5",
+          "h6"
+        ],
+        "weight": [
+          "bold",
+          "medium",
+          "normal",
+          "semibold"
+        ]
+      },
+      "defaultVariants": {
+        "align": "start",
+        "color": "default",
+        "type": "body"
+      }
+    }
+  }
+}

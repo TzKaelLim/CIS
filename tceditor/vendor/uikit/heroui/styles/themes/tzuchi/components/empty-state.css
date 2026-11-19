@@ -1,0 +1,78 @@
+/*
+ * Tzu Chi theme — EmptyState
+ * ---------------------------------------------------------------------------
+ * Base:   styles/components/empty-state.css — the whole component is one rule,
+ *         `.empty-state { p-2 text-sm text-muted }` (empty-state.css:2-4).
+ *         components/autocomplete.css:231-233 re-states `text-sm` (plus
+ *         `text-center` and a 60% overlay foreground) on the copy when it is
+ *         rendered inside an Autocomplete popover.
+ * Model:  no tc counterpart (DESIGN-LANGUAGE.md Q8 lists EmptyState among the
+ *         components with no Figma record at all). R21 is the rule that covers
+ *         it: "empty-state copy — NO EVIDENCE, derive: prose → R5".
+ *
+ * WHAT THIS CHANGES — the type scale, and nothing else:
+ *   §1's mechanical rule ("every 14px role moves to 16px; the weight and
+ *   line-height are decided by which of the two 16px voices it is") plus R21 →
+ *   R5, the prose voice: 16px / 1.6. HeroUI's `text-sm` is 14px / 20px, a step
+ *   Tzu Chi does not have.
+ *
+ * DELIBERATELY LEFT ALONE
+ *   · Colour. `text-muted` is already the themed --muted (light gray-700, dark
+ *     gray-400) = color.text.muted, the same colour the themed ProgressBar and
+ *     Meter readouts take (R19).
+ *   · Font weight. The base declares none, so the copy inherits 400 — R5's
+ *     value — from the page in every rendering context audited (the Table
+ *     empty state and the Autocomplete / ComboBox popovers; the themed option
+ *     panel sets its 700 on `[data-slot="list-box-item"]`, not on the panel).
+ *     Declaring a weight here would be a guard against a hypothesis, not a
+ *     change the spec asks for.
+ *   · Padding `p-2` = 8px. The spec has no rule for an empty state's inset and
+ *     §6 RESTRAINT says leave what it is silent on. Recorded as a spec gap:
+ *     inside a themed option panel the rows are inset 32px (R57/R93) and this
+ *     copy is not.
+ *   · Everything in autocomplete.css's own block — `text-center` and the
+ *     tinted colour — and every layout utility a consumer passes through
+ *     `className` (the Table story composes flex / gap-4 / items-center that
+ *     way, and the utilities layer beats the components layer by design).
+ *
+ * CASCADE NOTES
+ *   · `.empty-state` is (0,1,0); the first branch below, (0,2,0), beats it.
+ *   · `.autocomplete [data-slot="empty-state"]` (autocomplete.css:231) is also
+ *     (0,2,0), so the first branch only ties it. That tie already resolves
+ *     this file's way on source order — themes/tzuchi/components/index.css is
+ *     imported after @heroui/styles in the same `components` layer (N7) — but
+ *     the second branch settles it on specificity (0,3,0) instead of relying
+ *     on import order. Both branches carry the same two declarations, so the
+ *     order of the two is irrelevant.
+ *   · Nothing here reaches into another component's elements: both selectors
+ *     match EmptyState's own root and its own `data-slot`, which
+ *     empty-state.tsx:25 always emits.
+ *
+ * COLOURS — this file sets none.
+ *
+ * Reviewed: no changes. Verified against the live files: `.empty-state` and
+ * `[data-slot="empty-state"]` both exist in
+ * heroui/styles/components/empty-state.css and are emitted by
+ * empty-state.tsx (data-slot="empty-state" is unconditional on the root
+ * div); every rule is scoped [data-theme^="tzuchi"]; --tc-font-size-16 and
+ * --tc-line-height-relaxed resolve in packages/tokens/dist/tokens.css to
+ * :root-only values, never restated under [data-theme="dark"] — no
+ * --tc-color-*, no literal colour. Confirmed on the actual target story
+ * (components-data-display-table--empty-state-demo, table.stories.tsx's
+ * EmptyStateDemo): EmptyState is rendered directly, not inside an
+ * Autocomplete/ComboBox popover, so autocomplete.css's own
+ * `.autocomplete__popover [data-slot="empty-state"]` block (a disjoint
+ * ancestor) never competes here — the two-branch selector below is
+ * (0,2,0) and (0,3,0) against the base's (0,1,0), winning in every context.
+ * No colour, weight or padding is touched, matching RESTRAINT (§6) since the
+ * spec gives no rule for them; the popover-inset gap flagged in specGaps
+ * belongs to whichever file owns the option-popover shell, not to this one.
+ * No "*" immediately followed by "/" outside a comment's own close.
+ */
+
+[data-theme^="tzuchi"] .empty-state,
+[data-theme^="tzuchi"] .empty-state[data-slot="empty-state"] {
+  /* R21 → R5 (prose voice), via §1's "no 14px step" rule. */
+  font-size: var(--tc-font-size-16, 16px);
+  line-height: var(--tc-line-height-relaxed, 1.6);
+}

@@ -1,0 +1,72 @@
+/* Card — Tzu Chi shape overrides for HeroUI's base `.card`
+ * ---------------------------------------------------------------------------
+ * Source of truth: packages/components/src/card/tc-card.styles.ts
+ *                  packages/tokens/src/component/card.tokens.json
+ *
+ * WHAT THIS CHANGES (everything else in styles/components/card.css is kept):
+ *   .card              radius 24px → 16px (--tc-card-radius); gap 12px → 16px
+ *   .card__header      gap 0 → 8px  (breathing room under the bigger title)
+ *   .card__title       14px/24px/500 foreground → heading-3 (700 26px/1.4) accent
+ *   .card__description 14px/20px muted → body (400 16px/1.6) foreground
+ *   .card__footer      gap 0 → 8px  (tc `.footer` gap = --tc-space-8)
+ *
+ * VARIANT MAPPING (tc-card `variant` ↔ HeroUI `Card variant`):
+ *   elevated (tc default)  ↔  default   — bg --surface + `shadow-surface`
+ *                                          (= --surface-shadow, already identical
+ *                                           to --tc-card-elevation in light mode)
+ *   outlined               ↔  (none)    — HeroUI has no bordered card variant;
+ *                                          not introduced, nothing to override
+ *   (none)                 ↔  secondary / tertiary / transparent — kept as-is
+ *
+ * NOT TRANSFERABLE: tc-card's interactive/href mode (stretched link, hover
+ * elevation --tc-card-elevation-hover, hover headline colour, focus ring) has
+ * no counterpart — HeroUI's Card is a static container with no focusable root
+ * and no hover state, so there is nothing to scope those rules to.
+ *
+ * Colours come only from HeroUI theme variables, which the generated Tzu Chi
+ * theme already resolves per mode. --accent === --tc-color-brand-primary and
+ * --foreground === --tc-color-text-default in both tzuchi and tzuchi-dark.
+ *
+ * Reviewed: no changes. Verified every selector exists (cardVariants slot map:
+ * base=.card, header=.card__header, title=.card__title,
+ * description=.card__description, footer=.card__footer), every rule is
+ * [data-theme^="tzuchi"]-scoped, no --tc-color-* /hex/rgb literals in any
+ * declaration, --tc-card-radius/--tc-space-16/--tc-space-8/--tc-typography-*
+ * all resolve to mode-independent literals in tokens.css, and --accent/
+ * --foreground are byte-identical to --tc-color-brand-primary/
+ * --tc-color-text-default in both tzuchi and tzuchi-dark (tokens.css light
+ * block + [data-theme="dark"] block). All 6 assertions confirmed against
+ * card.css, card.tsx/card.styles.ts and index.json.
+ */
+
+/* Radius: HeroUI is min(32px, --radius-3xl) = 24px under tzuchi; tc card is 16px.
+   Gap: HeroUI gap-3 (12px) vs tc `.body` gap --tc-space-16 (16px).
+   Padding already matches (p-4 = 16px = --tc-card-padding), so it is left alone. */
+[data-theme^="tzuchi"] .card {
+  border-radius: var(--tc-card-radius, var(--radius-2xl));
+  gap: var(--tc-space-16, 1rem);
+}
+
+/* tc groups headline and body at 16px; inside a title+description pair that is
+   too much, so the pair uses tc's other spacing step, --tc-space-8. */
+[data-theme^="tzuchi"] .card__header {
+  gap: var(--tc-space-8, 0.5rem);
+}
+
+/* tc `.headline`: heading-3, --tc-card-headline-fg = brand-primary = --accent. */
+[data-theme^="tzuchi"] .card__title {
+  font: var(--tc-typography-heading-3, 700 26px / 1.4 var(--font-sans));
+  color: var(--accent);
+}
+
+/* tc has no 14px type step: card body copy is the `body` token at text-default
+   (tc-card default slot, and tc-article-card's excerpt, both agree). */
+[data-theme^="tzuchi"] .card__description {
+  font: var(--tc-typography-body, 400 16px / 1.6 var(--font-sans));
+  color: var(--foreground);
+}
+
+/* tc `.footer` gap. */
+[data-theme^="tzuchi"] .card__footer {
+  gap: var(--tc-space-8, 0.5rem);
+}

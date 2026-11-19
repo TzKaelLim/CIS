@@ -1,0 +1,68 @@
+{
+  "search-bar": {
+    "bg": {
+      "$type": "color",
+      "$value": "{color.surface.default}"
+    },
+    "border": {
+      "$type": "color",
+      "$value": "{color.border.default}"
+    },
+    "border-hover": {
+      "$type": "color",
+      "$value": "{color.border.focus}"
+    },
+    "border-focus": {
+      "$type": "color",
+      "$value": "{color.border.focus}"
+    },
+    "focus-ring": {
+      "$type": "color",
+      "$value": "{color.brand.surface-hover}"
+    },
+    "focus-ring-color": {
+      "$type": "color",
+      "$value": "{color.border.focus}"
+    },
+    "radius": {
+      "$type": "dimension",
+      "$value": "{radius.md}"
+    },
+    "text": {
+      "$type": "color",
+      "$value": "{color.text.default}"
+    },
+    "placeholder": {
+      "$type": "color",
+      "$value": "{color.text.muted}"
+    },
+    "icon-fg": {
+      "$type": "color",
+      "$value": "{color.brand.primary}"
+    },
+    "submit-bg": {
+      "$type": "color",
+      "$value": "{color.surface.subtle}"
+    },
+    "submit-bg-hover": {
+      "$type": "color",
+      "$value": "{color.brand.surface-hover}"
+    },
+    "category-bg": {
+      "$type": "color",
+      "$value": "{color.surface.subtle}"
+    },
+    "category-fg": {
+      "$type": "color",
+      "$value": "{color.text.default}"
+    },
+    "divider": {
+      "$type": "color",
+      "$value": "{color.border.default}"
+    },
+    "disabled-opacity": {
+      "$type": "number",
+      "$value": "{opacity.disabled}"
+    }
+  }
+}

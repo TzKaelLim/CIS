@@ -1,0 +1,280 @@
+/*
+ * Tzu Chi theme — ColorInputGroup
+ * ---------------------------------------------------------------------------
+ * Base:   styles/components/color-input-group.css — `.color-input-group`,
+ *         `.color-input-group__input`, `.color-input-group__prefix`,
+ *         `.color-input-group__suffix`, `.color-input-group--primary`,
+ *         `.color-input-group--secondary`, `.color-input-group--full-width`.
+ * Model:  no tc counterpart. ColorInputGroup is the SHELL of ColorField
+ *         (react/src/components/color-field/index.ts maps `.Group` onto
+ *         ColorInputGroupRoot). DESIGN-LANGUAGE §3.4 names
+ *         "ColorField/ColorInputGroup" among the new field-family components
+ *         that "follow R49-R54 — the Input shape, not the Select shape", and
+ *         R21 files the colour-field hex under "derive" — a value typed into a
+ *         text field, i.e. R2. So this file is the same set of changes
+ *         date-input-group.css makes, minus the segment rule.
+ *
+ * VARIANT MAPPING
+ *   tc-input `.control` (one single look)  <->  .color-input-group and
+ *                                               .color-input-group--primary
+ *   — no tc equivalent —                  <->  .color-input-group--secondary
+ *        (neutral `--default` fill; inherits every rule below through the
+ *        shared BEM classes and keeps the theme-wide 1px `--field-border` —
+ *        every Tzu Chi field is bordered, D13)
+ *   host-level width in tc                <->  .color-input-group--full-width
+ *        (untouched)
+ *
+ * WHAT THIS CHANGES — height, type, density and two state edges only.
+ * Radius (8px via --field-radius), border width (1px), every colour, the
+ * flattened field shadow, the disabled opacity and cursor and the font family
+ * already resolve to the Tzu Chi values through themes/tzuchi/variables.css
+ * and are not repeated here (N5 / D1).
+ *
+ *   1. HEIGHT   `h-9` (a fixed 36px) becomes content-driven with a 43.6px
+ *      floor — R41/R49, the identical calc search-field.css:98-105 uses.
+ *   2. TYPE     the shell's 14px and the input's `text-base sm:text-sm`
+ *      step-down both become 16px/1.6 at every width — §1 + R2 (field value).
+ *   3. DENSITY  the input's inline inset goes 12px -> 20px — R50 (tc
+ *      `.control`: 8px 20px; the 8px block padding already matches `py-2`).
+ *      Beside an affix HeroUI's own `ps-2` / `pe-2` rules are (0,3,0) and keep
+ *      the 8px gap, which is tc's model exactly (R53).
+ *   4. AFFIXES  prefix/suffix move from `ms-3`/`me-3` (12px) to 20px from the
+ *      shell edge — R53, as on the themed SearchField.
+ *   5. FOCUS    the border turns `--field-border-focus` — R67; the base file
+ *      forgot it here exactly as it did on SearchField, applying only
+ *      `status-focused-field` and leaving the edge resting grey.
+ *   6. INVALID  the border turns `--danger` and survives hover — R68/R69.
+ *      Upstream points it at `--color-field-border-invalid`, a variable
+ *      nothing under styles/ ever defines, so today the declaration is invalid
+ *      at computed-value time and the edge falls back to currentColor.
+ *
+ *   7. FOCUS RING (Pass 4) the 2px `--focus` ring becomes tc's 3px pale halo,
+ *      and a focused invalid shell gets it in `--danger`. §11 I1 / §12 Q2 is
+ *      settled: tc-input.styles.ts:42-44 / :71-73 is the Tzu Chi field focus,
+ *      and the ring every field kept under D21 was mechanical. Still no
+ *      `box-shadow` re-declaration (R74) — only Tailwind's ring LAYER variable
+ *      is swapped.
+ *
+ *   8. CHANNEL ROW (Pass 5) inside a ColorPicker popover the value's inline
+ *      inset drops from 20px to 8px. Those fields are 72px wide, where R50's
+ *      20px leaves a 4-glyph channel value nowhere to sit. Everywhere else the
+ *      20px inset stands.
+ *
+ * KEPT DELIBERATELY
+ *   · The prefix / suffix colour (`text-field-placeholder`). In the stock
+ *     stories the prefix holds a ColorSwatch, which paints itself; R54's
+ *     accent-coloured 20px glyph is SearchField's own magnifier and has no
+ *     counterpart here.
+ *   · `overflow-hidden`, the input's `h-full`, the placeholder colour (already
+ *     `--field-placeholder`), the 150ms base transitions, `status-disabled`
+ *     (D2) and the `--secondary` fill (D13).
+ *
+ * CASCADE NOTES
+ *   · The focus rule is `&:is(:focus-within, [data-focus-within="true"])`;
+ *     `:is()` takes its most specific argument, so both branches are (0,3,0).
+ *     The invalid rule is also (0,3,0) and is declared after it, so a focused
+ *     invalid field keeps the danger edge (search-field.css:123-127).
+ *   · The base hover rule `.color-input-group:hover:not(:focus-within)` is
+ *     (0,3,0) — a tie with the plain invalid rule that import order alone
+ *     would decide. R69's mirror makes the invalid+hover pair (0,5,0).
+ *   · Everything else is (0,2,0) against (0,1,0) base declarations, including
+ *     the `sm:` step-down, which compiles to a nested media query on the same
+ *     (0,1,0) selector.
+ *
+ * Reviewed: no changes. Verified against styles/components/color-input-group.css
+ * (no :has()-guarded trigger to reproduce — confirmed react/src/components/
+ * color-input-group/color-input-group.tsx has no trigger slot at all, so the
+ * simpler unguarded focus rule here is correct, not an omission), the
+ * ColorField -> ColorInputGroup composition (color-field/index.ts:3-21),
+ * tokens.css (all four --tc-* tokens present, mode-independent, fallbacks
+ * intact), themes/tzuchi/variables.css (--field-border-focus/--danger
+ * confirmed mode-flipped), and --color-field-border-invalid confirmed
+ * referenced-and-never-declared (also hit in input-group.css, number-field.css,
+ * search-field.css, date-input-group.css). Brace/comment counts balanced
+ * (9/9, 13/13); no premature comment close; no colour literal, no
+ * --tc-color-*, no !important, no physical property.
+ * No file for color-field.css needed: confirmed against
+ * styles/components/color-field.css — the same 20-line 4px stack as
+ * date-field.css/time-field.css, and the hex value's own type lives on
+ * .color-input-group__input above, not on the field stack.
+ *
+ * Pass 4 (2026-09-20): added the Tzu Chi focus halo (item 7 above) beside the
+ * focus-border rule, and its `--danger` twin inside the invalid block. Both
+ * override Tailwind's --tw-ring-shadow layer only; nothing declares
+ * `box-shadow`, so `shadow-field` and the inset layers survive. Nothing else
+ * in the file moved.
+ *
+ * Pass 4 reviewed: diffed against the pre-Pass-4 file — only item 7's two
+ * --tw-ring-shadow lines were added, inside the existing focus-border and
+ * invalid blocks; nothing else moved. Specificity (0,3,0) via :is() clears the
+ * base focus rule (0,2,0); the invalid variant at (0,4,0) clears both that and
+ * this file's own pale halo. No trigger slot exists on this component, so no
+ * :has() guard is needed. Injection-verified live on the plain and the
+ * invalid+focused group in both themes. No corrections needed.
+ *
+ * Pass 5 (2026-09-20): item 3's 20px inline inset is cut to 8px for the
+ * ColorFields that live in a ColorPicker popover (item 8 below).
+ *
+ * THE BUG. `components-colors-colorpicker--width-fields` lays its channel
+ * fields out in a `grid-cols-3` inside a `max-w-62` popover, so each
+ * `.color-input-group` is 72px wide — 70px of content. R50's 20px on each side
+ * leaves ~30px for the value, and a 16px 4-glyph channel ("220°", "360°" after
+ * End) needs ~40px, so it ran to within ~9px of the field's border while its
+ * neighbours "90%" and "50%" kept 15-19px: three fields that read as three
+ * different paddings, with the first one stuffed. Upstream is comfortable
+ * because it pairs a 14px value with 12px padding. (The input itself does not
+ * clip — the shell is `overflow-hidden` — but the intended inset is not
+ * honoured anywhere in that row.)
+ *
+ * THE SCOPE. `.color-picker__popover`, not `.color-picker`: React Aria
+ * portals the popover out of the trigger, so `.color-picker
+ * .color-input-group__input` matches nothing at all (probe-confirmed
+ * "NO MATCH"). The channel row itself carries no class of its own — it is the
+ * story's plain `<div class="grid grid-cols-3">` — so the popover is the
+ * nearest real hook, and it is the right one: a ColorField only ever appears
+ * in that popover as a channel field. Every ColorField outside a ColorPicker
+ * keeps the 20px inset; verified unchanged on colorfield--all-variations.
+ *
+ * Pass 5 cascade note: (0,3,0). It clears this file's own
+ * `.color-input-group__input` rule (0,2,0), and it TIES the base's affix rules
+ * `.color-input-group:has([data-slot="color-input-group-prefix"])
+ * .color-input-group__input` (0,3,0, base color-input-group.css:62-69), which
+ * source order settles in this file's favour — with no visible consequence,
+ * because those rules apply `ps-2` / `pe-2`, i.e. the same 8px. No colour is
+ * involved; `--tc-space-8` is mode-independent and keeps its fallback.
+ *
+ * Pass 5 verified by injection in tzuchi and tzuchi-dark on
+ * colorpicker--width-fields (opened with Tab+Enter): all three channel values
+ * now start at the same 8px inset with 22px or more to the trailing border.
+ * colorpicker--default and --with-sliders hold no ColorField, and
+ * colorfield--all-variations still probes 20px, so the blast radius is exactly
+ * the channel row.
+ *
+ * Pass 5 reviewed (2026-09-20): diffed against the live theme file — only
+ * item 8's rule and its header entries were added; every other declaration is
+ * untouched. Confirmed `.color-picker__popover` exists in the base file
+ * (styles/components/color-picker.css:51) and that the popover is portalled
+ * out of `.color-picker`, so this selector cannot be reached by, or reach
+ * into, a plain ColorField. Re-verified live by css: injection in both themes
+ * on colorpicker--width-fields (all three channel inputs read padding-inline
+ * 8px; the row renders with even, comparable trailing space in light and
+ * dark) and on colorfield--all-variations (unaffected: prefix/suffix-adjacent
+ * inputs still read 8px from `ps-2`/`pe-2` and the affix-less input still
+ * reads 20px). Note for the record, not a defect of this pass: the base
+ * `.color-input-group__input` (`flex-1` with no `min-w-0`, same shape as the
+ * pre-Pass-5 InputGroup bug) reports a computed width wider than its 72px
+ * channel shell; it is invisible in every theme and story checked because the
+ * shell is `overflow-hidden` and the next column's opaque shell paints over
+ * the overflow, and item 8 does not touch that. No colour, no --tc-color-*,
+ * no !important, no physical property, no premature comment close. No
+ * corrections needed to this file.
+ */
+
+[data-theme^="tzuchi"] {
+  /* ---------------------------------------------------------------- shell -- */
+  .color-input-group {
+    /* R41/R49 — a 16px/1.6 line box + 2x8px block padding + 2x1px border =
+       43.6px, the number input.css, textarea.css and search-field.css all land
+       on. `h-9` (36px) only fitted HeroUI's 14px/20px text. */
+    block-size: auto;
+    min-block-size: calc(
+      var(--tc-font-size-16, 16px) * var(--tc-line-height-relaxed, 1.6) + 2 *
+        var(--tc-space-8, 8px) + 2 * var(--field-border-width, 1px)
+    );
+
+    /* §1 — the shell's `text-sm` is a 14px role and Tzu Chi has no 14px step;
+       R2 (field value) is 400 16px/1.6. This is the context the prefix and
+       suffix inherit; the input restates it below because it carries its own
+       `text-base sm:text-sm`. */
+    font-size: var(--tc-font-size-16, 16px);
+    line-height: var(--tc-line-height-relaxed, 1.6);
+
+    /* R67 — focus paints the border, not only a ring, as `.input`
+       (input.css:29) and `.input-group` (input-group.css:36) already do. */
+    &:is(:focus-within, [data-focus-within="true"]) {
+      border-color: var(--field-border-focus);
+
+      /* Pass 4 — tc-input.styles.ts:42-44: the same rule that paints the
+         border also lays a 3px halo in color.brand.surface-hover.
+         --accent-soft-hover is that tint in both modes (blue-200 / blue-700).
+         MECHANISM: `status-focused-field` is Tailwind's `ring-2 ring-focus`,
+         which sets --tw-ring-shadow; the base composes `box-shadow` from
+         var(--tw-inset-shadow), var(--tw-inset-ring-shadow),
+         var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow),
+         so overriding that one layer swaps the ring for the halo and leaves
+         `shadow-field` and the inset layers alone. --tw-ring-offset-width is
+         already 0 in `focus-field-ring`.
+         SPECIFICITY: (0,3,0) via `:is()`, against the base focus rule's
+         (0,2,0) — the same margin the border declaration above relies on. */
+      --tw-ring-shadow: 0 0 0 3px var(--accent-soft-hover);
+    }
+
+    /* R68 — the edge itself turns the error colour and stays there through
+       hover AND focus (tc-input). Declared after the focus rule: equal
+       specificity, later wins. */
+    &[data-invalid="true"] {
+      border-color: var(--danger);
+
+      /* Pass 4 — tc-input.styles.ts:71-73: a focused invalid field swaps the
+         pale halo for a solid danger one. (0,4,0) via `:is()`, so it clears
+         both the base's invalid-focus ring (0,3,0) and this file's own
+         (0,3,0) halo rule outright. */
+      &:is(:focus-within, [data-focus-within="true"]) {
+        --tw-ring-shadow: 0 0 0 3px var(--danger);
+      }
+
+      /* R69 — the hover-vs-invalid trap: mirror both forms of the base hover
+         selector with [data-invalid] appended so the result cannot depend on
+         import order. */
+      @media (hover: hover) {
+        &:hover:not(:focus-within),
+        &[data-hovered="true"]:not([data-focus-within="true"]) {
+          border-color: var(--danger);
+        }
+      }
+    }
+  }
+
+  /* ----------------------------------------------------------------- text -- */
+  .color-input-group__input {
+    /* R50 — tc `.control`: padding 8px 20px; only the inline inset moves.
+       Beside a prefix/suffix the base `ps-2` / `pe-2` rules (0,3,0) keep the
+       8px gap to the hex value, which is tc's "pad 20px, gap 8px" model. */
+    padding-inline: var(--tc-space-20, 20px);
+
+    /* R2 / R21 (colour-field hex = a value typed into a field) — one body size
+       at every width, where HeroUI's `sm:text-sm` shrinks to 14px/20px above
+       40rem. Stated explicitly rather than inherited so the field value type
+       cannot drift if the shell's context changes. */
+    font-size: var(--tc-font-size-16, 16px);
+    line-height: var(--tc-line-height-relaxed, 1.6);
+  }
+
+  /* Pass 5 — the ColorPicker channel row. Those ColorFields are 72px wide
+     (a `grid-cols-3` inside a `max-w-62` popover), so 2x20px leaves ~30px for
+     a value that needs ~40px and "220°" ended up ~9px from the border while
+     "90%" and "50%" kept 15-19px. 8px is tc `.control`'s gap, the inset the
+     base already uses beside an affix, and it gives every channel value the
+     same start and 22px or more of trailing room.
+     SCOPE: the popover, because React Aria portals it out of `.color-picker`
+     (`.color-picker .color-input-group__input` matches nothing) and the row
+     itself carries no class. ColorField outside a ColorPicker is untouched.
+     (0,3,0): clears the 20px rule above (0,2,0) and ties the base's `ps-2` /
+     `pe-2` affix rules (0,3,0) at the same 8px value, so the tie is invisible. */
+  .color-picker__popover .color-input-group__input {
+    padding-inline: var(--tc-space-8, 8px);
+  }
+
+  /* -------------------------------------------------------------- affixes -- */
+  .color-input-group__prefix {
+    /* R53 — 20px from the shell edge; the base `ps-2` rule keeps the 8px gap
+       to the value. HeroUI's `ms-3` is 12px. */
+    margin-inline-start: var(--tc-space-20, 20px);
+  }
+
+  .color-input-group__suffix {
+    /* Mirror of the prefix inset so the text box is symmetrical (base `me-3`
+       is 12px, base `pe-2` keeps the 8px gap). */
+    margin-inline-end: var(--tc-space-20, 20px);
+  }
+}

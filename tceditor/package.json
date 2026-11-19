@@ -1,0 +1,41 @@
+{
+  "private": true,
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev --filter=demo",
+    "dev:showcase": "pnpm --filter @tzuchi/tceditor-showcase dev",
+    "storybook": "pnpm --filter @tzuchi/tceditor-storybook dev",
+    "storybook:build": "pnpm --filter @tzuchi/tceditor-storybook build",
+    "storybook:smoke": "node scripts/storybook-smoke.mjs",
+    "lint": "turbo run lint",
+    "format:check": "prettier --check \"**/*.{ts,tsx,mjs,md,mdx,css}\"",
+    "format": "prettier --write \"**/*.{ts,tsx,mjs,md,mdx,css}\"",
+    "smoke": "node scripts/e2e/smoke.mjs && node scripts/e2e/showcase-smoke.mjs",
+    "gen:blocks": "tsx packages/blocks/scripts/gen-blocks.ts",
+    "sync:uikit": "node scripts/uikit/sync-uikit.mjs",
+    "test": "turbo run test && node --test scripts/audit-gate-lib.test.mjs packages/core/scripts/check-bundle-imports.test.mjs scripts/uikit/uikit.test.mjs scripts/single-react.test.mjs scripts/check-edge.test.mjs scripts/storybook-smoke.test.mjs scripts/check-public-bundle.test.mjs scripts/eslint-rules.test.mjs scripts/e2e/smoke-framework.test.mjs",
+    "typecheck": "turbo run typecheck",
+    "audit:gate": "node scripts/audit-gate.mjs",
+    "check:bundle": "node packages/core/scripts/check-bundle-imports.mjs",
+    "check:edge": "node scripts/check-edge.mjs",
+    "check:public-bundle": "node scripts/check-public-bundle.mjs",
+    "verify": "pnpm test && pnpm typecheck && pnpm lint && pnpm format:check && pnpm build && pnpm check:bundle && pnpm check:edge && pnpm check:public-bundle && pnpm storybook:smoke && pnpm audit:gate"
+  },
+  "devDependencies": {
+    "asciichart": "^1.5.25",
+    "esbuild": "0.27.7",
+    "eslint": "^9.0.0",
+    "eslint-config-custom": "workspace:*",
+    "prettier": "^2.5.1",
+    "puppeteer": "^24.8.2",
+    "style-dictionary": "4.4.0",
+    "tsx": "4.23.15",
+    "turbo": "^2.5.8"
+  },
+  "name": "tceditor-repo",
+  "packageManager": "pnpm@10.26.1",
+  "version": "0.1.0",
+  "engines": {
+    "node": ">=24.0.0"
+  }
+}

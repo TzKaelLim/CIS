@@ -1,0 +1,47 @@
+# apps/docs stays in the repo as reference material only; it is not part of
+# the workspace, the install or the build.
+packages:
+  - "apps/demo"
+  - "apps/showcase"
+  - "apps/storybook"
+  - "packages/*"
+
+shamefullyHoist: true
+autoInstallPeers: true
+
+# Supply-chain mitigation: pnpm 10 only runs dependency lifecycle scripts for
+# packages listed in onlyBuiltDependencies. Keep this list minimal.
+onlyBuiltDependencies:
+  # Installs and verifies esbuild's platform binary, which tsup (the core and
+  # plugin builds), tsx (gen:blocks), Vite (the Storybook build) and the
+  # scripts that call esbuild directly (the edge validator build, the uikit
+  # options scan) need
+  - esbuild
+  # Downloads the Chrome that pnpm storybook:smoke (part of pnpm verify) and
+  # the e2e smoke tests (pnpm smoke) drive
+  - puppeteer
+
+# Install scripts we deliberately skip, each with the reason it is safe.
+# Listing them here silences pnpm's "Ignored build scripts" warning.
+ignoredBuiltDependencies:
+  # The three below only build from source (or, for unrs-resolver, download)
+  # a binary when the prebuilt optional binary is missing.
+  - "@parcel/watcher" # via sass (next, typescript-plugin-css-modules)
+  - sharp # via next; the demo does not use next/image
+  - unrs-resolver # via eslint-config-next's import resolver
+  # The two below only run patch-package (their own development patches); the
+  # tokens build of pnpm sync:uikit works without it.
+  - "@bundled-es-modules/glob" # via style-dictionary
+  - style-dictionary # root devDependency that builds the tokens in pnpm sync:uikit
+
+# pnpm ignores package.json `resolutions`; v0.23.0's yarn resolutions that still
+# apply to the dependency graph are carried over here.
+overrides:
+  # GHSA-48c2-rrv3-qjmp. Also keeps postcss-load-config on yaml@2.9.0, the
+  # version yarn resolved for v0.23.0.
+  yaml: ">=2.8.3"
+  # One zod 4 for the whole graph: packages/spec pins 4.6.5, and copies of zod
+  # share their configuration through globalThis (patch releases have also
+  # removed APIs before). The range matters: a bare "zod" override would move
+  # puppeteer's chromium-bidi from zod 3 to zod 4 and break its error handling.
+  "zod@^4": "4.6.5"

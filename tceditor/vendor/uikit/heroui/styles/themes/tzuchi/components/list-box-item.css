@@ -1,0 +1,227 @@
+/* ==========================================================================
+   ListBox item — Tzu Chi option geometry (shared)
+   --------------------------------------------------------------------------
+   Scoped to [data-theme^="tzuchi"]; loaded into the "components" layer AFTER
+   heroui/styles/components/list-box-item.css. Upstream's light/dark are
+   untouched.
+
+   MODEL: tc `.option` — packages/components/src/dropdown/tc-dropdown.styles.ts
+   :82-93 — `padding: 8px 32px`, square full-bleed rows,
+   `font: var(--tc-typography-subtitle)` = 700 16px/1.5.
+
+   WHY HERE AND NOT IN select.css
+   `.list-box-item` is shared by Select, ComboBox, Autocomplete and the
+   standalone ListBox. Putting the row GEOMETRY here is what makes an option
+   look the same wherever it is rendered, which is the same reason pass 1 gave
+   HeroUI's menu rows the tc `.option` shape in dropdown.css. It is also what
+   keeps a Select and a Dropdown looking alike.
+
+   COLOUR IS DELIBERATELY ABSENT. tc's option colours (brand-surface panel,
+   brand-primary text, brand-surface-hover fill) only make sense on tc's tinted
+   listbox panel, which in HeroUI is the Select popover — so those live in
+   select.css, scoped to `.select__popover`. A standalone ListBox keeps HeroUI's
+   surface and its neutral `--default` hover, which the Tzu Chi theme already
+   maps to a Tzu Chi grey (gray-100 light / gray-900 dark). Nothing here is
+   mode-dependent, so nothing here can go wrong under "tzuchi-dark".
+   [SUPERSEDED by Pass 5 — see the pass-5 note below: the row's own STATE fills
+   are now set here, because a bare row and a row on the panel must answer the
+   same gesture in the same colour.]
+
+   NOT CHANGED: min-h-9 (never binds once the row is 40px, but it keeps the
+   floor for label-less rows), gap-3, the absolute 16px `.list-box-item__indicator`
+   at `end-2` (the 32px text inset clears its 8+16 = 24px box), the pressed
+   scale(0.98), the disabled treatment (--disabled-opacity is already 0.38),
+   the focus ring, and the danger variant's colours — tc has no equivalent for
+   any of them.
+
+   Reviewed: no changes. `.list-box-item` and its `[data-slot="label"]` /
+   `[data-slot="description"]` children are confirmed against list-box-item.tsx,
+   label.css and description.css. The one rule is scoped under
+   [data-theme^="tzuchi"]. Every token used (--tc-space-8/-32,
+   --tc-font-size-16, --tc-line-height-normal, --tc-font-weight-bold/-regular)
+   is a mode-independent dimension/weight token per packages/tokens/dist/
+   tokens.css — no colour, so nothing here can differ between "tzuchi" and
+   "tzuchi-dark". Specificity ([data-theme^] + .list-box-item = 0,2,0) beats
+   the base `.list-box-item` rule (0,1,0) outright, and select.css's own
+   0,3,0 popover-scoped padding rule makes the popover's 32px inset correct
+   regardless of this file's import order relative to select.css. No variant/
+   size/state is hidden — danger colours, the indicator, the pressed scale
+   and the focus ring are all left as HeroUI ships them. No corrections
+   required.
+   Pass 4 (2026-09-20): the focus ring, listed above as "left as HeroUI ships
+   it", is now drawn INSIDE the row. It had to move: this file made the row
+   edge to edge (radius 0, full width) and HeroUI paints the ring and its
+   offset OUTSIDE the padding box, so every scrolling or clipping host — the
+   Select / ComboBox / Autocomplete popovers AND the standalone
+   `.list-box` — cut its left and right segments off. Direction only: the
+   colour is still --focus and the width still 2px, and this file still sets
+   no colour of its own.
+   Pass 5 (2026-09-20): three changes, all from the option-lists QA pass.
+     1. THE 32px INLINE INSET WAS NEVER A GLOBAL VALUE. It is tc-dropdown's
+        POPOVER number, and this file applied it to every row everywhere. A
+        bare ListBox is width-constrained by its consumer (the stories use
+        220px and 256px), so 64px of inset took the text column below what a
+        16px description needs: `martha@heroui.com` was clipped mid-glyph in
+        components-collections-listbox--default and every row of
+        --with-sections wrapped to two or three lines. Global rows now take
+        the FIELD inset, 20px (--tc-space-20), the same number the themed
+        Input, SearchField and ComboBox shell already use; the 32px stays
+        only inside the Select / Autocomplete / Dropdown popovers, which
+        re-assert it at (0,3,0) in their own files.
+        The `padding-inline` shorthand still overwrites HeroUI's `pe-7`
+        indicator reserve, exactly as the 32px value did. MEASURED, not
+        assumed: `.list-box-item__indicator` is `absolute end-2 size-4`, so
+        its box spans 8…24px from the row's end and the 10px checkmark inside
+        it spans 11…21px — i.e. the glyph crosses the 20px text column by at
+        most 1px, and only if a label filled its column to the last pixel.
+        Reserving HeroUI's 28px instead would have cost exactly the 8px that
+        lets `bob@heroui.com` sit on ONE line in the 220px `--default` story,
+        which is the defect this item exists to fix, so the 1px is accepted
+        and recorded rather than paid for.
+     2. A row's `[data-slot="description"]` takes `overflow-wrap: anywhere`,
+        so an unbreakable string (an e-mail address) wraps instead of being
+        sliced by the list box's `overflow-clip`.
+     3. STATE FILLS, the paragraph marked SUPERSEDED above. The theme makes a
+        `.list-box-item` and a `.menu-item` the same row, then answered the
+        same gesture in two different colours: inside a Dropdown / Select
+        popover a hovered or selected row took the brand tint, while a bare
+        row took HeroUI's neutral `bg-default` and a bare SELECTED row took
+        no fill at all (only the 10px tick). Global rows now hover in
+        --accent-soft and paint pressed / selected in --accent-soft-hover.
+        Both are HeroUI theme variables, so the rule is still mode-safe; the
+        popover-scoped rules (0,4,0) are untouched and still win inside a
+        panel.
+   Pass 5 reviewed (2026-09-20): diffed against the live theme file — only the
+   three briefed changes differ; nothing else lost, reordered or reformatted.
+   Every rule scoped under [data-theme^="tzuchi"]; no colour literal, no
+   --tc-color-*, no !important, no physical box property; comment-marker count
+   balanced. Cascade re-derived: the new hover/pressed/selected rules are
+   (0,3,0), beating the base's (0,2,0) and losing cleanly to each of the four
+   popovers' own (0,4,0) fills, confirmed live on a bare ListBox (hover
+   --accent-soft, selected+focused --accent-soft-hover, both distinct from a
+   Dropdown/Select row's unaffected tint). Injection-verified in both themes:
+   `components-collections-listbox--default` (20px inset, `bob@`/`fred@` one
+   line, `martha@heroui.com` wraps, not clipped), `--multi-select` dark
+   (selected vs. hovered fills distinct), `--with-disabled-items` (disabled row
+   stays transparent — pointer-events:none keeps :hover from ever matching it,
+   same as upstream). No variant, size or state broken. No corrections needed.
+   ========================================================================== */
+
+[data-theme^="tzuchi"] .list-box-item {
+  /* tc-dropdown.styles.ts:82-93 — full-bleed square rows on the panel, where
+     HeroUI draws inset 16px-rounded pills (`rounded-2xl px-2 py-1.5`).
+     PASS 5: the inline inset is the 20px FIELD inset, not tc-dropdown's 32px
+     popover inset — see pass-5 note 1 in the header. The popovers re-assert
+     32px at (0,3,0); this value is what a bare ListBox, and any other host
+     that composes a row, gets. */
+  border-radius: 0;
+  padding-block: var(--tc-space-8, 8px);
+  padding-inline: var(--tc-space-20, 20px);
+
+  /* tc-dropdown.styles.ts:88 — `font: var(--tc-typography-subtitle)`
+     = 700 16px/1.5, against HeroUI's inherited `text-sm` (14px/20px) and
+     `.label`'s `font-medium`. Longhands only, so the theme's --font-sans stack
+     is not re-declared. Content 24px + 16px padding = 40px per row. */
+  font-size: var(--tc-font-size-16, 16px);
+  line-height: var(--tc-line-height-normal, 1.5);
+  font-weight: var(--tc-font-weight-bold, 700);
+
+  /* `.label` re-asserts `text-sm`/`font-medium` on its own (label.css:4). */
+  & [data-slot="label"] {
+    font-size: inherit;
+    line-height: inherit;
+    font-weight: var(--tc-font-weight-bold, 700);
+  }
+
+  /* `.description` sets no weight of its own, so it would inherit the 700
+     above. tc has no description; keep it at HeroUI's normal weight.
+     PASS 5 — the host clips (`.list-box` is `overflow-clip`), and HeroUI's
+     `text-wrap` only breaks at soft wrap opportunities, so a bare e-mail
+     address had none and was sliced through a glyph. `anywhere` lets the
+     last resort break happen inside the word AND lowers the row's min-content
+     contribution, which is what keeps a narrow list box from overflowing. */
+  & [data-slot="description"] {
+    font-weight: var(--tc-font-weight-regular, 400);
+    overflow-wrap: anywhere;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   State fills — PASS 5
+   -------------------------------------------------------------------------- */
+
+/* tc-dropdown.styles.ts:96-98 `.option:hover` and :102-104
+   `.option[aria-selected="true"]`. HeroUI paints the neutral --default on
+   hover and NOTHING on selection (list-box-item.css:53-64), which is why a
+   bare row and the identical row inside a Dropdown answered the same gesture
+   in two different colours. The two fills are split so the states stay
+   distinguishable on a bare row, where there is no keyboard-cursor fill to
+   compete with: hover is the lighter --accent-soft, pressed and selected the
+   stronger --accent-soft-hover.
+   The `@media (hover: hover)` wrapper mirrors the base rule exactly, so touch
+   devices keep HeroUI's behaviour, and both React Aria's `[data-hovered]` hook
+   and the native `:hover` branch are covered, as upstream does.
+   CASCADE: (0,3,0) against the base's `.list-box-item:hover` (0,2,0). The four
+   popover files scope their own fills at (0,4,0), so a row on a tinted panel
+   is unaffected by this rule. */
+@media (hover: hover) {
+  [data-theme^="tzuchi"] .list-box-item:hover,
+  [data-theme^="tzuchi"] .list-box-item[data-hovered="true"] {
+    background-color: var(--accent-soft);
+  }
+}
+
+/* Declared AFTER the hover block on purpose: same specificity, so a row that
+   is both selected and hovered keeps the stronger selected fill. The pressed
+   branch mirrors the base's own `:active, [data-pressed="true"]` rule, which
+   only scales the row, so the scale is untouched and only a fill is added. */
+[data-theme^="tzuchi"] .list-box-item:active,
+[data-theme^="tzuchi"] .list-box-item[data-pressed="true"],
+[data-theme^="tzuchi"] .list-box-item[aria-selected="true"],
+[data-theme^="tzuchi"] .list-box-item[data-selected="true"] {
+  background-color: var(--accent-soft-hover);
+}
+
+/* --------------------------------------------------------------------------
+   Focus ring — PASS 4
+   -------------------------------------------------------------------------- */
+
+/* CLIPPED RING. The rule above makes an option edge to edge (radius 0, full
+   width); `focus-ring` (utilities/index.css:2-6, applied by
+   list-box-item.css:37-40) paints BOTH its 2px ring and its 2px offset OUTSIDE
+   the padding box, so any host that clips — a popover, or the standalone
+   `.list-box`'s own scroll box — removes the ring's left and right segments
+   and the keyboard user sees two horizontal lines instead of a ring.
+   Tailwind composes the ring from three custom properties —
+     --tw-ring-offset-shadow: var(--tw-ring-inset,) 0 0 0 OFFSETW OFFSETC
+     --tw-ring-shadow:        var(--tw-ring-inset,) 0 0 0 calc(2px + OFFSETW) RINGC
+   — so giving --tw-ring-inset a value flips both layers inward, and a 0 offset
+   width leaves exactly one 2px band of --focus hugging the row edge on all four
+   sides. That is HeroUI's own answer wherever a ring may not escape its box
+   (`focus-field-ring`, utilities/index.css:8-12, "ring sits directly against
+   the element"). Colour and width are unchanged; only the direction is.
+   NO COLOUR IS INTRODUCED, which is why the fix belongs here rather than only
+   in the four tinted popovers: --tw-ring-offset-width 0 paints nothing, so the
+   row needs no knowledge of the fill behind it and the rule is as correct on an
+   untinted ListBox as on the brand panel.
+   CASCADE: the base is `.list-box-item:focus-visible:not([data-focused])`
+   (0,3,0) and `.list-box-item[data-focus-visible="true"]` (0,2,0); mirroring
+   the `:not([data-focused])` branch makes this (0,4,0) / (0,3,0), so it wins
+   outright instead of depending on import order. */
+[data-theme^="tzuchi"] .list-box-item:focus-visible:not([data-focused]),
+[data-theme^="tzuchi"] .list-box-item[data-focus-visible="true"] {
+  --tw-ring-inset: inset;
+  --tw-ring-offset-width: 0px;
+}
+
+/* Pass 4 reviewed (2026-09-20): verified against the live file — only the new
+   focus-ring block was added; nothing above it moved, reordered or
+   reformatted. Selector mirrors the base's :not([data-focused]) branch, so
+   specificity is (0,4,0)/(0,3,0) against the base's (0,3,0)/(0,2,0) — wins
+   outright. No colour introduced, confirmed by grep. Comment safety scanned
+   (marker counts match). Re-verified live: standalone ListBox
+   (components-collections-listbox--default, key:Tab) — the "Bob" row shows
+   one full inset ring where the un-fixed row showed two clipped lines;
+   confirmed again on with-sections (untinted header stays --muted at
+   16px/500) and inside every popover that composes this class. No
+   variant/size/state broken. No corrections needed. */

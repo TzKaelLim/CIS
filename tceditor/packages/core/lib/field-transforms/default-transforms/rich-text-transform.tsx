@@ -1,0 +1,159 @@
+"use client";
+
+import type { Editor as TipTapEditor } from "@tiptap/react";
+import {
+  useEffect,
+  useRef,
+  useCallback,
+  memo,
+  MouseEvent,
+  lazy,
+  Suspense,
+} from "react";
+import { resolveAndReplaceData } from "../../data/resolve-and-replace-data";
+
+import { EditorFallback } from "../../../components/RichTextEditor/components/EditorFallback";
+import { RichTextContent } from "../../../components/RichTextEditor/components/RichTextContent";
+import { FieldTransforms } from "../../../types/API/FieldTransforms";
+import { useAppStoreApi } from "../../../store";
+
+import { RichtextField, UiState } from "../../../types";
+import type { RichTextDoc } from "../../richtext/types";
+
+import { setDeep } from "../../data/set-deep";
+import { registerOverlayPortal } from "../../overlay-portal";
+
+import { getSelectorForId } from "../../get-selector-for-id";
+
+const Editor = lazy(() =>
+  import("../../../components/RichTextEditor/components/Editor").then((m) => ({
+    default: m.Editor,
+  }))
+);
+
+const InlineEditorWrapper = memo(
+  ({
+    value,
+    componentId,
+    propPath,
+    field,
+    id,
+  }: {
+    value: RichTextDoc | string;
+    componentId: string;
+    propPath: string;
+    field: RichtextField;
+    id: string;
+  }) => {
+    const portalRef = useRef<HTMLDivElement>(null);
+    const appStoreApi = useAppStoreApi();
+
+    const onClickHandler = (e: MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+    };
+
+    const onClickCaptureHandler = (e: MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const itemSelector = getSelectorForId(
+        appStoreApi.getState().state,
+        componentId
+      );
+
+      appStoreApi.getState().setUi({ itemSelector });
+    };
+
+    // Register portal once
+    useEffect(() => {
+      if (!portalRef.current) return;
+      const cleanup = registerOverlayPortal(portalRef.current, {
+        disableDragOnFocus: true,
+      });
+      return () => cleanup?.();
+    }, [portalRef.current]);
+
+    const handleChange = useCallback(
+      async (content: RichTextDoc, ui?: Partial<UiState>) => {
+        const appStore = appStoreApi.getState();
+        const node = appStore.state.indexes.nodes[componentId];
+
+        const newProps = setDeep(node.data.props, propPath, content);
+
+        await resolveAndReplaceData(
+          { ...node.data, props: newProps },
+          appStoreApi.getState,
+          "replace",
+          true,
+          ui
+        );
+      },
+      [appStoreApi, componentId, propPath]
+    );
+
+    const handleFocus = useCallback(
+      (editor: TipTapEditor) => {
+        appStoreApi.setState({
+          currentRichText: {
+            inlineComponentId: componentId,
+            inline: true,
+            field,
+            editor,
+            id,
+          },
+        });
+      },
+      [field, componentId]
+    );
+
+    if (!field.contentEditable) return <RichTextContent content={value} />;
+
+    const editorProps = {
+      content: value,
+      onChange: handleChange,
+      field: field,
+      inline: true,
+      onFocus: handleFocus,
+      id: id,
+      name: propPath,
+    };
+
+    return (
+      <div
+        ref={portalRef}
+        onClick={onClickHandler}
+        onClickCapture={onClickCaptureHandler}
+      >
+        <Suspense fallback={<EditorFallback {...editorProps} />}>
+          <Editor {...editorProps} />
+        </Suspense>
+      </div>
+    );
+  }
+);
+
+InlineEditorWrapper.displayName = "InlineEditorWrapper";
+
+export const getRichTextTransform = (): FieldTransforms => ({
+  richtext: ({ value, componentId, field, propPath, isReadOnly }) => {
+    // Unset means false, as in the field docs and InlineEditorWrapper: only
+    // `contentEditable: true` puts an inline editor on the canvas
+    if (!field.contentEditable || isReadOnly) {
+      return <RichTextContent content={value} />;
+    }
+
+    const id = `${componentId}_${field.type}_${propPath}`;
+
+    return (
+      <InlineEditorWrapper
+        key={id}
+        value={value}
+        componentId={componentId}
+        propPath={propPath}
+        field={field}
+        id={id}
+      />
+    );
+  },
+});

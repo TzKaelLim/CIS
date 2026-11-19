@@ -1,0 +1,14 @@
+{
+  "checkbox": {
+    "size": { "$type": "dimension", "$value": "{size.icon.md}" },
+    "radius": { "$type": "dimension", "$value": "{radius.sm}" },
+    "border": { "$type": "color", "$value": "{color.border.strong}" },
+    "border-checked": { "$type": "color", "$value": "{color.brand.primary}" },
+    "bg": { "$type": "color", "$value": "{color.surface.default}" },
+    "bg-checked": { "$type": "color", "$value": "{color.brand.primary}" },
+    "check": { "$type": "color", "$value": "{color.text.on-brand}" },
+    "label": { "$type": "color", "$value": "{color.text.default}" },
+    "disabled-opacity": { "$type": "number", "$value": "{opacity.disabled}" },
+    "focus-ring-color": { "$type": "color", "$value": "{focus-ring.color}" }
+  }
+}

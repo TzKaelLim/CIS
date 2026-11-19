@@ -1,0 +1,17 @@
+{
+  "dropdown": {
+    "radius": { "$type": "dimension", "$value": "{radius.md}" },
+    "disabled-opacity": { "$type": "number", "$value": "{opacity.disabled}" },
+    "focus-ring-color": { "$type": "color", "$value": "{focus-ring.color}" },
+    "bg": { "$type": "color", "$value": "{color.surface.default}" },
+    "bg-open": { "$type": "color", "$value": "{color.brand.surface-hover}" },
+    "border": { "$type": "color", "$value": "{color.border.default}" },
+    "border-open": { "$type": "color", "$value": "{color.brand.primary}" },
+    "trigger-fg": { "$type": "color", "$value": "{color.text.muted}" },
+    "value-fg": { "$type": "color", "$value": "{color.brand.primary}" },
+    "listbox-bg": { "$type": "color", "$value": "{color.brand.surface}" },
+    "option-fg": { "$type": "color", "$value": "{color.brand.primary}" },
+    "option-bg-hover": { "$type": "color", "$value": "{color.brand.surface-hover}" },
+    "option-bg-selected": { "$type": "color", "$value": "{color.brand.surface-hover}" }
+  }
+}

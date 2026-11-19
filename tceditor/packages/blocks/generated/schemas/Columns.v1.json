@@ -1,0 +1,58 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "columns": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "content": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "props": {
+                  "additionalProperties": {},
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "type": "object"
+                },
+                "type": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "props",
+                "type"
+              ],
+              "type": "object"
+            },
+            "type": "array",
+            "x-slot": {
+              "allow": [
+                "Button",
+                "Card",
+                "Heading",
+                "Image",
+                "Paragraph",
+                "TagList"
+              ]
+            }
+          }
+        },
+        "type": "object"
+      },
+      "maxItems": 3,
+      "minItems": 2,
+      "type": "array"
+    },
+    "gap": {
+      "enum": [
+        "16",
+        "24",
+        "32"
+      ],
+      "type": "string"
+    }
+  },
+  "type": "object"
+}

@@ -1,0 +1,21 @@
+CHANGELOG.md
+
+# Generated build output (not source; Prettier does not read .gitignore)
+dist/
+.next/
+build/
+storybook-static/
+
+# Local agent workspace (git-ignored; Prettier 2 does not read .gitignore)
+.superpowers/
+
+# Design specs and implementation plans are working documents, not shipped docs
+docs/superpowers/
+
+# Vendored uikit snapshot: written by pnpm sync:uikit from a pinned uikit
+# commit and never edited by hand (vendor/uikit/SOURCE.json has the hashes)
+vendor/
+
+# Vendored upstream Supabase self-hosting files (see infra/supabase/README.md);
+# kept byte-identical to upstream so update.sh can merge future versions
+infra/supabase/docker/

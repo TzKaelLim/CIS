@@ -1,0 +1,45 @@
+{
+  "name": "@tzuchi/tceditor-plugin-heading-analyzer",
+  "version": "0.1.0",
+  "description": "tceditor plugin that shows the heading outline and flags missing heading levels",
+  "author": "Tzu Chi",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.ts"
+    },
+    "./dist/index.css": "./dist/index.css"
+  },
+  "license": "MIT",
+  "scripts": {
+    "lint": "eslint \"**/*.ts*\"",
+    "build": "rm -rf dist && tsup index.ts",
+    "prepare": "pnpm build"
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "NOTICE"
+  ],
+  "devDependencies": {
+    "@tzuchi/tceditor": "workspace:*",
+    "@types/minimatch": "3.0.5",
+    "@types/react": "^19.0.1",
+    "@types/react-dom": "^19.0.2",
+    "eslint": "^9.0.0",
+    "eslint-config-custom": "workspace:*",
+    "tsconfig": "workspace:*",
+    "tsup": "^8.2.4",
+    "tsup-config": "workspace:*",
+    "typescript": "^5.5.4"
+  },
+  "dependencies": {
+    "react-from-json": "^0.8.0"
+  },
+  "peerDependencies": {
+    "react": "^17.0.0 || ^18.0.0 || ^19.0.0"
+  }
+}

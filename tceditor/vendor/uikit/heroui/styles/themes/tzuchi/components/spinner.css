@@ -1,0 +1,163 @@
+/*
+ * Spinner — Tzu Chi theme overrides
+ * =============================================================================
+ * Base            : ../../../components/spinner.css
+ * Source of truth : tc-spinner
+ *   CISwebsite/packages/components/src/spinner/tc-spinner.styles.ts
+ *   CISwebsite/packages/tokens/src/component/spinner.tokens.json
+ *
+ * WHAT THIS CHANGES
+ *   1. Size scale — HeroUI's Tailwind steps (16 / 24 / 32 / 40px) become Tzu
+ *      Chi's shared icon scale (20 / 32 / 40px). The default `md` therefore
+ *      grows 24px → 32px, which is the real density difference between the two.
+ *   2. Track ring — tc-spinner draws a full neutral ring *under* the moving arc
+ *      (`.track`, stroke = color.border.default); HeroUI has none. It is painted
+ *      here as a radial-gradient band on the (square) root span, aligned to the
+ *      exact radii of HeroUI's own SVG arc so the two read as one ring. The
+ *      band is radially symmetric, so the span's rotation leaves it untouched.
+ *   3. Spin duration — HeroUI's shared 0.75s → tc's own 0.8s token.
+ *
+ * VARIANT MAPPING — tc-spinner has no colour variants; its one look is the
+ * default, and HeroUI's default colour variant already is that look:
+ *   tc indicator  (--tc-spinner-color = color.brand.primary)
+ *       ↔ .spinner--accent = var(--accent)        — ALREADY IDENTICAL, not touched.
+ *         (spinnerVariants defaultVariants.color === "accent", and the Tzu Chi
+ *          theme maps --accent onto brand.primary in both modes.)
+ *   tc track      (--tc-spinner-track-color = color.border.default)
+ *       ↔ var(--border)                           — same primitive in both modes.
+ *   .spinner--current / --danger / --success / --warning have no tc counterpart;
+ *         they are kept untouched, except that `current` gets its track derived
+ *         from the inherited colour (it rides on filled surfaces — Button
+ *         pending, Toast — where the neutral --border would be the wrong value).
+ *   Sizes: tc has sm/md/lg only. HeroUI's extra `xl` is kept and pushed one 8px
+ *         space step past lg (→ 48px) so all four steps stay distinct.
+ *
+ * NOT TRANSFERABLE — stroke thickness (12.5% of the box here vs tc's 8%), the
+ * 90/150 dash gap, round line caps and the reduced-motion dash swap all live
+ * inside tc's stroked <circle>s. HeroUI's mark is two gradient-*filled* <path>s,
+ * so none of it is reachable from CSS without replacing the SVG.
+ *
+ * Reviewed: no changes. Verified against the live base file
+ *   (heroui/styles/components/spinner.css), spinner.tsx/spinner.styles.ts,
+ *   spinner.stories.tsx, toast.css, themes/tzuchi/variables.css,
+ *   themes/shared/theme.css and packages/tokens/dist/tokens.css: every
+ *   selector exists, every rule is scoped under [data-theme^="tzuchi"], no
+ *   forbidden colour token or literal is used (--border/--accent are HeroUI
+ *   theme variables that already resolve per mode; --tc-spinner-size-*,
+ *   --tc-spinner-duration and --tc-space-8 are mode-independent dimension/
+ *   duration tokens with fallbacks), the toast-indicator guard is genuinely
+ *   required (same-specificity same-layer collision with toast.css:198-200
+ *   that the tzuchi import order would otherwise let this file win), and no
+ *   HeroUI size/colour variant is broken or hidden. All 5 assertions verified
+ *   against real story ids in index.json and the resolved values above.
+ *
+ * PASS 5 (2026-09-20) — the tinted-surface guard now covers the Alert too.
+ * The `.spinner--current` rule below already derives the track from the
+ * inherited colour "because it rides on filled surfaces (Button pending,
+ * Toast)". The theme's Alert is exactly such a surface — alert.css:108-126
+ * repainted it with the *-soft washes — but an Alert's custom indicator is an
+ * ordinary `<Spinner size="sm">`, i.e. colour variant `accent`, not `current`,
+ * so it kept the neutral --border track: a grey donut on pale blue in light and
+ * on navy in dark, where the moving arc was barely lighter than the ring
+ * (reproduced on `components-feedback-alert--default`, the "Processing your
+ * request" card, in both themes). The new rule gives any spinner inside an
+ * `.alert__indicator` the same currentColor-derived track the toast case
+ * already gets, so the ring tints with the status instead of staying neutral.
+ * currentColor is the right channel: base alert.css:31-66 colours
+ * `.alert__indicator` per status and alert.css (theme):131-136 overrides the
+ * four toned ones to the raw tone, while the spinner's own
+ * `.spinner--accent { color: var(--accent) }` supplies the colour on the
+ * element itself — either way it is the card's own tone, never a neutral.
+ * Cascade: (0,3,0) against this file's `.spinner` (0,2,0) and the base's
+ * `.spinner--accent` (0,1,0), so it wins on specificity; the radial-gradient
+ * that paints the band stays on `.spinner` and simply reads the winning value
+ * of --spinner-track. Nothing else about the Alert spinner changes — the 20px
+ * `sm` size, the arc colour and the spin rate are untouched, and the
+ * `.toast__indicator` size guard below is a different selector on a different
+ * property and is unaffected.
+ * =============================================================================
+ *
+ * Pass 5 reviewed (2026-09-20): diffed against the live
+ * styles/themes/tzuchi/components/spinner.css — only the new
+ * `.alert__indicator .spinner` guard and this header differ; every other
+ * rule (sizes, `--current`, the toast guard) is untouched. Confirmed the
+ * Alert story's loading indicator really is an unnamed-colour `<Spinner
+ * size="sm">` (default variant `accent`, not `current`), so it needed its
+ * own rule rather than relying on `.spinner--current`; confirmed the
+ * specificity math ((0,3,0) beats this file's own `.spinner` at (0,2,0) and
+ * the base's `.spinner--accent` at (0,1,0)). Verified live with the browser
+ * tool on the "Processing your request" alert in both themes: the ring is
+ * now a currentColor-tinted band instead of a neutral grey donut on the
+ * tinted card, while a plain Spinner outside an alert keeps its neutral
+ * `--border` track. Scoping, colour-token and comment-safety scans clean.
+ * No changes made — the fix matches the brief exactly.
+ */
+
+/* Default size = tc `md`. `.spinner--md` carries no declarations of its own in
+   the base file, so the default has to land on the root class. */
+[data-theme^="tzuchi"] .spinner {
+  /* tc-spinner.styles.ts:35 — .track stroke is color.border.default; the Tzu Chi
+     theme maps --border onto that same primitive per mode. */
+  --spinner-track: var(--border);
+
+  inline-size: var(--tc-spinner-size-md, 32px);
+  block-size: var(--tc-spinner-size-md, 32px);
+
+  /* tc-spinner.styles.ts:16 — 0.8s linear. Longhand only, so HeroUI's `spin`
+     keyframes and its motion-reduce:animate-none both survive (with
+     animation-name:none the duration is moot). */
+  animation-duration: var(--tc-spinner-duration, 0.8s);
+
+  /* The track. Stops are fractions of the gradient radius (= half the square),
+     picked to match HeroUI's own arc: its 24-unit viewBox runs the band from
+     r=7.5 to r=10.5 about (12, 12) — 62.5% → 87.5% of the 12-unit half box.
+     1% of feather on each edge stops the circle aliasing. */
+  background: radial-gradient(
+    circle closest-side,
+    transparent 62%,
+    var(--spinner-track) 63% 87%,
+    transparent 88%
+  );
+}
+
+[data-theme^="tzuchi"] .spinner--sm {
+  inline-size: var(--tc-spinner-size-sm, 20px);
+  block-size: var(--tc-spinner-size-sm, 20px);
+}
+
+[data-theme^="tzuchi"] .spinner--lg {
+  inline-size: var(--tc-spinner-size-lg, 40px);
+  block-size: var(--tc-spinner-size-lg, 40px);
+}
+
+/* No tc token above icon-lg; one 8px space step past lg keeps the run even at
+   20 / 32 / 40 / 48 and preserves `xl` as a distinct step. */
+[data-theme^="tzuchi"] .spinner--xl {
+  inline-size: calc(var(--tc-spinner-size-lg, 40px) + var(--tc-space-8, 8px));
+  block-size: calc(var(--tc-spinner-size-lg, 40px) + var(--tc-space-8, 8px));
+}
+
+/* `current` inherits the surface it sits on (Button pending, Toast), where a
+   neutral --border track would be wrong. Derive it from that colour instead. */
+[data-theme^="tzuchi"] .spinner--current {
+  --spinner-track: color-mix(in oklab, currentColor 20%, transparent);
+}
+
+/* Pass 5 — same guard, for the Alert. An Alert's indicator slot sits on the
+   status-tinted alert surface, so a neutral --border ring is the wrong value
+   there for exactly the reason `.spinner--current` exists. The spinner in that
+   slot is colour variant `accent` (the component default), not `current`, so
+   it needs its own rule; (0,3,0) beats both `.spinner` (0,2,0) above and the
+   base's `.spinner--accent` (0,1,0). Size, arc colour and spin rate untouched. */
+[data-theme^="tzuchi"] .alert__indicator .spinner {
+  --spinner-track: color-mix(in oklab, currentColor 20%, transparent);
+}
+
+/* GUARD, not a restyle. components/toast.css:198-200 pins the toast indicator's
+   spinner to size-4 (1rem) to match the toast's other indicator icons, at the
+   same specificity as the rules above — and this file is imported later in the
+   same layer. Restated so the toast keeps upstream's value. */
+[data-theme^="tzuchi"] .toast__indicator .spinner {
+  inline-size: 1rem;
+  block-size: 1rem;
+}

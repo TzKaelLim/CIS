@@ -1,0 +1,27 @@
+{
+  "name": "demo",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "NEXT_TELEMETRY_DISABLED=1 next dev -H 127.0.0.1",
+    "build": "NEXT_TELEMETRY_DISABLED=1 next build",
+    "start": "NEXT_TELEMETRY_DISABLED=1 next start -H 127.0.0.1",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "classnames": "^2.3.2",
+    "lucide-react": "^0.468.0",
+    "next": "^16.2.5",
+    "rc-footer": "^0.6.8",
+    "react": "^19.2.1",
+    "react-dom": "^19.2.1"
+  },
+  "devDependencies": {
+    "@tzuchi/tceditor": "workspace:*",
+    "@types/node": "^17.0.12",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "eslint-config-custom": "workspace:*",
+    "typescript": "^5.5.4"
+  }
+}
