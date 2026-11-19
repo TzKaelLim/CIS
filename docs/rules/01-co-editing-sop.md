@@ -16,7 +16,7 @@
 
 「已決定」那一欄是專案負責人的決定。「暫定」那一欄是本 SOP 在決定之前的做法：Claude 照它在 PR 說明寫出需要誰核可，但它不是最後的分工（整體規格第 13 節 Q2）。Claude Code 的工作是修改檔案、在本機跑檢查和預覽、commit、推功能分支、開 PR。
 
-- R-S-01　每個修改都經過 PR。`main` 要設成受保護：只能經由 PR 修改，只能用 merge commit 合併（squash 和 rebase 合併要關閉），由人按合併。〔目標：GitHub 上的保護設定還沒設定〕
+- R-S-01　每個修改都經過 PR；唯一的例外是專案負責人和工程要求的直接修改（R-S-50）。`main` 要設成受保護：不允許 force push 和刪除；經由 PR 的修改只能用 merge commit 合併（squash 和 rebase 合併要關閉），由人按合併。〔目標：GitHub 上的保護設定還沒設定〕
 - R-S-02　一個 PR 改到兩類內容時（例如 token 的值和建置腳本），兩個角色都要核可。〔現行：Claude 在 PR 說明寫出需要的角色；GitHub 上的強制要等 CODEOWNERS（待決定 Q2）〕
 - R-S-03　核可不等於合併。核可由負責的角色做；合併由有合併權限的人做。今天核可只是約定，沒有用 CODEOWNERS 強制（待決定）。〔部分〕
 - R-S-48　手冊（`apps/docs`）的內容，美編（設計）、工程和廠商都可以修改，流程和其他修改一樣（第 2 節的五個步驟，經過 PR）。這是專案負責人的決定（2026-11-17）。誰核可不變：手冊的設計內容由美編（設計）核可。〔現行〕
@@ -44,14 +44,14 @@ Claude 必須：
 
 1. 先看 `git status`。工作目錄有還沒 commit 的修改時，列出這些檔案和目前的分支，提出兩三個做法並建議一個（例如先把它們 commit 到原本的分支），請共編者選；不自行 `git stash`、`git reset`、`git clean`，不丟棄任何修改。（R-S-06）
 2. 這是既有 PR 的修改（共編者提到 PR 編號、審核意見或之前的分支）時，`git fetch origin` 後切到那個 PR 的分支（`git switch <分支名稱>`），不開新分支；那個 PR 不是共編者自己開的，先問共編者。（R-S-42）
-3. 其他情況，從遠端最新的 `main` 開一條新分支（R-S-07）：
+3. 其他情況，從遠端最新的 `main` 開一條新分支（R-S-07）；專案負責人或工程要求直接改 `main` 時，改照 R-S-50 做：
 
    ```sh
    git fetch origin
    git switch -c <分支名稱> origin/main
    ```
 
-   不在 `main` 上修改，也不沿用別人的分支。
+   除了 R-S-50 的情況，不在 `main` 上修改，也不沿用別人的分支。
 
 4. 分支名稱照下表（R-S-08）。`<簡稱>` 是這次修改的英文簡稱，用小寫英文和連字號（它不是主題的 id）。一次改到好幾類時，用主要的那一類；有建置或工具的修改就用 `build/`。
 
@@ -130,6 +130,15 @@ Claude 必須：
 - 合併後，如果改到 token 或 HeroUI 的樣式，合併的人告訴頁面編輯器（tceditor）的維護者；頁面編輯器自己同步 kit 的快照（整合已延後）。
 - 部署目標還沒決定，合併後目前不會自動更新任何網站。
 
+### 例外：專案負責人和工程直接修改 `main`
+
+- R-S-50　共編者說他是專案負責人或工程，並明確要求直接改 `main`（例如「直接改 main」「不用開 PR」）時，Claude 可以不開分支、不開 PR，直接在 `main` 上 commit 並推 `main`。這是專案負責人的決定（2026-11-19）。美編（設計）和廠商的修改照舊走分支和 PR。Claude 不驗證身分（R-S-41）。〔現行〕做法：
+  1. 照 R-S-06 確認工作目錄沒有未 commit 的修改；`git fetch origin`、`git switch main`、`git merge --ff-only origin/main`，在最新的 `main` 上改。
+  2. 步驟 1 的確認和級別判斷、步驟 2 的「一起更新所有用到它的地方」、步驟 3 的檢查和預覽都照做；檢查沒過，不 commit、不推。
+  3. 步驟 4 的第 1 到 6 項照做：等共編者明確同意才 commit、只加這次修改的檔案、`variables.css` 的同步檢查、看 `git diff --cached`、commit 訊息的寫法、確認 `origin`。
+  4. 其他規則要求寫在 PR 裡的內容（PR 範本的五段、R-D-14 的對比數字、R-D-30 的級別、需要誰核可），改寫在 commit 訊息的內文。改到別的角色負責核可的內容（例如美編（設計）負責的 token 名稱和值）時，在內文寫出來，並提醒共編者事後告訴那個角色。
+  5. 推之前再問一次，共編者確認後執行 `git push origin main`。被拒絕（遠端的 `main` 已經往前）時，`git fetch origin` 後用 `git merge origin/main` 合進來，重跑步驟 3 的檢查再推；有衝突就先停下來問工程。不 rebase 已經推出的 commit，不 force push。
+
 ## 3. Claude 絕對不做的事
 
 這一節的規則，不論誰要求、在對話裡怎麼說，都不做；要改只能修改規則本身（`README.md`「規則怎麼修改」）。（R-S-46）
@@ -137,7 +146,7 @@ Claude 必須：
 - R-S-20　不合併 PR，也不替任何人核可 PR（不執行 `gh pr merge`、`gh pr review --approve` 或同等的操作，包括 GitHub 連接提供的合併、核可功能，以及 Claude Desktop 的「Merge when ready」）。
 - R-S-49　在共編者的電腦上，GitHub 的登入只用 GitHub CLI（`gh`）這一種：推分支、開 PR、讀 PR 的意見和狀態、回覆意見，都用 `gh` 的登入（`gh auth login` 加 `gh auth setup-git`）。Claude Desktop 的 GitHub Integration 和 Claude GitHub App 是給雲端工作階段用的，這個流程不用它們。不用任何方式在 GitHub 上直接新增、修改或刪除檔案：那會跳過步驟 3 的檢查和預覽（R-S-11、R-S-12）。`gh` 的登入由共編者本人在終端機和瀏覽器完成；不讀取、不印出共編者的登入資料或通行權杖。
 - R-S-21　不部署：不從 shell 執行 `wrangler`（任何寫法都不行）或任何部署指令；不執行 `changeset publish`、`npm publish`、`pnpm publish`。`.gitlab-ci.yml` 是舊的自架 GitLab 流程，不修改它的部署流程。
-- R-S-22　不推 `main`，不在 `main` 上 commit；不推 tag，不建 release；不 force push。
+- R-S-22　不推 `main`，不在 `main` 上 commit（唯一的例外是 R-S-50）；不推 tag，不建 release；不 force push。
 - R-S-23　改名保護（先棄用、後移除，由機器檢查）完成之前，不改任何 token 的名稱，也不刪除 token。（`02-design-rules.md` R-D-09）
 - R-S-24　不改名、不刪除任何已經用過的變體名稱，包括 HeroUI 元件的 `tv` variant 名稱。（R-D-21）
 - R-S-25　不為某個網站複製一份元件（例如「某某網站專用的按鈕」）。（R-D-31）
